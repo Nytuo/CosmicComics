@@ -1,0 +1,353 @@
+<html>
+  <head>
+    <link rel="stylesheet" href="css/bootstrap.css" />
+    <link rel="stylesheet" href="css/index.css" />
+    <link
+      href="https://fonts.googleapis.com/icon?family=Material+Icons"
+      rel="stylesheet"
+    />
+    <link
+      rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/4.1.1/animate.min.css"
+    />
+    <script type="text/javascript" src="js/html-magnifier.js"></script>
+    <link href="css/materialize.css" rel="stylesheet" />
+    <script type="text/javascript" src="js/menu.js"></script>
+    <title>CosmicComics Viewer</title>
+  </head>
+  <header>
+    <nav
+      class="animate__animated animate__slideInDown fixed-top"
+      style="-webkit-app-region: drag"
+    >
+      <div class="nav-wrapper">
+        <a class="brand-logo" style="-webkit-app-region: drag"
+          ><img
+            src="Images/Logo.png"
+            alt=""
+            width="auto"
+            height="80px"
+            class="navbar-brand rotate linear infinite"
+            style="-webkit-app-region: drag"
+        /></a>
+
+        <ul id="nav-mobile" class="right hide-on-med-and-down">
+          <li>
+            <a onclick="minimizeWindow()" style="-webkit-app-region: no-drag"
+              ><i class="material-icons">minimize</i></a
+            >
+          </li>
+          <li>
+            <a
+              onclick="maximizeWindow()"
+              style="-webkit-app-region: no-drag"
+              id="maximize"
+              ><i class="material-icons">fullscreen</i></a
+            >
+          </li>
+          <li>
+            <a
+              onclick="closeWindow()"
+              class="closebtn"
+              style="-webkit-app-region: no-drag"
+              ><i class="material-icons">close</i></a
+            >
+          </li>
+        </ul>
+        <div style="padding-left: 65px">
+          <button
+            class="btn"
+            style="margin: 5px; height: 40px; -webkit-app-region: no-drag"
+            onclick="window.location.href = ('index.html')"
+            id="goback_id"
+          >
+            <i class="material-icons" style="line-height: 1; height: 40px"
+              >arrow_back</i
+            >
+          </button>
+          <!--TODO LANG-->
+          <button
+            class="btn"
+            style="margin: 5px; height: 40px; -webkit-app-region: no-drag"
+            onclick="Start();"
+            id="id_gostart"
+          >
+            <i class="material-icons" style="line-height: 1; height: 40px"
+              >first_page</i
+            >
+          </button>
+          <button
+            class="btn"
+            style="margin: 5px; height: 40px; -webkit-app-region: no-drag"
+            onclick="PreviousPage();"
+            id="id_goprevious"
+          >
+            <i class="material-icons" style="line-height: 1; height: 40px"
+              >navigate_before</i
+            >
+          </button>
+          <button
+            class="btn"
+            id="nextpage"
+            style="margin: 5px; height: 40px; -webkit-app-region: no-drag"
+            onclick="NextPage();"
+          >
+            <i class="material-icons" style="line-height: 1; height: 40px"
+              >navigate_next</i
+            >
+          </button>
+          <button
+            class="btn"
+            style="margin: 5px; height: 40px; -webkit-app-region: no-drag"
+            onclick="End();"
+            id="id_goend"
+          >
+            <i class="material-icons" style="line-height: 1; height: 40px"
+              >last_page</i
+            >
+          </button>
+          <button
+            class="btn"
+            style="margin: 5px; height: 40px; -webkit-app-region: no-drag"
+            onclick="markasread();"
+            id="id_mkread"
+          >
+            <i class="material-icons" style="line-height: 1; height: 40px"
+              >done</i
+            >
+          </button>
+          <button
+            class="btn"
+            style="margin: 5px; height: 40px; -webkit-app-region: no-drag"
+            onclick="markasreading()"
+            id="id_mkreading"
+          >
+            <i class="material-icons" style="line-height: 1; height: 40px"
+              >auto_stories</i
+            >
+          </button>
+          <button
+            class="btn"
+            style="margin: 5px; height: 40px; -webkit-app-region: no-drag"
+            onclick="markasunread();"
+            id="id_mkunread"
+          >
+            <i class="material-icons" style="line-height: 1; height: 40px"
+              >close</i
+            >
+          </button>
+          <button
+            class="btn"
+            style="margin: 5px; height: 40px; -webkit-app-region: no-drag"
+            onclick="ToogleFav()"
+            id="id_togglefav"
+          >
+            <i
+              class="material-icons"
+              style="line-height: 1; height: 40px"
+              id="favoicon"
+              >favorite_border</i
+            >
+          </button>
+          <button
+            class="btn"
+            style="margin: 5px; height: 40px; -webkit-app-region: no-drag"
+            onclick="FixHeight();"
+            id="id_fixheight"
+          >
+            <i class="material-icons" style="line-height: 1; height: 40px"
+              >align_horizontal_center</i
+            >
+          </button>
+          <button
+            class="btn"
+            style="margin: 5px; height: 40px; -webkit-app-region: no-drag"
+            onclick="FixWidth();"
+            id="id_fixwidth"
+          >
+            <i class="material-icons" style="line-height: 1; height: 40px"
+              >vertical_align_center</i
+            >
+          </button>
+          <button
+            class="btn"
+            style="margin: 5px; height: 40px; -webkit-app-region: no-drag"
+            onclick="AutoBGC();"
+            id="id_autobgcolor"
+          >
+            <i class="material-icons" style="line-height: 1; height: 40px"
+              >palette</i
+            >
+          </button>
+          <button
+            class="btn"
+            style="margin: 5px; height: 40px; -webkit-app-region: no-drag"
+            data-bs-toggle="modal"
+            data-bs-target="#magnifiersettings"
+            style="margin: 10px; height: 40px"
+            data-bs-dismiss="modal"
+            id="magnifier_id"
+          >
+            <i class="material-icons" style="line-height: 1; height: 40px"
+              >pageview</i
+            ><a></a>
+          </button>
+
+          <button
+            class="btn"
+            style="margin: 5px; height: 40px; -webkit-app-region: no-drag"
+            onclick="ZoomIn();"
+            id="id_zoomin"
+          >
+            <i class="material-icons" style="line-height: 1; height: 40px"
+              >zoom_in</i
+            >
+          </button>
+          <button
+            class="btn"
+            style="margin: 5px; height: 40px; -webkit-app-region: no-drag"
+            onclick="ZoomOut();"
+            id="id_zoomout"
+          >
+            <i class="material-icons" style="line-height: 1; height: 40px"
+              >zoom_out</i
+            >
+          </button>
+          <button
+          class="btn"
+          style="margin: 5px; height: 40px; -webkit-app-region: no-drag"
+          onclick="TBM();"
+          id="id_toogleBookMark"
+        >
+          <i class="material-icons" id="BMI" style="line-height: 1; height: 40px"
+            >bookmark_border</i
+          >
+        </button>
+          <p id="currentpage" style="color: white"></p>
+        </div>
+      </div>
+    </nav>
+
+    <div style="padding-top: 60px"></div>
+  </header>
+
+  <body onload="Viewer();">
+    <!-- Modal -->
+    <div
+      class="modal animate__animated animate__zoomIn animate__faster"
+      id="magnifiersettings"
+      tabindex="500"
+      aria-labelledby="id_magnifiermod"
+      aria-hidden="true"
+      style="overflow: hidden"
+    >
+      <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content">
+          <div class="modal-header">
+            <h5 class="modal-title" id="id_magnifiermod">
+              Magnifier Settings
+            </h5>
+            <button
+              type="button"
+              class="btn-close btn-close-white"
+              data-bs-dismiss="modal"
+              aria-label="Close"
+            ></button>
+          </div>
+          <div class="modal-body">
+            <label for="zoomvalue" class="form-label" id="zoomlvl">Zoom</label>
+            <input
+              type="range"
+              class="form-range"
+              min="1"
+              max="10"
+              step="0.5"
+              id="zoomvalue"
+            />
+            <label for="widthvalue" class="form-label" id="widthlvl">width</label>
+            <input
+              type="range"
+              class="form-range"
+              min="100"
+              max="500"
+              id="widthvalue"
+            />
+            <label for="Heightvalue" class="form-label" id="heightlvl">Height</label>
+            <input
+              type="range"
+              class="form-range"
+              min="100"
+              max="800"
+              id="Heightvalue"
+            />
+            <label for="Radiusvalue" class="form-label" id="Radiuslvl">Radius</label>
+            <input
+              type="range"
+              class="form-range"
+              min="0"
+              max="100"
+              id="Radiusvalue"
+            />
+            <p id="magnifier_note">
+              
+            </p>
+          </div>
+          <div class="modal-footer">
+            <button
+              type="button"
+              class="btn btn-secondary"
+              data-bs-dismiss="modal"
+              onclick="MagnifierT()"
+              id="id_spawnmagnifier"
+            >
+              Spawn Magnifier
+            </button>
+            <button
+              type="button"
+              class="btn btn-secondary"
+              data-bs-dismiss="modal"
+              onclick="MagnifierDestroy()"
+              id="id_destroymagnifier"
+            >
+              Destroy Magnifier
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div id="overlay">
+      <div style="text-align: center; margin-top: 20%">
+        <img
+          src="Images/swsb_character_fact_comicbookguy_550x960.png"
+          width="10%"
+        />
+        <p id="overlaymsg">We take care of your comics</p>
+        <div
+          class="spinner-border"
+          style="width: 70px; height: 70px"
+          role="status"
+        >
+          <span class="visually-hidden">Loading...</span>
+        </div>
+      </div>
+    </div>
+    <div style="text-align: center">
+      <img id="imgViewer"/>
+    </div>
+
+    <script type="text/javascript" src="viewer.js"></script>
+    <script>
+      var magnifier = new HTMLMagnifier();
+      function MagnifierT() {
+        magnifier.setHeight(document.getElementById("Heightvalue").value);
+        magnifier.setWidth(document.getElementById("widthvalue").value);
+        magnifier.setZoom(document.getElementById("zoomvalue").value);
+        magnifier.setShape(document.getElementById("Radiusvalue").value);
+        magnifier.show();
+      }
+      function MagnifierDestroy() {
+        magnifier.hide();
+      }
+    </script>
+  </body>
+</html>

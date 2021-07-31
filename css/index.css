@@ -1,0 +1,265 @@
+html {
+  background-color: #222222;
+}
+a {
+  text-decoration: none;
+}
+.logo {
+  display: block;
+  width: 300px;
+  height: 450px;
+  background-repeat: no-repeat;
+  line-height: 20px;
+  text-align: center;
+
+  color: white;
+  font-size: 20px;
+
+  background-size: contain;
+  background-position: center;
+  -webkit-transform-style: preserve-3d;
+  transform-style: preserve-3d;
+  -webkit-transform: perspective(500px);
+  transform: perspective(500px);
+  margin-bottom: 150px;
+}
+.cards-list {
+  z-index: 0;
+  width: 100%;
+  display: flex;
+  justify-content: space-around;
+  flex-wrap: wrap;
+}
+.item-list {
+  z-index: 0;
+  display: flex;
+  justify-content: space-around;
+  flex-wrap: wrap;
+}
+.logo > span {
+  position: relative;
+  display: block;
+  -webkit-transform: translateZ(50px) scale(0.7);
+  transform: translateZ(50px) scale(0.7);
+  margin: 10px;
+  padding-top: 20px;
+}
+
+.logo > span:after {
+  content: "";
+  position: absolute;
+  color: white;
+  font-size: 18px;
+  top: 36px;
+  left: 50%;
+  transform: translateX(-50%);
+
+  opacity: 0.8;
+
+  transition: 0.3s ease all;
+}
+
+.logo > span:before {
+  content: "";
+  position: absolute;
+  color: white;
+  font-size: 18px;
+  top: 36px;
+  left: 50%;
+  transform: translateX(-50%) translateY(-10px);
+
+  opacity: 0;
+
+  display: inline-block;
+  width: 100%;
+
+  transition: 0.3s ease all;
+}
+
+.logo:hover > span:after {
+  opacity: 0;
+  transform: translateX(-50%) translateY(10px);
+}
+
+.logo:hover > span:before {
+  opacity: 0.8;
+  transform: translateX(-50%);
+}
+
+.logo > span > span {
+  display: block;
+  font-size: 18px;
+}
+img {
+  image-rendering: initial;
+}
+::-webkit-scrollbar {
+  width: 2px;
+}
+
+::-webkit-scrollbar-thumb {
+  background-color: #444444;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background-color: #333333;
+}
+
+::-webkit-scrollbar-track {
+  background-color: #222222;
+}
+.SpaceX {
+  margin: 100px;
+}
+.menu {
+  width: 120px;
+  z-index: 1;
+  box-shadow: 0 4px 5px 3px rgba(0, 0, 0, 0.2);
+  position: fixed;
+  display: none;
+  transition: 0.2s display ease-in;
+  background-color: #222222;
+}
+.menu .menu-options {
+  list-style: none;
+  padding: 10px 0;
+  z-index: 1;
+}
+.menu .menu-options .menu-option {
+  font-weight: 500;
+  z-index: 1;
+  font-size: 14px;
+  padding: 10px 40px 10px 20px;
+  cursor: pointer;
+}
+.menu .menu-options .menu-option:hover {
+  background: rgba(0, 0, 0, 0.2);
+}
+#overlay {
+  position: fixed;
+  /* Sit on top of the page content */
+  display: none;
+  /* Hidden by default */
+  width: 100%;
+  /* Full width (cover the whole page) */
+  height: 100%;
+  /* Full height (cover the whole page) */
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-color: #222222;
+  /* Black background with opacity */
+  z-index: 2;
+  /* Specify a stack order in case you're using a different order for other elements */
+  cursor: normal;
+  /* Add a pointer on hover */
+}
+
+#textoverlay {
+  position: absolute;
+  font-family: "Oswald", sans-serif;
+  font-size: 14px;
+  top: 50%;
+  left: 50%;
+  font-size: 50px;
+  color: white;
+  transform: translate(-50%, -50%);
+  -ms-transform: translate(-50%, -50%);
+}
+.rotate {
+  animation: rotation 10s;
+}
+
+.linear {
+  animation-timing-function: linear;
+}
+
+.infinite {
+  animation-iteration-count: infinite;
+}
+
+@keyframes rotation {
+  from {
+    transform: rotate(0deg);
+  }
+  to {
+    transform: rotate(359deg);
+  }
+}
+/** {box-sizing: border-box;}
+.img-magnifier-container:hover {
+  position:relative;
+  cursor:none;
+}
+.img-magnifier-container:hover .img-magnifier-glass {
+  position: absolute;
+  border: 3px solid #000;
+  border-radius: 50%;
+  cursor: none;
+  width: 100px;
+  height: 100px;
+  display:block;
+}
+.img-magnifier-glass {
+  display:none;
+}*/
+
+.closebtn:hover {
+  background-color: rgb(87, 6, 6);
+}
+ul:not(.browser-default) > li {
+  list-style-type: none;
+}
+ul.staggered-list li {
+  opacity: 0;
+}
+ul li {
+  -webkit-transition: background-color 0.3s;
+  transition: background-color 0.3s;
+  float: left;
+  padding: 0;
+  margin: 5px;
+  padding-top: 0px;
+  margin-top: 0px;
+  cursor: pointer;
+}
+a {
+  color: dodgerblue;
+}
+.animate-RtL {
+  position: relative;
+  animation: RtL 0.4s;
+}
+.animate-LtR {
+  position: relative;
+  animation: LtR 0.4s;
+}
+@keyframes RtL {
+  from {
+    right: -100%;
+  }
+  to {
+    right: 0;
+  }
+}
+@keyframes LtR {
+  from {
+    left: -100%;
+  }
+  to {
+    left: 0;
+  }
+}
+.animate-CtL {
+  position: relative;
+  animation: CtL 0.4s;
+}
+@keyframes CtL {
+  from {
+    left:0;
+  }
+  to {
+    left: -100%;
+  }
+}

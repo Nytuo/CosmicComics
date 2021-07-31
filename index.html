@@ -1,0 +1,393 @@
+<!DOCTYPE html>
+<html style="overflow-x: hidden">
+  <head>
+    <meta charset="UTF-8" />
+    <link rel="stylesheet" href="css/bootstrap.css" />
+    <link rel="stylesheet" href="css/index.css" />
+    <link
+      rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/4.1.1/animate.min.css"
+    />
+    <link
+      href="https://fonts.googleapis.com/icon?family=Material+Icons"
+      rel="stylesheet"
+    />
+    <link href="css/materialize.css" rel="stylesheet" />
+    <script type="text/javascript" src="js/menu.js"></script>
+    <title>CosmicComics Collectionner</title>
+  </head>
+  <header>
+    <nav
+      style="-webkit-app-region: drag"
+      class="animate__animated animate__slideInDown fixed-top"
+    >
+      <div class="nav-wrapper" style="-webkit-app-region: drag">
+        <a class="brand-logo center" style="-webkit-app-region: drag"
+          ><img
+            src="Images/Logo.png"
+            alt=""
+            width="auto"
+            height="80px"
+            class="navbar-brand rotate linear infinite"
+            style="-webkit-app-region: drag" /><img
+            src="Images/LogoTxt.png"
+            alt=""
+            class="navbar-brand"
+            height="80px"
+            style="-webkit-app-region: drag"
+        /></a>
+
+        <ul id="nav-mobile" class="right hide-on-med-and-down">
+          <li>
+            <a onclick="minimizeWindow()" style="-webkit-app-region: no-drag"
+              ><i class="material-icons">minimize</i></a
+            >
+          </li>
+          <li>
+            <a
+              onclick="maximizeWindow()"
+              style="-webkit-app-region: no-drag"
+              id="maximize"
+              ><i class="material-icons">fullscreen</i></a
+            >
+          </li>
+          <li>
+            <a
+              onclick="closeWindow()"
+              class="closebtn"
+              style="-webkit-app-region: no-drag"
+              ><i class="material-icons">close</i></a
+            >
+          </li>
+        </ul>
+        <button
+          class="btn"
+          data-bs-toggle="modal"
+          data-bs-target="#buttonp"
+          style="margin: 10px; height: 40px; -webkit-app-region: no-drag"
+          id="menuid"
+        >
+          <i class="material-icons" style="line-height: 1; height: 40px"
+            >menu</i
+          >
+        </button>
+        <button
+          class="btn"
+          style="margin: 5px; height: 40px; -webkit-app-region: no-drag"
+          id="GotoRoot"
+        >
+          <i class="material-icons" style="line-height: 1; height: 40px"
+            >north</i
+          >
+        </button>
+        <button
+          class="btn"
+          style="margin: 5px; height: 40px; -webkit-app-region: no-drag"
+          id="gotoback"
+        >
+          <i class="material-icons" style="line-height: 1; height: 40px"
+            >arrow_back</i
+          >
+        </button>
+        <button
+          class="btn"
+          style="margin: 5px; height: 40px; -webkit-app-region: no-drag"
+          onclick="continuereading()"
+          id="id_continuereading"
+        >
+          <i class="material-icons" style="line-height: 1; height: 40px"
+            >arrow_right</i
+          >
+        </button>
+      </div>
+    </nav>
+  </header>
+  <body>
+    <!-- Modal -->
+    <div
+      class="modal animate__animated animate__zoomIn animate__faster"
+      id="buttonp"
+      tabindex="-1"
+      aria-labelledby="id_nav"
+      aria-hidden="true"
+    >
+      <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content">
+          <div class="modal-header">
+            <h5 class="modal-title" id="id_nav">Navigation</h5>
+            <button
+              type="button"
+              class="btn-close btn-close-white"
+              data-bs-dismiss="modal"
+              aria-label="Close"
+            ></button>
+          </div>
+          <div class="modal-body">
+            <div id="controller">
+              <button
+                onclick="openFolder()"
+                class="btn"
+                style="margin: 10px"
+                id="opnfld"
+                data-bs-dismiss="modal"
+              >
+                <i class="material-icons">create_new_folder</i>
+              </button>
+              <button
+                class="btn"
+                data-bs-dismiss="modal"
+                style="margin: 10px"
+                data-bs-toggle="modal"
+                data-bs-target="#bm"
+                id="id_bm"
+              >
+                <i class="material-icons">bookmarks</i>
+              </button>
+              <button
+                class="btn"
+                style="margin: 10px"
+                onclick="obliviate();"
+                data-bs-dismiss="modal"
+                id="id_forgetfolder"
+              >
+                <i class="material-icons">delete</i>
+              </button>
+              <button
+                class="btn"
+                data-bs-dismiss="modal"
+                style="margin: 10px"
+                id="id_settings"
+                data-bs-toggle="modal"
+                data-bs-target="#settingsmodal"
+              >
+                <i class="material-icons">settings</i>
+              </button>
+
+              <button
+                class="btn"
+                style="margin: 10px"
+                onclick="refreshFolder();"
+                data-bs-dismiss="modal"
+                id="id_refreshFolder"
+              >
+                <i class="material-icons">refresh</i>
+              </button>
+
+              <button
+                class="btn"
+                style="margin: 10px"
+                onclick="OpenFileOnce()"
+                data-bs-dismiss="modal"
+                id="id_opnfile"
+              >
+                <i class="material-icons">note_add</i>
+              </button>
+              <button
+                class="btn"
+                data-bs-toggle="modal"
+                data-bs-target="#about"
+                style="margin: 10px; height: 40px"
+                data-bs-dismiss="modal"
+                id="id_info"
+              >
+                <i class="material-icons">info</i>
+              </button>
+            </div>
+          </div>
+          <div class="modal-footer">
+            <button
+              type="button"
+              class="btn btn-secondary"
+              data-bs-dismiss="modal"
+              id="close_nav"
+            >
+              Close
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+    <!-- Modal -->
+    <div
+      class="modal animate__animated animate__zoomIn animate__faster"
+      id="about"
+      tabindex="-1"
+      aria-labelledby="id_about"
+      aria-hidden="true"
+      style="overflow: hidden"
+    >
+      <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content">
+          <div class="modal-header">
+            <h5 class="modal-title" id="id_about">About</h5>
+            <button
+              type="button"
+              class="btn-close btn-close-white"
+              data-bs-dismiss="modal"
+              aria-label="Close"
+            ></button>
+          </div>
+          <div class="modal-body" style="text-align: center">
+            <h1>Cosmic Comics</h1>
+            <img
+              src="Images/Logo.png"
+              alt=""
+              width="auto"
+              height="80px"
+              class="navbar-brand rotate linear infinite"
+            /><img
+              src="Images/LogoTxt.png"
+              alt=""
+              class="navbar-brand"
+              height="80px"
+            />
+            <p id="version"></p>
+            <p id="createdby">Created by Nytuo (Arnaud BEUX)</p>
+            <p id="usewhat">
+              This application use Electron, NodeJS, HTML/CSS/JS, and other
+              dependancies to work.
+            </p>
+            <p id="seewhere">
+              See the project on
+              <a
+                style="cursor: pointer"
+                onclick="require('electron').remote.shell.openExternal('https://github.com/Nytuo/CosmicComics')"
+                >GitHub</a
+              >, and feel free to make issues if you found a bug or have ideas
+              about functionalities
+            </p>
+            <p id="project">
+              All the code is on GitHub, under the
+              <a
+                style="cursor: pointer"
+                onclick="require('electron').remote.shell.openExternal('https://www.gnu.org/licenses/gpl-3.0.html')"
+                >GNU GPL-3.0</a
+              >
+              license.
+            </p>
+            <p id="translated">
+              Translations : For the moment the software only supports English.
+              (But according to the plan other languages will be available.)
+            </p>
+            <p id="beta_test">THEO LEPRINCE</p>
+          </div>
+          <div class="modal-footer">
+            <button
+              type="button"
+              class="btn btn-secondary"
+              data-bs-dismiss="modal"
+              id="close_about"
+            >
+              Close
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+    <!-- Modal -->
+    <div
+      class="modal animate__animated animate__zoomIn animate__faster"
+      id="bm"
+      tabindex="-1"
+      aria-labelledby="id_bmm"
+      aria-hidden="true"
+      style="overflow: hidden"
+    >
+      <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content">
+          <div class="modal-header">
+            <h5 class="modal-title" id="id_bmm">Bookmarks</h5>
+            <button
+              type="button"
+              class="btn-close btn-close-white"
+              data-bs-dismiss="modal"
+              aria-label="Close"
+            ></button>
+          </div>
+          <div class="modal-body">
+            <div id="bookmarkContainer">
+
+            </div>
+          </div>
+          <div class="modal-footer">
+            <button
+              type="button"
+              class="btn btn-secondary"
+              data-bs-dismiss="modal"
+              id="close_bm"
+            >
+              Close
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+    <!-- Modal -->
+    <div
+      class="modal animate__animated animate__zoomIn animate__faster"
+      id="settingsmodal"
+      tabindex="-1"
+      aria-labelledby="id_settingsmod"
+      aria-hidden="true"
+      style="overflow: hidden"
+    >
+      <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content">
+          <div class="modal-header">
+            <h5 class="modal-title" id="id_settingsmod">Settings</h5>
+            <button
+              type="button"
+              class="btn-close btn-close-white"
+              data-bs-dismiss="modal"
+              aria-label="Close"
+            ></button>
+          </div>
+          <div class="modal-body">
+            <p id="languages">Langues: </p>
+            <div id="lang_container">
+
+            </div>                      
+          </div>
+          <div class="modal-footer">
+            <button
+              type="button"
+              class="btn btn-secondary"
+              data-bs-dismiss="modal"
+              id="close_settings"
+            >
+              Close
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="menu">
+      <ul class="menu-options">
+        <li class="menu-option" onclick="markasread()">Mark as Read</li>
+        <li class="menu-option" onclick="markasunread()">Mark as Unread</li>
+        <li class="menu-option" onclick="markasreading()">Mark as Reading</li>
+        <li class="menu-option" onclick="favorite()">Toggle Favorite</li>
+      </ul>
+    </div>
+    <div id="overlay">
+      <div style="text-align: center; margin-top: 20%">
+        <img
+          src="Images/swsb_character_fact_comicbookguy_550x960.png"
+          width="10%"
+        />
+        <p id="overlaymsg">We take care of your comics</p>
+        <div
+          class="spinner-border"
+          style="width: 70px; height: 70px"
+          role="status"
+        >
+          <span class="visually-hidden">Loading...</span>
+        </div>
+      </div>
+    </div>
+    <div class="SpaceX"></div>
+    <div class="cards-list" id="ContainerExplorer"></div>
+
+    <script type="text/javascript" src="index.js"></script>
+  </body>
+</html>

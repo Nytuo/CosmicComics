@@ -1,0 +1,5 @@
+Linux users need to install unrar on their computer in order to get the RAR / CBR file working
+--> Ubuntu: sudo apt-get install unrar
+--> Fedora: sudo yum install unrar
+--> Arch: pacman -S unrar
+--> Any other: Download the Linux RAR (x86/x64) on https://www.rarlab.com/download.htm and run sudo make in the containing directory
