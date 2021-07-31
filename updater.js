@@ -51,17 +51,17 @@ var OnlineVersionNum = OnlineVersion.replaceAll(".","")
 OnlineVersionNum = parseInt(OnlineVersionNum)
 var proverNum = process.version.replaceAll(".","")
 proverNum = parseInt(proverNum)
-if (OnlineVersionNum > process.version) {
+if (OnlineVersionNum > proverNum) {
   sendMessage("Update Available");
   DLUpdate();
-} else if (OnlineVersionNum < process.version) {
+} else if (OnlineVersionNum < proverNum) {
   sendMessage(
     "Do you came from the future, this is a future version of the app"
   );
   setTimeout(() => {
     openWindow();
   }, 2000);
-} else if (OnlineVersionNum == process.version) {
+} else if (OnlineVersionNum == proverNum) {
   sendMessage("No Update Available");
   setTimeout(() => {
     openWindow();
