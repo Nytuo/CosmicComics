@@ -1,7 +1,22 @@
+<!--This file is part of Cosmic-comics.
+
+Cosmic-Comics is free software: you can redistribute it and/or modify
+it under the terms of the GNU General Public License as published by
+the Free Software Foundation, either version 3 of the License, or
+(at your option) any later version.
+
+Cosmic-Comics is distributed in the hope that it will be useful,
+but WITHOUT ANY WARRANTY; without even the implied warranty of
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+GNU General Public License for more details.
+
+You should have received a copy of the GNU General Public License
+along with Cosmic-Comics.  If not, see <https://www.gnu.org/licenses/>.--->
 <!DOCTYPE html>
 <html style="overflow-x: hidden">
   <head>
     <meta charset="UTF-8" />
+    <!--Declaring the stylesheets-->
     <link rel="stylesheet" href="css/bootstrap.css" />
     <link rel="stylesheet" href="css/index.css" />
     <link
@@ -13,14 +28,18 @@
       rel="stylesheet"
     />
     <link href="css/materialize.css" rel="stylesheet" />
+    <link
+      rel="stylesheet"
+      href="https://cdn.materialdesignicons.com/2.4.85/css/materialdesignicons.min.css"
+    />
+    <!--Declaring the scripts-->
     <script type="text/javascript" src="js/menu.js"></script>
-    <title>CosmicComics Collectionner</title>
+    <!--The name of the page-->
+    <title>Cosmic-Comics Collectionner</title>
   </head>
   <header>
-    <nav
-      style="-webkit-app-region: drag"
-      class="animate__animated animate__slideInDown fixed-top"
-    >
+    <!--The navigation system-->
+    <nav style="-webkit-app-region: drag" class="fixed-top">
       <div class="nav-wrapper" style="-webkit-app-region: drag">
         <a class="brand-logo center" style="-webkit-app-region: drag"
           ><img
@@ -39,16 +58,20 @@
 
         <ul id="nav-mobile" class="right hide-on-med-and-down">
           <li>
-            <a onclick="minimizeWindow()" style="-webkit-app-region: no-drag"
+            <a
+              class="btnw"
+              onclick="minimizeWindow()"
+              style="-webkit-app-region: no-drag"
               ><i class="material-icons">minimize</i></a
             >
           </li>
           <li>
             <a
+              class="btnw"
               onclick="maximizeWindow()"
               style="-webkit-app-region: no-drag"
               id="maximize"
-              ><i class="material-icons">fullscreen</i></a
+              ><i class="material-icons">check_box_outline_blank</i></a
             >
           </li>
           <li>
@@ -60,6 +83,7 @@
             >
           </li>
         </ul>
+        <!--The Navigation Menu-->
         <button
           class="btn"
           data-bs-toggle="modal"
@@ -103,7 +127,7 @@
     </nav>
   </header>
   <body>
-    <!-- Modal -->
+    <!-- Modal navigation -->
     <div
       class="modal animate__animated animate__zoomIn animate__faster"
       id="buttonp"
@@ -192,6 +216,16 @@
               >
                 <i class="material-icons">info</i>
               </button>
+              <button
+                class="btn"
+                data-bs-toggle="modal"
+                data-bs-target="#tips"
+                style="margin: 10px; height: 40px"
+                data-bs-dismiss="modal"
+                id="id_tips-btn"
+              >
+                <i class="material-icons">tips_and_updates</i>
+              </button>
             </div>
           </div>
           <div class="modal-footer">
@@ -207,7 +241,7 @@
         </div>
       </div>
     </div>
-    <!-- Modal -->
+    <!-- Modal about-->
     <div
       class="modal animate__animated animate__zoomIn animate__faster"
       id="about"
@@ -243,33 +277,24 @@
             />
             <p id="version"></p>
             <p id="createdby">Created by Nytuo (Arnaud BEUX)</p>
-            <p id="usewhat">
-              This application use Electron, NodeJS, HTML/CSS/JS, and other
-              dependancies to work.
-            </p>
-            <p id="seewhere">
-              See the project on
-              <a
-                style="cursor: pointer"
-                onclick="require('electron').remote.shell.openExternal('https://github.com/Nytuo/CosmicComics')"
-                >GitHub</a
-              >, and feel free to make issues if you found a bug or have ideas
-              about functionalities
-            </p>
-            <p id="project">
-              All the code is on GitHub, under the
-              <a
-                style="cursor: pointer"
-                onclick="require('electron').remote.shell.openExternal('https://www.gnu.org/licenses/gpl-3.0.html')"
-                >GNU GPL-3.0</a
-              >
-              license.
-            </p>
-            <p id="translated">
-              Translations : For the moment the software only supports English.
-              (But according to the plan other languages will be available.)
-            </p>
+            <p id="usewhat"></p>
+            <p id="seewhere"></p>
+            <p id="project"></p>
+            <p id="translated"></p>
             <p id="beta_test">THEO LEPRINCE</p>
+            <a href="#" onclick="shell.openExternal('https://nytuo.yo.fr/')"><img
+              src="Images/Nytuo_softwares.png"
+              alt=""
+              class=""
+              height="80px"
+            /></a>          
+              <a href="#" onclick="shell.openExternal('https://nytuo.yo.fr/')"><img
+              src="Images/Nytuo website.png"
+              alt=""
+              class=""
+              height="80px"
+            /></a>
+            
           </div>
           <div class="modal-footer">
             <button
@@ -284,7 +309,48 @@
         </div>
       </div>
     </div>
-    <!-- Modal -->
+    <!-- Modal Tips-->
+    <div
+      class="modal animate__animated animate__zoomIn animate__faster"
+      id="tips"
+      tabindex="-1"
+      aria-labelledby="id_tips"
+      aria-hidden="true"
+      style="overflow: hidden"
+    >
+      <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content">
+          <div class="modal-header">
+            <h5 class="modal-title" id="id_tips">Tips:</h5>
+            <button
+              type="button"
+              class="btn-close btn-close-white"
+              data-bs-dismiss="modal"
+              aria-label="Close"
+            ></button>
+          </div>
+          <div class="modal-body" style="text-align: center">
+            <h4 id="id_did_you_know"></h4>
+            <ul>
+              <li id="id_tip_1"></li>
+              <li id="id_tip_2"></li>
+              <li id="id_tip_3"></li>
+            </ul>
+          </div>
+          <div class="modal-footer">
+            <button
+              type="button"
+              class="btn btn-secondary"
+              data-bs-dismiss="modal"
+              id="close_about"
+            >
+              Close
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+    <!-- Modal Bookmarks-->
     <div
       class="modal animate__animated animate__zoomIn animate__faster"
       id="bm"
@@ -305,9 +371,7 @@
             ></button>
           </div>
           <div class="modal-body">
-            <div id="bookmarkContainer">
-
-            </div>
+            <div id="bookmarkContainer"></div>
           </div>
           <div class="modal-footer">
             <button
@@ -322,7 +386,7 @@
         </div>
       </div>
     </div>
-    <!-- Modal -->
+    <!-- Modal settings -->
     <div
       class="modal animate__animated animate__zoomIn animate__faster"
       id="settingsmodal"
@@ -343,10 +407,36 @@
             ></button>
           </div>
           <div class="modal-body">
-            <p id="languages">Langues: </p>
-            <div id="lang_container">
-
-            </div>                      
+            <p id="languages">Langues:</p>
+            <div id="lang_container"></div>
+            <button
+              id="id_btn_update_provider"
+              class="btn btn-primary"
+              onclick="changeUpdateProvider()"
+            >
+              Change Update Provider
+            </button>
+            <button
+              id="id_btn_appdata"
+              class="btn btn-primary"
+              onclick="OpenAppDataFolder()"
+            >
+              Open Cosmic-Comics Folder's In AppData
+            </button>
+            <button
+              id="id_btn_Temp"
+              class="btn btn-primary"
+              onclick="OpenTempDirectory()"
+            >
+              Open Cosmic-Comics Folder's In Temp
+            </button>
+            <button
+              id="id_btn_ComicsFolder"
+              class="btn btn-primary"
+              onclick="OpenComicsFolder()"
+            >
+              Open Loaded Comics Folder
+            </button>
           </div>
           <div class="modal-footer">
             <button
@@ -361,21 +451,15 @@
         </div>
       </div>
     </div>
-    <div class="menu">
-      <ul class="menu-options">
-        <li class="menu-option" onclick="markasread()">Mark as Read</li>
-        <li class="menu-option" onclick="markasunread()">Mark as Unread</li>
-        <li class="menu-option" onclick="markasreading()">Mark as Reading</li>
-        <li class="menu-option" onclick="favorite()">Toggle Favorite</li>
-      </ul>
-    </div>
+    <div id="snackbar">Some text some message..</div>
+    <!--The Tutorial text-->
+    <p id="tutotxt" style="text-align: center; padding-top: 10%">
+      To start, import a directory or a single file by clicking on the Hamburger
+      menu and the directory/file icon.
+    </p>
+    <!--The overlay-->
     <div id="overlay">
-      <div style="text-align: center; margin-top: 20%">
-        <img
-          src="Images/swsb_character_fact_comicbookguy_550x960.png"
-          width="10%"
-        />
-        <p id="overlaymsg">We take care of your comics</p>
+      <div style="text-align: center; margin-top: 25%">
         <div
           class="spinner-border"
           style="width: 70px; height: 70px"
@@ -383,11 +467,15 @@
         >
           <span class="visually-hidden">Loading...</span>
         </div>
+        <p id="overlaymsg" style="margin-top: 10px">
+          We take care of your comics
+        </p>
       </div>
     </div>
     <div class="SpaceX"></div>
+    <!--List of the books-->
     <div class="cards-list" id="ContainerExplorer"></div>
-
+    <!--Loading scripts-->
     <script type="text/javascript" src="index.js"></script>
   </body>
 </html>

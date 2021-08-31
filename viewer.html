@@ -1,3 +1,17 @@
+<!--This file is part of Cosmic-comics.
+
+Cosmic-Comics is free software: you can redistribute it and/or modify
+it under the terms of the GNU General Public License as published by
+the Free Software Foundation, either version 3 of the License, or
+(at your option) any later version.
+
+Cosmic-Comics is distributed in the hope that it will be useful,
+but WITHOUT ANY WARRANTY; without even the implied warranty of
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+GNU General Public License for more details.
+
+You should have received a copy of the GNU General Public License
+along with Cosmic-Comics.  If not, see <https://www.gnu.org/licenses/>.-->
 <html>
   <head>
     <link rel="stylesheet" href="css/bootstrap.css" />
@@ -10,14 +24,14 @@
       rel="stylesheet"
       href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/4.1.1/animate.min.css"
     />
-    <script type="text/javascript" src="js/html-magnifier.js"></script>
     <link href="css/materialize.css" rel="stylesheet" />
+    <script type="text/javascript" src="js/html-magnifier.js"></script>
     <script type="text/javascript" src="js/menu.js"></script>
     <title>CosmicComics Viewer</title>
   </head>
   <header>
     <nav
-      class="animate__animated animate__slideInDown fixed-top"
+      class="fixed-top"
       style="-webkit-app-region: drag"
     >
       <div class="nav-wrapper">
@@ -26,25 +40,28 @@
             src="Images/Logo.png"
             alt=""
             width="auto"
-            height="80px"
+            height=60px"
             class="navbar-brand rotate linear infinite"
             style="-webkit-app-region: drag"
         /></a>
 
-        <ul id="nav-mobile" class="right hide-on-med-and-down">
+        <ul id="nav-mobile" class="right hide-on-med-and-down">          
+
           <li>
-            <a onclick="minimizeWindow()" style="-webkit-app-region: no-drag"
+            <a onclick="minimizeWindow()"               class="btnw"style="-webkit-app-region: no-drag"
               ><i class="material-icons">minimize</i></a
             >
           </li>
           <li>
             <a
               onclick="maximizeWindow()"
+              class="btnw"
               style="-webkit-app-region: no-drag"
               id="maximize"
-              ><i class="material-icons">fullscreen</i></a
+              ><i class="material-icons">check_box_outline_blank</i></a
             >
           </li>
+
           <li>
             <a
               onclick="closeWindow()"
@@ -54,18 +71,17 @@
             >
           </li>
         </ul>
-        <div style="padding-left: 65px">
+        <div style="padding-left: 45px">
           <button
             class="btn"
             style="margin: 5px; height: 40px; -webkit-app-region: no-drag"
-            onclick="window.location.href = ('index.html')"
+            onclick="window.location.href = 'index.html'"
             id="goback_id"
           >
             <i class="material-icons" style="line-height: 1; height: 40px"
               >arrow_back</i
             >
           </button>
-          <!--TODO LANG-->
           <button
             class="btn"
             style="margin: 5px; height: 40px; -webkit-app-region: no-drag"
@@ -106,49 +122,7 @@
               >last_page</i
             >
           </button>
-          <button
-            class="btn"
-            style="margin: 5px; height: 40px; -webkit-app-region: no-drag"
-            onclick="markasread();"
-            id="id_mkread"
-          >
-            <i class="material-icons" style="line-height: 1; height: 40px"
-              >done</i
-            >
-          </button>
-          <button
-            class="btn"
-            style="margin: 5px; height: 40px; -webkit-app-region: no-drag"
-            onclick="markasreading()"
-            id="id_mkreading"
-          >
-            <i class="material-icons" style="line-height: 1; height: 40px"
-              >auto_stories</i
-            >
-          </button>
-          <button
-            class="btn"
-            style="margin: 5px; height: 40px; -webkit-app-region: no-drag"
-            onclick="markasunread();"
-            id="id_mkunread"
-          >
-            <i class="material-icons" style="line-height: 1; height: 40px"
-              >close</i
-            >
-          </button>
-          <button
-            class="btn"
-            style="margin: 5px; height: 40px; -webkit-app-region: no-drag"
-            onclick="ToogleFav()"
-            id="id_togglefav"
-          >
-            <i
-              class="material-icons"
-              style="line-height: 1; height: 40px"
-              id="favoicon"
-              >favorite_border</i
-            >
-          </button>
+
           <button
             class="btn"
             style="margin: 5px; height: 40px; -webkit-app-region: no-drag"
@@ -169,16 +143,7 @@
               >vertical_align_center</i
             >
           </button>
-          <button
-            class="btn"
-            style="margin: 5px; height: 40px; -webkit-app-region: no-drag"
-            onclick="AutoBGC();"
-            id="id_autobgcolor"
-          >
-            <i class="material-icons" style="line-height: 1; height: 40px"
-              >palette</i
-            >
-          </button>
+
           <button
             class="btn"
             style="margin: 5px; height: 40px; -webkit-app-region: no-drag"
@@ -190,7 +155,7 @@
           >
             <i class="material-icons" style="line-height: 1; height: 40px"
               >pageview</i
-            ><a></a>
+            >
           </button>
 
           <button
@@ -218,17 +183,57 @@
           style="margin: 5px; height: 40px; -webkit-app-region: no-drag"
           onclick="TBM();"
           id="id_toogleBookMark"
-        >
-          <i class="material-icons" id="BMI" style="line-height: 1; height: 40px"
-            >bookmark_border</i
           >
-        </button>
-          <p id="currentpage" style="color: white"></p>
+            <i class="material-icons" id="BMI" style="line-height: 1; height: 40px"
+              >bookmark_border</i>
+          </button>
+          <button
+          class="btn"
+          style="margin: 5px; height: 40px; -webkit-app-region: no-drag"
+          onclick=""
+          id="id_bookmenu"
+          data-bs-toggle="modal"
+          data-bs-target="#booksettings"
+          >
+          <i class="material-icons" id="BMI" style="line-height: 1; height: 40px"
+            >menu_book</i
+          >
+          </button>
+          <button
+          class="btn"
+          style="margin: 5px; height: 40px; -webkit-app-region: no-drag"
+          onclick="rotate(90)"
+          id="id_rotateright"
+          >
+          <i class="material-icons" id="ROTR" style="line-height: 1; height: 40px"
+            >rotate_right</i
+          >
+          </button>
+          <button
+          class="btn"
+          style="margin: 5px; height: 40px; -webkit-app-region: no-drag"
+          onclick="rotate(-90)"
+          id="id_rotateleft"
+          >
+          <i class="material-icons" id="ROTL" style="line-height: 1; height: 40px"
+            >rotate_left</i
+          >
+          </button>
+            <button
+              onclick="fullscreen()"
+              style="margin: 5px; height: 40px; -webkit-app-region: no-drag"
+              id="fullscreen_id"
+              class="btn"
+
+              ><i class="material-icons" id="fullscreen_i_id"style="line-height: 1; height: 40px">fullscreen</i></button
+            >
         </div>
       </div>
     </nav>
+          
 
-    <div style="padding-top: 60px"></div>
+    <div style="padding-top: 55px"></div>
+    <p id="currentpage" style="color: white;position: fixed;background-color:rgba(0,0,0,0.50);text-align: right;bottom: 0;right: 5px;z-index: 5;"></p>
   </header>
 
   <body onload="Viewer();">
@@ -315,13 +320,224 @@
         </div>
       </div>
     </div>
-    <div id="overlay">
-      <div style="text-align: center; margin-top: 20%">
-        <img
-          src="Images/swsb_character_fact_comicbookguy_550x960.png"
-          width="10%"
+    <!-- Modal -->
+    <div
+      class="modal animate__animated animate__zoomIn animate__faster"
+      id="booksettings"
+      tabindex="500"
+      aria-labelledby="id_booksettings"
+      aria-hidden="true"
+      style="overflow: hidden"
+    >
+      <div class="modal-dialog modal-dialog-centered modal-dialog-scrollable">
+        <div class="modal-content">
+          <div class="modal-header">
+            <h5 class="modal-title" id="id_booksettings">
+              Book Settings
+            </h5>
+            <button
+              type="button"
+              class="btn-close btn-close-white"
+              data-bs-dismiss="modal"
+              aria-label="Close"
+            ></button>
+          </div>
+          <div class="modal-body">
+            <div style="text-align: center">
+            <button
+            class="btn"
+            style="margin: 5px; height: 40px; -webkit-app-region: no-drag"
+            onclick="markasread();"
+            id="id_mkread"
+          >
+            <i class="material-icons" style="line-height: 1; height: 40px"
+              >done</i
+            >
+          </button>
+          <button
+            class="btn"
+            style="margin: 5px; height: 40px; -webkit-app-region: no-drag"
+            onclick="markasreading()"
+            id="id_mkreading"
+          >
+            <i class="material-icons" style="line-height: 1; height: 40px"
+              >auto_stories</i
+            >
+          </button>
+          <button
+            class="btn"
+            style="margin: 5px; height: 40px; -webkit-app-region: no-drag"
+            onclick="markasunread();"
+            id="id_mkunread"
+          >
+            <i class="material-icons" style="line-height: 1; height: 40px"
+              >close</i
+            >
+          </button>
+          <button
+            class="btn"
+            style="margin: 5px; height: 40px; -webkit-app-region: no-drag"
+            onclick="ToogleFav()"
+            id="id_togglefav"
+          >
+            <i
+              class="material-icons"
+              style="line-height: 1; height: 40px"
+              id="favoicon"
+              >favorite_border</i
+            >
+          </button>          
+          <button
+          class="btn"
+          style="margin: 5px; height: 40px; -webkit-app-region: no-drag"
+          onclick="AutoBGC();"
+          id="id_autobgcolor"
+        >
+          <i class="material-icons" style="line-height: 1; height: 40px"
+            >palette</i
+          >
+        </button>
+        
+      </div>
+          <div style="padding-top:30px"></div>
+
+            <div class="form-check form-switch">
+              <input class="form-check-input" type="checkbox" id="TDPMS" onchange="TDPM()">
+              <label class="form-check-label" for="TDPMS" id="DPMTXT">Double Page Mode</label>
+            </div>
+            <div class="form-check form-switch">
+              <input class="form-check-input" type="checkbox" id="BPABS" onchange="BPAB()">
+              <label class="form-check-label" for="BPABS" id="BPABTXT">Blank page at beginning</label>
+            </div>
+            <div class="form-check form-switch">
+              <input class="form-check-input" type="checkbox" id="NDPFHS" onchange="NDPFH()">
+              <label class="form-check-label" for="NDPFHS" id="NDPFHTXT">No Double page for Horizontal</label>
+            </div>
+            <div class="form-check form-switch">
+              <input class="form-check-input" type="checkbox" id="MMS" onchange="MMT()">
+              <label class="form-check-label" for="MMS" id="MMTXT">Manga Mode</label>
+              
+            </div>
+            <div class="form-check form-switch">
+              <input class="form-check-input" type="checkbox" id="SS" onchange="TSS()">
+              <label class="form-check-label" for="SS" id="SSTXT">SlideShow</label>
+            </div>
+              <div class="form-check form-switch">
+                <input class="form-check-input" type="checkbox" id="NBAR" onchange="NoBAR()">
+                <label class="form-check-label" for="NBAR" id="NBARTXT">No Bar</label>
+              </div>
+              <div class="form-check form-switch">
+                <input class="form-check-input" type="checkbox" id="SSB" onchange="TSB()">
+                <label class="form-check-label" for="SSB" id="SSBTXT">Side Bar</label>
+              </div>
+              <div class="form-check form-switch">
+                <input class="form-check-input" type="checkbox" id="PC" onchange="ChangeDM_CurrentPage()" checked>
+                <label class="form-check-label" for="PC" id="PCTXT">Page Count</label>
+              </div>
+              <div class="form-check form-switch">
+                <input class="form-check-input" type="checkbox" id="VIV" onchange="VIVT()">
+                <label class="form-check-label" for="VIV" id="VIVTXT">Vertical Reader Mode</label>
+              </div>
+              <div class="form-check form-switch">
+                <input class="form-check-input" type="checkbox" id="WTM" onchange="WTMT()">
+                <label class="form-check-label" for="WTM" id="WTMTXT">WebToon Mode (Fixed width + Vertical Reader)</label>
+              </div>
+              <div class="form-check form-switch">
+                <input class="form-check-input" type="checkbox" id="RZPS" onchange="RZP()">
+                <label class="form-check-label" for="RZPS" id="RZPSTXT">Reset Zoom for Each Page</label>
+              </div>
+              <div class="form-check form-switch">
+                <input class="form-check-input" type="checkbox" id="SBVS" onchange="SBVT()" checked>
+                <label class="form-check-label" for="SBVS" id="SBVSTXT">ScrollBar visible</label>
+              </div>
+            <div style="padding-top:10px"></div>
+            <label for="MarginValue" class="form-label" id="marginlvl">Margin:</label>
+            <input
+            type="range"
+            class="form-range"
+            min="0"
+            max="100"
+            id="MarginValue"
+            value="0"
+            onchange="MarginSlider()"
+            />
+            <label for="RotateValue" class="form-label" id="rotlvl">Rotation:</label>
+            <input
+            type="range"
+            class="form-range"
+            min="0"
+            max="270"
+            step="90"
+            id="RotateValue"
+            value="0"
+            onchange="AlwaysRotate()"
+          />          
+          <div style="padding-top:10px"></div>
+
+          
+          
+          <label for="zlvls" class="form-label" id="zlvll">Zoom Level:</label>
+          <input
+          type="range"
+          class="form-range"
+          min="10"
+          max="500"
+          step="10"
+          id="zlvls"
+          value="10"
+          onchange="changeZoomLVL()"
+          />
+          <label for="SSValue" class="form-label" id="sstxt">SlideShow Interval Time:</label>
+          <input
+          type="range"
+          class="form-range"
+          min="1"
+          max="60"
+          step="1"
+          id="SSValue"
+          value="1"
+          onchange="ShowOnChangeSlideShow()"
         />
-        <p id="overlaymsg">We take care of your comics</p>
+        
+          <label for="sps" class="form-label" id="lsps">Page Slider:</label>
+          <input
+          type="range"
+          class="form-range"
+          min="1"
+          max="60"
+          step="1"
+          id="sps"
+          value="1"
+          onchange="pageslide()"
+        />
+        <div style="text-align:center;">
+
+        <div class="col-md-2"style="display:inline" >
+
+          <input class="form-control form-control-sm" type="text" placeholder="" aria-label=".form-control-sm example" id="input_text" onchange="pagechoose()"style="text-align: center">
+        </div>
+        <p id="inputonwhat" style="display:inline"></p>
+        </div>
+        <label for="exampleColorInput" class="form-label" id="colorpicker_txt_id">Set Background Color</label>
+        <input type="color" class="form-control form-control-color" id="exampleColorInput" value="#212121" title="Choose your color" onchange="changeBGColorByPicker()">
+          </div>
+          <div class="modal-footer">
+            <button
+              type="button"
+              class="btn btn-secondary"
+              data-bs-dismiss="modal"
+              id="close_id_books"
+            >
+              Close
+            </button>
+          </div>
+        </div>
+      </div>
+      </div>
+    <div id="overlay">
+      <div style="text-align: center; margin-top: 25%">
+
+        
         <div
           class="spinner-border"
           style="width: 70px; height: 70px"
@@ -329,12 +545,17 @@
         >
           <span class="visually-hidden">Loading...</span>
         </div>
+        <p id="overlaymsg"style="margin-top: 10px">We take care of your comics</p>
       </div>
     </div>
-    <div style="text-align: center">
-      <img id="imgViewer"/>
+  </div>   
+   <div id="SideBar" style="display:none;position: fixed; width: 200px;height: 95%;background-color: #171717;overflow-y: scroll;text-align: center;">
+    <!--Contient dynamiquement des images-->
+  </div>
+    <div style="text-align: center;" id="viewport">
+      <img id="imgViewer_0"><img id="imgViewer_1" class=""/></img>
     </div>
-
+    <div id="snackbar">Some text some message..</div>
     <script type="text/javascript" src="viewer.js"></script>
     <script>
       var magnifier = new HTMLMagnifier();

@@ -1,0 +1,222 @@
+<!--/*This file is part of Cosmic-comics.
+
+Cosmic-Comics is free software: you can redistribute it and/or modify
+it under the terms of the GNU General Public License as published by
+the Free Software Foundation, either version 3 of the License, or
+(at your option) any later version.
+
+Cosmic-Comics is distributed in the hope that it will be useful,
+but WITHOUT ANY WARRANTY; without even the implied warranty of
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+GNU General Public License for more details.
+
+You should have received a copy of the GNU General Public License
+along with Cosmic-Comics.  If not, see <https://www.gnu.org/licenses/>.*/-->
+<html>
+  <head>
+    <!--Importing all stylesheets-->
+    <link rel="stylesheet" href="css/bootstrap.css" />
+    <link rel="stylesheet" href="css/index.css" />
+    <link
+      href="https://fonts.googleapis.com/icon?family=Material+Icons"
+      rel="stylesheet"
+    />
+    <link
+      rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/4.1.1/animate.min.css"
+    />
+    <link href="css/materialize.css" rel="stylesheet" />
+    <!--Importing All Javascripts-->
+    <script type="text/javascript" src="js/html-magnifier.js"></script>
+    <script type="text/javascript" src="js/menu.js"></script>
+    <!--Title of the page-->
+    <title>Cosmic-Comics Viewer</title>
+  </head>
+  <header>
+    <!--Navigation Menu-->
+    <nav
+      class="animate__animated animate__slideInDown fixed-top"
+      style="-webkit-app-region: drag"
+    >
+      <div class="nav-wrapper">
+        <a class="brand-logo" style="-webkit-app-region: drag"
+          ><img
+            src="Images/Logo.png"
+            alt=""
+            width="auto"
+            height="60px"
+            class="navbar-brand rotate linear infinite"
+            style="-webkit-app-region: drag"
+        /></a>
+        <div style="padding-left: 65px">
+          <button
+            class="btn"
+            style="margin: 5px; height: 40px; -webkit-app-region: no-drag"
+            onclick="window.location.href = ('index.html')"
+            id="goback_id"
+          >
+            <i class="material-icons" style="line-height: 1; height: 40px"
+              >arrow_back</i
+            >
+          </button>
+          <button
+            class="btn warning"
+            data-bs-toggle="modal"
+            data-bs-target="#warning"
+            style="margin: 5px; height: 40px; -webkit-app-region: no-drag"
+            id="warning_btn"
+          >
+            <i class="material-icons" style="line-height: 1; height: 40px"
+              >warning</i
+            >
+          </button>
+
+          <ul id="nav-mobile" class="right hide-on-med-and-down">
+            <li>
+              <a
+                class="btnw"
+                onclick="minimizeWindow()"
+                style="-webkit-app-region: no-drag"
+                ><i class="material-icons">minimize</i></a
+              >
+            </li>
+            <li>
+              <a
+                class="btnw"
+                onclick="maximizeWindow()"
+                style="-webkit-app-region: no-drag"
+                id="maximize"
+                ><i class="material-icons">check_box_outline_blank</i></a
+              >
+            </li>
+            <li>
+              <a
+                onclick="closeWindow()"
+                class="closebtn"
+                style="-webkit-app-region: no-drag"
+                ><i class="material-icons">close</i></a
+              >
+            </li>
+          </ul>
+        </div>
+      </div>
+    </nav>
+  </header>
+  <body>
+    <!-- Modal Warning-->
+    <div
+      class="modal animate__animated animate__zoomIn animate__faster"
+      id="warning"
+      tabindex="-1"
+      aria-labelledby="id_warning"
+      aria-hidden="true"
+    >
+      <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content">
+          <div class="modal-header">
+            <h5 class="modal-title" id="id_warning_title">Get Help:</h5>
+            <button
+              type="button"
+              class="btn-close btn-close-white"
+              data-bs-dismiss="modal"
+              aria-label="Close"
+            ></button>
+          </div>
+          <div class="modal-body">
+            <h1 id="id_warning_text">Warning:</h1>
+            <p id="id_warning_full_text">
+              The informations are provided by 3rd party websites such as
+              Anilist.co and leagueofcomicgeeks.com<br />
+              Because LeagueOfComicGeeks.com (For Comics) doesn't provide an API
+              to get the informations from, the comics gonna be display with
+              basic informations and the webpage is embedded to display more
+              info. Anilist.co (For Manga) has an API and I use it in order to
+              get the informations. Please note that you find many other
+              informations not displayed here, on the website itself, a link to
+              the Comic/Manga is provided at the end of the page.
+            </p>
+            <h1 id="id_issues">Issues?</h1>
+            <p id="id_issues_text">
+              If the informations provided are not correct (this is not the good
+              book) and you not finding it on the list of other probabilities,
+              then try rename your file with the name on the website's database
+              (Anilist or LeagueOfComicGeeks) or make a demand to add it on the
+              website if it doesn't provide it.
+            </p>
+          </div>
+          <div class="modal-footer">
+            <button
+              type="button"
+              class="btn btn-secondary"
+              data-bs-dismiss="modal"
+              id="close_gethelp"
+            >
+              Close
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+    <!--Notification-->
+    <div id="snackbar">Some text some message..</div>
+    <!--Background Image-->
+    <div class="background-image" id="bgimage">
+      <!--Layer to have a darker background-->
+      <div class="layer"></div>
+    </div>
+    <!--To select another source-->
+    <div class="content">
+      <h4 id="id_not_what_you_wanted">
+        Not what you wanted ? Try those other results:
+      </h4>
+      <select
+        class="form-select"
+        aria-label="Default select example"
+        style="margin-bottom: 5px"
+        onchange="selectAnother()"
+        id="selectAnother"
+      ></select>
+      <!--The Cover-->
+      <div style="display: inline-block">
+        <img id="cover" style="width: auto; height: 500px" />
+      </div>
+      <!--All informations provided by the API or scrapping-->
+      <div style="text-align: center">
+        <h3 id="Title"></h3>
+        <h4 id="description"></h4>
+        <p id="publisher"></p>
+        <p id="Format"></p>
+        <p id="type"></p>
+        <p id="Genres"></p>
+        <p id="status"></p>
+        <p id="startdate"></p>
+        <p id="EndDate"></p>
+        <p id="chapt"></p>
+        <p id="volume"></p>
+        <p id="OriginCountry"></p>
+        <p id="rating"></p>
+        <p id="MeanScore"></p>
+        <p id="popu"></p>
+        <p id="Favo"></p>
+        <p id="trending"></p>
+        <p id="rankings"></p>
+        <h3 id="relationsTXT"></h3>
+        <div id="relations" class="relationsDiv cards-list"></div>
+        <p id="charct"></p>
+        <p id="ID"></p>
+      </div>
+      <!--Display the Link of the source page-->
+      <a id="link"></a>
+      <!--Display website in the IFrame-->
+      <iframe
+        width="100%"
+        height="400"
+        src=""
+        id="iframeID"
+        style="margin-bottom: 10px"
+      ></iframe>
+    </div>
+  </body>
+  <!--Loading script-->
+  <script type="text/javascript" src="display.js"></script>
+</html>

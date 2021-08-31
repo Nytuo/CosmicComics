@@ -1,3 +1,17 @@
+<!--This file is part of Cosmic-comics.
+
+Cosmic-Comics is free software: you can redistribute it and/or modify
+it under the terms of the GNU General Public License as published by
+the Free Software Foundation, either version 3 of the License, or
+(at your option) any later version.
+
+Cosmic-Comics is distributed in the hope that it will be useful,
+but WITHOUT ANY WARRANTY; without even the implied warranty of
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+GNU General Public License for more details.
+
+You should have received a copy of the GNU General Public License
+along with Cosmic-Comics.  If not, see <https://www.gnu.org/licenses/>.--->
 <!DOCTYPE html>
 <html style="overflow-x: hidden">
   <head>
@@ -12,7 +26,10 @@
       href="https://fonts.googleapis.com/icon?family=Material+Icons"
       rel="stylesheet"
     />
-    <link href="https://fonts.googleapis.com/css?family=Oswald|Roboto+Condensed&display=swap" rel="stylesheet">
+    <link
+      href="https://fonts.googleapis.com/css?family=Oswald|Roboto+Condensed&display=swap"
+      rel="stylesheet"
+    />
 
     <link href="css/materialize.css" rel="stylesheet" />
 
@@ -28,9 +45,35 @@
         class="navbar-brand rotate linear infinite"
         id="logo"
       />
-      <p style="font-size: 20px;font-family: Roboto Condensed, sans-serif;margin-top: 10px;" id="msgloading">Loading...</p>
+      <p
+        style="
+          font-size: 20px;
+          font-family: Roboto Condensed, sans-serif;
+          margin-top: 10px;
+        "
+        id="msgloading"
+      >
+        Loading...
+      </p>
     </div>
-
+    <select
+      class="form-select"
+      aria-label="Default select example"
+      style="margin-bottom: 5px; display: none"
+      onchange="selectOS()"
+      id="selectOS"
+    >
+      <option value="msstore">Windows : Microsoft Store</option>
+      <option value="nsis">Windows : Executable</option>
+      <option value="wzip">Windows : ZIP</option>
+      <option value="snapcraft">Linux : Snapcraft</option>
+      <option value="snap">Linux : SNAP</option>
+      <option value="deb">Linux : DEB</option>
+      <option value="rpm">Linux : RPM</option>
+      <option value="appimage">Linux : AppImage</option>
+      <option value="lzip">Linux : ZIP</option>
+      <option value="wno">Portable / DevMode</option>
+    </select>
     <div class="progress">
       <div
         id="prgs"
@@ -41,6 +84,5 @@
   </header>
   <body>
     <script src="updater.js"></script>
-
   </body>
 </html>

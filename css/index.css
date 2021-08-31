@@ -1,5 +1,22 @@
+/*This file is part of Cosmic-comics.
+
+Cosmic-Comics is free software: you can redistribute it and/or modify
+it under the terms of the GNU General Public License as published by
+the Free Software Foundation, either version 3 of the License, or
+(at your option) any later version.
+
+Cosmic-Comics is distributed in the hope that it will be useful,
+but WITHOUT ANY WARRANTY; without even the implied warranty of
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+GNU General Public License for more details.
+
+You should have received a copy of the GNU General Public License
+along with Cosmic-Comics.  If not, see <https://www.gnu.org/licenses/>.*/
+
 html {
-  background-color: #222222;
+  background-color: #181818;
+  --speed: 0.65s;
+  --font: "Roboto", sans-serif;
 }
 a {
   text-decoration: none;
@@ -94,7 +111,7 @@ img {
   image-rendering: initial;
 }
 ::-webkit-scrollbar {
-  width: 2px;
+  width: 5px;
 }
 
 ::-webkit-scrollbar-thumb {
@@ -111,30 +128,7 @@ img {
 .SpaceX {
   margin: 100px;
 }
-.menu {
-  width: 120px;
-  z-index: 1;
-  box-shadow: 0 4px 5px 3px rgba(0, 0, 0, 0.2);
-  position: fixed;
-  display: none;
-  transition: 0.2s display ease-in;
-  background-color: #222222;
-}
-.menu .menu-options {
-  list-style: none;
-  padding: 10px 0;
-  z-index: 1;
-}
-.menu .menu-options .menu-option {
-  font-weight: 500;
-  z-index: 1;
-  font-size: 14px;
-  padding: 10px 40px 10px 20px;
-  cursor: pointer;
-}
-.menu .menu-options .menu-option:hover {
-  background: rgba(0, 0, 0, 0.2);
-}
+
 #overlay {
   position: fixed;
   /* Sit on top of the page content */
@@ -150,7 +144,7 @@ img {
   bottom: 0;
   background-color: #222222;
   /* Black background with opacity */
-  z-index: 2;
+  z-index: 1000;
   /* Specify a stack order in case you're using a different order for other elements */
   cursor: normal;
   /* Add a pointer on hover */
@@ -179,6 +173,40 @@ img {
   animation-iteration-count: infinite;
 }
 
+.background-image {
+  position: fixed;
+  left: 0;
+  right: 0;
+  z-index: 1;
+  display: block;
+  height: 100%;
+  -webkit-filter: blur(10px);
+  -moz-filter: blur(10px);
+  -o-filter: blur(10px);
+  -ms-filter: blur(10px);
+  filter: blur(10px);
+  background-size: 100%;
+}
+.relationsDiv {
+}
+.layer {
+  background-color: rgba(0, 0, 0, 0.6);
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  left: 0;
+  right: 0;
+}
+.content {
+  text-align: center;
+  margin-top: 60px;
+  position: relative;
+  left: 0;
+  right: 0;
+  z-index: 1000;
+  margin-left: 20px;
+  margin-right: 20px;
+}
 @keyframes rotation {
   from {
     transform: rotate(0deg);
@@ -207,6 +235,9 @@ img {
 
 .closebtn:hover {
   background-color: rgb(87, 6, 6);
+}
+.btnw:hover {
+  background-color: rgb(41, 41, 41);
 }
 ul:not(.browser-default) > li {
   list-style-type: none;
@@ -257,9 +288,686 @@ a {
 }
 @keyframes CtL {
   from {
-    left:0;
+    left: 0;
   }
   to {
     left: -100%;
   }
+}
+/* The snackbar - position it at the bottom and in the middle of the screen */
+#snackbar {
+  visibility: hidden; /* Hidden by default. Visible on click */
+  background-color: #333; /* Black background color */
+  min-width: 100%;
+  color: #fff; /* White text color */
+  text-align: center; /* Centered text */
+  border-radius: 2px; /* Rounded borders */
+  padding: 16px; /* Padding */
+  position: fixed; /* Sit on top of the screen */
+  z-index: 500000; /* Add a z-index if needed */
+  bottom: 30px; /* 30px from the bottom */
+}
+
+/* Show the snackbar when clicking on a button (class added with JavaScript) */
+#snackbar.show {
+  visibility: visible; /* Show the snackbar */
+  /* Add animation: Take 0.5 seconds to fade in and out the snackbar.
+  However, delay the fade out process for 2.5 seconds */
+  /*-webkit-animation: fadein 0.5s, fadeout 0.5s 2.5s;*/
+  animation: bounceInUp 1s, bounceOutDown 1s 2.5s;
+  /*animation: fadein 0.5s, fadeout 0.5s 2.5s;*/
+}
+
+/* Animations to fade the snackbar in and out */
+@-webkit-keyframes fadein {
+  from {
+    bottom: 0;
+    opacity: 0;
+  }
+  to {
+    bottom: 30px;
+    opacity: 1;
+  }
+}
+
+@keyframes fadein {
+  from {
+    bottom: 0;
+    opacity: 0;
+  }
+  to {
+    bottom: 30px;
+    opacity: 1;
+  }
+}
+
+@-webkit-keyframes fadeout {
+  from {
+    bottom: 30px;
+    opacity: 1;
+  }
+  to {
+    bottom: 0;
+    opacity: 0;
+  }
+}
+
+@keyframes fadeout {
+  from {
+    bottom: 30px;
+    opacity: 1;
+  }
+  to {
+    bottom: 0;
+    opacity: 0;
+  }
+}
+.warning:hover {
+  background-color: #fd7e14;
+  color: #000;
+}
+
+/* (A) WRAPPER */
+.hoverwrap {
+  position: relative;
+}
+
+/* (B) RESPONSIVE IMAGE */
+.hoverwrap img {
+  width: 100%;
+}
+
+/* (C) CAPTION */
+.hovercap {
+  /* (C1) DIMENSIONS */
+  box-sizing: border-box;
+  width: 100%;
+  height: 100%;
+  /* (C2) BOTTOM */
+  text-align: center;
+  top: 0;
+  position: absolute;
+  padding-top: 30%;
+  /* (C3) COLORS */
+  background-color: rgba(0, 0, 0, 0.836);
+  color: white;
+}
+
+/* (D) SHOW/HIDE */
+.hovercap {
+  visibility: none;
+  opacity: 0;
+  transition: opacity 0.3s;
+}
+.hoverwrap:hover .hovercap {
+  visibility: visible;
+  opacity: 1;
+}
+.SideBar_current {
+  background-color: #404040;
+}
+.rating-css {
+  cursor: pointer;
+  height: 30px;
+  font-size: 0;
+  margin-bottom: 15px;
+}
+
+.rating-css input {
+  display: none;
+}
+
+.rating-css input + label {
+  text-align: center;
+  font-size: 24px;
+  color: #ffc107;
+  cursor: pointer;
+}
+
+.rating-css input:checked + label ~ label {
+  color: #555;
+}
+
+.rating-css.hover-effect input:checked + label ~ label,
+.rating-css.hover-effect:hover input:hover + label ~ label {
+  opacity: 0.5;
+}
+
+.rating-css.hover-effect:hover input + label ~ label {
+  opacity: 1;
+}
+@keyframes zoom {
+  from {
+    object-position: 0 50%;
+  }
+  to {
+    object-position: 100% 50%;
+  }
+}
+
+@keyframes blur {
+  from {
+    -webkit-transform: scale(1, 1);
+    transform: scale(1, 1);
+  }
+  to {
+    -webkit-transform: scale(1.5, 1.5);
+    transform: scale(2, 2);
+  }
+}
+
+* {
+  border: 0;
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+body {
+  font-family: var(--font);
+  font-weight: var(--fontOrigin);
+  font-size: 1rem;
+  line-height: 1.2;
+  letter-spacing: 0.005rem;
+  -webkit-font-smoothing: subpixel-antialiased;
+  font-smoothing: subpixel-antialiased;
+}
+
+.menu {
+  grid-area: menu;
+  align-self: end;
+}
+
+.menu__list {
+  text-align: center;
+}
+
+.menu__item {
+  position: relative;
+  display: inline-block;
+  padding: 10px 20px;
+  font-size: var(--fontMedium);
+  font-weight: var(--fontRegular);
+  text-transform: uppercase;
+  color: #a9a9a9;
+  cursor: pointer;
+  -webkit-transition: all var(--speed) ease;
+  transition: all var(--speed) ease;
+}
+
+.menu__item::after {
+  content: "";
+  display: block;
+  width: 0;
+  height: 2px;
+  margin-top: 6px;
+  background: rgba(100, 100, 250, 1);
+  -webkit-transition: all var(--speed) ease;
+  transition: all var(--speed) ease;
+}
+
+.menu__item:hover {
+  color: rgba(150, 150, 255, 1);
+}
+.menu__item.active {
+  color: rgba(100, 100, 250, 1);
+}
+
+.menu__item.active::after {
+  width: 100%;
+}
+
+.card {
+  position: relative;
+  grid-area: card;
+  align-self: center;
+  justify-self: center;
+  overflow: hidden;
+  display: block;
+  width: 100%;
+  max-width: 250px;
+  height: 380px;
+  font-size: var(--fontOrigin);
+  border-radius: 8px;
+  box-shadow: 0 16px 60px rgba(0, 0, 0, 0.3);
+  -webkit-transition: all var(--speed) ease;
+  transition: all var(--speed) ease;
+  margin: 20px;
+}
+
+.card:hover {
+  box-shadow: 0 40px 130px rgba(0, 0, 0, 0.6);
+  -webkit-transform: scale(1.1, 1.1);
+  transform: scale(1.1, 1.1);
+}
+.card__rating {
+  position: absolute;
+  top: 10px;
+  left: 0;
+  display: block;
+  width: 35px;
+  height: 35px;
+  background: transparent;
+  border: 0;
+  opacity: 0;
+  border-radius: 3px;
+  -webkit-transition: all var(--speed) ease;
+  transition: all var(--speed) ease;
+  z-index: 2;
+}
+
+.card__rating:focus {
+  outline: 0;
+  background-color: rgba(255, 255, 255, 0);
+}
+
+.card:hover .card__rating {
+  opacity: 0.6;
+}
+
+.card__rating i {
+  font-size: 18px;
+  color: rgba(255, 255, 255, 0.6);
+  cursor: pointer;
+  -webkit-transition: all var(--speed) ease;
+  transition: all var(--speed) ease;
+}
+
+.card__rating:hover i {
+  color: rgba(255, 255, 255, 0.8);
+}
+
+.card__rating:active,
+.card__rating.active {
+  opacity: 1 !important;
+}
+
+.card__rating:active i,
+.card__rating.active i {
+  color: white;
+}
+.card__save {
+  position: absolute;
+  top: 10px;
+  right: 10px;
+  display: block;
+  width: 35px;
+  height: 35px;
+  background: transparent;
+  border: 0;
+  opacity: 0;
+  border-radius: 3px;
+  -webkit-transition: all var(--speed) ease;
+  transition: all var(--speed) ease;
+  z-index: 2;
+}
+
+.card__save:focus {
+  outline: 0;
+  background-color: rgba(255, 255, 255, 0);
+}
+
+.card:hover .card__save {
+  opacity: 0.6;
+}
+
+.card__save i {
+  font-size: 24px;
+  color: rgba(255, 0, 0, 0.6);
+  cursor: pointer;
+  -webkit-transition: all var(--speed) ease;
+  transition: all var(--speed) ease;
+}
+
+.card__save:hover i {
+  color: rgba(255, 0, 0, 0.8);
+}
+
+.card__save:active,
+.card__save.active {
+  opacity: 1 !important;
+}
+
+.card__save:active i,
+.card__save.active i {
+  color: rgb(255, 0, 0);
+}
+.card__close {
+  position: absolute;
+  top: 10px;
+  right: 40px;
+  display: block;
+  width: 35px;
+  height: 35px;
+  background: transparent;
+  border: 0;
+  opacity: 0;
+  border-radius: 3px;
+  -webkit-transition: all var(--speed) ease;
+  transition: all var(--speed) ease;
+  z-index: 2;
+}
+
+.card__close:focus {
+  outline: 0;
+  background-color: rgba(255, 255, 255, 0);
+}
+
+.card:hover .card__close {
+  opacity: 0.6;
+}
+
+.card__close i {
+  font-size: 24px;
+  color: rgba(255, 0, 0, 0.6);
+  cursor: pointer;
+  -webkit-transition: all var(--speed) ease;
+  transition: all var(--speed) ease;
+}
+
+.card__close:hover i {
+  color: rgba(255, 0, 0, 0.8);
+}
+
+.card__close:active,
+.card__close.active {
+  opacity: 1 !important;
+}
+
+.card__close:active i,
+.card__close.active i {
+  color: rgb(255, 0, 0);
+}
+.card__reading {
+  position: absolute;
+  top: 10px;
+  right: 80px;
+  display: block;
+  width: 35px;
+  height: 35px;
+  background: transparent;
+  border: 0;
+  opacity: 0;
+  border-radius: 3px;
+  -webkit-transition: all var(--speed) ease;
+  transition: all var(--speed) ease;
+  z-index: 2;
+}
+
+.card__reading:focus {
+  outline: 0;
+  background-color: rgba(255, 115, 0, 0);
+}
+
+.card:hover .card__reading {
+  opacity: 0.6;
+}
+
+.card__reading i {
+  font-size: 24px;
+  color: rgba(255, 145, 0, 0.4);
+  cursor: pointer;
+  -webkit-transition: all var(--speed) ease;
+  transition: all var(--speed) ease;
+}
+
+.card__reading:hover i {
+  color: rgba(255, 145, 0, 0.8);
+}
+
+.card__reading:active,
+.card__reading.active {
+  opacity: 1 !important;
+}
+
+.card__reading:active i,
+.card__reading.active i {
+  color: rgb(255, 145, 0);
+}
+.card__read {
+  position: absolute;
+  top: 10px;
+  right: 120px;
+  display: block;
+  width: 35px;
+  height: 35px;
+  background: transparent;
+  border: 0;
+  opacity: 0;
+  border-radius: 3px;
+  -webkit-transition: all var(--speed) ease;
+  transition: all var(--speed) ease;
+  z-index: 2;
+}
+
+.card__read:focus {
+  outline: 0;
+  background-color: rgba(255, 255, 255, 0);
+}
+
+.card:hover .card__read {
+  opacity: 0.6;
+}
+
+.card__read i {
+  font-size: 24px;
+  color: rgba(0, 223, 11, 0.6);
+  cursor: pointer;
+  -webkit-transition: all var(--speed) ease;
+  transition: all var(--speed) ease;
+}
+
+.card__read:hover i {
+  color: rgba(0, 223, 11, 0.8);
+}
+
+.card__read:active,
+.card__read.active {
+  opacity: 1 !important;
+}
+
+.card__read:active i,
+.card__read.active i {
+  color: rgb(0, 223, 11);
+}
+.card__play {
+  position: absolute;
+  right: 20px;
+  bottom: 20px;
+  display: block;
+  width: 40px;
+  height: 40px;
+  background: transparent;
+  border: 0;
+  opacity: 0;
+  border-radius: 3px;
+  -webkit-transition: all var(--speed) ease;
+  transition: all var(--speed) ease;
+  z-index: 2;
+}
+
+.card__play:focus {
+  outline: 0;
+  background-color: rgba(255, 255, 255, 0);
+}
+
+.card:hover .card__play {
+  opacity: 0.6;
+}
+
+.card__play i {
+  font-size: 40px;
+  color: rgba(255, 255, 255, 0.6);
+  cursor: pointer;
+  -webkit-transition: all var(--speed) ease;
+  transition: all var(--speed) ease;
+}
+
+.card__play:hover i {
+  color: rgba(255, 255, 255, 0.8);
+}
+
+.card__play:active,
+.card__play.active {
+  opacity: 1 !important;
+}
+
+.card__play:active i,
+.card__play.active i {
+  color: white;
+}
+.card__info {
+  position: absolute;
+  top: 10px;
+  right: 160px;
+  display: block;
+  width: 35px;
+  height: 35px;
+  background: transparent;
+  border: 0;
+  opacity: 0;
+  border-radius: 3px;
+  -webkit-transition: all var(--speed) ease;
+  transition: all var(--speed) ease;
+  z-index: 2;
+}
+
+.card__info:focus {
+  outline: 0;
+  background-color: rgba(255, 255, 255, 0);
+}
+
+.card:hover .card__info {
+  opacity: 0.6;
+}
+
+.card__info i {
+  font-size: 24px;
+  color: rgba(0, 162, 255, 0.76);
+  cursor: pointer;
+  -webkit-transition: all var(--speed) ease;
+  transition: all var(--speed) ease;
+}
+
+.card__info:hover i {
+  color: rgba(0, 162, 255, 0.8);
+}
+.card__image {
+  position: absolute;
+  top: 0;
+  left: 0;
+  z-index: 0;
+  overflow: hidden;
+  display: block;
+  width: 100%;
+  height: 100%;
+  pointer-events: none;
+  background-color: rgba(0, 0, 0, 0.753);
+}
+.card__image img {
+  -webkit-transform: scale(1.3, 1.3);
+  transform: scale(1, 1);
+  display: block;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  opacity: 1;
+  -webkit-transition: all var(--speed) ease;
+  transition: all var(--speed) ease;
+}
+
+.card:hover .card__image img {
+  -webkit-transform: scale(1, 1);
+  transform: scale(1, 1);
+  opacity: 0.1;
+}
+
+.card__header {
+  display: grid;
+  width: 100%;
+  height: 200px;
+}
+
+.card__profile {
+  align-self: center;
+  justify-self: center;
+  display: block;
+  overflow: hidden;
+  width: 10vmax;
+  height: 10vmax;
+  max-width: 100px;
+  max-height: 100px;
+  border-radius: 50%;
+}
+
+.card__profile img {
+  -webkit-transform: scale(1.5, 1.5) translateZ(0);
+  transform: scale(1.5, 1.5) translateZ(0);
+  display: block;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  object-position: 50% 50%;
+  -webkit-filter: grayscale(50%) contrast(75%) brightness(1.3);
+  filter: grayscale(50%) contrast(75%) brightness(1.3);
+  -webkit-transition: all var(--speed) ease;
+  transition: all var(--speed) ease;
+  mix-blend-mode: normal;
+  -webkit-backface-visibility: hidden;
+  backface-visibility: hidden;
+}
+
+.card:hover .card__profile img {
+  -webkit-transform: scale(1, 1) translateZ(0);
+  transform: scale(1, 1) translateZ(0);
+}
+
+.card__body {
+  display: grid;
+  padding: 100px 20px;
+}
+
+.card__name {
+  align-self: center;
+  justify-self: center;
+  margin-bottom: 2px;
+  color: white;
+  font-size: var(--fontLarge);
+  font-weight: var(--fontLight);
+  letter-spacing: 0.1rem;
+  text-align: center;
+  text-transform: uppercase;
+  text-shadow: 0 1px 2px rgba(0, 0, 0, 0.35);
+  background: -webkit-linear-gradient(white, #a1a1a1);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  -webkit-transition: all var(--speed) ease;
+  transition: all var(--speed) ease;
+}
+
+.card:hover .card__name {
+  background: -webkit-linear-gradient(white, #c1c1c1);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+}
+
+.card__bio {
+  position: relative;
+  -webkit-transform: translateY(30%);
+  transform: translateY(30%);
+  display: block;
+  margin: 22px 0 16px 0;
+  font-size: var(--fontMedium);
+  font-weight: var(--fontLight);
+  /*text-shadow: 0 0.5px 1px rgba(0, 0, 0, 0.35);*/
+  color: rgb(255, 255, 255);
+  opacity: 0;
+  -webkit-transition: all var(--speed) ease;
+  transition: all var(--speed) ease;
+}
+
+.card:hover .card__bio {
+  -webkit-transform: translateY(0);
+  transform: translateY(0);
+  opacity: 1;
 }

@@ -1,18 +1,21 @@
 {
     "name": "cosmiccomics",
-    "productName": "Cosmic Comics",
+    "productName": "Cosmic-Comics",
     "build": {
+        "artifactName": "Cosmic-Comics_${version}_${os}.${ext}",
         "files": [
             "**/*",
             "!FirstImageOfAll${/*}",
-            "!tmp${/*}"
+            "!tmp${/*}",
+            "!languages/dev.json"
         ],
         "asar": false,
         "appId": "com.Nytuo.CosmicComics",
         "nsis": {
             "oneClick": true,
             "runAfterFinish": false,
-            "createDesktopShortcut": "always"
+            "createDesktopShortcut": "always",
+            "perMachine": true
         },
         "snap": {
             "confinement": "strict"
@@ -28,6 +31,28 @@
             }
         ],
         "win": {
+            "fileAssociations": [
+                {
+                    "ext": "cosmic",
+                    "description": "Cosmic Comics Cover"
+                },
+                {
+                    "ext": "cbz",
+                    "description": "Comic Book Zip"
+                },
+                {
+                    "ext": "cbr",
+                    "description": "Comic Book RAR"
+                },
+                {
+                    "ext": "cbt",
+                    "description": "Comic Book TAR"
+                },
+                {
+                    "ext": "cb7",
+                    "description": "Comic Book 7z"
+                }
+            ],
             "publish": [
                 "github"
             ],
@@ -44,14 +69,19 @@
             "target": [
                 "AppImage",
                 "snap",
-                "zip"
+                "zip",
+                "deb",
+                "rpm"
             ],
             "icon": "Images/Logo.png",
             "category": "Utility"
+        },
+        "mac":{
+            "target": ["dmg","zip"]
         }
     },
-    "version": "0.0.23",
-    "description": "Comics and Manga Collection Viewer",
+    "version": "1.0.0",
+    "description": "Comics and Manga Reader with collectionner",
     "main": "main.js",
     "author": {
         "name": "Nytuo",
@@ -67,20 +97,21 @@
     "scripts": {
         "postinstall": "electron-builder install-app-deps",
         "dist": "electron-builder",
-        "devBuild": "electron-builder --x64 -p never",
+        "devBuild": "electron-builder --x64 --ia32 --arm -p never",
         "start": "electron .",
         "prodBuild": "electron-builder --x64 -p always"
     },
     "dependencies": {
         "7zip-bin": "^5.1.1",
         "@popperjs/core": "^2.9.2",
+        "anilist.js": "^1.2.1",
         "bootstrap": "^5.0.2",
         "bootstrap-icons": "^1.5.0",
         "color-thief-browser": "^2.0.2",
+        "comicgeeks": "^1.1.0",
         "discord-rich-presence": "^0.0.8",
         "discord-rpc": "^4.0.1",
         "download": "^8.0.0",
-        "electron-updater": "^4.3.9",
         "github-content": "^1.0.1",
         "html-magnifier": "^2.0.2",
         "node-7z": "^3.0.0",

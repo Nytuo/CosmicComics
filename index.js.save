@@ -12,21 +12,17 @@ GNU General Public License for more details.
 
 You should have received a copy of the GNU General Public License
 along with Cosmic-Comics.  If not, see <https://www.gnu.org/licenses/>.*/
-//Variables declaration
-//All required nodes modules
-const { shell } = require("electron");
+
+
+
+WARNING THIS A SAVE OF THE OLD INDEX.JS WHICH PROVIDE ANOTHER DISPLAY (BUT NOW INCOMPATIBLE)
+
+
+
+const { dialog, shell } = require("electron");
+const { Menu, MenuItem } = remote;
 const fs = require("fs");
 const patha = require("path");
-const SevenBin = require("7zip-bin");
-const Seven = require("node-7z");
-var Unrar = require("unrar");
-const { electron } = require("process");
-const { get } = require("https");
-var bootstrap = require("bootstrap");
-var popper = require("@popperjs/core");
-const DRPC = require("discord-rpc");
-
-//All other variables and constants
 const ValidatedExtension = [
   "cbr",
   "cbz",
@@ -38,62 +34,55 @@ const ValidatedExtension = [
   "cbt",
   "rar",
 ];
+const SevenBin = require("7zip-bin");
+const Seven = require("node-7z");
 const Path27Zip = SevenBin.path7za;
+var Unrar = require("unrar");
+const { electron } = require("process");
+const { get } = require("https");
 var imagelink = "null";
 var nabc = 0;
 var dirnamew = __dirname.replaceAll("\\", "/");
 var listOfImages = [];
-var name_of_the_current_book = "";
-var path_of_the_current_book = "";
+var whichname = "";
+var whichpath = "";
 var folderRootPath = [];
 var favonly = false;
 var readonly = false;
 var unreadonly = false;
 var readingonly = false;
-const app = remote.app;
-var CosmicComicsData = app.getPath("userData") + "/CosmicComics_data";
-var CosmicComicsTemp = app.getPath("temp") + "/CosmicComics";
-const parentfolder1 = require("path").dirname(__dirname);
-const parentfolder2 = require("path").dirname(parentfolder1);
-const parentfolder3 = require("path").dirname(parentfolder2);
-if (fs.existsSync(parentfolder3+"/portable.txt")){
-  CosmicComicsData = parentfolder3+"/AppData"
-  CosmicComicsTemp = parentfolder3+"/TMP"
-}
-var CosmicComicsTempI = CosmicComicsTemp + "/current_book/";
-
-var GetAllIMG = false;
-const ClientID = "870352308062539796";
-const rpc = new DRPC.Client({ transport: "ipc" });
-const startTimestamp = new Date();
-
-//ToolTips
+var popper = require("@popperjs/core");
+var bootstrap = require("bootstrap");
 var tooltipTriggerList = [].slice.call(
   document.querySelectorAll('[data-bs-toggle="tooltip"]')
 );
 var tooltipList = tooltipTriggerList.map(function (tooltipTriggerEl) {
   return new bootstrap.Tooltip(tooltipTriggerEl);
 });
-
-//set the Language
-var language = Get_Lang();
-
-//Get the Lang from the JSON
-function Get_Lang() {
-  var config_JSON = fs.readFileSync(CosmicComicsData + "/config.json");
-  var parsedJSON = JSON.parse(config_JSON);
-  var config_lang = Get_From_Config("language", parsedJSON);
-  return lang_from_JSON(config_lang);
-}
-
-//Get the language values from the language JSON
-function lang_from_JSON(language) {
-  var file = fs.readFileSync(__dirname + "/languages/" + language + ".json");
+const parentfolder1 = require("path").dirname(__dirname);
+const parentfolder2 = require("path").dirname(parentfolder1);
+const parentfolder3 = require("path").dirname(parentfolder2);
+const app = remote.app;
+var CosmicComicsData = app.getPath("userData") + "/CosmicComics_data";
+var GetAllIMG = false;
+const DRPC = require("discord-rpc");
+const { error } = require("console");
+const ClientID = "870352308062539796";
+const rpc = new DRPC.Client({ transport: "ipc" });
+const startTimestamp = new Date();
+function lang(langg) {
+  var file = fs.readFileSync(__dirname + "/languages/" + langg + ".json");
   var JSONRes = JSON.parse(file);
   return JSONRes[0];
 }
+function GetLANGINFO() {
+  var configFile = fs.readFileSync(CosmicComicsData + "/config.json");
+  var parsedJSON = JSON.parse(configFile);
+  var configlang = GetElFromInforPath("language", parsedJSON);
+  return lang(configlang);
+}
+var language = GetLANGINFO();
 
-//Set the activity on Discord
 function setActivity() {
   rpc.setActivity({
     details: language["in_menu"],
@@ -111,16 +100,10 @@ rpc.on("ready", () => {
   setInterval(setActivity(), 15e3);
 });
 rpc.login({ clientId: ClientID }).catch(console.error);
-
-//Get the version and display it on the info
 document.getElementById("version").innerHTML =
   language["version"] + ": " + remote.app.getVersion();
-
-//Get the path of the comics folder from the config.JSON
-var get_Folder_Path_JSON = get_folder_path_from_JSON(CosmicComicsData + "/config.json");
-
-//if you have a folder used lasted time then it's loaded
-if (get_Folder_Path_JSON != null && get_Folder_Path_JSON != "") {
+var getFolderJSON = getfolderfromJSON(CosmicComicsData + "/config.json");
+if (getFolderJSON != null && getFolderJSON != "") {
   document.getElementById("overlaymsg").innerHTML =
     language["overlaymsg_refolder"];
   setTimeout(() => {
@@ -128,12 +111,11 @@ if (get_Folder_Path_JSON != null && get_Folder_Path_JSON != "") {
       language["overlaymsg_piracy"];
   }, 5000);
   var listfolder = [];
-  listfolder.push(get_Folder_Path_JSON);
+  listfolder.push(getFolderJSON);
   folderRootPath.push(listfolder[0]);
-  openFolder_logic(listfolder);
+  openFolderRoutine(listfolder);
 }
 
-//Open the folder
 function openFolder() {
   let result = remote.dialog.showOpenDialogSync({
     properties: ["openDirectory"],
@@ -146,62 +128,52 @@ function openFolder() {
         language["overlaymsg_takecare"];
     }, 5000);
     folderRootPath.push(result[0]);
-    Modify_JSON_For_Config(CosmicComicsData + "/config.json", "path", result[0]);
-    openFolder_logic(result);
+    ModifyJSONFileForPath(CosmicComicsData + "/config.json", "path", result[0]);
+    openFolderRoutine(result);
   }
 }
-
-//Forget the current folder
 function obliviate() {
-  Modify_JSON_For_Config(CosmicComicsData + "/config.json", "path", "");
+  ModifyJSONFileForPath(CosmicComicsData + "/config.json", "path", "");
   window.location.reload();
 }
-
-//Changing the Update provider
 function changeUpdateProvider() {
-  Modify_JSON_For_Config(
+  ModifyJSONFileForPath(
     CosmicComicsData + "/config.json",
     "update_provider",
     ""
   );
-  Toastifycation(language["next_time"], "#00C33C");
+  Toastifycation(
+    "Done, You will be asked next time you launch the app!",
+    "#00C33C"
+  );
 }
-
-//Modify the JSON for config.json
-function Modify_JSON_For_Config(json, tomodify, modification) {
-  var config_JSON = fs.readFileSync(json);
-  var config = JSON.parse(config_JSON);
+function ModifyJSONFileForPath(json, tomod, mod) {
+  //check si obj exist pour remplacer valeur
+  var configFile = fs.readFileSync(json);
+  var config = JSON.parse(configFile);
   for (var i in config) {
-    config[i][tomodify] = modification;
+    config[i][tomod] = mod;
   }
-  var config_JSON_Final = JSON.stringify(config, null, 2);
-  fs.writeFileSync(json, config_JSON_Final);
+  var configJSON = JSON.stringify(config, null, 2);
+  fs.writeFileSync(json, configJSON);
 }
-
-//Get element from config.json
-function Get_From_Config(what_you_want, data) {
-  for (var i in data[0]) {
-    if (i == what_you_want) {
-      return data[0][i];
+function GetElFromInforPath(search, info) {
+  for (var i in info[0]) {
+    if (i == search) {
+      return info[0][i];
     }
   }
   return null;
 }
-
-//refresh the folder
 function refreshFolder() {
   window.location.href = window.location.href;
 }
-
-//get the folder's path from config.json
-function get_folder_path_from_JSON(json) {
+function getfolderfromJSON(json) {
   var configFile = fs.readFileSync(json);
   var parsedJSON = JSON.parse(configFile);
-  return Get_From_Config("path", parsedJSON);
+  return GetElFromInforPath("path", parsedJSON);
 }
-
-//Continue after extracting the image
-function Continue_After_Extracting_Image(
+function ContinueAfterExtrImg(
   FolderResults,
   result,
   favonly,
@@ -210,7 +182,7 @@ function Continue_After_Extracting_Image(
   readingonly
 ) {
   if (GetAllIMG == true) {
-    loadContent(
+    loadContents(
       FolderResults,
       result[0],
       favonly,
@@ -222,7 +194,7 @@ function Continue_After_Extracting_Image(
     alert(language["err_img"]);
   } else {
     setTimeout(() => {
-      Continue_After_Extracting_Image(
+      ContinueAfterExtrImg(
         FolderResults,
         result,
         favonly,
@@ -233,9 +205,7 @@ function Continue_After_Extracting_Image(
     }, 500);
   }
 }
-
-//Open folder logic
-function openFolder_logic(folder) {
+function openFolderRoutine(folder) {
   document.getElementById("tutotxt").style.display = "none";
   document.getElementById("opnfld").onclick = "";
   document.getElementById("opnfld").setAttribute("disabled", "");
@@ -244,23 +214,26 @@ function openFolder_logic(folder) {
     var result = folder;
     if (result) {
       var FolderRes = DetectFilesAndFolders(result[0]);
+      /*document.getElementById("p").innerHTML =
+        "Location: " + result + " -- Total: " + FolderRes.length;*/
+      //lancer le unzip des premiers de chaque
       var AllFolderRes = DetectAllFilesAndFolders(result[0]);
-      AllFolderResults = Check_File_For_Validated_extension(AllFolderRes, ValidatedExtension);
+      AllFolderResults = CheckCorrectExt4File(AllFolderRes, ValidatedExtension);
       GetTheFirstImageOfComicsByFolder(AllFolderResults);
-      FolderResults = Check_File_For_Validated_extension(FolderRes, ValidatedExtension);
+      FolderResults = CheckCorrectExt4File(FolderRes, ValidatedExtension);
       FolderResults.forEach((file) => {
         var stat = fs.statSync(file);
         var name = patha.basename(file);
         var realname = name.split(".");
         realname = realname[0];
-        var shortname = get_the_ID_by_name(realname);
-        var Info = Get_From_JSON(
+        var shortname = GetTheName(realname);
+        var Info = GetInfoFromJSON(
           CosmicComicsData + "/ListOfComics.json",
           shortname
         );
         if (
-          Get_element_from_data("read", Info) == "undefined" ||
-          Get_element_from_data("read", Info) == null
+          GetElFromInfo("read", Info) == "undefined" ||
+          GetElFromInfo("read", Info) == null
         ) {
           if (stat.isDirectory()) {
             var obj = {
@@ -275,7 +248,7 @@ function openFolder_logic(folder) {
               note: -1,
             };
 
-            Add_To_JSON(obj, CosmicComicsData + "/ListOfComics.json");
+            SaveInfoToJSON(obj, CosmicComicsData + "/ListOfComics.json");
           } else {
             var obj = {
               fullname: realname,
@@ -289,11 +262,11 @@ function openFolder_logic(folder) {
               note: -1,
             };
 
-            Add_To_JSON(obj, CosmicComicsData + "/ListOfComics.json");
+            SaveInfoToJSON(obj, CosmicComicsData + "/ListOfComics.json");
           }
         }
       });
-      Continue_After_Extracting_Image(
+      ContinueAfterExtrImg(
         FolderResults,
         result,
         favonly,
@@ -310,9 +283,7 @@ function openFolder_logic(folder) {
     }
   }, 500);
 }
-
-//Checking if the file have a correct extension (validated)
-function Check_File_For_Validated_extension(folderRes, validedextension) {
+function CheckCorrectExt4File(folderRes, validedextension) {
   FolderResults = [];
   folderRes.forEach((file) => {
     var stat = fs.statSync(file);
@@ -333,7 +304,6 @@ function Check_File_For_Validated_extension(folderRes, validedextension) {
   return FolderResults;
 }
 
-//Modify a JSON file
 function ModifyJSONFile(json, tomod, mod, name) {
   //check si obj exist pour remplacer valeur
   var configFile = fs.readFileSync(json);
@@ -350,60 +320,47 @@ function ModifyJSONFile(json, tomod, mod, name) {
   var configJSON = JSON.stringify(config, null, 2);
   fs.writeFileSync(json, configJSON);
 }
-
-//Add information to JSON
-function Add_To_JSON(obj, json) {
+function SaveInfoToJSON(obj, json) {
+  //check si obj exist pour remplacer valeur
   var configFile = fs.readFileSync(json);
   var config = JSON.parse(configFile);
   config.push(obj);
   var configJSON = JSON.stringify(config, null, 2);
   fs.writeFileSync(json, configJSON);
 }
-
-//Get element from JSON
-function Get_From_JSON(json, name) {
+function GetInfoFromJSON(json, name) {
   var data = fs.readFileSync(json);
   var info = JSON.parse(data);
   var Info = GetInfo("name", info, name);
   return Info;
 }
-
-//Get information
-function GetInfo(search, data, name) {
-  for (var i in data) {
-    for (var j in data[i]) {
+function GetInfo(search, info, name) {
+  for (var i in info) {
+    for (var j in info[i]) {
       if (j == search) {
-        if (name == data[i][j]) {
-          return data[i];
+        if (name == info[i][j]) {
+          return info[i];
         }
       }
     }
   }
   return null;
 }
-
-//Get element from data
-function Get_element_from_data(search, data) {
-  for (var i in data) {
+function GetElFromInfo(search, info) {
+  for (var i in info) {
     if (i == search) {
-      return data[i];
+      return info[i];
     }
   }
   return null;
 }
-
-//On RightClick
 function RightClick(object = HTMLAnchorElement, lepath) {
-  var name = patha.basename(lepath);
-  var realname = name.split(".")[0];
-  var shortname = get_the_ID_by_name(realname);
-  name_of_the_current_book = shortname;
-
-  path_of_the_current_book = lepath;
+  whichname = object.style.backgroundImage;
+  whichname = whichname.split("/");
+  whichname = whichname[whichname.length - 2];
+  whichpath = lepath;
 }
-
-//Loading the content
-function loadContent(
+function loadContents(
   FolderRes,
   root,
   favonly,
@@ -419,14 +376,14 @@ function loadContent(
     var name = patha.basename(file);
     var realname = name.split(".");
     realname = realname[0];
-    var shortname = get_the_ID_by_name(realname);
-    var Info = Get_From_JSON(
+    var shortname = GetTheName(realname);
+    var Info = GetInfoFromJSON(
       CosmicComicsData + "/ListOfComics.json",
       shortname
     );
     if (
-      Get_element_from_data("read", Info) == "undefined" ||
-      Get_element_from_data("read", Info) == null
+      GetElFromInfo("read", Info) == "undefined" ||
+      GetElFromInfo("read", Info) == null
     ) {
       if (stat.isDirectory()) {
         var obj = {
@@ -441,7 +398,7 @@ function loadContent(
           note: -1,
         };
 
-        Add_To_JSON(obj, CosmicComicsData + "/ListOfComics.json");
+        SaveInfoToJSON(obj, CosmicComicsData + "/ListOfComics.json");
       } else {
         var obj = {
           fullname: realname,
@@ -455,31 +412,31 @@ function loadContent(
           note: -1,
         };
 
-        Add_To_JSON(obj, CosmicComicsData + "/ListOfComics.json");
+        SaveInfoToJSON(obj, CosmicComicsData + "/ListOfComics.json");
       }
     }
   });
-  FolderRes.forEach((path, index) => {
+  FolderRes.forEach((path,index) => {
     var stat = fs.statSync(path);
     var name = patha.basename(path);
     var realname = name.split(".");
     realname = realname[0];
-    var shortname = get_the_ID_by_name(realname);
-    var Info = Get_From_JSON(
+    var shortname = GetTheName(realname);
+    var Info = GetInfoFromJSON(
       CosmicComicsData + "/ListOfComics.json",
       shortname
     );
-    var readed = Get_element_from_data("read", Info);
-    var reading = Get_element_from_data("reading", Info);
-    var favorite_v = Get_element_from_data("favorite", Info);
+    var readed = GetElFromInfo("read", Info);
+    var reading = GetElFromInfo("reading", Info);
+    var favorite = GetElFromInfo("favorite", Info);
     if (stat.isDirectory()) {
-      var node = document.createTextNode(realname + "<br> "+language["folder_p"]);
+      var node = document.createTextNode(realname);
       invertedPath = path.replaceAll("\\", "/");
       if (fs.existsSync(invertedPath + "/folder.cosmic")) {
         imagelink = invertedPath + "/folder.cosmic";
         console.log(imagelink);
       } else {
-        imagelink = __dirname + "/Images/folderDefault.png";
+        imagelink = "Images/folderDefault.png";
       }
     } else if (
       fs.existsSync(CosmicComicsData + "/FirstImageOfAll/" + shortname)
@@ -490,13 +447,11 @@ function loadContent(
       );
       var CCDN = CosmicComicsData.replaceAll("\\", "/");
       invertedPath = path.replaceAll("\\", "/");
-      if (fs.existsSync(invertedPath + ".cosmic")) {
-        imagelink = invertedPath + ".cosmic";
+      if (fs.existsSync(invertedPath + "/" + realname + ".cosmic")) {
+        imagelink = invertedPath + "/" + realname + ".cosmic";
         console.log(imagelink);
       } else {
         if (FIOA.length == 0) {
-          console.log(shortname + "/" + shortname + ".jpg not found");
-
           imagelink = "Images/fileDefault.png";
         } else {
           imagelink = CCDN + "/FirstImageOfAll/" + shortname + "/" + FIOA[0];
@@ -508,404 +463,279 @@ function loadContent(
       imagelink = "Images/fileDefault.png";
     }
 
-    listOfImages.push(imagelink);
+listOfImages.push(imagelink);
     //Setting Card Div
     const carddiv = document.createElement("div");
-    if (stat.isDirectory()) {
-      carddiv.style.cursor = "pointer";
-    }
-    carddiv.className = "card";
-    carddiv.setAttribute("data-effect", "zoom");
+    carddiv.className = "card"
+    carddiv.setAttribute("data-effect","blur")
     //button card_save
-    const buttonfav = document.createElement("button");
-    buttonfav.className = "card__save js-fav";
-    buttonfav.type = "button";
-    buttonfav.addEventListener("click", function () {
-      favorite();
-    });
-    buttonfav.id = "btn_id_fav_" + shortname;
-    new bootstrap.Tooltip(buttonfav, {
-      title: language["toogle_fav"],
-      placement: "bottom",
-    });
+    const buttonfav = document.createElement("button")
+    buttonfav.className = "card__save js-fav"
+    buttonfav.type = "button"
     //icon
-    const favicon = document.createElement("i");
-    favicon.className = "material-icons";
-    favicon.innerHTML = "favorite";
-    buttonfav.appendChild(favicon);
-    carddiv.appendChild(buttonfav);
-
+    const favicon = document.createElement("i")
+    favicon.className = "material-icons"
+    favicon.innerHTML = "favorite"
+    buttonfav.appendChild(favicon)
+    carddiv.appendChild(buttonfav)
     //button card__close
-    const button_unread = document.createElement("button");
-    button_unread.className = "card__close js-unread";
-    button_unread.type = "button";
-    button_unread.addEventListener("click", function () {
-      markasunread();
-    });
-    button_unread.id = "btn_id_unread_" + shortname;
-    new bootstrap.Tooltip(button_unread, {
-      title: language["mkunread"],
-      placement: "bottom",
-    });
+    const button_unread = document.createElement("button")
+    button_unread.className = "card__close js-unread"
+    button_unread.type = "button"
     //icon
-    const unread_icon = document.createElement("i");
-    unread_icon.className = "material-icons";
-    unread_icon.innerHTML = "close";
-
-    button_unread.appendChild(unread_icon);
-    carddiv.appendChild(button_unread);
+    const unread_icon = document.createElement("i")
+    unread_icon.className = "material-icons"
+    unread_icon.innerHTML = "close"
+    button_unread.appendChild(unread_icon)
+    carddiv.appendChild(button_unread)
     //button card__reading
-    const button_reading = document.createElement("button");
-    button_reading.className = "card__reading js-reading";
-    button_reading.type = "button";
-    button_reading.addEventListener("click", function () {
-      markasreading();
-    });
-    button_reading.id = "btn_id_reading_" + shortname;
-    new bootstrap.Tooltip(button_reading, {
-      title: language["mkreading"],
-      placement: "bottom",
-    });
+    const button_reading = document.createElement("button")
+    button_reading.className = "card__reading js-reading"
+    button_reading.type = "button"
     //icon
-    const reading_icon = document.createElement("i");
-    reading_icon.className = "material-icons";
-    reading_icon.innerHTML = "auto_stories";
-
-    button_reading.appendChild(reading_icon);
-    carddiv.appendChild(button_reading);
+    const reading_icon = document.createElement("i")
+    reading_icon.className = "material-icons"
+    reading_icon.innerHTML = "auto_stories"
+    button_reading.appendChild(reading_icon)
+    carddiv.appendChild(button_reading)
     //button card__read
-    const button_read = document.createElement("button");
-    button_read.className = "card__read js-read";
-    button_read.type = "button";
-
-    button_read.addEventListener("click", function () {
-      markasread();
-    });
-    button_read.id = "btn_id_read_" + shortname;
-    new bootstrap.Tooltip(button_read, {
-      title: language["mkread"],
-      placement: "bottom",
-    });
+    const button_read = document.createElement("button")
+    button_read.className = "card__read js-read"
+    button_read.type = "button"
     //ico
-    const read_ion = document.createElement("i");
-    read_ion.className = "material-icons";
-    read_ion.innerHTML = "done";
-
-    button_read.appendChild(read_ion);
-    carddiv.appendChild(button_read);
-    //button card__info
-    const button_info = document.createElement("button");
-    button_info.className = "card__info";
-    button_info.type = "button";
-    button_info.addEventListener("click", function () {
-      GetComicInfo();
-    });
-    new bootstrap.Tooltip(button_info, {
-      title: language["info"],
-      placement: "bottom",
-    });
-    //ico
-    const info_icon = document.createElement("i");
-    info_icon.className = "material-icons";
-    info_icon.innerHTML = "info";
-    button_info.appendChild(info_icon);
-    carddiv.appendChild(button_info);
+    const read_ion = document.createElement("i")
+    read_ion.className = "material-icons"
+    read_ion.innerHTML = "auto_stories"
+    button_read.appendChild(read_ion)
+    carddiv.appendChild(button_read)
     //figure card__image
-    const cardimage = document.createElement("div");
-    cardimage.className = "card__image";
-    const imgcard = document.createElement("img");
-    imgcard.style.width = "100%";
-    imgcard.id = "card_img_id_" + index;
-    cardimage.appendChild(imgcard);
-    carddiv.appendChild(cardimage);
+    const cardimage = document.createElement("figure")
+    const bgimg = document.createElement("img")
+
+    cardimage.appendChild(mettreimg)
+    carddiv.appendChild(cardimage)
     //card__body
-    const bodycard = document.createElement("div");
-    bodycard.className = "card__body";
+    const bodycard = document.createElement("div")
+    bodycard.className = "card__body"
     //button play
-    const playbtn = document.createElement("button");
-
-    playbtn.className = "card__play js-play";
-    playbtn.type = "button";
-    const playarr = document.createElement("i");
-    playarr.className = "material-icons";
-    playarr.innerHTML = "play_arrow";
-    playbtn.appendChild(playarr);
-    bodycard.appendChild(playbtn);
-    new bootstrap.Tooltip(playbtn, {
-      title: language["Play"],
-      placement: "bottom",
-    });
-    const pcard_bio = document.createElement("p");
-    pcard_bio.className = "card__bio";
-    pcard_bio.style = "text-align: center;";
-    pcard_bio.innerHTML = node.textContent;
-
-    bodycard.appendChild(pcard_bio);
-    carddiv.appendChild(bodycard);
+    const playbtn = document.createElement("button")
+    playbtn.className = "card__play js-play"
+    playbtn.type = "button"
+    const playarr = document.createElement("i")
+    playarr.className = "material-icons"
+    playarr.innerHTML = "play_arrow"
+    playbtn.appendChild(playarr)
+    const pcard_bio = document.createElement("p")
+    pcard_bio.className = "card__bio"
+    pcard_bio.style = "text-align: center;"
+    pcard_bio.innerHTML = mettretxt
+    bodycard.appendChild(playbtn)
+    bodycard.appendChild(pcard_bio)
+    carddiv.appendChild(bodycard)
     carddiv.id = "id" + n;
+    
 
-    //#region ratingCSS
-    const ratingcss = document.createElement("div");
 
-    ratingcss.className = "rating-css hover-effect card__rating";
-    const ratinginput1 = document.createElement("input");
-    ratinginput1.type = "radio";
-    ratinginput1.value = "1";
-    ratinginput1.id = "rating3-1_" + index;
-    ratinginput1.name = "Rating_" + shortname;
-    ratinginput1.addEventListener("click", function () {
-      SetForRating1(shortname);
-    });
 
-    const label1 = document.createElement("label");
-    label1.setAttribute("for", "rating3-1_" + index);
-    label1.className = "mdi mdi-star";
-    new bootstrap.Tooltip(label1, {
-      title: language["star1"],
-      placement: "right",
-    });
-    const ratinginput2 = document.createElement("input");
-    ratinginput2.type = "radio";
-    ratinginput2.value = "2";
-    ratinginput2.id = "rating3-2_" + index;
-    ratinginput2.name = "Rating_" + shortname;
-    ratinginput2.addEventListener("click", function () {
-      SetForRating2(shortname);
-    });
 
-    const label2 = document.createElement("label");
-    label2.setAttribute("for", "rating3-2_" + index);
-    label2.className = "mdi mdi-star";
-    new bootstrap.Tooltip(label2, {
-      title: language["star2"],
-      placement: "right",
-    });
-    const ratinginput3 = document.createElement("input");
-    ratinginput3.type = "radio";
-    ratinginput3.value = "3";
-    ratinginput3.id = "rating3-3_" + index;
-    ratinginput3.name = "Rating_" + shortname;
-    ratinginput3.addEventListener("click", function () {
-      SetForRating3(shortname);
-    });
 
-    const label3 = document.createElement("label");
-    label3.setAttribute("for", "rating3-3_" + index);
-    label3.className = "mdi mdi-star";
-    new bootstrap.Tooltip(label3, {
-      title: language["star3"],
-      placement: "right",
-    });
-    const ratinginput4 = document.createElement("input");
-    ratinginput4.type = "radio";
-    ratinginput4.value = "4";
-    ratinginput4.id = "rating3-4_" + index;
-    ratinginput4.name = "Rating_" + shortname;
-    ratinginput4.addEventListener("click", function () {
-      SetForRating4(shortname);
-    });
 
-    const label4 = document.createElement("label");
-    label4.setAttribute("for", "rating3-4_" + index);
-    label4.className = "mdi mdi-star";
-    new bootstrap.Tooltip(label4, {
-      title: language["star4"],
-      placement: "right",
-    });
-    const ratinginput5 = document.createElement("input");
-    ratinginput5.type = "radio";
-    ratinginput5.value = "5";
-    ratinginput5.id = "rating3-5_" + index;
-    ratinginput5.name = "Rating_" + shortname;
-    ratinginput5.addEventListener("click", function () {
-      SetForRating5(shortname);
-    });
 
-    const label5 = document.createElement("label");
-    label5.setAttribute("for", "rating3-5_" + index);
-    label5.className = "mdi mdi-star";
-    new bootstrap.Tooltip(label5, {
-      title: language["star5"],
-      placement: "right",
-    });
-    var rating = Get_element_from_data("note", Info);
-    console.log(rating);
-    if (rating == 1) {
-      ratinginput1.checked = true;
-    } else if (rating == 2) {
-      ratinginput2.checked = true;
-    } else if (rating == 3) {
-      ratinginput3.checked = true;
-    } else if (rating == 4) {
-      ratinginput4.checked = true;
-    } else if (rating == 5) {
-      ratinginput5.checked = true;
-    } else if (rating == -1) {
-    } else {
-      console.log("Error when loading Rating for " + shortname);
-    }
-    ratingcss.appendChild(ratinginput1);
-    ratingcss.appendChild(label1);
-    ratingcss.appendChild(ratinginput2);
-    ratingcss.appendChild(label2);
-    ratingcss.appendChild(ratinginput3);
-    ratingcss.appendChild(label3);
-    ratingcss.appendChild(ratinginput4);
-    ratingcss.appendChild(label4);
-    ratingcss.appendChild(ratinginput5);
-    ratingcss.appendChild(label5);
 
-    //#endregion
 
-    if (playbtn.addEventListener) {
-      if (stat.isDirectory()) {
-        carddiv.addEventListener("click", function () {
-          launchDetect(path, root);
-        });
-        playbtn.addEventListener("click", function () {
-          ModifyJSONFile(
-            CosmicComicsData + "/ListOfComics.json",
-            "reading",
-            true,
-            shortname
-          );
-          ModifyJSONFile(
-            CosmicComicsData + "/ListOfComics.json",
-            "unread",
-            false,
-            shortname
-          );
-          Modify_JSON_For_Config(
-            CosmicComicsData + "/config.json",
-            "last_opened",
-            path
-          );
-          window.location.href = "viewer.html?" + path;
-        });
-      } else {
-        playbtn.addEventListener("click", function () {
-          ModifyJSONFile(
-            CosmicComicsData + "/ListOfComics.json",
-            "reading",
-            true,
-            shortname
-          );
-          ModifyJSONFile(
-            CosmicComicsData + "/ListOfComics.json",
-            "unread",
-            false,
-            shortname
-          );
-          Modify_JSON_For_Config(
-            CosmicComicsData + "/config.json",
-            "last_opened",
-            path
-          );
-          window.location.href = "viewer.html?" + path;
-        });
-      }
-      carddiv.addEventListener("mouseover", function (e) {
-        e.preventDefault;
-        RightClick(this, path);
-      });
-    }
-    n++;
-    const element = document.getElementById("ContainerExplorer");
-    const divrating = document.createElement("div");
-    divrating.appendChild(ratingcss);
-    carddiv.appendChild(divrating);
-    element.appendChild(carddiv);
-
+    /*const aContainer = document.createElement("a");
+    const spanContainer = document.createElement("span");
+    spanContainer.style = "transform: translateZ(20px);color:white;";*/
     if (stat.isDirectory()) {
       const imgNode = document.createElement("img");
       imgNode.src = "";
       imgNode.style = "padding-top: 330px";
-      carddiv.appendChild(imgNode);
+      aContainer.appendChild(imgNode);
+      spanContainer.style =
+        "padding-top: 20px;font-size: 30px;line-height: 30px;";
     } else if (readed) {
-      //readed
-      toggleActive(document.getElementById("btn_id_read_" + shortname));
+      const RibbonNode = document.createElement("img");
+      RibbonNode.src = "Images/vertribbon.png";
+      RibbonNode.style = "padding-left: 207px";
+      aContainer.appendChild(RibbonNode);
     } else if (reading) {
-      //reazading
-      toggleActive(document.getElementById("btn_id_reading_" + shortname));
+      const RibbonNode = document.createElement("img");
+      RibbonNode.src = "Images/orangeribbon.png";
+      RibbonNode.style = "padding-left: 207px";
+      aContainer.appendChild(RibbonNode);
     } else {
-      //rien
-      toggleActive(document.getElementById("btn_id_unread_" + shortname));
+      const RibbonNode = document.createElement("img");
+      RibbonNode.style = "padding-top: 87px";
+      aContainer.appendChild(RibbonNode);
     }
-
-    if (favorite_v) {
-      toggleActive(document.getElementById("btn_id_fav_" + shortname));
-
-      //favorite
+    if (favorite) {
+      const fav = document.createElement("img");
+      fav.src = "Images/outline_favorite_black_24dp.png";
+      fav.style =
+        "padding-top:310px;padding-left:240px;display:flex;position: relative";
+      aContainer.appendChild(fav);
     } else if (stat.isDirectory()) {
-      //fav folder
+      const fav = document.createElement("img");
+      fav.style = "padding-top:110px; display:flex";
+      aContainer.appendChild(fav);
     } else {
-      //pas fav
+      const fav = document.createElement("img");
+      fav.style = "padding-top:360px; display:flex";
+      aContainer.appendChild(fav);
     }
-  });
-  preloadImage(listOfImages, n);
-}
+    //#region ratingCSS
+    const ratingcss = document.createElement("div")
+    ratingcss.className = "rating-css hover-effect";
+    const ratinginput1= document.createElement("input")
+    ratinginput1.type = "radio"
+    ratinginput1.value = "1"
+    ratinginput1.id = "rating3-1_"+index
+    ratinginput1.name = "Rating_"+shortname
+    ratinginput1.setAttribute("checked", "")
+    ratinginput1.checked = true;
+    ratinginput1.onchange = SetForRating1(shortname)
+    const label1 = document.createElement("label")
+    label1.setAttribute("for","rating3-1_"+index)
+    label1.className = "mdi mdi-star"
+    const ratinginput2= document.createElement("input")
+    ratinginput2.type = "radio"
+    ratinginput2.value = "2"
+    ratinginput2.id = "rating3-2_"+index
+    ratinginput2.name = "Rating_"+shortname
+    ratinginput2.onchange = SetForRating2(shortname)
+    const label2 = document.createElement("label")
+    label2.setAttribute("for","rating3-2_"+index)
+    label2.className = "mdi mdi-star"
+    const ratinginput3= document.createElement("input")
+    ratinginput3.type = "radio"
+    ratinginput3.value = "3"
+    ratinginput3.id = "rating3-3_"+index
+    ratinginput3.name = "Rating_"+shortname
+    ratinginput3.onchange = SetForRating3(shortname)
+    const label3 = document.createElement("label")
+    label3.setAttribute("for","rating3-3_"+index)
+    label3.className = "mdi mdi-star"
+    const ratinginput4= document.createElement("input")
+    ratinginput4.type = "radio"
+    ratinginput4.value = "4"
+    ratinginput4.id = "rating3-4_"+index
+    ratinginput4.name = "Rating_"+shortname
+    ratinginput4.onchange = SetForRating4(shortname)
+    const label4 = document.createElement("label")
+    label4.setAttribute("for","rating3-4_"+index)
+    label4.className = "mdi mdi-star"
+    const ratinginput5= document.createElement("input")
+    ratinginput5.type = "radio"
+    ratinginput5.value = "5"
+    ratinginput5.id = "rating3-5_"+index
+    ratinginput5.name = "Rating_"+shortname
+    ratinginput5.onchange = SetForRating5(shortname)
+    const label5 = document.createElement("label")
+    label5.setAttribute("for","rating3-5_"+index)
+    label5.className = "mdi mdi-star"
 
-//preload the images
-var preloadedImages = [];
-function preloadImage(listImages, n) {
+    ratingcss.appendChild(ratinginput1)
+    ratingcss.appendChild(label1)
+    ratingcss.appendChild(ratinginput2)
+    ratingcss.appendChild(label2)
+    ratingcss.appendChild(ratinginput3)
+    ratingcss.appendChild(label3)
+    ratingcss.appendChild(ratinginput4)
+    ratingcss.appendChild(label4)
+    ratingcss.appendChild(ratinginput5)
+    ratingcss.appendChild(label5)
+//#endregion
+
+/*     aContainer.setAttribute("data-tilt", "");
+    aContainer.className = "logo"; */
+    
+    if (aContainer.addEventListener) {
+      if (stat.isDirectory()) {
+        aContainer.addEventListener("click", function () {
+          launchDetect(path, root);
+        });
+      } else {
+        aContainer.addEventListener("click", function () {
+          ModifyJSONFile(
+            CosmicComicsData + "/ListOfComics.json",
+            "reading",
+            true,
+            shortname
+            );
+            ModifyJSONFile(
+              CosmicComicsData + "/ListOfComics.json",
+              "unread",
+              false,
+              shortname
+              );
+              ModifyJSONFileForPath(
+                CosmicComicsData + "/config.json",
+                "last_opened",
+                path
+                );
+                window.location.href = "viewer.html?" + path;
+              });
+              aContainer.addEventListener("contextmenu", function (e) {
+                e.preventDefault;
+                RightClick(this, path);
+              });
+            }
+          }
+          n++;
+          spanContainer.appendChild(node);
+          const element = document.getElementById("ContainerExplorer");
+          aContainer.appendChild(spanContainer);
+          /*aContainer.classList.add("animate__animated", "animate__fadeInDown", "animate____delay-2s")*/
+          const diva = document.createElement("div");
+          diva.appendChild(aContainer)
+          diva.appendChild(ratingcss);
+          diva.style.textAlign = "center";
+          diva.style.bottom = "0px";
+          element.appendChild(diva);
+        });
+        preloadImage(listOfImages, n);
+      }
+      var preloadedImages = [];
+      function preloadImage(listImages, n) {
   for (var i = 0; i < listImages.length; i++) {
     preloadedImages[i] = new Image();
     preloadedImages[i].src = listImages[i];
   }
   setTimeout(() => {
     LoadImages(n);
+    loadTiltScript();
   }, 500);
 }
-
-//Add and remove animate.style animations
-const animateCSS = (element, animation, prefix = 'animate__') =>
-  // We create a Promise and return it
-  new Promise((resolve, reject) => {
-    const animationName = `${prefix}${animation}`;
-    const node =(element);
-
-    node.classList.add(`${prefix}animated`, animationName);
-
-    // When the animation ends, we clean the classes and resolve the Promise
-    function handleAnimationEnd(event) {
-      event.stopPropagation();
-      node.classList.remove(`${prefix}animated`, animationName);
-      resolve('Animation ended');
-    }
-
-    node.addEventListener('animationend', handleAnimationEnd, {once: true});
-  });
-  
-//Load Images
 function LoadImages(numberOf) {
-  var coolanimations = ["zoomInDown","rollIn","zoomIn","jackInTheBox","fadeInUp","fadeInDown","fadeIn","bounceInUp","bounceInDown","backInDown","flip","flipInY"];
-  var random = coolanimations[Math.floor(Math.random()*coolanimations.length)]
-    if (numberOf == 0) {
-    Toastifycation(language["empty_notSupported"], "#ff0000");
+  if (numberOf == 0) {
+    Toastifycation(
+      "The directory is empty or files are not supported",
+      "#ff0000"
+    );
     document.getElementById("overlay").style.display = "none";
     document.getElementById("tutotxt").innerHTML =
-      language["empty_notSupported2"] +
-      ValidatedExtension +
-      language["empty_notSupported3"];
+      "Looks like an empty directory, or the files in it are not supported";
     document.getElementById("tutotxt").style.display = "block";
     document.getElementById("tutotxt").style.fontSize = "24px";
   }
   for (let i = 0; i < numberOf; i++) {
     document.getElementById("tutotxt").style.display = "none";
-    animateCSS(document.getElementById("id" + i),random).then((message)=>{
-      console.log(message)
-    })
+
+    /* var elch = document.getElementById("id"+i).firstElementChild
+    document.getElementById("id"+i).removeChild(elch) */
+    document
+      .getElementById("id" + i)
+      .classList.add("animate__animated", "animate__fadeIn");
     try {
-      document.getElementById("card_img_id_" + i).src = listOfImages[i];
+      document.getElementById("id" + i).style.backgroundImage =
+        "url('" + listOfImages[i] + "')";
     } catch (error) {
-      document.getElementById("card_img_id_" + i).src =
-        __dirname + "/Images/fileDefault.png";
+      document.getElementById("id" + i).style.backgroundImage =
+        "url('Images/fileDefault.png')";
     }
     document.getElementById("overlay").style.display = "none";
   }
 }
-
-//Navigate or launch the viewer
 function launchDetect(dir, root) {
   var parent = document.getElementById("ContainerExplorer");
   var parento = document.getElementById("controller");
@@ -938,10 +768,9 @@ function launchDetect(dir, root) {
   }
 
   var contents = DetectFilesAndFolders(dir);
-  FolderResults = Check_File_For_Validated_extension(contents, ValidatedExtension);
-  loadContent(FolderResults, root, favonly, readonly, unreadonly, readingonly);
+  FolderResults = CheckCorrectExt4File(contents, ValidatedExtension);
+  loadContents(FolderResults, root, favonly, readonly, unreadonly, readingonly);
 }
-
 //Detect files and folders in the current directory (not recursive)
 function DetectFilesAndFolders(dir) {
   var result = [];
@@ -950,6 +779,7 @@ function DetectFilesAndFolders(dir) {
     var stat = fs.statSync(file);
 
     if (stat && stat.isDirectory()) {
+      //result = result.concat(DetectFilesAndFolders(file))
       result = result.concat(file);
     } else {
       result.push(file);
@@ -962,8 +792,6 @@ function DetectFilesAndFolders(dir) {
   }
   return result;
 }
-
-//Sorting number in a string
 var SortingNumInStr = function (a, b) {
   return Number(a.match(/(\d+)/g)[0]) - Number(b.match(/(\d+)/g)[0]);
 };
@@ -986,17 +814,16 @@ function DetectAllFilesAndFolders(dir) {
 
   return result;
 }
+function loadTiltScript() {
+  var script = document.createElement("script");
+  script.src = "js/vanilla-tilt.js";
+  script.type = "text/javascript";
+  document.getElementsByTagName("body")[0].appendChild(script);
+}
 
-//Get the first image of book by folder to get the cover in the app
 function GetTheFirstImageOfComicsByFolder(filesInFolder = [], i = 0) {
   document.getElementById("overlaymsg").innerHTML =
-    language["extracting_thumb"] +
-    " " +
-    i +
-    " " +
-    language["out_of"] +
-    " " +
-    filesInFolder.length;
+    "Extracting thumbnails " + i + " out of " + filesInFolder.length;
   if (i < filesInFolder.length) {
     CreateFIOAFolder();
 
@@ -1004,7 +831,7 @@ function GetTheFirstImageOfComicsByFolder(filesInFolder = [], i = 0) {
     ext = name.split(".").pop();
     name = name.split(".");
     name = name[0];
-    var shortname = get_the_ID_by_name(name);
+    var shortname = GetTheName(name);
 
     CreateFolder(shortname, CosmicComicsData + "/FirstImageOfAll");
     if (fs.existsSync(CosmicComicsData + "/FirstImageOfAll/" + shortname)) {
@@ -1012,7 +839,7 @@ function GetTheFirstImageOfComicsByFolder(filesInFolder = [], i = 0) {
         fs.readdirSync(CosmicComicsData + "/FirstImageOfAll/" + shortname)
           .length == 0
       ) {
-        unarchive_first(
+        UnZipFirst(
           filesInFolder[i],
           CosmicComicsData + "/FirstImageOfAll/" + shortname,
           shortname,
@@ -1034,7 +861,7 @@ function GetTheFirstImageOfComicsByFolder(filesInFolder = [], i = 0) {
         GetTheFirstImageOfComicsByFolder(filesInFolder, i + 1);
       }
     } else {
-      unarchive_first(
+      UnZipFirst(
         filesInFolder[i],
         CosmicComicsData + "/FirstImageOfAll/" + shortname,
         shortname,
@@ -1059,22 +886,18 @@ function GetTheFirstImageOfComicsByFolder(filesInFolder = [], i = 0) {
       language["overlaymsg_worst"];
   }
 }
-
-//Check if the passed element contains numbers
 function hasNumbers(t) {
   var regex = /\d/g;
   return regex.test(t);
 }
+function GetTheName(CommonName = "") {
+  CommonName = CommonName.replaceAll("-", " ");
+  CommonName = CommonName.replaceAll(")", " ");
+  CommonName = CommonName.replaceAll("(", " ");
+  CommonName = CommonName.replaceAll("[", " ");
+  CommonName = CommonName.replaceAll("]", " ");
 
-//get the ID of the book by name
-function get_the_ID_by_name(the_name = "") {
-  the_name = the_name.replaceAll("-", " ");
-  the_name = the_name.replaceAll(")", " ");
-  the_name = the_name.replaceAll("(", " ");
-  the_name = the_name.replaceAll("[", " ");
-  the_name = the_name.replaceAll("]", " ");
-
-  var s = the_name.split(" ");
+  var s = CommonName.split(" ");
   var finalName = "";
   s.forEach((el) => {
     if (el != "") {
@@ -1089,31 +912,24 @@ function get_the_ID_by_name(the_name = "") {
   });
   return finalName;
 }
-
-//Create the first image of all folder
 function CreateFIOAFolder() {
   if (!fs.existsSync(CosmicComicsData + "/FirstImageOfAll")) {
     fs.mkdirSync(CosmicComicsData + "/FirstImageOfAll");
   }
 }
-
-//Creating a folder
 function CreateFolder(dirname, dirpath) {
   if (!fs.existsSync(dirpath + "/" + dirname)) {
     fs.mkdirSync(dirpath + "/" + dirname);
   }
 }
-
-//Unarchive the first element of each archive
-function unarchive_first(
+function UnZipFirst(
   zipPath,
   ExtractDir,
   name,
   ext,
   listofelements,
   indice,
-  filesInFolder,
-  recursion = 0
+  filesInFolder
 ) {
   nn = 0;
   if (
@@ -1132,6 +948,7 @@ function unarchive_first(
     });
     Stream.on("data", function (data) {
       fromfile = data.file;
+      console.log("DATA FROM UNZIP : " + fromfile);
       GetTheFirstImageOfComicsByFolder(filesInFolder, indice + 1);
 
       /*var instt = fs.createReadStream(ExtractDir + "/" + fromfile)
@@ -1144,15 +961,26 @@ function unarchive_first(
         fs.unlinkSync(ExtractDir + "/" + fromfile);*/
     });
     Stream.on("end", function () {
-      if (recursion != 0) {
-        console.log("reached");
+      if (
+        listofelements ==
+        [
+          "*001.jpg",
+          "01.jpg",
+          "01-copie.jpg",
+          "*-01.jpg",
+          "*001.png",
+          "01.png",
+          "01-copie.png",
+          "*-01.png",
+        ]
+      ) {
         if (Stream.info.get("Files") == "0") {
-          Toastifycation(language["cover_not_compatible"] +" "+ name, "#ff0000");
+          Toastifycation("Cover image not compatible for " + name, "#ff0000");
           GetTheFirstImageOfComicsByFolder(filesInFolder, indice + 1);
         }
       } else {
         if (Stream.info.get("Files") == "0") {
-          unarchive_first(
+          UnZipFirst(
             zipPath,
             ExtractDir,
             name,
@@ -1168,8 +996,7 @@ function unarchive_first(
               "*-01.png",
             ],
             indice,
-            filesInFolder,
-            1
+            filesInFolder
           );
         }
       }
@@ -1232,172 +1059,145 @@ function unarchive_first(
                 );
                 GetTheFirstImageOfComicsByFolder(filesInFolder, indice + 1);
               }
-            } else {
-              Toastifycation(
-                language["cover_not_compatible"] + " " + name,
-                "#ff0000"
-              );
-
-              GetTheFirstImageOfComicsByFolder(filesInFolder, indice + 1);
             }
           }
         }
       });
     });
   }
-  if (ext == "pdf") {
-    GetTheFirstImageOfComicsByFolder(filesInFolder, indice + 1);
-  }
 }
+const menu = document.querySelector(".menu");
+let menuVisible = false;
 
-//mark book as read
+const toggleMenu = (command) => {
+  menu.style.display = command === "show" ? "block" : "none";
+  menuVisible = !menuVisible;
+};
+
+const setPosition = ({ top, left }) => {
+  menu.style.left = `${left}px`;
+  menu.style.top = `${top}px`;
+  toggleMenu("show");
+};
+
+window.addEventListener("click", (e) => {
+  if (menuVisible) toggleMenu("hide");
+});
+window.addEventListener("contextmenu", (e) => {
+  e.preventDefault();
+  const origin = {
+    left: e.clientX,
+    top: e.clientY,
+  };
+  setPosition(origin);
+  return false;
+});
 function markasread() {
-  if (name_of_the_current_book != "") {
-    Toastifycation(language["marked_as_read"], "#00C33C");
+  if (whichname != "") {
+    Toastifycation("Marked as Read (it will appear next time)", "#00C33C");
 
     ModifyJSONFile(
       CosmicComicsData + "/ListOfComics.json",
       "reading",
       false,
-      name_of_the_current_book
+      whichname
     );
     ModifyJSONFile(
       CosmicComicsData + "/ListOfComics.json",
       "unread",
       false,
-      name_of_the_current_book
+      whichname
     );
     ModifyJSONFile(
       CosmicComicsData + "/ListOfComics.json",
       "read",
       true,
-      name_of_the_current_book
+      whichname
     );
-    document
-      .getElementById("btn_id_read_" + name_of_the_current_book)
-      .classList.add("active");
-    document
-      .getElementById("btn_id_reading_" + name_of_the_current_book)
-      .classList.remove("active");
-    document
-      .getElementById("btn_id_unread_" + name_of_the_current_book)
-      .classList.remove("active");
-
-    name_of_the_current_book = "";
+    whichname = "";
   }
 }
-
-//mark book as unread
 function markasunread() {
-  if (name_of_the_current_book != "") {
-    Toastifycation(language["marked_as_unread"], "#00C33C");
+  if (whichname != "") {
+    Toastifycation("Marked as Unread (it will appear next time)", "#00C33C");
 
     ModifyJSONFile(
       CosmicComicsData + "/ListOfComics.json",
       "reading",
       false,
-      name_of_the_current_book
+      whichname
     );
     ModifyJSONFile(
       CosmicComicsData + "/ListOfComics.json",
       "read",
       false,
-      name_of_the_current_book
+      whichname
     );
     ModifyJSONFile(
       CosmicComicsData + "/ListOfComics.json",
       "unread",
       true,
-      name_of_the_current_book
+      whichname
     );
-    document
-      .getElementById("btn_id_unread_" + name_of_the_current_book)
-      .classList.add("active");
-
-    document
-      .getElementById("btn_id_reading_" + name_of_the_current_book)
-      .classList.remove("active");
-    document
-      .getElementById("btn_id_read_" + name_of_the_current_book)
-      .classList.remove("active");
+    whichname = "";
   }
 }
-
-//marked as reading
 function markasreading() {
-  if (name_of_the_current_book != "") {
-    Toastifycation(language["marked_as_reading"], "#00C33C");
+  if (whichname != "") {
+    Toastifycation("Marked as Reading (it will appear next time)", "#00C33C");
 
     ModifyJSONFile(
       CosmicComicsData + "/ListOfComics.json",
       "reading",
       true,
-      name_of_the_current_book
+      whichname
     );
     ModifyJSONFile(
       CosmicComicsData + "/ListOfComics.json",
       "read",
       false,
-      name_of_the_current_book
+      whichname
     );
     ModifyJSONFile(
       CosmicComicsData + "/ListOfComics.json",
       "unread",
       false,
-      name_of_the_current_book
+      whichname
     );
-    document
-      .getElementById("btn_id_reading_" + name_of_the_current_book)
-      .classList.add("active");
-
-    document
-      .getElementById("btn_id_unread_" + name_of_the_current_book)
-      .classList.remove("active");
-    document
-      .getElementById("btn_id_read_" + name_of_the_current_book)
-      .classList.remove("active");
-
-    name_of_the_current_book = "";
+    whichname = "";
   }
 }
-
-//Toogle Favorite
 function favorite() {
-  if (name_of_the_current_book != "") {
-    var Info = Get_From_JSON(
+  if (whichname != "") {
+    var Info = GetInfoFromJSON(
       CosmicComicsData + "/ListOfComics.json",
-      name_of_the_current_book
+      whichname
     );
-    var favorite = Get_element_from_data("favorite", Info);
+    var favorite = GetElFromInfo("favorite", Info);
     if (favorite) {
-      Toastifycation(language["remove_fav"], "#00C33C");
+      Toastifycation(
+        "Removed from Favorite (it will appear next time)",
+        "#00C33C"
+      );
 
       ModifyJSONFile(
         CosmicComicsData + "/ListOfComics.json",
         "favorite",
         false,
-        name_of_the_current_book
-      );
-      toggleActive(
-        document.getElementById("btn_id_fav_" + name_of_the_current_book)
+        whichname
       );
     } else {
-      Toastifycation(language["add_fav"], "#00C33C");
+      Toastifycation("Added to Favorite (it will appear next time)", "#00C33C");
       ModifyJSONFile(
         CosmicComicsData + "/ListOfComics.json",
         "favorite",
         true,
-        name_of_the_current_book
-      );
-      toggleActive(
-        document.getElementById("btn_id_fav_" + name_of_the_current_book)
+        whichname
       );
     }
-    name_of_the_current_book = "";
+    whichname = "";
   }
 }
-
-//(Not Working, old idea to make a navigation by filters)
 function showOnlyFavT() {
   if (favonly == true) {
     favonly = false;
@@ -1414,29 +1214,21 @@ function showOnlyRead() {
 function showOnlyReading() {
   readingonly = true;
 }
-
-//Continue the reading of the last opened book
 function continuereading() {
   var configFile = fs.readFileSync(CosmicComicsData + "/config.json");
   var parsedJSON = JSON.parse(configFile);
-  var path = Get_From_Config("last_opened", parsedJSON);
+  var path = GetElFromInforPath("last_opened", parsedJSON);
   window.location.href = "viewer.html?" + path;
 }
-
-//Open a single file
 function OpenFileOnce() {
   let result = remote.dialog.showOpenDialogSync({
     properties: ["openFile"],
   });
   window.location.href = "viewer.html?" + result[0];
 }
-
-//Open a book in the bookmarks
 function openBOOKM(path) {
   window.location.href = "viewer.html?" + path;
 }
-
-//List of Bookmarked folder
 function listBM() {
   var data = fs.readFileSync(CosmicComicsData + "/bookmarks.json");
   var info = JSON.parse(data);
@@ -1463,11 +1255,7 @@ function listBM() {
     }
   });
 }
-
-//the Bookmarked loading
 listBM();
-
-//Loading ToolTips and languages
 new bootstrap.Tooltip(document.getElementById("menuid"), {
   title: language["menu"],
   placement: "bottom",
@@ -1513,10 +1301,6 @@ new bootstrap.Tooltip(document.getElementById("id_info"), {
   title: language["info"],
   placement: "bottom",
 });
-new bootstrap.Tooltip(document.getElementById("id_tips-btn"), {
-  title: language["Tips"],
-  placement: "bottom",
-});
 document.getElementById("id_about").innerHTML = language["about"];
 document.getElementById("createdby").innerHTML = language["createdby"];
 document.getElementById("usewhat").innerHTML = language["technology_used"];
@@ -1532,25 +1316,10 @@ document.getElementById("id_settingsmod").innerHTML = language["settings"];
 document.getElementById("languages").innerHTML = language["languages"];
 document.getElementById("beta_test").innerHTML =
   language["betatest"] + document.getElementById("beta_test").innerHTML;
-document.getElementById("id_tips").innerHTML = language["Tips"];
-document.getElementById("id_did_you_know").innerHTML = language["did_you_know"];
-document.getElementById("id_tip_1").innerHTML = language["tips_1"];
-document.getElementById("id_tip_2").innerHTML = language["tips_2"];
-document.getElementById("id_tip_3").innerHTML = language["tips_3"];
-document.getElementById("id_btn_update_provider").innerHTML =
-  language["btn_update_provider"];
-document.getElementById("id_btn_appdata").innerHTML = language["btn_appdata"];
-document.getElementById("id_btn_ComicsFolder").innerHTML =
-  language["btn_ComicsFolder"];
-document.getElementById("id_btn_Temp").innerHTML = language["btn_Temp"];
-document.getElementById("tutotxt").innerHTML = language["tuto_txt"];
 
-//Get Available Languages
 function getAvailableLanguages() {
   return fs.readdirSync(__dirname + "/languages");
 }
-
-//Get the flags by a cdn
 function getFlags() {
   var lang = getAvailableLanguages();
   var flagslist = [];
@@ -1562,7 +1331,6 @@ function getFlags() {
   return flagslist;
 }
 
-//Insert the flags in the settings
 function insertFlags() {
   var flagslist = getFlags();
   console.log(flagslist);
@@ -1592,17 +1360,12 @@ function insertFlags() {
     });
   });
 }
-
-//Change the language of the app
-function changeLang(langues) {
-  Modify_JSON_For_Config(CosmicComicsData + "/config.json", "language", langues);
+function changeLang(langa) {
+  ModifyJSONFileForPath(CosmicComicsData + "/config.json", "language", langa);
   window.location.reload();
 }
-
-//Loading flags
 insertFlags();
-
-//Send Notification
+//save dans le config.json
 function Toastifycation(message, BGColor = "#333", FrontColor = "#ffffff") {
   var x = document.getElementById("snackbar");
 
@@ -1615,15 +1378,13 @@ function Toastifycation(message, BGColor = "#333", FrontColor = "#ffffff") {
     x.className = x.className.replace("show", "");
   }, 3000);
 }
-
-//Launch the page to get the book informations
 function GetComicInfo() {
-  if (path_of_the_current_book != "") {
-    window.location.href = "display.html?" + path_of_the_current_book;
+  if (whichpath != "") {
+    Toastifycation("Launching the details page...", "#00C33C");
+
+    window.location.href = "display.html?" + whichpath;
   }
 }
-
-//Handle the drag and drop to open files in the app
 document.addEventListener("drop", (event) => {
   event.preventDefault();
   event.stopPropagation();
@@ -1644,7 +1405,7 @@ document.addEventListener("drop", (event) => {
       window.location.href = "viewer.html?" + f.path;
     } else {
       Toastifycation(
-        language["drag&drop_fail"],
+        "Drag and Drop Failed, maybe an incompatible file",
         "#ff0000"
       );
     }
@@ -1663,38 +1424,32 @@ document.addEventListener("dragenter", (event) => {
 document.addEventListener("dragleave", (event) => {
   console.log("File has left the Drop Space");
 });
-
-//Modify the Comics JSON at the note element by the user's note
 function SetForRating1(name_of_book) {
-  var rated = document
-    .getElementsByName("Rating_" + name_of_book)
-    .forEach((rate) => {
-      if (rate.checked) {
-        ModifyJSONFile(
-          CosmicComicsData + "/ListOfComics.json",
-          "note",
-          parseInt(rate.value),
-          name_of_book
-        );
-      }
-    });
+  var rated = document.getElementsByName("Rating_"+name_of_book).forEach((rate) => {
+    if (rate.checked) {
+      ModifyJSONFile(
+        CosmicComicsData + "/ListOfComics.json",
+        "note",
+        parseInt(rate.value),
+        name_of_book
+      );
+    }
+  });
 }
 function SetForRating2(name_of_book) {
-  var rated = document
-    .getElementsByName("Rating_" + name_of_book)
-    .forEach((rate) => {
-      if (rate.checked) {
-        ModifyJSONFile(
-          CosmicComicsData + "/ListOfComics.json",
-          "note",
-          parseInt(rate.value),
-          name_of_book
-        );
-      }
-    });
+  var rated = document.getElementsByName("Rating_"+name_of_book).forEach((rate) => {
+    if (rate.checked) {
+      ModifyJSONFile(
+        CosmicComicsData + "/ListOfComics.json",
+        "note",
+        parseInt(rate.value),
+        name_of_book
+      );
+    }
+  });
 }
 function SetForRating3(name_of_book) {
-  document.getElementsByName("Rating_" + name_of_book).forEach((rate) => {
+  var rated = document.getElementsByName("Rating_"+name_of_book).forEach((rate) => {
     if (rate.checked) {
       ModifyJSONFile(
         CosmicComicsData + "/ListOfComics.json",
@@ -1706,66 +1461,63 @@ function SetForRating3(name_of_book) {
   });
 }
 function SetForRating4(name_of_book) {
-  var rated = document
-    .getElementsByName("Rating_" + name_of_book)
-    .forEach((rate) => {
-      if (rate.checked) {
-        ModifyJSONFile(
-          CosmicComicsData + "/ListOfComics.json",
-          "note",
-          parseInt(rate.value),
-          name_of_book
-        );
-      }
-    });
+  var rated = document.getElementsByName("Rating_"+name_of_book).forEach((rate) => {
+    if (rate.checked) {
+      ModifyJSONFile(
+        CosmicComicsData + "/ListOfComics.json",
+        "note",
+        parseInt(rate.value),
+        name_of_book
+      );
+    }
+  });
 }
 function SetForRating5(name_of_book) {
-  var rated = document
+  var rated = document.getElementsByName("Rating_"+name_of_book).forEach((rate) => {
+    if (rate.checked) {
+      ModifyJSONFile(
+        CosmicComicsData + "/ListOfComics.json",
+        "note",
+       parseInt(rate.value),
+        name_of_book
+      );
+    }
+  });
+}
+var demoButtons;
 
-    .getElementsByName("Rating_" + name_of_book)
-    .forEach((rate) => {
-      if (rate.checked) {
-        ModifyJSONFile(
-          CosmicComicsData + "/ListOfComics.json",
-          "note",
-          parseInt(rate.value),
-          name_of_book
-        );
-      }
-    });
+function start () {
+  
+  // Add event "click" to "demo buttons"
+  demoButtons = document.querySelectorAll ('.js-modify');
+  for (var i = 0; i < demoButtons.length; i++) {
+    demoButtons[i].addEventListener ('click', toggleEffect);
+  }
+  
+  // Add event "click" to "save buttons"
+  var favButtons = document.querySelectorAll ('.js-fav');
+  for (var i = 0; i < saveButtons.length; i++) {
+    saveButtons[i].addEventListener ('click', toggleActive);
+  }
+  
+}
+
+// Toggle "effect" classes
+function toggleEffect () {
+  var target = document.querySelector (this.dataset.target);
+      target.dataset.effect = this.dataset.effect;
+  
+  for (var i= 0; i < demoButtons.length; i++) {
+    demoButtons[i].classList.remove ('active');
+  }
+  
+  toggleActive.call (this);
 }
 
 // Toggle "active" class
-function toggleActive(object) {
-  object.classList.toggle("active");
+function toggleActive () {
+  this.classList.toggle ('active');
 }
 
-//Open the loaded comics folder
-function OpenComicsFolder() {
-  shell.openExternal(get_Folder_Path_JSON);
-}
-
-//Open the Temporary folder
-function OpenTempDirectory() {
-  shell.openExternal(CosmicComicsTempI);
-}
-
-//Open the Appdata folder
-function OpenAppDataFolder() {
-  shell.openExternal(CosmicComicsData);
-}
-
-//Keyboard Shortcuts
-window.addEventListener("keydown", (e) => {
-  if (e.code == "KeyC") {
-    continuereading();
-  } else if (e.code == "KeyF") {
-    obliviate();
-  } else if (e.code == "KeyR") {
-    refreshFolder();
-  } else if (e.code == "KeyO") {
-    OpenFileOnce();
-  } else if (e.code == "KeyD") {
-    openFolder();
-  }
-});
+// Invoke "start ()" function
+window.addEventListener ('load', start);
