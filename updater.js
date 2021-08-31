@@ -14,6 +14,8 @@ You should have received a copy of the GNU General Public License
 along with Cosmic-Comics.  If not, see <https://www.gnu.org/licenses/>.*/
 //Declaring variables
 var OnlineVersion = "";
+const os = require("os");
+var osarch = os.arch()
 const fs = require("fs");
 const download = require("download");
 const { shell, remote } = require("electron");
@@ -286,7 +288,41 @@ gc.file("Version.txt", function (err, file) {
     } else {
       sendMessage(language["error_update"]);
     }
-  } else if (updateProvider == "wno") {
+  } else if (updateProvider == "mac") {
+    if (OnlineVersionNum > proverNum) {
+      sendMessage(language["update_available"]);
+      DLUpdate(".dmg", "mac");
+    } else if (OnlineVersionNum < proverNum) {
+      sendMessage(language["newer_version"]);
+      setTimeout(() => {
+        openWindow();
+      }, 2000);
+    } else if (OnlineVersionNum == proverNum) {
+      sendMessage(language["no_update"]);
+      setTimeout(() => {
+        openWindow();
+      }, 2000);
+    } else {
+      sendMessage(language["error_update"]);
+    }
+  } else if (updateProvider == "mzip") {
+    if (OnlineVersionNum > proverNum) {
+      sendMessage(language["update_available"]);
+      DLUpdate(".zip", "mac");
+    } else if (OnlineVersionNum < proverNum) {
+      sendMessage(language["newer_version"]);
+      setTimeout(() => {
+        openWindow();
+      }, 2000);
+    } else if (OnlineVersionNum == proverNum) {
+      sendMessage(language["no_update"]);
+      setTimeout(() => {
+        openWindow();
+      }, 2000);
+    } else {
+      sendMessage(language["error_update"]);
+    }
+  } else if (updateProvider == "dev") {
     if (OnlineVersionNum > proverNum) {
       sendMessage(language["update_manual"]);
     } else if (OnlineVersionNum < proverNum) {
@@ -323,6 +359,7 @@ function sendMessage(message) {
 
 //downloading the update
 async function DLUpdate(executable, endname = "") {
+  arch = osarch
   if (process.platform === "win32" || process.platform === "linux") {
     var starttime = new Date().getTime();
     await download(
@@ -331,7 +368,7 @@ async function DLUpdate(executable, endname = "") {
         "/Cosmic-Comics_" +
         OnlineVersion +
         "_" +
-        endname +
+        endname +"_"+arch+
         executable,
       CosmicComicsData
     )
@@ -368,7 +405,7 @@ async function DLUpdate(executable, endname = "") {
             "/Cosmic-Comics_" +
             OnlineVersion +
             "_" +
-            endname +
+            endname +"_"+arch+
             executable
         );
       });

@@ -1,121 +1,169 @@
 {
-    "name": "cosmiccomics",
-    "productName": "Cosmic-Comics",
-    "build": {
-        "artifactName": "Cosmic-Comics_${version}_${os}.${ext}",
-        "files": [
-            "**/*",
-            "!FirstImageOfAll${/*}",
-            "!tmp${/*}",
-            "!languages/dev.json"
-        ],
-        "asar": false,
-        "appId": "com.Nytuo.CosmicComics",
-        "nsis": {
-            "oneClick": true,
-            "runAfterFinish": false,
-            "createDesktopShortcut": "always",
-            "perMachine": true
+  "name": "cosmiccomics",
+  "productName": "Cosmic-Comics",
+  "build": {
+    "artifactName": "Cosmic-Comics_${version}_${os}_${arch}.${ext}",
+    "files": [
+      "**/*",
+      "!FirstImageOfAll${/*}",
+      "!tmp${/*}",
+      "!languages/dev.json"
+    ],
+    "asar": false,
+    "appId": "com.Nytuo.CosmicComics",
+    "nsis": {
+      "oneClick": true,
+      "runAfterFinish": false,
+      "createDesktopShortcut": "always",
+      "perMachine": true
+    },
+    "snap": {
+      "confinement": "strict"
+    },
+    "publish": [
+      {
+        "provider": "github",
+        "repo": "CosmicComics",
+        "owner": "Nytuo",
+        "vPrefixedTagName": true,
+        "host": "github.com",
+        "protocol": "https"
+      }
+    ],
+    "win": {
+      "fileAssociations": [
+        {
+          "ext": "cosmic",
+          "description": "Cosmic Comics Cover"
         },
-        "snap": {
-            "confinement": "strict"
+        {
+          "ext": "cbz",
+          "description": "Comic Book Zip"
         },
-        "publish": [
-            {
-                "provider": "github",
-                "repo": "CosmicComics",
-                "owner": "Nytuo",
-                "vPrefixedTagName": true,
-                "host": "github.com",
-                "protocol": "https"
-            }
-        ],
-        "win": {
-            "fileAssociations": [
-                {
-                    "ext": "cosmic",
-                    "description": "Cosmic Comics Cover"
-                },
-                {
-                    "ext": "cbz",
-                    "description": "Comic Book Zip"
-                },
-                {
-                    "ext": "cbr",
-                    "description": "Comic Book RAR"
-                },
-                {
-                    "ext": "cbt",
-                    "description": "Comic Book TAR"
-                },
-                {
-                    "ext": "cb7",
-                    "description": "Comic Book 7z"
-                }
-            ],
-            "publish": [
-                "github"
-            ],
-            "target": [
-                "nsis",
-                "zip"
-            ],
-            "icon": "Images/Logo.ico"
+        {
+          "ext": "cbr",
+          "description": "Comic Book RAR"
         },
-        "linux": {
-            "publish": [
-                "github"
-            ],
-            "target": [
-                "AppImage",
-                "snap",
-                "zip",
-                "deb",
-                "rpm"
-            ],
-            "icon": "Images/Logo.png",
-            "category": "Utility"
+        {
+          "ext": "cbt",
+          "description": "Comic Book TAR"
         },
-        "mac":{
-            "target": ["dmg","zip"]
+        {
+          "ext": "cb7",
+          "description": "Comic Book 7z"
         }
+      ],
+      "publish": [
+        "github"
+      ],
+      "target":
+      [
+        {
+          "target": "nsis",
+          "arch": [
+            "x64","ia32","arm64"
+          ]
+        },
+        {
+            "target": "zip",
+            "arch": [
+              "x64","ia32","arm64"
+            ]
+          }
+      ],
+      "icon": "Images/Logo.ico"
     },
-    "version": "1.0.0",
-    "description": "Comics and Manga Reader with collectionner",
-    "main": "main.js",
-    "author": {
-        "name": "Nytuo",
-        "email": "nytuo.yt@gmail.com"
+    "linux": {
+      "publish": [
+        "github"
+      ],
+      "target": [
+        {
+          "target": "AppImage",
+          "arch": [
+            "x64",
+            "ia32",
+            "arm64"
+          ]
+        },
+        {
+          "target": "zip",
+          "arch": [
+            "x64",
+            "ia32",
+            "arm64"
+          ]
+        },
+        {
+          "target": "deb",
+          "arch": [
+            "x64",
+            "ia32",
+            "arm64"
+          ]
+        },
+        {
+          "target": "rpm",
+          "arch": [
+            "x64",
+            "ia32",
+            "arm64"
+          ]
+        },
+        {
+          "target": "snap"
+        }
+      ],
+      "icon": "Images/Logo.png",
+      "category": "Utility"
     },
-    "repository": "https://github.com/Nytuo/CosmicComics.git",
-    "license": "GPL-3.0-only",
-    "private": false,
-    "devDependencies": {
-        "electron": "^13.1.6",
-        "electron-builder": "^22.11.7"
-    },
-    "scripts": {
-        "postinstall": "electron-builder install-app-deps",
-        "dist": "electron-builder",
-        "devBuild": "electron-builder --x64 --ia32 --arm -p never",
-        "start": "electron .",
-        "prodBuild": "electron-builder --x64 -p always"
-    },
-    "dependencies": {
-        "7zip-bin": "^5.1.1",
-        "@popperjs/core": "^2.9.2",
-        "anilist.js": "^1.2.1",
-        "bootstrap": "^5.0.2",
-        "bootstrap-icons": "^1.5.0",
-        "color-thief-browser": "^2.0.2",
-        "comicgeeks": "^1.1.0",
-        "discord-rich-presence": "^0.0.8",
-        "discord-rpc": "^4.0.1",
-        "download": "^8.0.0",
-        "github-content": "^1.0.1",
-        "html-magnifier": "^2.0.2",
-        "node-7z": "^3.0.0",
-        "unrar": "^0.2.0",
-        "upscaler": "^0.8.22"
+    "mac": {
+      "target": [
+        {
+          "target": "dmg",
+          "arch": [
+            "x64"
+          ]
+        }
+      ]
     }
+  },
+  "version": "1.0.0",
+  "description": "Comics and Manga Reader with collectionner",
+  "main": "main.js",
+  "author": {
+    "name": "Nytuo",
+    "email": "nytuo.yt@gmail.com"
+  },
+  "repository": "https://github.com/Nytuo/CosmicComics.git",
+  "license": "GPL-3.0-only",
+  "private": false,
+  "devDependencies": {
+    "electron": "^13.1.6",
+    "electron-builder": "^22.11.7"
+  },
+  "scripts": {
+    "postinstall": "electron-builder install-app-deps",
+    "dist": "electron-builder",
+    "devBuild": "electron-builder -p never",
+    "start": "electron .",
+    "prodBuild": "electron-builder -p always"
+  },
+  "dependencies": {
+    "7zip-bin": "^5.1.1",
+    "@popperjs/core": "^2.9.2",
+    "anilist.js": "^1.2.1",
+    "bootstrap": "^5.0.2",
+    "bootstrap-icons": "^1.5.0",
+    "color-thief-browser": "^2.0.2",
+    "comicgeeks": "^1.1.0",
+    "discord-rich-presence": "^0.0.8",
+    "discord-rpc": "^4.0.1",
+    "download": "^8.0.0",
+    "github-content": "^1.0.1",
+    "html-magnifier": "^2.0.2",
+    "node-7z": "^3.0.0",
+    "unrar": "^0.2.0",
+    "upscaler": "^0.8.22"
+  }
 }

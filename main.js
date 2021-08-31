@@ -25,14 +25,10 @@ if (fs.existsSync(TempDir + "/CosmicComics/current_book") == false) {
 const parentfolder1 = require("path").dirname(__dirname);
 const parentfolder2 = require("path").dirname(parentfolder1);
 const parentfolder3 = require("path").dirname(parentfolder2);
-if (fs.existsSync(parentfolder3+"/portable.txt")){
- AppDataDir = parentfolder3+"/AppData"
- TempDir = parentfolder3+"/TMP"
+if (fs.existsSync(parentfolder3 + "/portable.txt")) {
+  AppDataDir = parentfolder3 + "/AppData";
+  TempDir = parentfolder3 + "/TMP";
 }
-
-
-
-
 
 function createWindow() {
   const win = new BrowserWindow({
@@ -93,7 +89,7 @@ if (!fs.existsSync(AppDataDir + "/CosmicComics_data/config.json")) {
       magnifier_Width: 100,
       magnifier_Height: 100,
       magnifier_Radius: 0,
-      reset_zoom: false
+      reset_zoom: false,
     },
   ];
   fs.writeFileSync(
@@ -120,17 +116,14 @@ if (fs.existsSync(AppDataDir + "/CosmicComics_data/unrar_bin") == false) {
   fs.mkdirSync(AppDataDir + "/CosmicComics_data/unrar_bin");
 }
 if (
-  fs.existsSync(AppDataDir + "/CosmicComics_data/unrar_bin/UnRAR.exe") ==
-  false
+  fs.existsSync(AppDataDir + "/CosmicComics_data/unrar_bin/UnRAR.exe") == false
 ) {
   fs.copyFileSync(
     __dirname + "/UnRAR.exe",
     AppDataDir + "/CosmicComics_data/unrar_bin/UnRAR.exe"
   );
 }
-if (
-  fs.existsSync(AppDataDir + "/CosmicComics_data/unrar_bin/unrar") == false
-) {
+if (fs.existsSync(AppDataDir + "/CosmicComics_data/unrar_bin/unrar") == false) {
   fs.copyFileSync(
     __dirname + "/unrar",
     AppDataDir + "/CosmicComics_data/unrar_bin/unrar"
@@ -156,7 +149,7 @@ function openWindow() {
 }
 
 app.whenReady().then(() => {
-  if (process.argv.length != 0) {
+  try {
     if (
       process.argv[1].includes(".cbz") ||
       process.argv[1].includes(".cbr") ||
@@ -171,7 +164,8 @@ app.whenReady().then(() => {
     } else {
       createWindow();
     }
-  } else {
+  } catch (error) {
+    console.log(error);
     createWindow();
   }
 });
