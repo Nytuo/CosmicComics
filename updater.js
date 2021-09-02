@@ -127,7 +127,7 @@ gc.file("Version.txt", function (err, file) {
   OnlineVersion = OnlineVersion[0];
   var OnlineVersionNum = OnlineVersion.replaceAll(".", "");
   OnlineVersionNum = parseInt(OnlineVersionNum);
-  var proverNum = process.version.replaceAll(".", "").replace("v", "");
+  var proverNum = app.getVersion().replaceAll(".", "").replace("v", "");
   proverNum = parseInt(proverNum);
   //Choose what to do depending of your choice
   if (updateProvider == "") {
@@ -204,6 +204,7 @@ gc.file("Version.txt", function (err, file) {
       sendMessage(language["error_update"]);
     }
   } else if (updateProvider == "nsis") {
+  alert(OnlineVersionNum+"   "+proverNum)
     if (OnlineVersionNum > proverNum) {
       sendMessage(language["update_available"]);
       DLUpdate(".exe", "win");
