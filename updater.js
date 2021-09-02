@@ -155,7 +155,7 @@ gc.file("Version.txt", function (err, file) {
     if (OnlineVersionNum > proverNum) {
       sendMessage(language["update_snapcraft"]);
       setTimeout(() => {
-        close();
+        openWindow();
       }, 2000);
     } else if (OnlineVersionNum < proverNum) {
       sendMessage(language["newer_version"]);
@@ -173,6 +173,9 @@ gc.file("Version.txt", function (err, file) {
   } else if (updateProvider == "msstore") {
     if (OnlineVersionNum > proverNum) {
       sendMessage(language["update_via_MSStore"]);
+      setTimeout(() => {
+        openWindow();
+      }, 2000);
     } else if (OnlineVersionNum < proverNum) {
       sendMessage(language["newer_version"]);
       setTimeout(() => {
@@ -326,6 +329,9 @@ gc.file("Version.txt", function (err, file) {
   } else if (updateProvider == "dev") {
     if (OnlineVersionNum > proverNum) {
       sendMessage(language["update_manual"]);
+      setTimeout(() => {
+        openWindow();
+      }, 2000);
     } else if (OnlineVersionNum < proverNum) {
       sendMessage(language["newer_version"]);
       setTimeout(() => {
