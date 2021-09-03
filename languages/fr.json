@@ -98,8 +98,8 @@
     "fetching_metadata": "Aquisition des metadata",
     "this_is_a_n": "Ceci est un.e : ",
     "did_you_know": "Le savais-tu?",
-    "tips_1": "Tu peux mettre une photo de couverture personnalisé sur ton dossier en plaçant dans le dossier en question une images et en la renommant en \"folder.cosmic\"",
-    "tips_2": "Tu peux mettre une photo de couverture personnalisé sur ton fichier en plaçant dans le même dossier que ton fichier une iamge et en la renommant en \"&ltle_même_nom_que_ton_fichier.extension_du_fichier&gt.cosmic\"",
+    "tips_1": "Tu peux mettre une photo de couverture personnalisé (<a href='#' onclick=openWindow('https://developer.mozilla.org/fr/docs/Web/HTML/Element/img#supported_image_formats')>voir tout les types compatibles</a>) sur ton dossier en plaçant dans le dossier en question une images et en la renommant en \"folder.cosmic\" (Note: Si ton fichier est un SVG, alors garde le \".svg\" à la fin.)",
+    "tips_2": "Tu peux mettre une photo de couverture personnalisé (<a href='#' onclick=openWindow('https://developer.mozilla.org/fr/docs/Web/HTML/Element/img#supported_image_formats')>voir tout les types compatibles</a>) sur ton fichier en plaçant dans le même dossier que ton fichier une iamge et en la renommant en \"&ltle_même_nom_que_ton_fichier.extension_du_fichier&gt.cosmic\" (Note: Si ton fichier est un SVG, alors garde le\".svg\" à la fin)",
     "tips_3": "Tu peux aussi cacher ces images du dossier (va check sur le net)",
     "btn_update_provider": "Changer de fournisseur de mise à jour",
     "btn_appdata": "Ouvrir le dossier Cosmic-Comics dans Appdata",
@@ -162,6 +162,8 @@
     "Webtoon_Mode": "Mode Webtoon",
     "reset_zoom": "Remettre à zéro le zoom pour chaque page",
     "scrollBar_visible" : "Visibilité de la barre de défilement",
-    "color_picker" : "Changer la couleur d'arrière plan"
+    "color_picker" : "Changer la couleur d'arrière plan",
+    "FU": "Forcer la mise à jour",
+    "force_update_msg": "Forçage du protocole de mise à jour..."
   }
 ]

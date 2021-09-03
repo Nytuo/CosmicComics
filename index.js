@@ -25,7 +25,7 @@ const { get } = require("https");
 var bootstrap = require("bootstrap");
 var popper = require("@popperjs/core");
 const DRPC = require("discord-rpc");
-
+const unrarBin = require("unrar-binaries");
 //All other variables and constants
 const ValidatedExtension = [
   "cbr",
@@ -56,9 +56,9 @@ var CosmicComicsTemp = app.getPath("temp") + "/CosmicComics";
 const parentfolder1 = require("path").dirname(__dirname);
 const parentfolder2 = require("path").dirname(parentfolder1);
 const parentfolder3 = require("path").dirname(parentfolder2);
-if (fs.existsSync(parentfolder3+"/portable.txt")){
-  CosmicComicsData = parentfolder3+"/AppData"
-  CosmicComicsTemp = parentfolder3+"/TMP"
+if (fs.existsSync(parentfolder3 + "/portable.txt")) {
+  CosmicComicsData = parentfolder3 + "/AppData";
+  CosmicComicsTemp = parentfolder3 + "/TMP";
 }
 var CosmicComicsTempI = CosmicComicsTemp + "/current_book/";
 
@@ -117,7 +117,9 @@ document.getElementById("version").innerHTML =
   language["version"] + ": " + remote.app.getVersion();
 
 //Get the path of the comics folder from the config.JSON
-var get_Folder_Path_JSON = get_folder_path_from_JSON(CosmicComicsData + "/config.json");
+var get_Folder_Path_JSON = get_folder_path_from_JSON(
+  CosmicComicsData + "/config.json"
+);
 
 //if you have a folder used lasted time then it's loaded
 if (get_Folder_Path_JSON != null && get_Folder_Path_JSON != "") {
@@ -146,7 +148,11 @@ function openFolder() {
         language["overlaymsg_takecare"];
     }, 5000);
     folderRootPath.push(result[0]);
-    Modify_JSON_For_Config(CosmicComicsData + "/config.json", "path", result[0]);
+    Modify_JSON_For_Config(
+      CosmicComicsData + "/config.json",
+      "path",
+      result[0]
+    );
     openFolder_logic(result);
   }
 }
@@ -245,9 +251,15 @@ function openFolder_logic(folder) {
     if (result) {
       var FolderRes = DetectFilesAndFolders(result[0]);
       var AllFolderRes = DetectAllFilesAndFolders(result[0]);
-      AllFolderResults = Check_File_For_Validated_extension(AllFolderRes, ValidatedExtension);
+      AllFolderResults = Check_File_For_Validated_extension(
+        AllFolderRes,
+        ValidatedExtension
+      );
       GetTheFirstImageOfComicsByFolder(AllFolderResults);
-      FolderResults = Check_File_For_Validated_extension(FolderRes, ValidatedExtension);
+      FolderResults = Check_File_For_Validated_extension(
+        FolderRes,
+        ValidatedExtension
+      );
       FolderResults.forEach((file) => {
         var stat = fs.statSync(file);
         var name = patha.basename(file);
@@ -473,10 +485,15 @@ function loadContent(
     var reading = Get_element_from_data("reading", Info);
     var favorite_v = Get_element_from_data("favorite", Info);
     if (stat.isDirectory()) {
-      var node = document.createTextNode(realname + "<br> "+language["folder_p"]);
+      var node = document.createTextNode(
+        realname + "<br> " + language["folder_p"]
+      );
       invertedPath = path.replaceAll("\\", "/");
       if (fs.existsSync(invertedPath + "/folder.cosmic")) {
         imagelink = invertedPath + "/folder.cosmic";
+        console.log(imagelink);
+      } else if (fs.existsSync(invertedPath + "/folder.cosmic.svg")) {
+        imagelink = invertedPath + "/folder.cosmic.svg";
         console.log(imagelink);
       } else {
         imagelink = __dirname + "/Images/folderDefault.png";
@@ -492,6 +509,9 @@ function loadContent(
       invertedPath = path.replaceAll("\\", "/");
       if (fs.existsSync(invertedPath + ".cosmic")) {
         imagelink = invertedPath + ".cosmic";
+        console.log(imagelink);
+      } else if (fs.existsSync(invertedPath + ".cosmic.svg")) {
+        imagelink = invertedPath + ".cosmic.svg";
         console.log(imagelink);
       } else {
         if (FIOA.length == 0) {
@@ -858,11 +878,11 @@ function preloadImage(listImages, n) {
 }
 
 //Add and remove animate.style animations
-const animateCSS = (element, animation, prefix = 'animate__') =>
+const animateCSS = (element, animation, prefix = "animate__") =>
   // We create a Promise and return it
   new Promise((resolve, reject) => {
     const animationName = `${prefix}${animation}`;
-    const node =(element);
+    const node = element;
 
     node.classList.add(`${prefix}animated`, animationName);
 
@@ -870,17 +890,31 @@ const animateCSS = (element, animation, prefix = 'animate__') =>
     function handleAnimationEnd(event) {
       event.stopPropagation();
       node.classList.remove(`${prefix}animated`, animationName);
-      resolve('Animation ended');
+      resolve("Animation ended");
     }
 
-    node.addEventListener('animationend', handleAnimationEnd, {once: true});
+    node.addEventListener("animationend", handleAnimationEnd, { once: true });
   });
-  
+
 //Load Images
 function LoadImages(numberOf) {
-  var coolanimations = ["zoomInDown","rollIn","zoomIn","jackInTheBox","fadeInUp","fadeInDown","fadeIn","bounceInUp","bounceInDown","backInDown","flip","flipInY"];
-  var random = coolanimations[Math.floor(Math.random()*coolanimations.length)]
-    if (numberOf == 0) {
+  var coolanimations = [
+    "zoomInDown",
+    "rollIn",
+    "zoomIn",
+    "jackInTheBox",
+    "fadeInUp",
+    "fadeInDown",
+    "fadeIn",
+    "bounceInUp",
+    "bounceInDown",
+    "backInDown",
+    "flip",
+    "flipInY",
+  ];
+  var random =
+    coolanimations[Math.floor(Math.random() * coolanimations.length)];
+  if (numberOf == 0) {
     Toastifycation(language["empty_notSupported"], "#ff0000");
     document.getElementById("overlay").style.display = "none";
     document.getElementById("tutotxt").innerHTML =
@@ -892,9 +926,9 @@ function LoadImages(numberOf) {
   }
   for (let i = 0; i < numberOf; i++) {
     document.getElementById("tutotxt").style.display = "none";
-    animateCSS(document.getElementById("id" + i),random).then((message)=>{
-      console.log(message)
-    })
+    animateCSS(document.getElementById("id" + i), random).then((message) => {
+      console.log(message);
+    });
     try {
       document.getElementById("card_img_id_" + i).src = listOfImages[i];
     } catch (error) {
@@ -938,7 +972,10 @@ function launchDetect(dir, root) {
   }
 
   var contents = DetectFilesAndFolders(dir);
-  FolderResults = Check_File_For_Validated_extension(contents, ValidatedExtension);
+  FolderResults = Check_File_For_Validated_extension(
+    contents,
+    ValidatedExtension
+  );
   loadContent(FolderResults, root, favonly, readonly, unreadonly, readingonly);
 }
 
@@ -1026,6 +1063,34 @@ function GetTheFirstImageOfComicsByFolder(filesInFolder = [], i = 0) {
             "00.png",
             "00-copie.png",
             "*-00.png",
+            "*000.jpeg",
+            "00.jpeg",
+            "00-copie.jpeg",
+            "*-00.jpeg",
+            "*000.bmp",
+            "00.bmp",
+            "00-copie.bmp",
+            "*-00.bmp",
+            "*000.apng",
+            "00.apng",
+            "00-copie.apng",
+            "*-00.apng",
+            "*000.svg",
+            "00.svg",
+            "00-copie.svg",
+            "*-00.svg",
+            "*000.ico",
+            "00.ico",
+            "00-copie.ico",
+            "*-00.ico",
+            "*000.webp",
+            "00.webp",
+            "00-copie.webp",
+            "*-00.webp",
+            "*000.gif",
+            "00.gif",
+            "00-copie.gif",
+            "*-00.gif",
           ],
           i,
           filesInFolder
@@ -1048,6 +1113,34 @@ function GetTheFirstImageOfComicsByFolder(filesInFolder = [], i = 0) {
           "00.png",
           "00-copie.png",
           "*-00.png",
+          "*000.jpeg",
+          "00.jpeg",
+          "00-copie.jpeg",
+          "*-00.jpeg",
+          "*000.bmp",
+          "00.bmp",
+          "00-copie.bmp",
+          "*-00.bmp",
+          "*000.apng",
+          "00.apng",
+          "00-copie.apng",
+          "*-00.apng",
+          "*000.svg",
+          "00.svg",
+          "00-copie.svg",
+          "*-00.svg",
+          "*000.ico",
+          "00.ico",
+          "00-copie.ico",
+          "*-00.ico",
+          "*000.webp",
+          "00.webp",
+          "00-copie.webp",
+          "*-00.webp",
+          "*000.gif",
+          "00.gif",
+          "00-copie.gif",
+          "*-00.gif",
         ],
         i,
         filesInFolder
@@ -1147,7 +1240,10 @@ function unarchive_first(
       if (recursion != 0) {
         console.log("reached");
         if (Stream.info.get("Files") == "0") {
-          Toastifycation(language["cover_not_compatible"] +" "+ name, "#ff0000");
+          Toastifycation(
+            language["cover_not_compatible"] + " " + name,
+            "#ff0000"
+          );
           GetTheFirstImageOfComicsByFolder(filesInFolder, indice + 1);
         }
       } else {
@@ -1166,6 +1262,34 @@ function unarchive_first(
               "01.png",
               "01-copie.png",
               "*-01.png",
+              "*001.gif",
+              "01.gif",
+              "01-copie.gif",
+              "*-01.gif",
+              "*001.jpeg",
+              "01.jpeg",
+              "01-copie.jpeg",
+              "*-01.jpeg",
+              "*001.bmp",
+              "01.bmp",
+              "01-copie.bmp",
+              "*-01.bmp",
+              "*001.apng",
+              "01.apng",
+              "01-copie.apng",
+              "*-01.apng",
+              "*001.svg",
+              "01.svg",
+              "01-copie.svg",
+              "*-01.svg",
+              "*001.ico",
+              "01.ico",
+              "01-copie.ico",
+              "*-01.ico",
+              "*001.webp",
+              "01.webp",
+              "01-copie.webp",
+              "*-01.webp",
             ],
             indice,
             filesInFolder,
@@ -1180,69 +1304,80 @@ function unarchive_first(
   }
 
   if (ext == "rar" || ext == "cbr") {
-    if (process.platform == "win32") {
+    var configFile = fs.readFileSync(CosmicComicsData + "/config.json");
+    var parsedJSON = JSON.parse(configFile);
+    var provider = Get_From_Config("update_provider", parsedJSON)
+    console.log(provider);
+    if (provider == "msstore"){
       var archive = new Unrar({
         path: zipPath,
-        bin: CosmicComicsData + "/unrar_bin/UnRAR.exe",
+        bin: CosmicComicsData+ "/unrar_bin/UnRAR.exe",
       });
-    } else if (process.platform == "linux") {
+    }else{
       var archive = new Unrar({
         path: zipPath,
-      });
-    } else if (process.platform == "darwin") {
-      var archive = new Unrar({
-        path: zipPath,
-        bin: CosmicComicsData + "/unrar_bin/unrar",
+        bin: unrarBin,
       });
     }
 
     archive.list(function (err, entries) {
-      entries.forEach((file) => {
-        //if name contains 000.jpg or 001.jpg
-        for (var i in file) {
-          if (i == "name") {
-            var currentName = file[i];
-            currentName = currentName.toString();
-            if (
-              currentName.includes("000.jpg") ||
-              currentName.includes("000a.jpg") ||
-              currentName.includes("001.jpg") ||
-              /*currentName.includes("01.jpg") ||
-              currentName.includes("00.jpg") ||*/
-              currentName.includes("acvr.jpg")
-            ) {
-              if (
-                currentName.includes("000.jpg") ||
-                currentName.includes("000a.jpg") ||
-                currentName.includes("acvr.jpg")
-              ) {
-                nabc = 0;
-              } else if (currentName.includes("001.jpg")) {
-                nabc = 1;
-              }
-              var stream = archive.stream(currentName);
-              stream.on("error", console.error);
-              if (
-                !fs.existsSync(ExtractDir + "/" + name + "_" + nabc + ".jpg")
-              ) {
-                stream.pipe(
-                  fs.createWriteStream(
-                    ExtractDir + "/" + name + "_" + nabc + ".jpg"
-                  )
-                );
-                GetTheFirstImageOfComicsByFolder(filesInFolder, indice + 1);
-              }
-            } else {
-              Toastifycation(
-                language["cover_not_compatible"] + " " + name,
-                "#ff0000"
-              );
-
-              GetTheFirstImageOfComicsByFolder(filesInFolder, indice + 1);
-            }
+      if (err) {
+        GetTheFirstImageOfComicsByFolder(filesInFolder, indice + 1);
+        return;
+      }
+      entries.sort((a, b) => {
+        let fa = a.name.toLowerCase(),
+          fb = b.name.toLowerCase();
+        if (fa < fb) {
+          return -1;
+        }
+        if (fa > fb) {
+          return 1;
+        }
+        return 0;
+      });
+      for (var i = 0; i < entries.length; i++) {
+        const file = entries[i]["name"];
+        var currentName = file;
+        currentName = currentName.toString();
+        if (
+          currentName.includes(".png") ||
+          currentName.includes(".jpg") ||
+          currentName.includes(".jpeg") ||
+          currentName.includes(".gif") ||
+          currentName.includes(".apng") ||
+          currentName.includes(".svg") ||
+          currentName.includes(".ico") ||
+          currentName.includes(".webp") ||
+          currentName.includes(".bmp")
+        ) {
+          var stream = archive.stream(currentName);
+          stream.on("error", function (err) {
+            alert("erreur RAR: " + err);
+            GetTheFirstImageOfComicsByFolder(filesInFolder, indice + 1);
+            return;
+          });
+          if (fs.existsSync(ExtractDir + "/0.jpg") == false) {
+            var x = fs.createWriteStream(ExtractDir + "/0.jpg");
+            stream.pipe(x);
+            GetTheFirstImageOfComicsByFolder(filesInFolder, indice + 1);
+            return;
           }
         }
-      });
+        if (
+          (currentName.includes(".png") ||
+            currentName.includes(".jpg") ||
+            currentName.includes(".jpeg") ||
+            currentName.includes(".gif") ||
+            currentName.includes(".apng") ||
+            currentName.includes(".svg") ||
+            currentName.includes(".ico") ||
+            currentName.includes(".webp") ||
+            currentName.includes(".bmp")) == false
+        ) {
+          GetTheFirstImageOfComicsByFolder(filesInFolder, indice + 1);
+        }
+      }
     });
   }
   if (ext == "pdf") {
@@ -1595,7 +1730,11 @@ function insertFlags() {
 
 //Change the language of the app
 function changeLang(langues) {
-  Modify_JSON_For_Config(CosmicComicsData + "/config.json", "language", langues);
+  Modify_JSON_For_Config(
+    CosmicComicsData + "/config.json",
+    "language",
+    langues
+  );
   window.location.reload();
 }
 
@@ -1610,7 +1749,6 @@ function Toastifycation(message, BGColor = "#333", FrontColor = "#ffffff") {
   x.innerHTML = message;
   x.style.backgroundColor = BGColor;
   x.style.color = FrontColor;
-  console.log(window.innerWidth + "<-k->" + x.offsetWidth);
   setTimeout(function () {
     x.className = x.className.replace("show", "");
   }, 3000);
@@ -1643,10 +1781,7 @@ document.addEventListener("drop", (event) => {
     ) {
       window.location.href = "viewer.html?" + f.path;
     } else {
-      Toastifycation(
-        language["drag&drop_fail"],
-        "#ff0000"
-      );
+      Toastifycation(language["drag&drop_fail"], "#ff0000");
     }
   }
 });
@@ -1769,3 +1904,33 @@ window.addEventListener("keydown", (e) => {
     openFolder();
   }
 });
+function openWindow(pathaa) {
+  const BrowserWindow = require("electron").remote.BrowserWindow;
+  const path = require("path");
+  const win = new BrowserWindow({
+    width: 1280,
+    height: 720,
+    minHeight: 720,
+    minWidth: 1280,
+    icon: __dirname + "/Images/Logo.png",
+    webPreferences: {
+      webSecurity: false,
+      nodeIntegration: true,
+      enableRemoteModule: true,
+      contextIsolation: false,
+    },
+  });
+
+  win.loadURL(pathaa);
+}
+
+//set force update
+function setFU(){
+  Modify_JSON_For_Config(CosmicComicsData + "/config.json","force_update",true)
+  Toastifycation(language["force_update_msg"])
+  setTimeout(() => {
+    app.relaunch()
+    app.exit();
+  }, 1000);
+}
+document.getElementById("id_btn_FU").innerHTML = language["FU"];

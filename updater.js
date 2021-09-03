@@ -15,7 +15,7 @@ along with Cosmic-Comics.  If not, see <https://www.gnu.org/licenses/>.*/
 //Declaring variables
 var OnlineVersion = "";
 const os = require("os");
-var osarch = os.arch()
+var osarch = os.arch();
 const fs = require("fs");
 const download = require("download");
 const { shell, remote } = require("electron");
@@ -24,12 +24,13 @@ var CosmicComicsData = app.getPath("userData") + "/CosmicComics_data";
 const parentfolder1 = require("path").dirname(__dirname);
 const parentfolder2 = require("path").dirname(parentfolder1);
 const parentfolder3 = require("path").dirname(parentfolder2);
-if (fs.existsSync(parentfolder3+"/portable.txt")){
-  CosmicComicsData = parentfolder3+"/AppData"
+if (fs.existsSync(parentfolder3 + "/portable.txt")) {
+  CosmicComicsData = parentfolder3 + "/AppData";
 }
 var configFile = fs.readFileSync(CosmicComicsData + "/config.json");
 var parsedJSON = JSON.parse(configFile);
 var updateProvider = GetElFromInforPath("update_provider", parsedJSON);
+var forceupdate = GetElFromInforPath("force_update", parsedJSON);
 
 //Get elements from the config.json
 function GetElFromInforPath(search, info) {
@@ -129,6 +130,10 @@ gc.file("Version.txt", function (err, file) {
   OnlineVersionNum = parseInt(OnlineVersionNum);
   var proverNum = app.getVersion().replaceAll(".", "").replace("v", "");
   proverNum = parseInt(proverNum);
+  if (forceupdate == true){
+    proverNum = 0
+}
+  
   //Choose what to do depending of your choice
   if (updateProvider == "") {
     sendMessage(language["provider_not_set"]);
@@ -154,38 +159,27 @@ gc.file("Version.txt", function (err, file) {
   } else if (updateProvider == "snapcraft") {
     if (OnlineVersionNum > proverNum) {
       sendMessage(language["update_snapcraft"]);
-      setTimeout(() => {
-        openWindow();
-      }, 2000);
+      openWindow();
     } else if (OnlineVersionNum < proverNum) {
       sendMessage(language["newer_version"]);
-      setTimeout(() => {
-        openWindow();
-      }, 2000);
+      openWindow();
     } else if (OnlineVersionNum == proverNum) {
       sendMessage(language["no_update"]);
-      setTimeout(() => {
-        openWindow();
-      }, 2000);
+      openWindow();
     } else {
       sendMessage(language["error_update"]);
     }
   } else if (updateProvider == "msstore") {
     if (OnlineVersionNum > proverNum) {
       sendMessage(language["update_via_MSStore"]);
-      setTimeout(() => {
-        openWindow();
-      }, 2000);
+      openWindow();
     } else if (OnlineVersionNum < proverNum) {
       sendMessage(language["newer_version"]);
-      setTimeout(() => {
-        openWindow();
-      }, 2000);
+      openWindow();
     } else if (OnlineVersionNum == proverNum) {
       sendMessage(language["no_update"]);
-      setTimeout(() => {
-        openWindow();
-      }, 2000);
+
+      openWindow();
     } else {
       sendMessage(language["error_update"]);
     }
@@ -207,7 +201,6 @@ gc.file("Version.txt", function (err, file) {
       sendMessage(language["error_update"]);
     }
   } else if (updateProvider == "nsis") {
-  alert(OnlineVersionNum+"   "+proverNum)
     if (OnlineVersionNum > proverNum) {
       sendMessage(language["update_available"]);
       DLUpdate(".exe", "win");
@@ -329,19 +322,13 @@ gc.file("Version.txt", function (err, file) {
   } else if (updateProvider == "dev") {
     if (OnlineVersionNum > proverNum) {
       sendMessage(language["update_manual"]);
-      setTimeout(() => {
-        openWindow();
-      }, 2000);
+      openWindow();
     } else if (OnlineVersionNum < proverNum) {
       sendMessage(language["newer_version"]);
-      setTimeout(() => {
-        openWindow();
-      }, 2000);
+      openWindow();
     } else if (OnlineVersionNum == proverNum) {
       sendMessage(language["no_update"]);
-      setTimeout(() => {
-        openWindow();
-      }, 2000);
+      openWindow();
     } else {
       sendMessage(language["error_update"]);
     }
@@ -366,7 +353,7 @@ function sendMessage(message) {
 
 //downloading the update
 async function DLUpdate(executable, endname = "") {
-  arch = osarch
+  arch = osarch;
   if (process.platform === "win32" || process.platform === "linux") {
     var starttime = new Date().getTime();
     await download(
@@ -375,7 +362,9 @@ async function DLUpdate(executable, endname = "") {
         "/Cosmic-Comics_" +
         OnlineVersion +
         "_" +
-        endname +"_"+arch+
+        endname +
+        "_" +
+        arch +
         executable,
       CosmicComicsData
     )
@@ -412,7 +401,9 @@ async function DLUpdate(executable, endname = "") {
             "/Cosmic-Comics_" +
             OnlineVersion +
             "_" +
-            endname +"_"+arch+
+            endname +
+            "_" +
+            arch +
             executable
         );
       });

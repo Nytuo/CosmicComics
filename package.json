@@ -56,20 +56,23 @@
       "publish": [
         "github"
       ],
-      "target":
-      [
+      "target": [
         {
           "target": "nsis",
           "arch": [
-            "x64","ia32","arm64"
+            "x64",
+            "ia32",
+            "arm64"
           ]
         },
         {
-            "target": "zip",
-            "arch": [
-              "x64","ia32","arm64"
-            ]
-          }
+          "target": "zip",
+          "arch": [
+            "x64",
+            "ia32",
+            "arm64"
+          ]
+        }
       ],
       "icon": "Images/Logo.ico"
     },
@@ -128,7 +131,7 @@
       ]
     }
   },
-  "version": "1.0.1",
+  "version": "1.1.0",
   "description": "Comics and Manga Reader with collectionner",
   "main": "main.js",
   "author": {
@@ -154,7 +157,6 @@
     "@popperjs/core": "^2.9.2",
     "anilist.js": "^1.2.1",
     "bootstrap": "^5.0.2",
-    "bootstrap-icons": "^1.5.0",
     "color-thief-browser": "^2.0.2",
     "comicgeeks": "^1.1.0",
     "discord-rich-presence": "^0.0.8",
@@ -164,6 +166,7 @@
     "html-magnifier": "^2.0.2",
     "node-7z": "^3.0.0",
     "unrar": "^0.2.0",
+    "unrar-binaries": "^1.1.0",
     "upscaler": "^0.8.22"
   }
 }

@@ -27,8 +27,20 @@ const ValidatedExtension = [
   "tar",
   "cbt",
 ];
-const ValidatedExtensionV = ["png", "jpg", "jpeg", "bmp"];
+const ValidatedExtensionV = [
+  "png",
+  "jpg",
+  "jpeg",
+  "bmp",
+  "apng",
+  "svg",
+  "ico",
+  "webp",
+  "gif",
+];
 const SevenBin = require("7zip-bin");
+const unrarBin = require("unrar-binaries");
+
 const Seven = require("node-7z");
 const Path27Zip = SevenBin.path7za;
 var Unrar = require("unrar");
@@ -50,9 +62,9 @@ var CosmicComicsTemp = app.getPath("temp") + "/CosmicComics";
 const parentfolder1 = require("path").dirname(__dirname);
 const parentfolder2 = require("path").dirname(parentfolder1);
 const parentfolder3 = require("path").dirname(parentfolder2);
-if (fs.existsSync(parentfolder3+"/portable.txt")){
-  CosmicComicsData = parentfolder3+"/AppData"
-  CosmicComicsTemp = parentfolder3+"/TMP"
+if (fs.existsSync(parentfolder3 + "/portable.txt")) {
+  CosmicComicsData = parentfolder3 + "/AppData";
+  CosmicComicsTemp = parentfolder3 + "/TMP";
 }
 var CosmicComicsTempI = CosmicComicsTemp + "/current_book/";
 var rarlength = 0;
@@ -254,22 +266,20 @@ function UnZip(zipPath, ExtractDir, name, ext) {
   }
 
   if (ext == "rar" || ext == "cbr") {
-    if (process.platform == "win32") {
+    var configFile = fs.readFileSync(CosmicComicsData + "/config.json");
+    var parsedJSON = JSON.parse(configFile);
+    var provider = Get_From_Config("update_provider", parsedJSON);
+    if (provider == "msstore") {
       var archive = new Unrar({
         path: zipPath,
         bin: CosmicComicsData + "/unrar_bin/UnRAR.exe",
       });
-    } else if (process.platform == "darwin") {
+    } else {
       var archive = new Unrar({
         path: zipPath,
-        bin: CosmicComicsData + "/unrar_bin/unrar",
-      });
-    } else if (process.platform == "linux") {
-      var archive = new Unrar({
-        path: zipPath,
+        bin: unrarBin,
       });
     }
-
     archive.list(function (err, entries) {
       console.log(entries);
       //tri numérique
@@ -291,14 +301,27 @@ function UnZip(zipPath, ExtractDir, name, ext) {
             currentName = currentName.toString();
             var stream = archive.stream(currentName);
             stream.on("error", console.error);
+
             if (!fs.existsSync(CosmicComicsTempI)) {
               fs.mkdirSync(CosmicComicsTempI);
             }
-            stream.pipe(
-              fs.createWriteStream(CosmicComicsTempI + name + ".jpg")
-            );
-            n = parseInt(name) + 1;
-            name = Array(5 - String(n).length + 1).join("0") + n;
+            if (
+              currentName.includes("png") ||
+              currentName.includes("jpg") ||
+              currentName.includes("jpeg") ||
+              currentName.includes(".gif") ||
+              currentName.includes("bmp") ||
+              currentName.includes("apng") ||
+              currentName.includes("svg") ||
+              currentName.includes("ico") ||
+              currentName.includes("webp")
+            ) {
+              stream.pipe(
+                fs.createWriteStream(CosmicComicsTempI + name + ".jpg")
+              );
+              n = parseInt(name) + 1;
+              name = Array(5 - String(n).length + 1).join("0") + n;
+            }
           }
         }
       });
@@ -1152,7 +1175,7 @@ function changeZoomLVL() {
   var val = document.getElementById("zlvls").value;
   ZoomLVL = parseInt(val);
   document.getElementById("zlvll").innerHTML =
-    language[0]["zoomlvl"]+" (" + ZoomLVL + "px):";
+    language[0]["zoomlvl"] + " (" + ZoomLVL + "px):";
   ModifyJSONFileForPath(CosmicComicsData + "/config.json", "ZoomLVL", ZoomLVL);
 }
 
@@ -1421,19 +1444,22 @@ new bootstrap.Tooltip(document.getElementById("id_toogleBookMark"), {
   title: language[0]["Bookmark"],
   placement: "bottom",
 });
-document.getElementById("id_magnifiermod").innerHTML = language[0]["magnifier_mod"],
-document.getElementById("zoomlvl").innerHTML= language[0]["zoom"]
+(document.getElementById("id_magnifiermod").innerHTML =
+  language[0]["magnifier_mod"]),
+  (document.getElementById("zoomlvl").innerHTML = language[0]["zoom"]);
 
-document.getElementById("widthlvl").innerHTML = language[0]["width"]
-document.getElementById("heightlvl").innerHTML = language[0]["height"]
+document.getElementById("widthlvl").innerHTML = language[0]["width"];
+document.getElementById("heightlvl").innerHTML = language[0]["height"];
 
-document.getElementById("Radiuslvl").innerHTML = language[0]["radius"]
+document.getElementById("Radiuslvl").innerHTML = language[0]["radius"];
 new bootstrap.Tooltip(document.getElementById("magnifier_note"), {
   title: language[0]["magnifier_note"],
   placement: "bottom",
 });
-document.getElementById("id_spawnmagnifier").innerHTML = language[0]["spawn_magnifier"]
-document.getElementById("id_destroymagnifier").innerHTML = language[0]["destroy_magnifier"]
+document.getElementById("id_spawnmagnifier").innerHTML =
+  language[0]["spawn_magnifier"];
+document.getElementById("id_destroymagnifier").innerHTML =
+  language[0]["destroy_magnifier"];
 
 //Hide the Double Pages
 function HideDB() {
@@ -1505,7 +1531,10 @@ function MarginSlider() {
       document.getElementById("imgViewer_" + i).style.marginBottom =
         document.getElementById("MarginValue").value;
       document.getElementById("marginlvl").innerHTML =
-        language[0]['margin']+" (" + document.getElementById("MarginValue").value + " px):";
+        language[0]["margin"] +
+        " (" +
+        document.getElementById("MarginValue").value +
+        " px):";
       ModifyJSONFileForPath(
         CosmicComicsData + "/config.json",
         "Margin",
@@ -1516,7 +1545,10 @@ function MarginSlider() {
     document.getElementById("imgViewer_1").style.marginLeft =
       document.getElementById("MarginValue").value;
     document.getElementById("marginlvl").innerHTML =
-      language[0]["margin"]+" (" + document.getElementById("MarginValue").value + " px):";
+      language[0]["margin"] +
+      " (" +
+      document.getElementById("MarginValue").value +
+      " px):";
     ModifyJSONFileForPath(
       CosmicComicsData + "/config.json",
       "Margin",
@@ -1698,7 +1730,7 @@ function AlwaysRotate() {
     document.getElementById("imgViewer_1").style.transform =
       "rotate(" + AlwaysRotateV + "deg)";
     document.getElementById("rotlvl").innerHTML =
-      language[0]["rotation"]+" (" + rotateval + " degrees):";
+      language[0]["rotation"] + " (" + rotateval + " degrees):";
   }
   ModifyJSONFileForPath(
     CosmicComicsData + "/config.json",
@@ -1735,9 +1767,12 @@ function TSS() {
 //Text of the Slide Show slider
 function ShowOnChangeSlideShow() {
   document.getElementById("sstxt").innerHTML =
-    language[0]["slideshow_interval"]+" (" +
+    language[0]["slideshow_interval"] +
+    " (" +
     document.getElementById("SSValue").value +
-    " "+language[0]["secondes"]+"):";
+    " " +
+    language[0]["secondes"] +
+    "):";
 }
 
 //FullScreen
@@ -1948,7 +1983,10 @@ function pageslide() {
   var listofImg = GetListOfImg(CosmicComicsTempI);
   var pageto = document.getElementById("sps").value - 1;
   document.getElementById("lsps").innerHTML =
-    language[0]["page_slider"]+" (" + document.getElementById("sps").value + "):";
+    language[0]["page_slider"] +
+    " (" +
+    document.getElementById("sps").value +
+    "):";
   Reader(listofImg, pageto);
 }
 
@@ -2137,19 +2175,24 @@ function loadParameters() {
     }
   }
   document.getElementById("sstxt").innerHTML =
-   language[0]["slideshow_interval"]+ " (" + configSST + " "+language[0]['secondes']+"):";
+    language[0]["slideshow_interval"] +
+    " (" +
+    configSST +
+    " " +
+    language[0]["secondes"] +
+    "):";
   document.getElementById("RotateValue").value = configRA;
   AlwaysRotate();
   if (VIV_On == true) {
     for (let i = 0; i < VIV_Count; i++) {
       document.getElementById("imgViewer_" + i).style.marginBottom = configM;
       document.getElementById("marginlvl").innerHTML =
-        language[0]["margin"]+" (" + configM + " px):";
+        language[0]["margin"] + " (" + configM + " px):";
     }
   } else {
     document.getElementById("imgViewer_1").style.marginLeft = configM;
     document.getElementById("marginlvl").innerHTML =
-      language[0]["margin"]+" (" + configM + " px):";
+      language[0]["margin"] + " (" + configM + " px):";
   }
   if (configMM == true) {
     MMT();
@@ -2181,7 +2224,6 @@ function loadParameters() {
     document.getElementById("RZPS").checked = true;
   }
 }
-
 
 document.getElementById("Heightvalue").onchange = function () {
   ModifyJSONFileForPath(
@@ -2240,7 +2282,7 @@ window.onscroll = function (ev) {
 var nb_of_next = 0;
 var nb_of_prev = 0;
 
-//Go to the next or previous page by scrolling 
+//Go to the next or previous page by scrolling
 window.addEventListener("wheel", function (e) {
   if (ctrlisDown) {
     console.log(ctrlisDown);
@@ -2296,34 +2338,37 @@ document
     NextPage();
   });
 
-  //Wait before Image load up
+//Wait before Image load up
 document.getElementById("imgViewer_0").onload = function () {
   document.getElementById("imgViewer_0").style.display = "";
 };
 document.getElementById("imgViewer_1").onload = function () {
   document.getElementById("imgViewer_1").style.display = "";
 };
-document.getElementById("id_booksettings").innerHTML = language[0]["book_settings"]
-document.getElementById("DPMTXT").innerHTML = language[0]["double_page_mode"]
-document.getElementById("BPABTXT").innerHTML = language[0]["blank_at_beggining"]
-document.getElementById("NDPFHTXT").innerHTML = language[0]["no_dpm_horizontal"]
-document.getElementById("MMTXT").innerHTML = language[0]["manga_mode"]
-document.getElementById("SSTXT").innerHTML = language[0]["Slideshow"]
-document.getElementById("NBARTXT").innerHTML = language[0]["nobar"]
-document.getElementById("SSBTXT").innerHTML = language[0]["sideBar"]
-document.getElementById("PCTXT").innerHTML = language[0]["PageCount"]
-document.getElementById("VIVTXT").innerHTML = language[0]["vertical_reader"]
-document.getElementById("WTMTXT").innerHTML = language[0]["Webtoon_Mode"]
-document.getElementById("RZPSTXT").innerHTML = language[0]["reset_zoom"]
-document.getElementById("SBVSTXT").innerHTML = language[0]["scrollBar_visible"]
-document.getElementById("marginlvl").innerHTML = language[0]["margin"]
-document.getElementById("rotlvl").innerHTML = language[0]["rotation"]
-document.getElementById("zlvll").innerHTML = language[0]["zoomlvl"]
-document.getElementById("sstxt").innerHTML = language[0]["slideshow_interval"]
-document.getElementById("lsps").innerHTML = language[0]["page_slider"]
-document.getElementById("colorpicker_txt_id").innerHTML = language[0]["color_picker"]
-document.getElementById("close_id_books").innerHTML = language[0]["close"]
-
+document.getElementById("id_booksettings").innerHTML =
+  language[0]["book_settings"];
+document.getElementById("DPMTXT").innerHTML = language[0]["double_page_mode"];
+document.getElementById("BPABTXT").innerHTML =
+  language[0]["blank_at_beggining"];
+document.getElementById("NDPFHTXT").innerHTML =
+  language[0]["no_dpm_horizontal"];
+document.getElementById("MMTXT").innerHTML = language[0]["manga_mode"];
+document.getElementById("SSTXT").innerHTML = language[0]["Slideshow"];
+document.getElementById("NBARTXT").innerHTML = language[0]["nobar"];
+document.getElementById("SSBTXT").innerHTML = language[0]["sideBar"];
+document.getElementById("PCTXT").innerHTML = language[0]["PageCount"];
+document.getElementById("VIVTXT").innerHTML = language[0]["vertical_reader"];
+document.getElementById("WTMTXT").innerHTML = language[0]["Webtoon_Mode"];
+document.getElementById("RZPSTXT").innerHTML = language[0]["reset_zoom"];
+document.getElementById("SBVSTXT").innerHTML = language[0]["scrollBar_visible"];
+document.getElementById("marginlvl").innerHTML = language[0]["margin"];
+document.getElementById("rotlvl").innerHTML = language[0]["rotation"];
+document.getElementById("zlvll").innerHTML = language[0]["zoomlvl"];
+document.getElementById("sstxt").innerHTML = language[0]["slideshow_interval"];
+document.getElementById("lsps").innerHTML = language[0]["page_slider"];
+document.getElementById("colorpicker_txt_id").innerHTML =
+  language[0]["color_picker"];
+document.getElementById("close_id_books").innerHTML = language[0]["close"];
 
 new bootstrap.Tooltip(document.getElementById("id_rotateright"), {
   title: language[0]["rotate_right"],

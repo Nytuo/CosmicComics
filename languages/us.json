@@ -98,8 +98,8 @@
     "fetching_metadata": "Fetching metadata",
     "this_is_a_n": "This is a.n : ",
     "did_you_know": "Did you know?",
-    "tips_1": "You can set a custom folder cover by placing an image of your choice in the folder you want to customize and rename it to \"folder.cosmic\"",
-    "tips_2": "You can set a custom cover by placing an image of your choice in the same folder of your file and rename it to \"&ltthe_same_name_as_your_file.extension_du_&gt.cosmic\"",
+    "tips_1": "You can set a custom folder cover (<a href='#' onclick=openWindow('https://developer.mozilla.org/fr/docs/Web/HTML/Element/img#supported_image_formats')>See all compatible image formats</a>) by placing an image of your choice in the folder you want to customize and rename it to \"folder.cosmic\" (NB: If your file is a SVG, then keep the \".svg\" at the end of the file)",
+    "tips_2": "You can set a custom cover (<a href='#' onclick=openWindow('https://developer.mozilla.org/fr/docs/Web/HTML/Element/img#supported_image_formats')>See all compatible image formats</a>) by placing an image of your choice in the same folder of your file and rename it to \"&ltthe_same_name_as_your_file.extension_du_&gt.cosmic\" (NB: If your file is a SVG, then keep the \".svg\" at the end of the file)",
     "tips_3": "For the two tips above you can also hide them of the folder",
     "btn_update_provider": "Change Update Provider",
     "btn_appdata": "Open Cosmic-Comics Folder's in Appdata",
@@ -162,6 +162,8 @@
     "Webtoon_Mode": "WebToon Mode (Fixed width + Vertical Reader)",
     "reset_zoom": "Reset Zoom for Each Page",
     "scrollBar_visible" : "ScrollBar visible",
-    "color_picker" : "Set Background Color"
+    "color_picker" : "Set Background Color",
+    "FU": "Force Update",
+    "force_update_msg": "Forcing Update Protocol"
     }
 ]

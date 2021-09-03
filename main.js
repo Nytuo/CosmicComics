@@ -90,6 +90,7 @@ if (!fs.existsSync(AppDataDir + "/CosmicComics_data/config.json")) {
       magnifier_Height: 100,
       magnifier_Radius: 0,
       reset_zoom: false,
+      force_update : false
     },
   ];
   fs.writeFileSync(
@@ -119,14 +120,8 @@ if (
   fs.existsSync(AppDataDir + "/CosmicComics_data/unrar_bin/UnRAR.exe") == false
 ) {
   fs.copyFileSync(
-    __dirname + "/UnRAR.exe",
+    __dirname + "/node_modules/unrar-binaries/bin/win32/unrar.exe",
     AppDataDir + "/CosmicComics_data/unrar_bin/UnRAR.exe"
-  );
-}
-if (fs.existsSync(AppDataDir + "/CosmicComics_data/unrar_bin/unrar") == false) {
-  fs.copyFileSync(
-    __dirname + "/unrar",
-    AppDataDir + "/CosmicComics_data/unrar_bin/unrar"
   );
 }
 function openWindow() {
