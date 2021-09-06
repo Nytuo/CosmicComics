@@ -100,6 +100,11 @@ Viewer page (viewer, where you read the book):
 - Mouse Left Click (not on the MenuBar or the SideBar) : Previous Page
 - Mouse Right Click (Not on the MenuBar or the SideBar) : Next Page
 
+## Known Issues
+- Linux: all modal cannot be opened (no access to the settings, informations, book settings, bookmarks, etc...)
+    Don't know yet why but will investigate soon...
+- Global: The no good visibily of the cover's icons (read,reading,unread,favorite) when activate and persistant.
+
 ## Mobile Version ?
 Well, my software use Electron which is not possible to export to Android (and I don't talk about IOS), I try many way to convert my project to Android but still no success.
 In the future I have the plan to make an android application.

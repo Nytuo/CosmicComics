@@ -66,6 +66,14 @@ if (fs.existsSync(parentfolder3 + "/portable.txt")) {
   CosmicComicsData = parentfolder3 + "/AppData";
   CosmicComicsTemp = parentfolder3 + "/TMP";
 }
+try {
+  fs.readdirSync(CosmicComicsData)
+  fs.readdirSync(CosmicComicsTemp)
+} catch (error) {
+  console.log(error)
+  CosmicComicsData = __dirname + "/AppData";
+  CosmicComicsTemp = __dirname + "/TMP";
+}
 var CosmicComicsTempI = CosmicComicsTemp + "/current_book/";
 var rarlength = 0;
 const DRPC = require("discord-rpc");

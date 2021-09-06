@@ -20,12 +20,19 @@ const fs = require("fs");
 const download = require("download");
 const { shell, remote } = require("electron");
 const app = remote.app;
+
 var CosmicComicsData = app.getPath("userData") + "/CosmicComics_data";
 const parentfolder1 = require("path").dirname(__dirname);
 const parentfolder2 = require("path").dirname(parentfolder1);
 const parentfolder3 = require("path").dirname(parentfolder2);
 if (fs.existsSync(parentfolder3 + "/portable.txt")) {
   CosmicComicsData = parentfolder3 + "/AppData";
+}
+try {
+  fs.readdirSync(CosmicComicsData)
+} catch (error) {
+  console.log(error)
+  CosmicComicsData = __dirname + "/AppData";
 }
 var configFile = fs.readFileSync(CosmicComicsData + "/config.json");
 var parsedJSON = JSON.parse(configFile);

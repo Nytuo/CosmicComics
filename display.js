@@ -42,7 +42,12 @@ const parentfolder3 = require("path").dirname(parentfolder2);
 if (fs.existsSync(parentfolder3+"/portable.txt")){
   CosmicComicsData = parentfolder3+"/AppData"
 }
-
+try {
+  fs.readdirSync(CosmicComicsData)
+} catch (error) {
+  console.log(error)
+  CosmicComicsData = __dirname + "/AppData";
+}
 //Declaring and initializing the Anilist API
 const AniList = new Client();
 

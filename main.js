@@ -14,6 +14,7 @@ You should have received a copy of the GNU General Public License
 along with Cosmic-Comics.  If not, see <https://www.gnu.org/licenses/>.*/
 const { app, BrowserWindow } = require("electron");
 var fs = require("fs");
+const { platform } = require("os");
 var AppDataDir = app.getPath("userData");
 var TempDir = app.getPath("temp");
 if (fs.existsSync(TempDir + "/CosmicComics") == false) {
@@ -29,7 +30,28 @@ if (fs.existsSync(parentfolder3 + "/portable.txt")) {
   AppDataDir = parentfolder3 + "/AppData";
   TempDir = parentfolder3 + "/TMP";
 }
-
+try {
+  fs.readdirSync(AppDataDir)
+  fs.readdirSync(TempDir)
+} catch (error) {
+  console.log(error)
+  AppDataDir = __dirname + "/AppData";
+  TempDir = __dirname + "/TMP";
+}
+if (fs.existsSync(AppDataDir) == false){
+  fs.mkdirSync(AppDataDir)
+}
+if (fs.existsSync(TempDir) == false){
+  fs.mkdirSync(TempDir)
+}
+function GetElFromInforPath(search, info) {
+  for (var i in info[0]) {
+    if (i == search) {
+      return info[0][i];
+    }
+  }
+  return null;
+}
 function createWindow() {
   const win = new BrowserWindow({
     width: 500,
@@ -117,7 +139,7 @@ if (fs.existsSync(AppDataDir + "/CosmicComics_data/unrar_bin") == false) {
   fs.mkdirSync(AppDataDir + "/CosmicComics_data/unrar_bin");
 }
 if (
-  fs.existsSync(AppDataDir + "/CosmicComics_data/unrar_bin/UnRAR.exe") == false
+  fs.existsSync(AppDataDir + "/CosmicComics_data/unrar_bin/UnRAR.exe") == false && process.platform == "win32"
 ) {
   fs.copyFileSync(
     __dirname + "/node_modules/unrar-binaries/bin/win32/unrar.exe",
