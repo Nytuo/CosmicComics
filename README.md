@@ -101,8 +101,6 @@ Viewer page (viewer, where you read the book):
 - Mouse Right Click (Not on the MenuBar or the SideBar) : Next Page
 
 ## Known Issues
-- Linux: all modal cannot be opened (no access to the settings, informations, book settings, bookmarks, etc...)
-    Don't know yet why but will investigate soon...
 - Global: The no good visibily of the cover's icons (read,reading,unread,favorite) when activate and persistant.
 
 ## Mobile Version ?
