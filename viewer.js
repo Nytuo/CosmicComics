@@ -268,7 +268,7 @@ function UnZip(zipPath, ExtractDir, name, ext) {
   if (ext == "rar" || ext == "cbr") {
     var configFile = fs.readFileSync(CosmicComicsData + "/config.json");
     var parsedJSON = JSON.parse(configFile);
-    var provider = Get_From_Config("update_provider", parsedJSON);
+    var provider = GetElFromInforPath("update_provider", parsedJSON);
     if (provider == "msstore") {
       var archive = new Unrar({
         path: zipPath,
