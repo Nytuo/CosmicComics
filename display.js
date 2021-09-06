@@ -14,6 +14,7 @@ You should have received a copy of the GNU General Public License
 along with Cosmic-Comics.  If not, see <https://www.gnu.org/licenses/>.*/
 //#region Variables
 //importing the modules required
+const {shell} = require("electron")
 const fs = require("fs");
 const patha = require("path");
 var popper = require("@popperjs/core");
@@ -198,6 +199,10 @@ async function Manga(name, n) {
       opt.innerHTML = search.Results[i]["info"]["title"].romaji;
       document.getElementById("selectAnother").appendChild(opt);
     }
+    const Conly = document.createElement("option")
+    Conly.value = "Search for Comics"
+    Conly.innerHTML = "Search for Comics"
+    document.getElementById("selectAnother").appendChild(Conly)
 
     //Notify the user
     Toastifycation(language["found"], "#00C33C");
@@ -412,7 +417,43 @@ function Comics(name, n) {
             if (resulta[i]["name"] === result[n]["name"]) {
               //When the comic is found
               Toastifycation(language["found"], "#00C33C");
+              //removing maybe exinsting informations from Manga function
+              document.getElementById("cover").src ="";
+    document.getElementById("Title").innerHTML =""
+    document.getElementById("description").innerHTML =""
+    document.getElementById("rating").innerHTML =""
+    document.getElementById("chapt").innerHTML =""
+    document.getElementById("charct").innerHTML =""
+    document.getElementById("OriginCountry").innerHTML =""
+    
+      document.getElementById("EndDate").innerHTML =""
 
+    document.getElementById("Favo").innerHTML =""
+    document.getElementById("Format").innerHTML =""
+    document.getElementById("Genres").innerHTML = ""
+    document.getElementById("ID").innerHTML =""
+    document.getElementById("MeanScore").innerHTML =""
+    document.getElementById("relationsTXT").innerHTML = ""
+    
+    document.getElementById("rankings").innerHTML = ""
+    document.getElementById("popu").innerHTML =""
+    document.getElementById("startdate").innerHTML =""
+    document.getElementById("status").innerHTML =""
+    document.getElementById("type").innerHTML =""
+    document.getElementById("trending").innerHTML =""
+    document.getElementById("volume").innerHTML =""
+    document.getElementById("link").innerHTML = ""
+    document
+      .getElementById("link")
+      .setAttribute(
+        "onclick",
+        ""
+      );
+    
+    document.getElementById("bgimage").style.backgroundImage =""
+
+
+      //Getting the info for comics
               document.getElementById("cover").src = resulta[i]["cover"];
               document.getElementById("Title").innerHTML = resulta[i]["name"];
               document.getElementById("description").innerHTML =
@@ -449,12 +490,22 @@ function Comics(name, n) {
 
 //Start the search
 Manga(name_ID, 0);
-
+var current_provider = "Manga"
 //Select another book
 function selectAnother() {
   var test = document.querySelector("#selectAnother").selectedIndex;
+  var test2 = document.querySelector("#selectAnother").value
+  console.log(test2)
+  if (test2 == "Search for Comics"){
+    current_provider = "Comics"
+  }
   Toastifycation(language["fetching_metadata"], "#292929");
-  Manga(name_ID, test);
+  if (current_provider == "Manga"){
+    Manga(name_ID, test);
+
+  }else{
+    Comics(name_ID,test)
+  }
 }
 
 //Send Notification

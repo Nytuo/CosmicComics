@@ -48,8 +48,7 @@ var imagelink = "null";
 var nabc = 0;
 var dirnamew = __dirname.replaceAll("\\", "/");
 var name1 = patha.basename(GetFilePath());
-var realname1 = name1.split(".");
-realname1 = realname1[0];
+var realname1 = name1.split(".")[0];
 var shortname = GetTheName(realname1);
 var toogleBGC = false;
 var ColorThief = require("color-thief-browser");
@@ -1354,6 +1353,7 @@ function TBM() {
     SaveInfoToJSON(
       {
         name: shortname,
+        full_name: realname1,
         path: GetFilePath(),
         page: GetCurrentPage(),
         bookmarked: true,
@@ -1361,6 +1361,7 @@ function TBM() {
       },
       CosmicComicsData + "/bookmarks.json"
     );
+    document.getElementById("BMI").innerHTML = "bookmark";
   }
 }
 

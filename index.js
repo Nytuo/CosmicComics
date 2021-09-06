@@ -1597,7 +1597,7 @@ function listBM() {
       btn.className = "btn btn-primary";
       btn.style = "margin:5px";
       btn.innerHTML =
-        file["name"] +
+        file["full_name"] +
         " " +
         language["page"] +
         " " +
@@ -1885,17 +1885,17 @@ function toggleActive(object) {
 
 //Open the loaded comics folder
 function OpenComicsFolder() {
-  shell.openExternal(get_Folder_Path_JSON);
+  shell.showItemInFolder(get_Folder_Path_JSON);
 }
 
 //Open the Temporary folder
 function OpenTempDirectory() {
-  shell.openExternal(CosmicComicsTempI);
+  shell.showItemInFolder(CosmicComicsTempI);
 }
 
 //Open the Appdata folder
 function OpenAppDataFolder() {
-  shell.openExternal(CosmicComicsData);
+  shell.showItemInFolder(CosmicComicsData)
 }
 
 //Keyboard Shortcuts
