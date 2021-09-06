@@ -1605,6 +1605,13 @@ function listBM() {
       document.getElementById("bookmarkContainer").appendChild(btn);
     }
   });
+  if (info.length == 0){
+      var iblock = document.createElement("i")
+  iblock.innerHTML = "block"
+  iblock.className = "material-icons"
+  document.getElementById("bookmarkContainer").appendChild(iblock)
+  }
+
 }
 
 //the Bookmarked loading
