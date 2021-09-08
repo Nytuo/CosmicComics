@@ -29,9 +29,9 @@ if (fs.existsSync(parentfolder3 + "/portable.txt")) {
   CosmicComicsData = parentfolder3 + "/AppData";
 }
 try {
-  fs.readdirSync(CosmicComicsData)
+  fs.readdirSync(CosmicComicsData);
 } catch (error) {
-  console.log(error)
+  console.log(error);
   CosmicComicsData = __dirname + "/AppData";
 }
 var configFile = fs.readFileSync(CosmicComicsData + "/config.json");
@@ -137,10 +137,15 @@ gc.file("Version.txt", function (err, file) {
   OnlineVersionNum = parseInt(OnlineVersionNum);
   var proverNum = app.getVersion().replaceAll(".", "").replace("v", "");
   proverNum = parseInt(proverNum);
-  if (forceupdate == true){
-    proverNum = 0
-}
-  
+  if (forceupdate == true) {
+    proverNum = 0;
+    ModifyJSONFileForPath(
+      CosmicComicsData + "/config.json",
+      "force_update",
+      false
+    );
+  }
+
   //Choose what to do depending of your choice
   if (updateProvider == "") {
     sendMessage(language["provider_not_set"]);
