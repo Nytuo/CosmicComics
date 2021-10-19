@@ -2756,7 +2756,12 @@ function getAllThemes() {
 }
 getAllThemes();
 async function WConv() {
-  webp.grant_permission();
+  try {
+    webp.grant_permission();
+    
+  } catch (error) {
+    console.log("error")
+  } 
   var dir = fs.readdirSync(CosmicComicsData + "/FirstImageOfAll/");
   for (var i = 0; i < dir.length; i++) {
     try {
