@@ -2065,12 +2065,12 @@ function unarchive_first(
             return;
           }
         }
-        if (process.platform == "linux" || process.platform == "darwin") {
-          GetTheFirstImageOfComicsByFolder(filesInFolder, indice + 1);
-          return;
-        }
       }
     });
+    if (process.platform == "linux" || process.platform == "darwin") {
+      GetTheFirstImageOfComicsByFolder(filesInFolder, indice + 1);
+      return;
+    }
   }
   if (ext == "pdf") {
     GetTheFirstImageOfComicsByFolder(filesInFolder, indice + 1);
