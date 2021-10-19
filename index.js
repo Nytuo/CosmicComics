@@ -252,6 +252,9 @@ function Themes() {
             theme_nohover_listview;
         });
     }
+    for (let i = 0; i < document.querySelectorAll("label").length; i++) {
+      document.getElementsByTagName("label")[i].style.color = theme_FG;
+    }
     document.getElementsByClassName("closebtn")[0].style.color = theme_FG;
     document
       .getElementsByClassName("closebtn")[0]

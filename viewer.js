@@ -354,6 +354,9 @@ function Themes() {
     for (let i = 0; i < document.querySelectorAll("h1").length; i++) {
       document.getElementsByTagName("h1")[i].style.color = theme_FG;
     }
+    for (let i = 0; i < document.querySelectorAll("label").length; i++) {
+      document.getElementsByTagName("label")[i].style.color = theme_FG;
+    }
     for (let i = 0; i < document.querySelectorAll(".btnw").length; i++) {
       document.getElementsByClassName("btnw")[i].style.color = theme_FG;
       document
