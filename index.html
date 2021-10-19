@@ -47,10 +47,12 @@ along with Cosmic-Comics.  If not, see <https://www.gnu.org/licenses/>.--->
             alt=""
             width="auto"
             height="80px"
+            id="logo_id"
             class="navbar-brand rotate linear infinite"
             style="-webkit-app-region: drag" /><img
             src="Images/LogoTxt.png"
             alt=""
+            id="logo_id_txt"
             class="navbar-brand"
             height="80px"
             style="-webkit-app-region: drag"
@@ -123,10 +125,33 @@ along with Cosmic-Comics.  If not, see <https://www.gnu.org/licenses/>.--->
             >arrow_right</i
           >
         </button>
+        <button
+          class="btn"
+          style="margin: 5px; height: 40px; -webkit-app-region: no-drag"
+          onclick="changeVM()"
+          id="id_viewmode"
+        >
+          <i
+            class="material-icons"
+            id="icon_id_viewmode"
+            style="line-height: 1; height: 40px"
+            >view_list</i
+          >
+        </button>
       </div>
     </nav>
   </header>
+
   <body>
+    <iframe
+      width="854"
+      height="480"
+      style="display: none"
+      id="iframe_yt_music"
+      src=""
+      frameborder="0"
+      allowfullscreen
+    ></iframe>
     <!-- Modal navigation -->
     <div
       class="modal animate__animated animate__zoomIn animate__faster"
@@ -184,6 +209,15 @@ along with Cosmic-Comics.  If not, see <https://www.gnu.org/licenses/>.--->
               >
                 <i class="material-icons">settings</i>
               </button>
+              <button
+                class="btn"
+                style="margin: 10px"
+                id="id_theme"
+                data-bs-toggle="modal"
+                data-bs-target="#thememodal"
+              >
+                <i class="material-icons">palette</i>
+              </button>
 
               <button
                 class="btn"
@@ -205,10 +239,9 @@ along with Cosmic-Comics.  If not, see <https://www.gnu.org/licenses/>.--->
                 <i class="material-icons">note_add</i>
               </button>
               <button
-              class="btn"
-              
-              data-bs-toggle="modal"
-              data-bs-target="#about"
+                class="btn"
+                data-bs-toggle="modal"
+                data-bs-target="#about"
                 style="margin: 10px; height: 40px"
                 id="id_info"
               >
@@ -253,7 +286,8 @@ along with Cosmic-Comics.  If not, see <https://www.gnu.org/licenses/>.--->
             <h5 class="modal-title" id="id_about">About</h5>
             <button
               type="button"
-              class="btn-close btn-close-white"
+              class="btn-close"
+              id="btn_close_icon_about"
               data-bs-dismiss="modal"
               aria-label="Close"
             ></button>
@@ -279,19 +313,20 @@ along with Cosmic-Comics.  If not, see <https://www.gnu.org/licenses/>.--->
             <p id="project"></p>
             <p id="translated"></p>
             <p id="beta_test">THEO LEPRINCE</p>
-            <a href="#" onclick="shell.openExternal('https://nytuo.yo.fr/')"><img
-              src="Images/Nytuo_softwares.png"
-              alt=""
-              class=""
-              height="80px"
-            /></a>          
-              <a href="#" onclick="shell.openExternal('https://nytuo.yo.fr/')"><img
-              src="Images/Nytuo website.png"
-              alt=""
-              class=""
-              height="80px"
+            <a href="#" onclick="shell.openExternal('https://nytuo.yo.fr/')"
+              ><img
+                src="Images/Nytuo_softwares.png"
+                alt=""
+                class=""
+                height="80px"
             /></a>
-            
+            <a href="#" onclick="shell.openExternal('https://nytuo.yo.fr/')"
+              ><img
+                src="Images/Nytuo website.png"
+                alt=""
+                class=""
+                height="80px"
+            /></a>
           </div>
           <div class="modal-footer">
             <button
@@ -368,7 +403,7 @@ along with Cosmic-Comics.  If not, see <https://www.gnu.org/licenses/>.--->
             ></button>
           </div>
           <div class="modal-body">
-            <div id="bookmarkContainer" style="text-align: center;"></div>
+            <div id="bookmarkContainer" style="text-align: center"></div>
           </div>
           <div class="modal-footer">
             <button
@@ -403,12 +438,13 @@ along with Cosmic-Comics.  If not, see <https://www.gnu.org/licenses/>.--->
               aria-label="Close"
             ></button>
           </div>
-          <div class="modal-body">
+          <div class="modal-body" style="text-align: center">
             <p id="languages">Langues:</p>
             <div id="lang_container"></div>
             <button
               id="id_btn_update_provider"
               class="btn btn-primary"
+              style="width: 100%"
               onclick="changeUpdateProvider()"
             >
               Change Update Provider
@@ -416,6 +452,7 @@ along with Cosmic-Comics.  If not, see <https://www.gnu.org/licenses/>.--->
             <button
               id="id_btn_appdata"
               class="btn btn-primary"
+              style="width: 100%"
               onclick="OpenAppDataFolder()"
             >
               Open Cosmic-Comics Folder's In AppData
@@ -423,6 +460,7 @@ along with Cosmic-Comics.  If not, see <https://www.gnu.org/licenses/>.--->
             <button
               id="id_btn_Temp"
               class="btn btn-primary"
+              style="width: 100%"
               onclick="OpenTempDirectory()"
             >
               Open Cosmic-Comics Folder's In Temp
@@ -430,17 +468,376 @@ along with Cosmic-Comics.  If not, see <https://www.gnu.org/licenses/>.--->
             <button
               id="id_btn_ComicsFolder"
               class="btn btn-primary"
+              style="width: 100%"
               onclick="OpenComicsFolder()"
             >
               Open Loaded Comics Folder
             </button>
             <button
-            id="id_btn_FU"
-            class="btn btn-primary"
-            onclick="setFU()"
-          >
-            Force Update
-          </button>
+              id="id_btn_FU"
+              class="btn btn-primary"
+              style="width: 100%"
+              onclick="setFU()"
+            >
+              Force Update
+            </button>
+            <button
+              id="id_btn_STB"
+              class="btn btn-primary"
+              style="width: 100%"
+              onclick="toggleSkip()"
+            >
+              Toggle Skip the thumbnails
+            </button>
+            <button
+              id="id_btn_CTN"
+              class="btn btn-primary"
+              style="width: 100%"
+              onclick="clearTN()"
+            >
+              Clear the thumbnails
+            </button>
+            <div style="margin: 10px">
+              <select
+                class="form-select"
+                aria-label="Default select example"
+                style="margin-bottom: 5px"
+                onchange="selectTheme()"
+                id="themeselector"
+              >
+                <option value="" id="selectTheme_id">Select a theme</option>
+              </select>
+            </div>
+            <button
+              id="id_btn_TE"
+              class="btn btn-primary"
+              style="width: 100%"
+              onclick="ToggleTBY()"
+            >
+              No theme by event
+            </button>
+          </div>
+          <div class="modal-footer">
+            <button
+              type="button"
+              class="btn btn-secondary"
+              data-bs-dismiss="modal"
+              id="close_settings"
+            >
+              Close
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+    <!-- Modal Theme -->
+    <div
+      class="modal animate__animated animate__zoomIn animate__faster"
+      id="thememodal"
+      tabindex="-1"
+      aria-labelledby="id_thememod"
+      aria-hidden="true"
+      style="overflow: hidden"
+    >
+      <div class="modal-dialog modal-dialog-centered modal-dialog-scrollable">
+        <div class="modal-content">
+          <div class="modal-header">
+            <h5 class="modal-title" id="id_thememod">Theme Customizer</h5>
+            <button
+              type="button"
+              class="btn-close btn-close-white"
+              data-bs-dismiss="modal"
+              aria-label="Close"
+            ></button>
+          </div>
+          <div class="modal-body" style="text-align: center">
+            <label for="colorBG" class="form-label" id="colorBG_txt"
+              >Set Background Color</label
+            >
+            <input
+              type="color"
+              class="form-control form-control-color"
+              id="colorBG"
+              value="#212121"
+              title="Choose your color"
+              onchange="saveToTheme(this,'BG')"
+            />
+            <label for="colorFG" class="form-label" id="colorFG_txt"
+              >Set Foreground Color</label
+            >
+            <input
+              type="color"
+              class="form-control form-control-color"
+              id="colorFG"
+              value="#212121"
+              title="Choose your color"
+              onchange="saveToTheme(this,'FG')"
+            />
+            <label for="colorO2" class="form-label" id="colorO2_txt"
+              >Set O2 Color</label
+            >
+            <input
+              type="color"
+              class="form-control form-control-color"
+              id="colorO2"
+              value="#212121"
+              title="Choose your color"
+              onchange="saveToTheme(this,'O2')"
+            />
+            <p id="overlay_background_txt">Overlay Background</p>
+            <input
+              type="text"
+              class="form-control"
+              id="O2BG_id"
+              aria-describedby="basic-addon3"
+              onchange="saveToTheme(this,'O2')"
+            />
+            <button
+              class="btn btn-primary"
+              id="browseFileTheme_txt"
+              onclick="openFileImageTheme('O2BG_id','O2')"
+            >
+              browse</button
+            ><br />
+            <label for="colorNotifBG" class="form-label" id="colorNotifBG_txt"
+              >notificaton Background</label
+            >
+            <input
+              type="color"
+              class="form-control form-control-color"
+              id="colorNotifBG"
+              value="#212121"
+              title="Choose your color"
+              onchange="saveToTheme(this,'notifBG')"
+            />
+            <div class="form-check form-switch">
+              <input
+                class="form-check-input"
+                type="checkbox"
+                id="btn_card_id"
+                onchange="saveToTheme(this,'button_card','','black')"
+              />
+              <label
+                class="form-check-label"
+                for="btn_card_id"
+                id="btn_card_txt"
+                >button card (white or black)</label
+              >
+            </div>
+            <div class="form-check form-switch">
+              <input
+                class="form-check-input"
+                type="checkbox"
+                id="progress_color_id"
+                onchange="saveToTheme(this,'progress','','white')"
+              />
+              <label
+                class="form-check-label"
+                for="progress_color_id"
+                id="progress_color_txt"
+                >progress color (black or white)</label
+              >
+            </div>
+
+            <label for="BTNHC_id" class="form-label" id="BTNHC_txt"
+              >Set hover close button</label
+            >
+            <input
+              type="color"
+              class="form-control form-control-color"
+              id="BTNHC_id"
+              value="#212121"
+              title="Choose your color"
+              onchange="saveToTheme(this,'hover_close')"
+            />
+
+            <label for="BTNFG_id" class="form-label" id="BTNFG_txt"
+              >Set button Foreground Color</label
+            >
+            <input
+              type="color"
+              class="form-control form-control-color"
+              id="BTNFG_id"
+              value="#212121"
+              title="Choose your color"
+              onchange="saveToTheme(this,'btn_FG')"
+            />
+
+            <label for="BTNBG_id" class="form-label" id="BTNBG_txt"
+              >Set button background color</label
+            >
+            <input
+              type="color"
+              class="form-control form-control-color"
+              id="BTNBG_id"
+              value="#212121"
+              title="Choose your color"
+              onchange="saveToTheme(this,'btn_BG')"
+            />
+
+            <label for="BTNBC_id" class="form-label" id="BTNBC_txt"
+              >Set button border color</label
+            >
+            <input
+              type="color"
+              class="form-control form-control-color"
+              id="BTNBC_id"
+              value="#212121"
+              title="Choose your color"
+              onchange="saveToTheme(this,'btn_border')"
+            />
+
+            <label for="BTNH_id" class="form-label" id="BTNH_txt"
+              >Set button hover color</label
+            >
+            <input
+              type="color"
+              class="form-control form-control-color"
+              id="BTNH_id"
+              value="#212121"
+              title="Choose your color"
+              onchange="saveToTheme(this,'btn_hover')"
+            />
+
+            <label for="FGSBC_id" class="form-label" id="FGSBC_txt"
+              >Set foreground secondary button color</label
+            >
+            <input
+              type="color"
+              class="form-control form-control-color"
+              id="FGSBC_id"
+              value="#212121"
+              title="Choose your color"
+              onchange="saveToTheme(this,'btn_FG_s')"
+            />
+
+            <label for="BGSBC_id" class="form-label" id="BGSBC_txt"
+              >Set background secondary background color</label
+            >
+            <input
+              type="color"
+              class="form-control form-control-color"
+              id="BGSBC_id"
+              value="#212121"
+              title="Choose your color"
+              onchange="saveToTheme(this,'btn_BG_s')"
+            />
+
+            <label for="BSC_id" class="form-label" id="BSC_txt"
+              >Set border secondary color</label
+            >
+            <input
+              type="color"
+              class="form-control form-control-color"
+              id="BSC_id"
+              value="#212121"
+              title="Choose your color"
+              onchange="saveToTheme(this,'btn_border_s')"
+            />
+            <label for="HSC_id" class="form-label" id="HSC_txt"
+              >Set hover secondary color</label
+            >
+            <input
+              type="color"
+              class="form-control form-control-color"
+              id="HSC_id"
+              value="#212121"
+              title="Choose your color"
+              onchange="saveToTheme(this,'btn_hover_s')"
+            />
+            <label for="HLVC_id" class="form-label" id="HLVC_txt"
+              >Set hover listview color</label
+            >
+            <input
+              type="color"
+              class="form-control form-control-color"
+              id="HLVC_id"
+              value="#212121"
+              title="Choose your color"
+              onchange="saveToTheme(this,'hover_listview')"
+            />
+
+            <label for="BGCI_id" class="form-label" id="BGCI_txt"
+              >Set Background CI</label
+            >
+            <input
+              type="color"
+              class="form-control form-control-color"
+              id="BGCI_id"
+              value="#212121"
+              title="Choose your color"
+              onchange="saveToTheme(this,'BG_CI')"
+            />
+            <label for="NBGC_id" class="form-label" id="NBGC_txt"
+              >Set navigation background color</label
+            >
+            <input
+              type="color"
+              class="form-control form-control-color"
+              id="NBGC_id"
+              value="#212121"
+              title="Choose your color"
+              onchange="saveToTheme(this,'nav_BG')"
+            /><!--RESTE à FAIRE-->
+            <div class="form-check form-switch">
+              <input
+                class="form-check-input"
+                type="checkbox"
+                id="SCID"
+                onchange="saveToTheme(this,'scrollbar','black','white')"
+              />
+              <label class="form-check-label" for="SCID" id="SCID_txt"
+                >ScrollBar</label
+              >
+            </div>
+            <div class="form-check form-switch">
+              <input
+                class="form-check-input"
+                type="checkbox"
+                id="PGRSBW_id"
+                onchange="saveToTheme(this,'progressbar_progresswhite_progressblack','progress','progresswhite')"
+              />
+              <label class="form-check-label" for="PGRSBW_id" id="PGRSBW_txt"
+                >Progressbar Black or White</label
+              >
+            </div>
+            <label for="MUSIC_id" class="form-label" id="MUSIC_txt"
+              >Music Link</label
+            >
+            <input
+              type="text"
+              class="form-control"
+              id="MUSIC_id"
+              aria-describedby="basic-addon3"
+              onchange="saveToTheme(this,'Music')"
+            />
+            <p id="LBG_txt">Link BG</p>
+            <input
+              type="text"
+              class="form-control"
+              id="LBG_id"
+              aria-describedby="basic-addon3"
+              onchange="saveToTheme(this,'linkBG')"
+            />
+            <button
+              class="btn btn-primary"
+              onclick="openFileImageTheme('LBG_id','linkBG')"
+              id="browse_fileImageTheme_txt"
+            >
+              browse</button
+            ><br />
+
+            <label for="PRGSBC_id" class="form-label" id="PRGSBC_txt"
+              >Set progress bar color</label
+            >
+            <input
+              type="color"
+              class="form-control form-control-color"
+              value="#212121"
+              id="PRGSBC_id"
+              title="Choose your color"
+              onchange="saveToTheme(this,'progress_color')"
+            />
           </div>
           <div class="modal-footer">
             <button
@@ -464,18 +861,41 @@ along with Cosmic-Comics.  If not, see <https://www.gnu.org/licenses/>.--->
     <!--The overlay-->
     <div id="overlay">
       <div style="text-align: center; margin-top: 25%">
-        <div
+        <!-- <div
           class="spinner-border"
           style="width: 70px; height: 70px"
           role="status"
         >
           <span class="visually-hidden">Loading...</span>
-        </div>
+        </div> -->
+        <img
+          src="Images/Logo.png"
+          alt=""
+          class="rotate infinite"
+          style="width: auto; height: 90px"
+        />
+        <p id="decompressfilename" style="margin-top: 10px"></p>
         <p id="overlaymsg" style="margin-top: 10px">
           We take care of your comics
         </p>
+        <div class="progress" id="progressbar">
+          <div
+            id="prgs"
+            class="indeterminate"
+            style="background-color: #4c66ff"
+          ></div>
+        </div>
+        <button
+          onclick="skipping()"
+          class="btn btn-primary"
+          id="extract_thumbnails"
+        >
+          Skip the extraction of thumbnails
+        </button>
       </div>
     </div>
+    <!--The overlay2-->
+    <div id="overlay2"></div>
     <div class="SpaceX"></div>
     <!--List of the books-->
     <div class="cards-list" id="ContainerExplorer"></div>

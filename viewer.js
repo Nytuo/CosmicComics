@@ -55,6 +55,7 @@ var ColorThief = require("color-thief-browser");
 var colorThief = new ColorThief();
 var popper = require("@popperjs/core");
 var bootstrap = require("bootstrap");
+const remote = require("@electron/remote");
 const app = remote.app;
 var CosmicComicsData = app.getPath("userData") + "/CosmicComics_data";
 var CosmicComicsTemp = app.getPath("temp") + "/CosmicComics";
@@ -66,10 +67,10 @@ if (fs.existsSync(parentfolder3 + "/portable.txt")) {
   CosmicComicsTemp = parentfolder3 + "/TMP";
 }
 try {
-  fs.readdirSync(CosmicComicsData)
-  fs.readdirSync(CosmicComicsTemp)
+  fs.readdirSync(CosmicComicsData);
+  fs.readdirSync(CosmicComicsTemp);
 } catch (error) {
-  console.log(error)
+  console.log(error);
   CosmicComicsData = __dirname + "/AppData";
   CosmicComicsTemp = __dirname + "/TMP";
 }
@@ -93,7 +94,7 @@ var wasDPM = false;
 var PPwasDPM = false;
 var mangaMode = false;
 var language = GetLANGINFO();
-
+var BGBT = false; // Background By Theme
 //toolTips
 var tooltipTriggerList = [].slice.call(
   document.querySelectorAll('[data-bs-toggle="tooltip"]')
@@ -203,141 +204,354 @@ function Toastifycation(message, BGColor = "#333", FrontColor = "#ffffff") {
   }, 3000);
 }
 
+//Theme set up
+var theme_BG = "#181818";
+var theme_FG = "white";
+var theme_BG_CI = "rgba(0,0,0,0.753)";
+var currenttheme = GetElFromInforPath(
+  "theme",
+  JSON.parse(fs.readFileSync(CosmicComicsData + "/config.json"))
+);
+var theme_O2 = "black";
+var theme_notifBG = "rgb(143, 143, 143)";
+var theme_button_card = "";
+var theme_progress = "";
+var theme_hover_listview = "#242424";
+var theme_nohover_listview = "transparent";
+var theme_hover_close;
+var theme_btn_FG = "white";
+var theme_btn_BG = "#0d6efd";
+var theme_btn_FG_s = "white";
+var theme_btn_BG_s = "#6c757d";
+var theme_btn_border = theme_btn_BG;
+var theme_btn_hover = "#0b5ed7";
+var theme_btn_border_s = theme_btn_BG;
+var theme_btn_hover_s = "#5c636a";
+var linkBG = "";
+document.getElementsByTagName("html")[0].className = "black";
+function Themes() {
+  if (currenttheme != "[DEFAULT] - Default.json") {
+    if (currenttheme == "[EVENT] - Halloween.json") {
+      document.getElementById("logo_id").src = "Images/Logo_h.png";
+    } else if (currenttheme == "[EVENT] - X-Mas.json") {
+      document.getElementById("logo_id").src = "Images/Logo_n.png";
+    }
+    var config_JSON = fs.readFileSync(__dirname + "/themes/" + currenttheme);
+    var parsedJSON = JSON.parse(config_JSON);
+    linkBG = GetElFromInforPath("linkBG", parsedJSON);
+    theme_BG = GetElFromInforPath("BG", parsedJSON);
+    theme_FG = GetElFromInforPath("FG", parsedJSON);
+    theme_O2 = GetElFromInforPath("O2", parsedJSON);
+    theme_notifBG = GetElFromInforPath("notifBG", parsedJSON);
+    theme_button_card = GetElFromInforPath("button_card", parsedJSON);
+    theme_progress = GetElFromInforPath("progress", parsedJSON);
+    theme_hover_close = GetElFromInforPath("hover_close", parsedJSON);
+    theme_btn_FG = GetElFromInforPath("btn_FG", parsedJSON);
+    theme_btn_BG = GetElFromInforPath("btn_BG", parsedJSON);
+    theme_btn_border = theme_btn_BG;
+    theme_btn_hover = GetElFromInforPath("btn_hover", parsedJSON);
+    theme_btn_FG_s = GetElFromInforPath("btn_FG_s", parsedJSON);
+    theme_btn_BG_s = GetElFromInforPath("btn_BG_s", parsedJSON);
+    theme_btn_border_s = theme_btn_BG_s;
+    theme_btn_hover_s = GetElFromInforPath("btn_hover_s", parsedJSON);
+    document.getElementsByTagName("html")[0].className = GetElFromInforPath(
+      "scrollbar",
+      parsedJSON
+    );
+    document.getElementsByTagName("nav")[0].style.backgroundColor =
+      GetElFromInforPath("nav_BG", parsedJSON);
+    theme_hover_listview = GetElFromInforPath("hover_listview", parsedJSON);
+    theme_BG_CI = GetElFromInforPath("BG_CI", parsedJSON);
+
+    for (
+      let i = 0;
+      i < document.querySelectorAll(".modal-content").length;
+      i++
+    ) {
+      document.getElementsByClassName("modal-content")[
+        i
+      ].style.backgroundColor = theme_BG;
+    }
+    for (let i = 0; i < document.querySelectorAll(".btn").length; i++) {
+      if (
+        document
+          .getElementsByClassName("btn")
+          [i].classList.contains("btn-primary") ||
+        document
+          .getElementsByClassName("btn")
+          [i].classList.contains("btn-secondary")
+      ) {
+        if (
+          document
+            .getElementsByClassName("btn")
+            [i].classList.contains("btn-primary")
+        ) {
+          document.getElementsByClassName("btn")[i].style.color = theme_btn_FG;
+          document.getElementsByClassName("btn")[i].style.backgroundColor =
+            theme_btn_BG;
+          document.getElementsByClassName("btn")[i].style.borderColor =
+            theme_btn_BG;
+          document
+            .getElementsByClassName("btn")
+            [i].addEventListener("mouseover", function () {
+              document.getElementsByClassName("btn")[i].style.backgroundColor =
+                theme_btn_hover;
+            });
+          document
+            .getElementsByClassName("btn")
+            [i].addEventListener("mouseout", function () {
+              document.getElementsByClassName("btn")[i].style.backgroundColor =
+                theme_btn_BG;
+            });
+          document
+            .getElementsByClassName("btn")
+            [i].addEventListener("mousedown", function () {
+              document.getElementsByClassName("btn")[i].style.borderColor =
+                theme_btn_BG;
+            });
+        } else {
+          document.getElementsByClassName("btn")[i].style.color =
+            theme_btn_FG_s;
+          document.getElementsByClassName("btn")[i].style.backgroundColor =
+            theme_btn_BG_s;
+          document.getElementsByClassName("btn")[i].style.borderColor =
+            theme_btn_BG_s;
+          document
+            .getElementsByClassName("btn")
+            [i].addEventListener("mouseover", function () {
+              document.getElementsByClassName("btn")[i].style.backgroundColor =
+                theme_btn_hover_s;
+            });
+          document
+            .getElementsByClassName("btn")
+            [i].addEventListener("mouseout", function () {
+              document.getElementsByClassName("btn")[i].style.backgroundColor =
+                theme_btn_BG_s;
+            });
+        }
+      } else {
+        document.getElementsByClassName("btn")[i].style.color = theme_FG;
+        document
+          .getElementsByClassName("btn")
+          [i].addEventListener("mouseover", function () {
+            document.getElementsByClassName("btn")[i].style.backgroundColor =
+              theme_hover_listview;
+          });
+        document
+          .getElementsByClassName("btn")
+          [i].addEventListener("mouseout", function () {
+            document.getElementsByClassName("btn")[i].style.backgroundColor =
+              theme_nohover_listview;
+          });
+      }
+    }
+    for (let i = 0; i < document.querySelectorAll(".modal-title").length; i++) {
+      document.getElementsByClassName("modal-title")[i].style.color = theme_FG;
+    }
+    for (let i = 0; i < document.querySelectorAll("p").length; i++) {
+      document.getElementsByTagName("p")[i].style.color = theme_FG;
+    }
+    for (let i = 0; i < document.querySelectorAll("h1").length; i++) {
+      document.getElementsByTagName("h1")[i].style.color = theme_FG;
+    }
+    for (let i = 0; i < document.querySelectorAll(".btnw").length; i++) {
+      document.getElementsByClassName("btnw")[i].style.color = theme_FG;
+      document
+        .getElementsByClassName("btnw")
+        [i].addEventListener("mouseover", function () {
+          document.getElementsByClassName("btnw")[i].style.backgroundColor =
+            theme_hover_listview;
+        });
+      document
+        .getElementsByClassName("btnw")
+        [i].addEventListener("mouseout", function () {
+          document.getElementsByClassName("btnw")[i].style.backgroundColor =
+            theme_nohover_listview;
+        });
+    }
+    document.getElementsByClassName("closebtn")[0].style.color = theme_FG;
+    document
+      .getElementsByClassName("closebtn")[0]
+      .addEventListener("mouseover", function () {
+        document.getElementsByClassName("closebtn")[0].style.backgroundColor =
+          theme_hover_close;
+      });
+    document
+      .getElementsByClassName("closebtn")[0]
+      .addEventListener("mouseout", function () {
+        document.getElementsByClassName("closebtn")[0].style.backgroundColor =
+          theme_nohover_listview;
+      });
+    for (let i = 0; i < document.querySelectorAll("li").length; i++) {
+      document.getElementsByTagName("li")[i].style.color = theme_FG;
+    }
+    for (let i = 0; i < document.querySelectorAll("h4").length; i++) {
+      document.getElementsByTagName("h4")[i].style.color = theme_FG;
+    }
+    if (linkBG != "" && BGBT == true) {
+      document.getElementsByTagName("html")[0].style.backgroundImage =
+        "url('" + linkBG + "')";
+    } else {
+      document.getElementsByTagName("html")[0].style.backgroundImage = "";
+    }
+    document.getElementById("overlaymsg").style.color = theme_FG;
+    document.getElementById("snackbar").style.color = theme_FG;
+    document.getElementById("snackbar").style.backgroundColor = theme_notifBG;
+    document.getElementsByTagName("html")[0].style.backgroundColor = theme_BG;
+  }
+}
+Themes();
+function BGBTF() {
+  if (BGBT == true) {
+    BGBT = false;
+    Themes();
+  } else {
+    BGBT = true;
+    Themes();
+  }
+}
 //UnZip the archive
 function UnZip(zipPath, ExtractDir, name, ext) {
-  var n = 0;
-  if (fs.existsSync(CosmicComicsTempI)) {
-    fs.rmSync(CosmicComicsTempI, {
-      recursive: true,
-    });
-    fs.mkdirSync(CosmicComicsTempI);
-  } else {
-    fs.mkdirSync(CosmicComicsTempI);
-  }
-  fs.writeFileSync(CosmicComicsTempI + "/path.txt", zipPath);
-
-  if (ext == "pdf") {
-    alert(language[0]["pdf"]);
-    openWindow(zipPath);
-    window.location.href = "index.html";
-  }
-
-  if (
-    ext == "zip" ||
-    ext == "cbz" ||
-    ext == "7z" ||
-    ext == "cb7" ||
-    ext == "tar" ||
-    ext == "cbt"
-  ) {
-    var fromfile = "";
-
-    const Stream = Seven.extract(zipPath, ExtractDir, {
-      recursive: true,
-      $bin: Path27Zip,
-    });
-    Stream.on("end", () => {
-      Toastifycation(language[0]["extraction_completed"], "#00C33C");
-
-      var listofImg = GetListOfImg(CosmicComicsTempI);
-      var filepage = GetFilePage();
-      preloadImage(listofImg);
-      console.log(filepage);
-
-      if (filepage != false) {
-        var lastpage = filepage;
-        document.getElementById("overlay").style.display = "none";
-        setTimeout(() => {
-          Reader(listofImg, lastpage);
-        }, 1000);
-      } else {
-        var lastpage = 0;
-        try {
-          var info = GetInfoFromJSON(
-            CosmicComicsData + "/ListOfComics.json",
-            shortname
-          );
-          lastpage = GetElFromInfo("last_page", info);
-        } catch (error) {
-          console.log(error);
-        }
-        document.getElementById("overlay").style.display = "none";
-        setTimeout(() => {
-          Reader(listofImg, lastpage);
-        }, 1000);
-      }
-    });
-    Stream.on("error", (err) => {
-      console.log("An error occured" + err);
-    });
-  }
-
-  if (ext == "rar" || ext == "cbr") {
-    var configFile = fs.readFileSync(CosmicComicsData + "/config.json");
-    var parsedJSON = JSON.parse(configFile);
-    var provider = GetElFromInforPath("update_provider", parsedJSON);
-    if (provider == "msstore") {
-      var archive = new Unrar({
-        path: zipPath,
-        bin: CosmicComicsData + "/unrar_bin/UnRAR.exe",
+  try {
+    var n = 0;
+    if (fs.existsSync(CosmicComicsTempI)) {
+      fs.rmSync(CosmicComicsTempI, {
+        recursive: true,
       });
+      fs.mkdirSync(CosmicComicsTempI);
     } else {
-      var archive = new Unrar({
-        path: zipPath,
-        bin: unrarBin,
+      fs.mkdirSync(CosmicComicsTempI);
+    }
+    fs.writeFileSync(CosmicComicsTempI + "/path.txt", zipPath);
+
+    if (ext == "pdf") {
+      alert(language[0]["pdf"]);
+      openWindow(zipPath);
+      window.location.href = "index.html";
+    }
+
+    if (
+      ext == "zip" ||
+      ext == "cbz" ||
+      ext == "7z" ||
+      ext == "cb7" ||
+      ext == "tar" ||
+      ext == "cbt"
+    ) {
+      var fromfile = "";
+
+      const Stream = Seven.extract(zipPath, ExtractDir, {
+        recursive: true,
+        $bin: Path27Zip,
+      });
+      Stream.on("end", () => {
+        Toastifycation(language[0]["extraction_completed"], "#00C33C");
+
+        var listofImg = GetListOfImg(CosmicComicsTempI);
+        var filepage = GetFilePage();
+        preloadImage(listofImg);
+        console.log(filepage);
+
+        if (filepage != false) {
+          var lastpage = filepage;
+          document.getElementById("overlay").style.display = "none";
+          setTimeout(() => {
+            Reader(listofImg, lastpage);
+          }, 1000);
+        } else {
+          var lastpage = 0;
+          try {
+            var info = GetInfoFromJSON(
+              CosmicComicsData + "/ListOfComics.json",
+              shortname
+            );
+            lastpage = GetElFromInfo("last_page", info);
+          } catch (error) {
+            console.log(error);
+          }
+          document.getElementById("overlay").style.display = "none";
+          setTimeout(() => {
+            Reader(listofImg, lastpage);
+          }, 1000);
+        }
+      });
+      Stream.on("error", (err) => {
+        console.log("An error occured" + err);
       });
     }
-    archive.list(function (err, entries) {
-      console.log(entries);
-      //tri numérique
-      entries.sort((a, b) => {
-        let fa = a.name.toLowerCase(),
-          fb = b.name.toLowerCase();
-        if (fa < fb) {
-          return -1;
-        }
-        if (fa > fb) {
-          return 1;
-        }
-        return 0;
-      });
-      entries.forEach((file) => {
-        for (var i in file) {
-          if (i == "name") {
-            var currentName = file[i];
-            currentName = currentName.toString();
-            var stream = archive.stream(currentName);
-            stream.on("error", console.error);
 
-            if (!fs.existsSync(CosmicComicsTempI)) {
-              fs.mkdirSync(CosmicComicsTempI);
-            }
-            if (
-              currentName.includes("png") ||
-              currentName.includes("jpg") ||
-              currentName.includes("jpeg") ||
-              currentName.includes(".gif") ||
-              currentName.includes("bmp") ||
-              currentName.includes("apng") ||
-              currentName.includes("svg") ||
-              currentName.includes("ico") ||
-              currentName.includes("webp")
-            ) {
-              stream.pipe(
-                fs.createWriteStream(CosmicComicsTempI + name + ".jpg")
-              );
-              n = parseInt(name) + 1;
-              name = Array(5 - String(n).length + 1).join("0") + n;
+    if (ext == "rar" || ext == "cbr") {
+      var configFile = fs.readFileSync(CosmicComicsData + "/config.json");
+      var parsedJSON = JSON.parse(configFile);
+      var provider = GetElFromInforPath("update_provider", parsedJSON);
+      if (provider == "msstore") {
+        var archive = new Unrar({
+          path: zipPath,
+          bin: CosmicComicsData + "/unrar_bin/UnRAR.exe",
+        });
+      } else {
+        var archive = new Unrar({
+          path: zipPath,
+          bin: unrarBin,
+        });
+      }
+      archive.list(function (err, entries) {
+        console.log(entries);
+        //tri numérique
+        entries.sort((a, b) => {
+          let fa = a.name.toLowerCase(),
+            fb = b.name.toLowerCase();
+          if (fa < fb) {
+            return -1;
+          }
+          if (fa > fb) {
+            return 1;
+          }
+          return 0;
+        });
+        entries.forEach((file) => {
+          for (var i in file) {
+            if (i == "name") {
+              var currentName = file[i];
+              currentName = currentName.toString();
+              var stream = archive.stream(currentName);
+              stream.on("error", console.error);
+
+              if (!fs.existsSync(CosmicComicsTempI)) {
+                fs.mkdirSync(CosmicComicsTempI);
+              }
+              if (
+                currentName.includes("png") ||
+                currentName.includes("jpg") ||
+                currentName.includes("jpeg") ||
+                currentName.includes(".gif") ||
+                currentName.includes("bmp") ||
+                currentName.includes("apng") ||
+                currentName.includes("svg") ||
+                currentName.includes("ico") ||
+                currentName.includes("webp")
+              ) {
+                stream.pipe(
+                  fs.createWriteStream(CosmicComicsTempI + name + ".jpg")
+                );
+                n = parseInt(name) + 1;
+                name = Array(5 - String(n).length + 1).join("0") + n;
+              }
             }
           }
-        }
+        });
+        postunrar();
       });
-      postunrar();
-    });
+    }
+  } catch (error) {
+    Toastifycation(
+      "Error when loading the file, please verify that the path doesn't contain any specials characters'",
+      "#292929"
+    );
   }
 }
 function openWindow(pathaa) {
-  const BrowserWindow = require("electron").remote.BrowserWindow;
+  const BrowserWindow = require("@electron/remote").BrowserWindow;
   const path = require("path");
   const win = new BrowserWindow({
     width: 1280,
@@ -354,6 +568,7 @@ function openWindow(pathaa) {
   });
 
   win.loadURL(pathaa);
+  remote.require("@electron/remote/main").enable(win.webContents);
 }
 
 //same as the one in the "end" listener of the ZIP but for RAR archive
@@ -1459,6 +1674,8 @@ new bootstrap.Tooltip(document.getElementById("id_toogleBookMark"), {
 
 document.getElementById("widthlvl").innerHTML = language[0]["width"];
 document.getElementById("heightlvl").innerHTML = language[0]["height"];
+document.getElementById("BGBTTXT").innerHTML =
+  language[0]["background_by_theme"];
 
 document.getElementById("Radiuslvl").innerHTML = language[0]["radius"];
 new bootstrap.Tooltip(document.getElementById("magnifier_note"), {

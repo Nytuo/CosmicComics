@@ -43,7 +43,7 @@ along with Cosmic-Comics.  If not, see <https://www.gnu.org/licenses/>.--->
         width="auto"
         height="120px"
         class="navbar-brand rotate linear infinite"
-        id="logo"
+        id="logo_id"
       />
       <p
         style="
@@ -77,12 +77,8 @@ along with Cosmic-Comics.  If not, see <https://www.gnu.org/licenses/>.--->
       <option value="mzip">MAC : ZIP</option>
       <option value="dev">DevMode</option>
     </select>
-    <div class="progress">
-      <div
-        id="prgs"
-        class="indeterminate"
-        style="background-color: #4c66ff"
-      ></div>
+    <div class="progress" id="progressbar">
+      <div id="prgs" class="indeterminate"></div>
     </div>
   </header>
   <body>

@@ -26,6 +26,7 @@ var bootstrap = require("bootstrap");
 var popper = require("@popperjs/core");
 const DRPC = require("discord-rpc");
 const unrarBin = require("unrar-binaries");
+const webp = require("webp-converter");
 //All other variables and constants
 const ValidatedExtension = [
   "cbr",
@@ -50,21 +51,301 @@ var favonly = false;
 var readonly = false;
 var unreadonly = false;
 var readingonly = false;
+const remote = require("@electron/remote");
+
 const app = remote.app;
 var CosmicComicsData = app.getPath("userData") + "/CosmicComics_data";
 var CosmicComicsTemp = app.getPath("temp") + "/CosmicComics";
 const parentfolder1 = require("path").dirname(__dirname);
 const parentfolder2 = require("path").dirname(parentfolder1);
 const parentfolder3 = require("path").dirname(parentfolder2);
+var global_I_PRGS = 0;
+var skip = Get_From_Config(
+  "skip",
+  JSON.parse(fs.readFileSync(CosmicComicsData + "/config.json"))
+);
+var cardMode = _01toBool(
+  Get_From_Config(
+    "display_style",
+    JSON.parse(fs.readFileSync(CosmicComicsData + "/config.json"))
+  )
+);
+var theme_BG = "#181818";
+var theme_FG = "white";
+var theme_BG_CI = "rgba(0,0,0,0.753)";
+var currenttheme = Get_From_Config(
+  "theme",
+  JSON.parse(fs.readFileSync(CosmicComicsData + "/config.json"))
+);
+var theme_O2 = "black";
+var theme_notifBG = "rgb(143, 143, 143)";
+var theme_button_card = "";
+var theme_progress = "";
+var theme_hover_listview = "#242424";
+var theme_nohover_listview = "transparent";
+var theme_hover_close;
+var theme_btn_FG = "white";
+var theme_btn_BG = "#0d6efd";
+var theme_btn_FG_s = "white";
+var theme_btn_BG_s = "#6c757d";
+var theme_btn_border = theme_btn_BG;
+var theme_btn_hover = "#0b5ed7";
+var theme_btn_border_s = theme_btn_BG;
+var theme_btn_hover_s = "#5c636a";
+var linkBG = "";
+document.getElementsByTagName("html")[0].className = "black";
+document.getElementById("btn_close_icon_about").className =
+  "btn-close btn-close-white";
+function Themes() {
+  if (currenttheme != "[DEFAULT] - Default.json") {
+    if (currenttheme == "[EVENT] - Halloween.json") {
+      document.getElementById("logo_id_txt").src = "Images/LogoTxt_h.png";
+      document.getElementById("logo_id").src = "Images/Logo_h.png";
+    } else if (currenttheme == "[EVENT] - X-Mas.json") {
+      document.getElementById("logo_id_txt").src = "Images/LogoTxt_n.png";
+      document.getElementById("logo_id").src = "Images/Logo_n.png";
+    }
+    var config_JSON = fs.readFileSync(__dirname + "/themes/" + currenttheme);
+    var parsedJSON = JSON.parse(config_JSON);
+    linkBG = Get_From_Config("linkBG", parsedJSON);
+    theme_BG = Get_From_Config("BG", parsedJSON);
+    theme_FG = Get_From_Config("FG", parsedJSON);
+    theme_O2 = Get_From_Config("O2", parsedJSON);
+    theme_notifBG = Get_From_Config("notifBG", parsedJSON);
+    theme_button_card = Get_From_Config("button_card", parsedJSON);
+    theme_progress = Get_From_Config("progress", parsedJSON);
+    theme_hover_close = Get_From_Config("hover_close", parsedJSON);
+    theme_btn_FG = Get_From_Config("btn_FG", parsedJSON);
+    theme_btn_BG = Get_From_Config("btn_BG", parsedJSON);
+    theme_btn_border = theme_btn_BG;
+    theme_btn_hover = Get_From_Config("btn_hover", parsedJSON);
+    theme_btn_FG_s = Get_From_Config("btn_FG_s", parsedJSON);
+    theme_btn_BG_s = Get_From_Config("btn_BG_s", parsedJSON);
+    theme_btn_border_s = theme_btn_BG_s;
+    theme_btn_hover_s = Get_From_Config("btn_hover_s", parsedJSON);
+
+    document.getElementById("prgs").style.backgroundColor = Get_From_Config(
+      "progress_color",
+      parsedJSON
+    );
+    document.getElementsByTagName("html")[0].className = Get_From_Config(
+      "scrollbar",
+      parsedJSON
+    );
+    document.getElementsByTagName("nav")[0].style.backgroundColor =
+      Get_From_Config("nav_BG", parsedJSON);
+    theme_hover_listview = Get_From_Config("hover_listview", parsedJSON);
+    document.getElementById("progressbar").className = Get_From_Config(
+      "progressbar_progresswhite_progressblack",
+      parsedJSON
+    );
+    theme_BG_CI = Get_From_Config("BG_CI", parsedJSON);
+
+    document.getElementById("iframe_yt_music").src = Get_From_Config(
+      "Music",
+      parsedJSON
+    );
+
+    for (
+      let i = 0;
+      i < document.querySelectorAll(".modal-content").length;
+      i++
+    ) {
+      document.getElementsByClassName("modal-content")[
+        i
+      ].style.backgroundColor = theme_BG;
+    }
+    for (let i = 0; i < document.querySelectorAll(".btn").length; i++) {
+      if (
+        document
+          .getElementsByClassName("btn")
+          [i].classList.contains("btn-primary") ||
+        document
+          .getElementsByClassName("btn")
+          [i].classList.contains("btn-secondary")
+      ) {
+        if (
+          document
+            .getElementsByClassName("btn")
+            [i].classList.contains("btn-primary")
+        ) {
+          document.getElementsByClassName("btn")[i].style.color = theme_btn_FG;
+          document.getElementsByClassName("btn")[i].style.backgroundColor =
+            theme_btn_BG;
+          document.getElementsByClassName("btn")[i].style.borderColor =
+            theme_btn_BG;
+          document
+            .getElementsByClassName("btn")
+            [i].addEventListener("mouseover", function () {
+              document.getElementsByClassName("btn")[i].style.backgroundColor =
+                theme_btn_hover;
+            });
+          document
+            .getElementsByClassName("btn")
+            [i].addEventListener("mouseout", function () {
+              document.getElementsByClassName("btn")[i].style.backgroundColor =
+                theme_btn_BG;
+            });
+          document
+            .getElementsByClassName("btn")
+            [i].addEventListener("mousedown", function () {
+              document.getElementsByClassName("btn")[i].style.borderColor =
+                theme_btn_BG;
+            });
+        } else {
+          document.getElementsByClassName("btn")[i].style.color =
+            theme_btn_FG_s;
+          document.getElementsByClassName("btn")[i].style.backgroundColor =
+            theme_btn_BG_s;
+          document.getElementsByClassName("btn")[i].style.borderColor =
+            theme_btn_BG_s;
+          document
+            .getElementsByClassName("btn")
+            [i].addEventListener("mouseover", function () {
+              document.getElementsByClassName("btn")[i].style.backgroundColor =
+                theme_btn_hover_s;
+            });
+          document
+            .getElementsByClassName("btn")
+            [i].addEventListener("mouseout", function () {
+              document.getElementsByClassName("btn")[i].style.backgroundColor =
+                theme_btn_BG_s;
+            });
+        }
+      } else {
+        document.getElementsByClassName("btn")[i].style.color = theme_FG;
+        document
+          .getElementsByClassName("btn")
+          [i].addEventListener("mouseover", function () {
+            document.getElementsByClassName("btn")[i].style.backgroundColor =
+              theme_hover_listview;
+          });
+        document
+          .getElementsByClassName("btn")
+          [i].addEventListener("mouseout", function () {
+            document.getElementsByClassName("btn")[i].style.backgroundColor =
+              theme_nohover_listview;
+          });
+      }
+    }
+    for (let i = 0; i < document.querySelectorAll(".modal-title").length; i++) {
+      document.getElementsByClassName("modal-title")[i].style.color = theme_FG;
+    }
+    for (let i = 0; i < document.querySelectorAll("p").length; i++) {
+      document.getElementsByTagName("p")[i].style.color = theme_FG;
+    }
+    for (let i = 0; i < document.querySelectorAll("h1").length; i++) {
+      document.getElementsByTagName("h1")[i].style.color = theme_FG;
+    }
+    for (let i = 0; i < document.querySelectorAll(".btnw").length; i++) {
+      document.getElementsByClassName("btnw")[i].style.color = theme_FG;
+      document
+        .getElementsByClassName("btnw")
+        [i].addEventListener("mouseover", function () {
+          document.getElementsByClassName("btnw")[i].style.backgroundColor =
+            theme_hover_listview;
+        });
+      document
+        .getElementsByClassName("btnw")
+        [i].addEventListener("mouseout", function () {
+          document.getElementsByClassName("btnw")[i].style.backgroundColor =
+            theme_nohover_listview;
+        });
+    }
+    document.getElementsByClassName("closebtn")[0].style.color = theme_FG;
+    document
+      .getElementsByClassName("closebtn")[0]
+      .addEventListener("mouseover", function () {
+        document.getElementsByClassName("closebtn")[0].style.backgroundColor =
+          theme_hover_close;
+      });
+    document
+      .getElementsByClassName("closebtn")[0]
+      .addEventListener("mouseout", function () {
+        document.getElementsByClassName("closebtn")[0].style.backgroundColor =
+          theme_nohover_listview;
+      });
+    for (let i = 0; i < document.querySelectorAll("li").length; i++) {
+      document.getElementsByTagName("li")[i].style.color = theme_FG;
+    }
+    for (let i = 0; i < document.querySelectorAll("h4").length; i++) {
+      document.getElementsByTagName("h4")[i].style.color = theme_FG;
+    }
+    document.getElementById("btn_close_icon_about").className = "btn-close";
+    if (linkBG != "") {
+      document.getElementsByTagName("html")[0].style.backgroundImage =
+        "url('" + linkBG + "')";
+    }
+    document.getElementById("overlaymsg").style.color = theme_FG;
+    if (
+      theme_O2.includes("https://") ||
+      theme_O2.includes("http://") ||
+      theme_O2.includes("/") ||
+      theme_O2.includes("\\")
+    ) {
+      document.getElementById("overlay2").style.backgroundRepeat = "no-repeat";
+      document.getElementById("overlay2").style.backgroundSize = "cover";
+      document.getElementById("overlay2").style.backgroundImage =
+        "url('" + theme_O2 + "')";
+      document.getElementById("overlay").style.backgroundRepeat = "no-repeat";
+      document.getElementById("overlay").style.backgroundSize = "cover";
+      document.getElementById("overlay").style.backgroundImage =
+        "url('" + theme_O2 + "')";
+    } else {
+      document.getElementById("overlay").style.backgroundColor = theme_BG;
+      document.getElementById("overlay2").style.backgroundColor = theme_O2;
+    }
+    document.getElementById("snackbar").style.color = theme_FG;
+    document.getElementById("snackbar").style.backgroundColor = theme_notifBG;
+    document.getElementsByTagName("html")[0].style.backgroundColor = theme_BG;
+  }
+}
+Themes();
+if (currenttheme == 99) {
+  //Custom theme
+  document.getElementById("iframe_yt_music").src = "placeholder";
+
+  theme_BG = "black";
+  theme_FG = "white";
+  theme_O2 = "black";
+  theme_notifBG = "rgb(0, 0, 0)";
+  theme_button_card = "";
+  theme_progress = "";
+  theme_hover_close = "rgb(170, 40, 40)";
+  theme_btn_FG = "white";
+  theme_btn_BG = "black";
+  theme_btn_border = theme_btn_BG;
+  theme_btn_hover = "gray";
+  theme_btn_FG_s = "white";
+  theme_btn_BG_s = "black";
+  theme_btn_border_s = theme_btn_BG_s;
+  theme_btn_hover_s = "gray";
+
+  document.getElementsByTagName("html")[0].className = "black";
+  document.getElementsByTagName("nav")[0].style.backgroundColor =
+    "rgba(0, 0, 0, 0.8)";
+  theme_hover_listview = "rgb(40, 40, 40)";
+  document.getElementById("progressbar").className = "progress";
+  theme_BG_CI = "rgba(0, 0, 255,0.753)";
+  Themes();
+}
+function _01toBool(number) {
+  if (number == 0) {
+    return true;
+  } else {
+    return false;
+  }
+}
+
 if (fs.existsSync(parentfolder3 + "/portable.txt")) {
   CosmicComicsData = parentfolder3 + "/AppData";
   CosmicComicsTemp = parentfolder3 + "/TMP";
 }
 try {
-  fs.readdirSync(CosmicComicsData)
-  fs.readdirSync(CosmicComicsTemp)
+  fs.readdirSync(CosmicComicsData);
+  fs.readdirSync(CosmicComicsTemp);
 } catch (error) {
-  console.log(error)
+  console.log(error);
   CosmicComicsData = __dirname + "/AppData";
   CosmicComicsTemp = __dirname + "/TMP";
 }
@@ -128,6 +409,25 @@ document.getElementById("version").innerHTML =
 var get_Folder_Path_JSON = get_folder_path_from_JSON(
   CosmicComicsData + "/config.json"
 );
+
+//Add and remove animate.style animations
+const animateCSS = (element, animation, prefix = "animate__") =>
+  // We create a Promise and return it
+  new Promise((resolve, reject) => {
+    const animationName = `${prefix}${animation}`;
+    const node = element;
+
+    node.classList.add(`${prefix}animated`, animationName);
+
+    // When the animation ends, we clean the classes and resolve the Promise
+    function handleAnimationEnd(event) {
+      event.stopPropagation();
+      node.classList.remove(`${prefix}animated`, animationName);
+      resolve("Animation ended");
+    }
+
+    node.addEventListener("animationend", handleAnimationEnd, { once: true });
+  });
 
 //if you have a folder used lasted time then it's loaded
 if (get_Folder_Path_JSON != null && get_Folder_Path_JSON != "") {
@@ -254,15 +554,27 @@ function openFolder_logic(folder) {
   document.getElementById("opnfld").onclick = "";
   document.getElementById("opnfld").setAttribute("disabled", "");
   document.getElementById("overlay").style.display = "block";
+
   setTimeout(() => {
     var result = folder;
     if (result) {
       var FolderRes = DetectFilesAndFolders(result[0]);
       var AllFolderRes = DetectAllFilesAndFolders(result[0]);
-      AllFolderResults = Check_File_For_Validated_extension(
+      var AllFolderResults = Check_File_For_Validated_extension(
         AllFolderRes,
         ValidatedExtension
       );
+      AllFolderResults.sort((a, b) => {
+        let fa = a.substring(a.lastIndexOf(".") + 1);
+        fb = b.substring(b.lastIndexOf(".") + 1);
+        if (fa < fb) {
+          return 1;
+        }
+        if (fa > fb) {
+          return -1;
+        }
+        return 0;
+      });
       GetTheFirstImageOfComicsByFolder(AllFolderResults);
       FolderResults = Check_File_For_Validated_extension(
         FolderRes,
@@ -326,7 +638,11 @@ function openFolder_logic(folder) {
         .getElementById("opnfld")
         .setAttribute("onclick", "openFolderDialog()");
       document.getElementById("opnfld").removeAttribute("disabled");
-      document.getElementById("overlay").style.display = "none";
+      animateCSS(document.getElementById("overlay"), "slideOutDown").then(
+        (message) => {
+          document.getElementById("overlay").style.display = "none";
+        }
+      );
     }
   }, 500);
 }
@@ -433,7 +749,7 @@ function loadContent(
 ) {
   var n = 0;
   listOfImages = [];
-  document.getElementById("overlay").style.display = "block";
+  document.getElementById("overlay2").style.display = "block";
   FolderResults.forEach((file) => {
     var stat = fs.statSync(file);
     var name = patha.basename(file);
@@ -479,9 +795,12 @@ function loadContent(
       }
     }
   });
+  const divlist = document.createElement("div");
+  divlist.className = "list-group";
   FolderRes.forEach((path, index) => {
     var stat = fs.statSync(path);
     var name = patha.basename(path);
+    var path_without_file = patha.dirname(path);
     var realname = name.split(".");
     realname = realname[0];
     var shortname = get_the_ID_by_name(realname);
@@ -493,10 +812,16 @@ function loadContent(
     var reading = Get_element_from_data("reading", Info);
     var favorite_v = Get_element_from_data("favorite", Info);
     if (stat.isDirectory()) {
-      var node = document.createTextNode(
-        realname + "<br> " + language["folder_p"]
-      );
-      invertedPath = path.replaceAll("\\", "/");
+      if (cardMode == true) {
+        var node = document.createTextNode(
+          realname + "<br> " + language["folder_p"]
+        );
+      } else {
+        var node = document.createTextNode(
+          realname + " " + language["folder_p"]
+        );
+      }
+      var invertedPath = path.replaceAll("\\", "/");
       if (fs.existsSync(invertedPath + "/folder.cosmic")) {
         imagelink = invertedPath + "/folder.cosmic";
         console.log(imagelink);
@@ -515,7 +840,10 @@ function loadContent(
       );
       var CCDN = CosmicComicsData.replaceAll("\\", "/");
       invertedPath = path.replaceAll("\\", "/");
-      if (fs.existsSync(invertedPath + ".cosmic")) {
+      if (fs.existsSync(path_without_file + "/coverAll.cosmic")) {
+        imagelink = path_without_file + "/coverAll.cosmic";
+        console.log(imagelink);
+      } else if (fs.existsSync(invertedPath + ".cosmic")) {
         imagelink = invertedPath + ".cosmic";
         console.log(imagelink);
       } else if (fs.existsSync(invertedPath + ".cosmic.svg")) {
@@ -524,8 +852,12 @@ function loadContent(
       } else {
         if (FIOA.length == 0) {
           console.log(shortname + "/" + shortname + ".jpg not found");
-
-          imagelink = "Images/fileDefault.png";
+          if (fs.existsSync(path_without_file + "/folder.cosmic")) {
+            imagelink = path_without_file + "/folder.cosmic";
+            console.log(imagelink);
+          } else {
+            imagelink = "Images/fileDefault.png";
+          }
         } else {
           imagelink = CCDN + "/FirstImageOfAll/" + shortname + "/" + FIOA[0];
         }
@@ -533,7 +865,12 @@ function loadContent(
     } else {
       console.log(shortname + "/" + shortname + ".jpg not found");
       var node = document.createTextNode(realname);
-      imagelink = "Images/fileDefault.png";
+      if (fs.existsSync(path_without_file + "/folder.cosmic")) {
+        imagelink = path_without_file + "/folder.cosmic";
+        console.log(imagelink);
+      } else {
+        imagelink = "Images/fileDefault.png";
+      }
     }
 
     listOfImages.push(imagelink);
@@ -542,314 +879,685 @@ function loadContent(
     if (stat.isDirectory()) {
       carddiv.style.cursor = "pointer";
     }
-    carddiv.className = "card";
-    carddiv.setAttribute("data-effect", "zoom");
-    //button card_save
-    const buttonfav = document.createElement("button");
-    buttonfav.className = "card__save js-fav";
-    buttonfav.type = "button";
-    buttonfav.addEventListener("click", function () {
-      favorite();
-    });
-    buttonfav.id = "btn_id_fav_" + shortname;
-    new bootstrap.Tooltip(buttonfav, {
-      title: language["toogle_fav"],
-      placement: "bottom",
-    });
-    //icon
-    const favicon = document.createElement("i");
-    favicon.className = "material-icons";
-    favicon.innerHTML = "favorite";
-    buttonfav.appendChild(favicon);
-    carddiv.appendChild(buttonfav);
+    if (cardMode == true) {
+      carddiv.className = "cardcusto";
+      carddiv.setAttribute("data-effect", "zoom");
+      //button card_save
+      const buttonfav = document.createElement("button");
+      buttonfav.className = "card__save js-fav";
+      buttonfav.type = "button";
+      buttonfav.addEventListener("click", function () {
+        favorite();
+      });
+      buttonfav.id = "btn_id_fav_" + shortname;
+      new bootstrap.Tooltip(buttonfav, {
+        title: language["toogle_fav"],
+        placement: "bottom",
+      });
+      //icon
+      const favicon = document.createElement("i");
+      favicon.className = "material-icons";
+      favicon.innerHTML = "favorite";
+      if (currenttheme > 1)
+        buttonfav.className = "js-fav card__save" + theme_button_card;
 
-    //button card__close
-    const button_unread = document.createElement("button");
-    button_unread.className = "card__close js-unread";
-    button_unread.type = "button";
-    button_unread.addEventListener("click", function () {
-      markasunread();
-    });
-    button_unread.id = "btn_id_unread_" + shortname;
-    new bootstrap.Tooltip(button_unread, {
-      title: language["mkunread"],
-      placement: "bottom",
-    });
-    //icon
-    const unread_icon = document.createElement("i");
-    unread_icon.className = "material-icons";
-    unread_icon.innerHTML = "close";
+      buttonfav.appendChild(favicon);
+      carddiv.appendChild(buttonfav);
 
-    button_unread.appendChild(unread_icon);
-    carddiv.appendChild(button_unread);
-    //button card__reading
-    const button_reading = document.createElement("button");
-    button_reading.className = "card__reading js-reading";
-    button_reading.type = "button";
-    button_reading.addEventListener("click", function () {
-      markasreading();
-    });
-    button_reading.id = "btn_id_reading_" + shortname;
-    new bootstrap.Tooltip(button_reading, {
-      title: language["mkreading"],
-      placement: "bottom",
-    });
-    //icon
-    const reading_icon = document.createElement("i");
-    reading_icon.className = "material-icons";
-    reading_icon.innerHTML = "auto_stories";
+      //button card__close
+      const button_unread = document.createElement("button");
+      button_unread.className = "card__close js-unread";
 
-    button_reading.appendChild(reading_icon);
-    carddiv.appendChild(button_reading);
-    //button card__read
-    const button_read = document.createElement("button");
-    button_read.className = "card__read js-read";
-    button_read.type = "button";
+      button_unread.type = "button";
+      button_unread.addEventListener("click", function () {
+        markasunread();
+      });
+      button_unread.id = "btn_id_unread_" + shortname;
+      new bootstrap.Tooltip(button_unread, {
+        title: language["mkunread"],
+        placement: "bottom",
+      });
+      //icon
+      const unread_icon = document.createElement("i");
+      unread_icon.className = "material-icons";
+      unread_icon.innerHTML = "close";
+      if (currenttheme > 1)
+        button_unread.className = "js-unread card__close" + theme_button_card;
 
-    button_read.addEventListener("click", function () {
-      markasread();
-    });
-    button_read.id = "btn_id_read_" + shortname;
-    new bootstrap.Tooltip(button_read, {
-      title: language["mkread"],
-      placement: "bottom",
-    });
-    //ico
-    const read_ion = document.createElement("i");
-    read_ion.className = "material-icons";
-    read_ion.innerHTML = "done";
+      button_unread.appendChild(unread_icon);
+      carddiv.appendChild(button_unread);
+      //button card__reading
+      const button_reading = document.createElement("button");
+      button_reading.className = "card__reading js-reading";
+      button_reading.type = "button";
+      button_reading.addEventListener("click", function () {
+        markasreading();
+      });
+      button_reading.id = "btn_id_reading_" + shortname;
+      new bootstrap.Tooltip(button_reading, {
+        title: language["mkreading"],
+        placement: "bottom",
+      });
+      //icon
+      const reading_icon = document.createElement("i");
+      reading_icon.className = "material-icons";
+      reading_icon.innerHTML = "auto_stories";
+      if (currenttheme > 1)
+        button_reading.className =
+          "js-reading card__reading" + theme_button_card;
 
-    button_read.appendChild(read_ion);
-    carddiv.appendChild(button_read);
-    //button card__info
-    const button_info = document.createElement("button");
-    button_info.className = "card__info";
-    button_info.type = "button";
-    button_info.addEventListener("click", function () {
-      GetComicInfo();
-    });
-    new bootstrap.Tooltip(button_info, {
-      title: language["info"],
-      placement: "bottom",
-    });
-    //ico
-    const info_icon = document.createElement("i");
-    info_icon.className = "material-icons";
-    info_icon.innerHTML = "info";
-    button_info.appendChild(info_icon);
-    carddiv.appendChild(button_info);
-    //figure card__image
-    const cardimage = document.createElement("div");
-    cardimage.className = "card__image";
-    const imgcard = document.createElement("img");
-    imgcard.style.width = "100%";
-    imgcard.id = "card_img_id_" + index;
-    cardimage.appendChild(imgcard);
-    carddiv.appendChild(cardimage);
-    //card__body
-    const bodycard = document.createElement("div");
-    bodycard.className = "card__body";
-    //button play
-    const playbtn = document.createElement("button");
+      button_reading.appendChild(reading_icon);
+      carddiv.appendChild(button_reading);
+      //button card__read
+      const button_read = document.createElement("button");
+      button_read.className = "card__read js-read";
+      button_read.type = "button";
 
-    playbtn.className = "card__play js-play";
-    playbtn.type = "button";
-    const playarr = document.createElement("i");
-    playarr.className = "material-icons";
-    playarr.innerHTML = "play_arrow";
-    playbtn.appendChild(playarr);
-    bodycard.appendChild(playbtn);
-    new bootstrap.Tooltip(playbtn, {
-      title: language["Play"],
-      placement: "bottom",
-    });
-    const pcard_bio = document.createElement("p");
-    pcard_bio.className = "card__bio";
-    pcard_bio.style = "text-align: center;";
-    pcard_bio.innerHTML = node.textContent;
+      button_read.addEventListener("click", function () {
+        markasread();
+      });
+      button_read.id = "btn_id_read_" + shortname;
+      new bootstrap.Tooltip(button_read, {
+        title: language["mkread"],
+        placement: "bottom",
+      });
+      //ico
+      const read_ion = document.createElement("i");
+      read_ion.className = "material-icons";
+      read_ion.innerHTML = "done";
+      if (currenttheme > 1)
+        button_read.className = "js-read card__read" + theme_button_card;
 
-    bodycard.appendChild(pcard_bio);
-    carddiv.appendChild(bodycard);
-    carddiv.id = "id" + n;
+      button_read.appendChild(read_ion);
+      carddiv.appendChild(button_read);
+      //button card__info
+      const button_info = document.createElement("button");
+      button_info.className = "card__info";
+      button_info.type = "button";
+      button_info.addEventListener("click", function () {
+        GetComicInfo();
+      });
+      new bootstrap.Tooltip(button_info, {
+        title: language["info"],
+        placement: "bottom",
+      });
+      //ico
+      const info_icon = document.createElement("i");
+      info_icon.className = "material-icons";
+      info_icon.innerHTML = "info";
+      button_info.appendChild(info_icon);
+      if (currenttheme > 1)
+        button_info.className = "card__info" + theme_button_card;
 
-    //#region ratingCSS
-    const ratingcss = document.createElement("div");
+      carddiv.appendChild(button_info);
+      //figure card__image
+      const cardimage = document.createElement("div");
+      cardimage.className = "card__image";
+      cardimage.style.backgroundColor = theme_BG_CI;
+      const imgcard = document.createElement("img");
+      imgcard.style.width = "100%";
+      imgcard.id = "card_img_id_" + index;
+      cardimage.appendChild(imgcard);
+      carddiv.appendChild(cardimage);
+      //card__body
+      const bodycard = document.createElement("div");
+      bodycard.className = "card__body";
+      //button play
+      const playbtn = document.createElement("button");
 
-    ratingcss.className = "rating-css hover-effect card__rating";
-    const ratinginput1 = document.createElement("input");
-    ratinginput1.type = "radio";
-    ratinginput1.value = "1";
-    ratinginput1.id = "rating3-1_" + index;
-    ratinginput1.name = "Rating_" + shortname;
-    ratinginput1.addEventListener("click", function () {
-      SetForRating1(shortname);
-    });
+      playbtn.className = "card__play js-play";
+      playbtn.type = "button";
+      const playarr = document.createElement("i");
+      playarr.className = "material-icons";
+      playarr.innerHTML = "play_arrow";
+      playarr.style.color = theme_button_card;
+      playbtn.appendChild(playarr);
+      bodycard.appendChild(playbtn);
+      new bootstrap.Tooltip(playbtn, {
+        title: language["Play"],
+        placement: "bottom",
+      });
+      const pcard_bio = document.createElement("p");
+      pcard_bio.className = "card__bio";
+      pcard_bio.style = "text-align: center;";
+      pcard_bio.style.color = theme_FG;
+      pcard_bio.innerHTML = node.textContent;
 
-    const label1 = document.createElement("label");
-    label1.setAttribute("for", "rating3-1_" + index);
-    label1.className = "mdi mdi-star";
-    new bootstrap.Tooltip(label1, {
-      title: language["star1"],
-      placement: "right",
-    });
-    const ratinginput2 = document.createElement("input");
-    ratinginput2.type = "radio";
-    ratinginput2.value = "2";
-    ratinginput2.id = "rating3-2_" + index;
-    ratinginput2.name = "Rating_" + shortname;
-    ratinginput2.addEventListener("click", function () {
-      SetForRating2(shortname);
-    });
+      bodycard.appendChild(pcard_bio);
+      carddiv.appendChild(bodycard);
+      carddiv.id = "id" + n;
 
-    const label2 = document.createElement("label");
-    label2.setAttribute("for", "rating3-2_" + index);
-    label2.className = "mdi mdi-star";
-    new bootstrap.Tooltip(label2, {
-      title: language["star2"],
-      placement: "right",
-    });
-    const ratinginput3 = document.createElement("input");
-    ratinginput3.type = "radio";
-    ratinginput3.value = "3";
-    ratinginput3.id = "rating3-3_" + index;
-    ratinginput3.name = "Rating_" + shortname;
-    ratinginput3.addEventListener("click", function () {
-      SetForRating3(shortname);
-    });
+      //#region ratingCSS
+      const ratingcss = document.createElement("div");
 
-    const label3 = document.createElement("label");
-    label3.setAttribute("for", "rating3-3_" + index);
-    label3.className = "mdi mdi-star";
-    new bootstrap.Tooltip(label3, {
-      title: language["star3"],
-      placement: "right",
-    });
-    const ratinginput4 = document.createElement("input");
-    ratinginput4.type = "radio";
-    ratinginput4.value = "4";
-    ratinginput4.id = "rating3-4_" + index;
-    ratinginput4.name = "Rating_" + shortname;
-    ratinginput4.addEventListener("click", function () {
-      SetForRating4(shortname);
-    });
+      ratingcss.className = "rating-css hover-effect card__rating";
+      const ratinginput1 = document.createElement("input");
+      ratinginput1.type = "radio";
+      ratinginput1.value = "1";
+      ratinginput1.id = "rating3-1_" + index;
+      ratinginput1.name = "Rating_" + shortname;
+      ratinginput1.addEventListener("click", function () {
+        SetForRating1(shortname);
+      });
 
-    const label4 = document.createElement("label");
-    label4.setAttribute("for", "rating3-4_" + index);
-    label4.className = "mdi mdi-star";
-    new bootstrap.Tooltip(label4, {
-      title: language["star4"],
-      placement: "right",
-    });
-    const ratinginput5 = document.createElement("input");
-    ratinginput5.type = "radio";
-    ratinginput5.value = "5";
-    ratinginput5.id = "rating3-5_" + index;
-    ratinginput5.name = "Rating_" + shortname;
-    ratinginput5.addEventListener("click", function () {
-      SetForRating5(shortname);
-    });
+      const label1 = document.createElement("label");
+      label1.setAttribute("for", "rating3-1_" + index);
+      label1.className = "mdi mdi-star";
+      new bootstrap.Tooltip(label1, {
+        title: language["star1"],
+        placement: "right",
+      });
+      const ratinginput2 = document.createElement("input");
+      ratinginput2.type = "radio";
+      ratinginput2.value = "2";
+      ratinginput2.id = "rating3-2_" + index;
+      ratinginput2.name = "Rating_" + shortname;
+      ratinginput2.addEventListener("click", function () {
+        SetForRating2(shortname);
+      });
 
-    const label5 = document.createElement("label");
-    label5.setAttribute("for", "rating3-5_" + index);
-    label5.className = "mdi mdi-star";
-    new bootstrap.Tooltip(label5, {
-      title: language["star5"],
-      placement: "right",
-    });
-    var rating = Get_element_from_data("note", Info);
-    console.log(rating);
-    if (rating == 1) {
-      ratinginput1.checked = true;
-    } else if (rating == 2) {
-      ratinginput2.checked = true;
-    } else if (rating == 3) {
-      ratinginput3.checked = true;
-    } else if (rating == 4) {
-      ratinginput4.checked = true;
-    } else if (rating == 5) {
-      ratinginput5.checked = true;
-    } else if (rating == -1) {
-    } else {
-      console.log("Error when loading Rating for " + shortname);
-    }
-    ratingcss.appendChild(ratinginput1);
-    ratingcss.appendChild(label1);
-    ratingcss.appendChild(ratinginput2);
-    ratingcss.appendChild(label2);
-    ratingcss.appendChild(ratinginput3);
-    ratingcss.appendChild(label3);
-    ratingcss.appendChild(ratinginput4);
-    ratingcss.appendChild(label4);
-    ratingcss.appendChild(ratinginput5);
-    ratingcss.appendChild(label5);
+      const label2 = document.createElement("label");
+      label2.setAttribute("for", "rating3-2_" + index);
+      label2.className = "mdi mdi-star";
+      new bootstrap.Tooltip(label2, {
+        title: language["star2"],
+        placement: "right",
+      });
+      const ratinginput3 = document.createElement("input");
+      ratinginput3.type = "radio";
+      ratinginput3.value = "3";
+      ratinginput3.id = "rating3-3_" + index;
+      ratinginput3.name = "Rating_" + shortname;
+      ratinginput3.addEventListener("click", function () {
+        SetForRating3(shortname);
+      });
 
-    //#endregion
+      const label3 = document.createElement("label");
+      label3.setAttribute("for", "rating3-3_" + index);
+      label3.className = "mdi mdi-star";
+      new bootstrap.Tooltip(label3, {
+        title: language["star3"],
+        placement: "right",
+      });
+      const ratinginput4 = document.createElement("input");
+      ratinginput4.type = "radio";
+      ratinginput4.value = "4";
+      ratinginput4.id = "rating3-4_" + index;
+      ratinginput4.name = "Rating_" + shortname;
+      ratinginput4.addEventListener("click", function () {
+        SetForRating4(shortname);
+      });
 
-    if (playbtn.addEventListener) {
-      if (stat.isDirectory()) {
-        carddiv.addEventListener("click", function () {
-          launchDetect(path, root);
-        });
-        playbtn.addEventListener("click", function () {
-          ModifyJSONFile(
-            CosmicComicsData + "/ListOfComics.json",
-            "reading",
-            true,
-            shortname
-          );
-          ModifyJSONFile(
-            CosmicComicsData + "/ListOfComics.json",
-            "unread",
-            false,
-            shortname
-          );
-          Modify_JSON_For_Config(
-            CosmicComicsData + "/config.json",
-            "last_opened",
-            path
-          );
-          window.location.href = "viewer.html?" + path;
-        });
+      const label4 = document.createElement("label");
+      label4.setAttribute("for", "rating3-4_" + index);
+      label4.className = "mdi mdi-star";
+      new bootstrap.Tooltip(label4, {
+        title: language["star4"],
+        placement: "right",
+      });
+      const ratinginput5 = document.createElement("input");
+      ratinginput5.type = "radio";
+      ratinginput5.value = "5";
+      ratinginput5.id = "rating3-5_" + index;
+      ratinginput5.name = "Rating_" + shortname;
+      ratinginput5.addEventListener("click", function () {
+        SetForRating5(shortname);
+      });
+
+      const label5 = document.createElement("label");
+      label5.setAttribute("for", "rating3-5_" + index);
+      label5.className = "mdi mdi-star";
+      new bootstrap.Tooltip(label5, {
+        title: language["star5"],
+        placement: "right",
+      });
+      var rating = Get_element_from_data("note", Info);
+      console.log(rating);
+      if (rating == 1) {
+        ratinginput1.checked = true;
+      } else if (rating == 2) {
+        ratinginput2.checked = true;
+      } else if (rating == 3) {
+        ratinginput3.checked = true;
+      } else if (rating == 4) {
+        ratinginput4.checked = true;
+      } else if (rating == 5) {
+        ratinginput5.checked = true;
+      } else if (rating == -1) {
       } else {
-        playbtn.addEventListener("click", function () {
-          ModifyJSONFile(
-            CosmicComicsData + "/ListOfComics.json",
-            "reading",
-            true,
-            shortname
-          );
-          ModifyJSONFile(
-            CosmicComicsData + "/ListOfComics.json",
-            "unread",
-            false,
-            shortname
-          );
-          Modify_JSON_For_Config(
-            CosmicComicsData + "/config.json",
-            "last_opened",
-            path
-          );
-          window.location.href = "viewer.html?" + path;
+        console.log("Error when loading Rating for " + shortname);
+      }
+      ratingcss.appendChild(ratinginput1);
+      ratingcss.appendChild(label1);
+      ratingcss.appendChild(ratinginput2);
+      ratingcss.appendChild(label2);
+      ratingcss.appendChild(ratinginput3);
+      ratingcss.appendChild(label3);
+      ratingcss.appendChild(ratinginput4);
+      ratingcss.appendChild(label4);
+      ratingcss.appendChild(ratinginput5);
+      ratingcss.appendChild(label5);
+
+      //#endregion
+
+      if (playbtn.addEventListener) {
+        if (stat.isDirectory()) {
+          carddiv.addEventListener("click", function () {
+            launchDetect(path, root);
+          });
+          playbtn.addEventListener("click", function () {
+            ModifyJSONFile(
+              CosmicComicsData + "/ListOfComics.json",
+              "reading",
+              true,
+              shortname
+            );
+            ModifyJSONFile(
+              CosmicComicsData + "/ListOfComics.json",
+              "unread",
+              false,
+              shortname
+            );
+            Modify_JSON_For_Config(
+              CosmicComicsData + "/config.json",
+              "last_opened",
+              path
+            );
+            window.location.href = "viewer.html?" + path;
+          });
+        } else {
+          playbtn.addEventListener("click", function () {
+            ModifyJSONFile(
+              CosmicComicsData + "/ListOfComics.json",
+              "reading",
+              true,
+              shortname
+            );
+            ModifyJSONFile(
+              CosmicComicsData + "/ListOfComics.json",
+              "unread",
+              false,
+              shortname
+            );
+            Modify_JSON_For_Config(
+              CosmicComicsData + "/config.json",
+              "last_opened",
+              path
+            );
+            window.location.href = "viewer.html?" + path;
+          });
+        }
+        carddiv.addEventListener("mouseover", function (e) {
+          e.preventDefault;
+          RightClick(this, path);
         });
       }
-      carddiv.addEventListener("mouseover", function (e) {
-        e.preventDefault;
-        RightClick(this, path);
-      });
-    }
-    n++;
-    const element = document.getElementById("ContainerExplorer");
-    const divrating = document.createElement("div");
-    divrating.appendChild(ratingcss);
-    carddiv.appendChild(divrating);
-    element.appendChild(carddiv);
+      n++;
+      const element = document.getElementById("ContainerExplorer");
+      const divrating = document.createElement("div");
+      divrating.appendChild(ratingcss);
+      carddiv.appendChild(divrating);
+      element.appendChild(carddiv);
 
-    if (stat.isDirectory()) {
-      const imgNode = document.createElement("img");
-      imgNode.src = "";
-      imgNode.style = "padding-top: 330px";
-      carddiv.appendChild(imgNode);
-    } else if (readed) {
+      if (stat.isDirectory()) {
+        const imgNode = document.createElement("img");
+        imgNode.src = "";
+        imgNode.style = "padding-top: 330px";
+        carddiv.appendChild(imgNode);
+      } else if (readed) {
+        //readed
+        toggleActive(document.getElementById("btn_id_read_" + shortname));
+      } else if (reading) {
+        //reazading
+        toggleActive(document.getElementById("btn_id_reading_" + shortname));
+      } else {
+        //rien
+        toggleActive(document.getElementById("btn_id_unread_" + shortname));
+      }
+
+      if (favorite_v) {
+        toggleActive(document.getElementById("btn_id_fav_" + shortname));
+
+        //favorite
+      } else if (stat.isDirectory()) {
+        //fav folder
+      } else {
+        //pas fav
+      }
+    } else {
+      //POINTER TO LISTGROUP
+
+      const alist = document.createElement("a");
+      alist.className = "list-group-item list-group-item-action";
+      alist.style.backgroundColor = "transparent";
+      alist.style.color = theme_FG;
+      alist.style.cursor = "pointer";
+      alist.id = "id" + index;
+      alist.addEventListener("mouseover", function () {
+        alist.style.backgroundColor = theme_hover_listview;
+      });
+      alist.addEventListener("mouseleave", function () {
+        alist.style.backgroundColor = "transparent";
+      });
+      alist.innerHTML = node.textContent;
+      divlist.appendChild(alist);
+      const playbtn = document.createElement("button");
+
+      playbtn.className = "card__play js-play";
+      playbtn.type = "button";
+      playbtn.style.opacity = 1;
+      playbtn.style.top = "10px";
+      const playarr = document.createElement("i");
+      playarr.className = "material-icons";
+      playarr.style.color = theme_button_card;
+      playarr.innerHTML = "play_arrow";
+      playbtn.appendChild(playarr);
+      alist.appendChild(playbtn);
+      new bootstrap.Tooltip(playbtn, {
+        title: language["Play"],
+        placement: "bottom",
+      });
+
+      //button card_save
+      const buttonfav = document.createElement("button");
+      buttonfav.className = "card__save js-fav";
+      buttonfav.style.opacity = 1;
+      buttonfav.style.top = "10px";
+      buttonfav.style.right = "190px";
+      buttonfav.type = "button";
+      buttonfav.addEventListener("click", function () {
+        favorite();
+      });
+      buttonfav.id = "btn_id_fav_" + shortname;
+      if (currenttheme > 1)
+        buttonfav.className = "js-fav card__save" + theme_button_card;
+
+      new bootstrap.Tooltip(buttonfav, {
+        title: language["toogle_fav"],
+        placement: "bottom",
+      });
+      //icon
+      const favicon = document.createElement("i");
+      favicon.className = "material-icons";
+      favicon.innerHTML = "favorite";
+      buttonfav.appendChild(favicon);
+      alist.appendChild(buttonfav);
+
+      //button card__close
+      const button_unread = document.createElement("button");
+      button_unread.className = "card__close js-unread";
+      button_unread.type = "button";
+      button_unread.style.opacity = 1;
+      button_unread.style.top = "10px";
+      button_unread.style.right = "70px";
+
+      button_unread.addEventListener("click", function () {
+        markasunread();
+      });
+      button_unread.id = "btn_id_unread_" + shortname;
+      if (currenttheme > 1)
+        button_unread.className = "js-unread card__close" + theme_button_card;
+
+      new bootstrap.Tooltip(button_unread, {
+        title: language["mkunread"],
+        placement: "bottom",
+      });
+      //icon
+      const unread_icon = document.createElement("i");
+      unread_icon.className = "material-icons";
+      unread_icon.innerHTML = "close";
+
+      button_unread.appendChild(unread_icon);
+      alist.appendChild(button_unread);
+      //button card__reading
+      const button_reading = document.createElement("button");
+      button_reading.className = "card__reading js-reading";
+      button_reading.type = "button";
+      button_reading.style.opacity = 1;
+      button_reading.style.top = "10px";
+      button_reading.style.right = "110px";
+      button_reading.addEventListener("click", function () {
+        markasreading();
+      });
+      button_reading.id = "btn_id_reading_" + shortname;
+      if (currenttheme > 1)
+        button_reading.className =
+          "js-reading card__reading" + theme_button_card;
+
+      new bootstrap.Tooltip(button_reading, {
+        title: language["mkreading"],
+        placement: "bottom",
+      });
+      //icon
+      const reading_icon = document.createElement("i");
+      reading_icon.className = "material-icons";
+      reading_icon.innerHTML = "auto_stories";
+
+      button_reading.appendChild(reading_icon);
+      alist.appendChild(button_reading);
+      //button card__read
+      const button_read = document.createElement("button");
+      button_read.className = "card__read js-read";
+      button_read.type = "button";
+      button_read.style.opacity = 1;
+      button_read.style.top = "10px";
+      button_read.style.right = "150px";
+      button_read.addEventListener("click", function () {
+        markasread();
+      });
+      button_read.id = "btn_id_read_" + shortname;
+      if (currenttheme > 1)
+        button_read.className = "js-read card__read" + theme_button_card;
+
+      new bootstrap.Tooltip(button_read, {
+        title: language["mkread"],
+        placement: "bottom",
+      });
+      //ico
+      const read_ion = document.createElement("i");
+      read_ion.className = "material-icons";
+      read_ion.innerHTML = "done";
+
+      button_read.appendChild(read_ion);
+      alist.appendChild(button_read);
+      //button card__info
+      const button_info = document.createElement("button");
+      button_info.className = "card__info";
+      button_info.type = "button";
+      button_info.style.opacity = 1;
+      button_info.style.top = "10px";
+      button_info.style.right = "230px";
+      button_info.addEventListener("click", function () {
+        GetComicInfo();
+      });
+      new bootstrap.Tooltip(button_info, {
+        title: language["info"],
+        placement: "bottom",
+      });
+      //ico
+      const info_icon = document.createElement("i");
+      info_icon.className = "material-icons";
+      info_icon.innerHTML = "info";
+      button_info.appendChild(info_icon);
+      if (currenttheme > 1)
+        button_info.className = "card__info" + theme_button_card;
+
+      alist.appendChild(button_info);
+
+      //#region ratingCSS
+      const ratingcss = document.createElement("div");
+
+      ratingcss.className = "rating-css hover-effect";
+      const ratinginput1 = document.createElement("input");
+      ratinginput1.type = "radio";
+      ratinginput1.value = "1";
+      ratinginput1.id = "rating3-1_" + index;
+      ratinginput1.name = "Rating_" + shortname;
+      ratinginput1.addEventListener("click", function () {
+        SetForRating1(shortname);
+      });
+
+      const label1 = document.createElement("label");
+      label1.setAttribute("for", "rating3-1_" + index);
+      label1.className = "mdi mdi-star";
+      new bootstrap.Tooltip(label1, {
+        title: language["star1"],
+        placement: "right",
+      });
+      const ratinginput2 = document.createElement("input");
+      ratinginput2.type = "radio";
+      ratinginput2.value = "2";
+      ratinginput2.id = "rating3-2_" + index;
+      ratinginput2.name = "Rating_" + shortname;
+      ratinginput2.addEventListener("click", function () {
+        SetForRating2(shortname);
+      });
+
+      const label2 = document.createElement("label");
+      label2.setAttribute("for", "rating3-2_" + index);
+      label2.className = "mdi mdi-star";
+      new bootstrap.Tooltip(label2, {
+        title: language["star2"],
+        placement: "right",
+      });
+      const ratinginput3 = document.createElement("input");
+      ratinginput3.type = "radio";
+      ratinginput3.value = "3";
+      ratinginput3.id = "rating3-3_" + index;
+      ratinginput3.name = "Rating_" + shortname;
+      ratinginput3.addEventListener("click", function () {
+        SetForRating3(shortname);
+      });
+
+      const label3 = document.createElement("label");
+      label3.setAttribute("for", "rating3-3_" + index);
+      label3.className = "mdi mdi-star";
+      new bootstrap.Tooltip(label3, {
+        title: language["star3"],
+        placement: "right",
+      });
+      const ratinginput4 = document.createElement("input");
+      ratinginput4.type = "radio";
+      ratinginput4.value = "4";
+      ratinginput4.id = "rating3-4_" + index;
+      ratinginput4.name = "Rating_" + shortname;
+      ratinginput4.addEventListener("click", function () {
+        SetForRating4(shortname);
+      });
+
+      const label4 = document.createElement("label");
+      label4.setAttribute("for", "rating3-4_" + index);
+      label4.className = "mdi mdi-star";
+      new bootstrap.Tooltip(label4, {
+        title: language["star4"],
+        placement: "right",
+      });
+      const ratinginput5 = document.createElement("input");
+      ratinginput5.type = "radio";
+      ratinginput5.value = "5";
+      ratinginput5.id = "rating3-5_" + index;
+      ratinginput5.name = "Rating_" + shortname;
+      ratinginput5.addEventListener("click", function () {
+        SetForRating5(shortname);
+      });
+
+      const label5 = document.createElement("label");
+      label5.setAttribute("for", "rating3-5_" + index);
+      label5.className = "mdi mdi-star";
+      new bootstrap.Tooltip(label5, {
+        title: language["star5"],
+        placement: "right",
+      });
+      var rating = Get_element_from_data("note", Info);
+      console.log(rating);
+      if (rating == 1) {
+        ratinginput1.checked = true;
+      } else if (rating == 2) {
+        ratinginput2.checked = true;
+      } else if (rating == 3) {
+        ratinginput3.checked = true;
+      } else if (rating == 4) {
+        ratinginput4.checked = true;
+      } else if (rating == 5) {
+        ratinginput5.checked = true;
+      } else if (rating == -1) {
+      } else {
+        console.log("Error when loading Rating for " + shortname);
+      }
+      ratingcss.appendChild(ratinginput1);
+      ratingcss.appendChild(label1);
+      ratingcss.appendChild(ratinginput2);
+      ratingcss.appendChild(label2);
+      ratingcss.appendChild(ratinginput3);
+      ratingcss.appendChild(label3);
+      ratingcss.appendChild(ratinginput4);
+      ratingcss.appendChild(label4);
+      ratingcss.appendChild(ratinginput5);
+      ratingcss.appendChild(label5);
+      alist.appendChild(ratingcss);
+
+      //#endregion
+
+      if (playbtn.addEventListener) {
+        if (stat.isDirectory()) {
+          alist.addEventListener("dblclick", function () {
+            launchDetect(path, root);
+          });
+          playbtn.addEventListener("click", function () {
+            ModifyJSONFile(
+              CosmicComicsData + "/ListOfComics.json",
+              "reading",
+              true,
+              shortname
+            );
+            ModifyJSONFile(
+              CosmicComicsData + "/ListOfComics.json",
+              "unread",
+              false,
+              shortname
+            );
+            Modify_JSON_For_Config(
+              CosmicComicsData + "/config.json",
+              "last_opened",
+              path
+            );
+            window.location.href = "viewer.html?" + path;
+          });
+        } else {
+          playbtn.addEventListener("click", function () {
+            ModifyJSONFile(
+              CosmicComicsData + "/ListOfComics.json",
+              "reading",
+              true,
+              shortname
+            );
+            ModifyJSONFile(
+              CosmicComicsData + "/ListOfComics.json",
+              "unread",
+              false,
+              shortname
+            );
+            Modify_JSON_For_Config(
+              CosmicComicsData + "/config.json",
+              "last_opened",
+              path
+            );
+            window.location.href = "viewer.html?" + path;
+          });
+        }
+        alist.addEventListener("mouseover", function (e) {
+          e.preventDefault;
+          RightClick(this, path);
+        });
+      }
+      n++;
+      const element = document.getElementById("ContainerExplorer");
+      const divrating = document.createElement("div");
+      divrating.appendChild(alist);
+      divlist.appendChild(divrating);
+      element.appendChild(divlist);
+    }
+    if (readed) {
       //readed
       toggleActive(document.getElementById("btn_id_read_" + shortname));
     } else if (reading) {
@@ -870,39 +1578,66 @@ function loadContent(
       //pas fav
     }
   });
-  preloadImage(listOfImages, n);
+  if (cardMode == true) {
+    preloadImage(listOfImages, n);
+  } else {
+    if (n == 0) {
+      Toastifycation(language["empty_notSupported"], "#ff0000");
+
+      document.getElementById("tutotxt").innerHTML =
+        language["empty_notSupported2"] +
+        ValidatedExtension +
+        language["empty_notSupported3"];
+      document.getElementById("tutotxt").style.display = "block";
+      document.getElementById("tutotxt").style.fontSize = "24px";
+    } else {
+      var coolanimations = [
+        "zoomInDown",
+        "rollIn",
+        "zoomIn",
+        "jackInTheBox",
+        "fadeInUp",
+        "fadeInDown",
+        "fadeIn",
+        "bounceInUp",
+        "bounceInDown",
+        "backInDown",
+        "flip",
+        "flipInY",
+        "flipInX",
+      ];
+      var random =
+        coolanimations[Math.floor(Math.random() * coolanimations.length)];
+      document.getElementById("tutotxt").style.display = "none";
+      for (let i = 0; i < n; i++) {
+        animateCSS(document.getElementById("id" + i), random).then(
+          (message) => {
+            console.log(message);
+          }
+        );
+        document.getElementById("overlay2").style.display = "none";
+
+        animateCSS(document.getElementById("overlay"), "slideOutDown").then(
+          (message) => {
+            document.getElementById("overlay").style.display = "none";
+          }
+        );
+      }
+    }
+  }
 }
 
 //preload the images
 var preloadedImages = [];
 function preloadImage(listImages, n) {
-  for (var i = 0; i < listImages.length; i++) {
+  /* for (var i = 0; i < listImages.length; i++) {
     preloadedImages[i] = new Image();
     preloadedImages[i].src = listImages[i];
-  }
+  } */
   setTimeout(() => {
     LoadImages(n);
   }, 500);
 }
-
-//Add and remove animate.style animations
-const animateCSS = (element, animation, prefix = "animate__") =>
-  // We create a Promise and return it
-  new Promise((resolve, reject) => {
-    const animationName = `${prefix}${animation}`;
-    const node = element;
-
-    node.classList.add(`${prefix}animated`, animationName);
-
-    // When the animation ends, we clean the classes and resolve the Promise
-    function handleAnimationEnd(event) {
-      event.stopPropagation();
-      node.classList.remove(`${prefix}animated`, animationName);
-      resolve("Animation ended");
-    }
-
-    node.addEventListener("animationend", handleAnimationEnd, { once: true });
-  });
 
 //Load Images
 function LoadImages(numberOf) {
@@ -924,13 +1659,18 @@ function LoadImages(numberOf) {
     coolanimations[Math.floor(Math.random() * coolanimations.length)];
   if (numberOf == 0) {
     Toastifycation(language["empty_notSupported"], "#ff0000");
-    document.getElementById("overlay").style.display = "none";
-    document.getElementById("tutotxt").innerHTML =
-      language["empty_notSupported2"] +
-      ValidatedExtension +
-      language["empty_notSupported3"];
-    document.getElementById("tutotxt").style.display = "block";
-    document.getElementById("tutotxt").style.fontSize = "24px";
+    animateCSS(document.getElementById("overlay"), "slideOutDown").then(
+      (message) => {
+        document.getElementById("overlay2").style.display = "none";
+        document.getElementById("overlay").style.display = "none";
+        document.getElementById("tutotxt").innerHTML =
+          language["empty_notSupported2"] +
+          ValidatedExtension +
+          language["empty_notSupported3"];
+        document.getElementById("tutotxt").style.display = "block";
+        document.getElementById("tutotxt").style.fontSize = "24px";
+      }
+    );
   }
   for (let i = 0; i < numberOf; i++) {
     document.getElementById("tutotxt").style.display = "none";
@@ -943,12 +1683,18 @@ function LoadImages(numberOf) {
       document.getElementById("card_img_id_" + i).src =
         __dirname + "/Images/fileDefault.png";
     }
-    document.getElementById("overlay").style.display = "none";
+    document.getElementById("overlay2").style.display = "none";
+    animateCSS(document.getElementById("overlay"), "slideOutDown").then(
+      (message) => {
+        document.getElementById("overlay").style.display = "none";
+      }
+    );
   }
 }
 
 //Navigate or launch the viewer
 function launchDetect(dir, root) {
+  window.scrollTo(0, 0);
   var parent = document.getElementById("ContainerExplorer");
   var parento = document.getElementById("controller");
 
@@ -1033,7 +1779,17 @@ function DetectAllFilesAndFolders(dir) {
 }
 
 //Get the first image of book by folder to get the cover in the app
-function GetTheFirstImageOfComicsByFolder(filesInFolder = [], i = 0) {
+async function GetTheFirstImageOfComicsByFolder(filesInFolder = [], i = 0) {
+  document.getElementById("prgs").className = "determinate";
+  document.getElementById("prgs").style.width =
+    (i * 100) / filesInFolder.length + "%";
+  remote.getCurrentWindow().setProgressBar(i / filesInFolder.length);
+  try {
+    document.getElementById("decompressfilename").innerHTML =
+      language["extracting"] + patha.basename(filesInFolder[i + 1]);
+  } catch (error) {
+    console.log(error);
+  }
   document.getElementById("overlaymsg").innerHTML =
     language["extracting_thumb"] +
     " " +
@@ -1042,9 +1798,8 @@ function GetTheFirstImageOfComicsByFolder(filesInFolder = [], i = 0) {
     language["out_of"] +
     " " +
     filesInFolder.length;
-  if (i < filesInFolder.length) {
+  if (i < filesInFolder.length && skip == false) {
     CreateFIOAFolder();
-
     var name = patha.basename(filesInFolder[i]);
     ext = name.split(".").pop();
     name = name.split(".");
@@ -1063,42 +1818,15 @@ function GetTheFirstImageOfComicsByFolder(filesInFolder = [], i = 0) {
           shortname,
           ext,
           [
-            "*000.jpg",
-            "00.jpg",
-            "00-copie.jpg",
-            "*-00.jpg",
-            "*000.png",
-            "00.png",
-            "00-copie.png",
-            "*-00.png",
-            "*000.jpeg",
-            "00.jpeg",
-            "00-copie.jpeg",
-            "*-00.jpeg",
-            "*000.bmp",
-            "00.bmp",
-            "00-copie.bmp",
-            "*-00.bmp",
-            "*000.apng",
-            "00.apng",
-            "00-copie.apng",
-            "*-00.apng",
-            "*000.svg",
-            "00.svg",
-            "00-copie.svg",
-            "*-00.svg",
-            "*000.ico",
-            "00.ico",
-            "00-copie.ico",
-            "*-00.ico",
-            "*000.webp",
-            "00.webp",
-            "00-copie.webp",
-            "*-00.webp",
-            "*000.gif",
-            "00.gif",
-            "00-copie.gif",
-            "*-00.gif",
+            "*.jpg",
+            "*.png",
+            "*.jpeg",
+            "*.bmp",
+            "*.apng",
+            "*.svg",
+            "*.ico",
+            "*.webp",
+            "*.gif",
           ],
           i,
           filesInFolder
@@ -1109,58 +1837,35 @@ function GetTheFirstImageOfComicsByFolder(filesInFolder = [], i = 0) {
     } else {
       unarchive_first(
         filesInFolder[i],
-        CosmicComicsData + "/FirstImageOfAll/" + shortname,
+        CosmicComicsData + "\\FirstImageOfAll\\" + shortname,
         shortname,
         ext,
         [
-          "*000.jpg",
-          "00.jpg",
-          "00-copie.jpg",
-          "*-00.jpg",
-          "*000.png",
-          "00.png",
-          "00-copie.png",
-          "*-00.png",
-          "*000.jpeg",
-          "00.jpeg",
-          "00-copie.jpeg",
-          "*-00.jpeg",
-          "*000.bmp",
-          "00.bmp",
-          "00-copie.bmp",
-          "*-00.bmp",
-          "*000.apng",
-          "00.apng",
-          "00-copie.apng",
-          "*-00.apng",
-          "*000.svg",
-          "00.svg",
-          "00-copie.svg",
-          "*-00.svg",
-          "*000.ico",
-          "00.ico",
-          "00-copie.ico",
-          "*-00.ico",
-          "*000.webp",
-          "00.webp",
-          "00-copie.webp",
-          "*-00.webp",
-          "*000.gif",
-          "00.gif",
-          "00-copie.gif",
-          "*-00.gif",
+          "*.jpg",
+          "*.png",
+          "*.jpeg",
+          "*.bmp",
+          "*.apng",
+          "*.svg",
+          "*.ico",
+          "*.webp",
+          "*.gif",
         ],
         i,
         filesInFolder
       );
     }
   } else {
+    document.getElementById("overlaymsg").innerHTML = language["conversion"];
+    await delete_all_exept_the_first();
     GetAllIMG = true;
     document.getElementById("overlaymsg").innerHTML =
       language["overlaymsg_worst"];
+    document.getElementById("prgs").className = "indeterminate";
+    remote.getCurrentWindow().setProgressBar(-1);
+    document.getElementById("decompressfilename").innerHTML = "";
   }
 }
-
 //Check if the passed element contains numbers
 function hasNumbers(t) {
   var regex = /\d/g;
@@ -1205,7 +1910,39 @@ function CreateFolder(dirname, dirpath) {
   }
 }
 
+var configOSProvider = fs.readFileSync(CosmicComicsData + "/config.json");
+var JSON_OSProvider = JSON.parse(configOSProvider);
+var OSprovider = Get_From_Config("update_provider", JSON_OSProvider);
 //Unarchive the first element of each archive
+async function delete_all_exept_the_first() {
+  var dir = fs.readdirSync(CosmicComicsData + "/FirstImageOfAll/");
+  console.log(dir);
+  for (var i = 0; i < dir.length; i++) {
+    var files = fs.readdirSync(CosmicComicsData + "/FirstImageOfAll/" + dir[i]);
+    if (files.length > 1) {
+      files.sort((a, b) => {
+        let fa = a.toLowerCase(),
+          fb = b.toLowerCase();
+        if (fa < fb) {
+          return -1;
+        }
+        if (fa > fb) {
+          return 1;
+        }
+        return 0;
+      });
+      for (var j = 1; j < files.length; j++) {
+        fs.unlinkSync(
+          CosmicComicsData + "/FirstImageOfAll/" + dir[i] + "/" + files[j]
+        );
+      }
+    }
+  }
+  await WConv();
+  //Scan le dossier
+  // Sort
+  // Delete tt sauf le premier
+}
 function unarchive_first(
   zipPath,
   ExtractDir,
@@ -1213,8 +1950,7 @@ function unarchive_first(
   ext,
   listofelements,
   indice,
-  filesInFolder,
-  recursion = 0
+  filesInFolder
 ) {
   nn = 0;
   if (
@@ -1225,28 +1961,28 @@ function unarchive_first(
     ext == "tar" ||
     ext == "cbt"
   ) {
-    var fromfile = "";
-    const Stream = Seven.extract(zipPath, ExtractDir, {
+    var fromfile = [];
+
+    const Streamer = Seven.list(zipPath, {
       recursive: true,
       $cherryPick: listofelements,
       $bin: Path27Zip,
     });
-    Stream.on("data", function (data) {
-      fromfile = data.file;
-      GetTheFirstImageOfComicsByFolder(filesInFolder, indice + 1);
-
-      /*var instt = fs.createReadStream(ExtractDir + "/" + fromfile)
-        var outstr = fs.createWriteStream(ExtractDir + "/" + name + "_0.jpg")
-        instt.pipe(outstr)
-        /*fs.renameSync(
-          ExtractDir + "/" + fromfile,
-          ExtractDir + "/" + name + "_0.jpg"
-        );
-        fs.unlinkSync(ExtractDir + "/" + fromfile);*/
+    console.log(Streamer);
+    Streamer.on("data", function (data) {
+      fromfile.push(data.file);
+      console.log(fromfile);
     });
-    Stream.on("end", function () {
-      if (recursion != 0) {
-        console.log("reached");
+    Streamer.on("end", function () {
+      const Stream = Seven.extract(zipPath, ExtractDir, {
+        recursive: true,
+        $cherryPick: fromfile[0],
+        $bin: Path27Zip,
+      });
+      Stream.on("data", function (data) {
+        GetTheFirstImageOfComicsByFolder(filesInFolder, indice + 1);
+      });
+      Stream.on("end", function () {
         if (Stream.info.get("Files") == "0") {
           Toastifycation(
             language["cover_not_compatible"] + " " + name,
@@ -1254,74 +1990,20 @@ function unarchive_first(
           );
           GetTheFirstImageOfComicsByFolder(filesInFolder, indice + 1);
         }
-      } else {
-        if (Stream.info.get("Files") == "0") {
-          unarchive_first(
-            zipPath,
-            ExtractDir,
-            name,
-            ext,
-            [
-              "*001.jpg",
-              "01.jpg",
-              "01-copie.jpg",
-              "*-01.jpg",
-              "*001.png",
-              "01.png",
-              "01-copie.png",
-              "*-01.png",
-              "*001.gif",
-              "01.gif",
-              "01-copie.gif",
-              "*-01.gif",
-              "*001.jpeg",
-              "01.jpeg",
-              "01-copie.jpeg",
-              "*-01.jpeg",
-              "*001.bmp",
-              "01.bmp",
-              "01-copie.bmp",
-              "*-01.bmp",
-              "*001.apng",
-              "01.apng",
-              "01-copie.apng",
-              "*-01.apng",
-              "*001.svg",
-              "01.svg",
-              "01-copie.svg",
-              "*-01.svg",
-              "*001.ico",
-              "01.ico",
-              "01-copie.ico",
-              "*-01.ico",
-              "*001.webp",
-              "01.webp",
-              "01-copie.webp",
-              "*-01.webp",
-            ],
-            indice,
-            filesInFolder,
-            1
-          );
-        }
-      }
-    });
-    Stream.on("error", function (err) {
-      console.log("Error: " + err);
+      });
+      Stream.on("error", function (err) {
+        console.log("Error: " + err);
+      });
     });
   }
 
   if (ext == "rar" || ext == "cbr") {
-    var configFile = fs.readFileSync(CosmicComicsData + "/config.json");
-    var parsedJSON = JSON.parse(configFile);
-    var provider = Get_From_Config("update_provider", parsedJSON)
-    console.log(provider);
-    if (provider == "msstore"){
+    if (OSprovider == "msstore") {
       var archive = new Unrar({
         path: zipPath,
-        bin: CosmicComicsData+ "/unrar_bin/UnRAR.exe",
+        bin: CosmicComicsData + "/unrar_bin/UnRAR.exe",
       });
-    }else{
+    } else {
       var archive = new Unrar({
         path: zipPath,
         bin: unrarBin,
@@ -1330,6 +2012,7 @@ function unarchive_first(
 
     archive.list(function (err, entries) {
       if (err) {
+        new Notification("Cosmic-Comics", { body: err });
         GetTheFirstImageOfComicsByFolder(filesInFolder, indice + 1);
         return;
       }
@@ -1348,6 +2031,7 @@ function unarchive_first(
         const file = entries[i]["name"];
         var currentName = file;
         currentName = currentName.toString();
+        currentName = currentName.toLowerCase();
         if (
           currentName.includes(".png") ||
           currentName.includes(".jpg") ||
@@ -1361,29 +2045,17 @@ function unarchive_first(
         ) {
           var stream = archive.stream(currentName);
           stream.on("error", function (err) {
-            alert("erreur RAR: " + err);
+            new Notification("Cosmic-Comics", { body: err });
             GetTheFirstImageOfComicsByFolder(filesInFolder, indice + 1);
             return;
           });
+
           if (fs.existsSync(ExtractDir + "/0.jpg") == false) {
             var x = fs.createWriteStream(ExtractDir + "/0.jpg");
             stream.pipe(x);
             GetTheFirstImageOfComicsByFolder(filesInFolder, indice + 1);
             return;
           }
-        }
-        if (
-          (currentName.includes(".png") ||
-            currentName.includes(".jpg") ||
-            currentName.includes(".jpeg") ||
-            currentName.includes(".gif") ||
-            currentName.includes(".apng") ||
-            currentName.includes(".svg") ||
-            currentName.includes(".ico") ||
-            currentName.includes(".webp") ||
-            currentName.includes(".bmp")) == false
-        ) {
-          GetTheFirstImageOfComicsByFolder(filesInFolder, indice + 1);
         }
       }
     });
@@ -1605,13 +2277,13 @@ function listBM() {
       document.getElementById("bookmarkContainer").appendChild(btn);
     }
   });
-  if (info.length == 0){
-      var iblock = document.createElement("i")
-  iblock.innerHTML = "block"
-  iblock.className = "material-icons"
-  document.getElementById("bookmarkContainer").appendChild(iblock)
+  if (info.length == 0) {
+    var iblock = document.createElement("i");
+    iblock.innerHTML = "block";
+    iblock.className = "material-icons";
+    if (currenttheme > 1) iblock.style.color = theme_FG;
+    document.getElementById("bookmarkContainer").appendChild(iblock);
   }
-
 }
 
 //the Bookmarked loading
@@ -1667,6 +2339,14 @@ new bootstrap.Tooltip(document.getElementById("id_tips-btn"), {
   title: language["Tips"],
   placement: "bottom",
 });
+new bootstrap.Tooltip(document.getElementById("id_theme"), {
+  title: language["custom_theme"],
+  placement: "bottom",
+});
+new bootstrap.Tooltip(document.getElementById("icon_id_viewmode"), {
+  title: language["viewmode"],
+  placement: "bottom",
+});
 document.getElementById("id_about").innerHTML = language["about"];
 document.getElementById("createdby").innerHTML = language["createdby"];
 document.getElementById("usewhat").innerHTML = language["technology_used"];
@@ -1679,6 +2359,10 @@ document.getElementById("close_bm").innerHTML = language["close"];
 document.getElementById("close_about").innerHTML = language["close"];
 document.getElementById("close_settings").innerHTML = language["close"];
 document.getElementById("id_settingsmod").innerHTML = language["settings"];
+document.getElementById("id_btn_STB").innerHTML = language["skip_tb"];
+document.getElementById("id_btn_CTN").innerHTML = language["clear_tb"];
+document.getElementById("id_btn_TE").innerHTML =
+  language["activate_theme_date"];
 document.getElementById("languages").innerHTML = language["languages"];
 document.getElementById("beta_test").innerHTML =
   language["betatest"] + document.getElementById("beta_test").innerHTML;
@@ -1687,6 +2371,8 @@ document.getElementById("id_did_you_know").innerHTML = language["did_you_know"];
 document.getElementById("id_tip_1").innerHTML = language["tips_1"];
 document.getElementById("id_tip_2").innerHTML = language["tips_2"];
 document.getElementById("id_tip_3").innerHTML = language["tips_3"];
+document.getElementById("extract_thumbnails").innerHTML =
+  language["extracting_thumb"];
 document.getElementById("id_btn_update_provider").innerHTML =
   language["btn_update_provider"];
 document.getElementById("id_btn_appdata").innerHTML = language["btn_appdata"];
@@ -1902,7 +2588,7 @@ function OpenTempDirectory() {
 
 //Open the Appdata folder
 function OpenAppDataFolder() {
-  shell.showItemInFolder(CosmicComicsData)
+  shell.showItemInFolder(CosmicComicsData);
 }
 
 //Keyboard Shortcuts
@@ -1920,7 +2606,7 @@ window.addEventListener("keydown", (e) => {
   }
 });
 function openWindow(pathaa) {
-  const BrowserWindow = require("electron").remote.BrowserWindow;
+  const BrowserWindow = require("@electron/remote").remote.BrowserWindow;
   const path = require("path");
   const win = new BrowserWindow({
     width: 1280,
@@ -1937,15 +2623,279 @@ function openWindow(pathaa) {
   });
 
   win.loadURL(pathaa);
+  remote.require("@electron/remote/main").enable(win.webContents);
 }
 
 //set force update
-function setFU(){
-  Modify_JSON_For_Config(CosmicComicsData + "/config.json","force_update",true)
-  Toastifycation(language["force_update_msg"])
+function setFU() {
+  Modify_JSON_For_Config(
+    CosmicComicsData + "/config.json",
+    "force_update",
+    true
+  );
+  Toastifycation(language["force_update_msg"]);
   setTimeout(() => {
-    app.relaunch()
+    app.relaunch();
     app.exit();
   }, 1000);
 }
 document.getElementById("id_btn_FU").innerHTML = language["FU"];
+function skipping() {
+  skip = true;
+}
+function toggleSkip() {
+  var configFile = fs.readFileSync(CosmicComicsData + "/config.json");
+  var parsedJSON = JSON.parse(configFile);
+  var old = Get_From_Config("skip", parsedJSON);
+  if (old == true) {
+    Modify_JSON_For_Config(CosmicComicsData + "/config.json", "skip", false);
+  } else {
+    Modify_JSON_For_Config(CosmicComicsData + "/config.json", "skip", true);
+  }
+}
+function clearTN() {
+  fs.rmdirSync(CosmicComicsData + "/FirstImageOfAll", { recursive: true });
+  fs.mkdirSync(CosmicComicsData + "/FirstImageOfAll");
+}
+function changeVM() {
+  if (cardMode == true) {
+    cardMode = false;
+    document.getElementById("icon_id_viewmode").innerHTML = "grid_view";
+    Modify_JSON_For_Config(
+      CosmicComicsData + "/config.json",
+      "display_style",
+      1
+    );
+  } else {
+    cardMode = true;
+    document.getElementById("icon_id_viewmode").innerHTML = "view_list";
+    Modify_JSON_For_Config(
+      CosmicComicsData + "/config.json",
+      "display_style",
+      0
+    );
+  }
+}
+if (cardMode == true) {
+  document.getElementById("icon_id_viewmode").innerHTML = "view_list";
+} else {
+  document.getElementById("icon_id_viewmode").innerHTML = "grid_view";
+}
+function selectTheme() {
+  Modify_JSON_For_Config(
+    CosmicComicsData + "/config.json",
+    "theme",
+    document.getElementById("themeselector").value
+  );
+  window.location.reload();
+}
+function ToggleTBY() {
+  if (
+    Get_From_Config(
+      "theme_date",
+      JSON.parse(fs.readFileSync(CosmicComicsData + "/config.json"))
+    ) == true
+  ) {
+    Modify_JSON_For_Config(
+      CosmicComicsData + "/config.json",
+      "theme_date",
+      false
+    );
+    document.getElementById("id_btn_TE").innerHTML =
+      language["activate_theme_date"];
+  } else {
+    Modify_JSON_For_Config(
+      CosmicComicsData + "/config.json",
+      "theme_date",
+      true
+    );
+    document.getElementById("id_btn_TE").innerHTML =
+      language["deactivate_theme_date"];
+  }
+}
+if (
+  Get_From_Config(
+    "theme_date",
+    JSON.parse(fs.readFileSync(CosmicComicsData + "/config.json"))
+  ) == true
+) {
+  document.getElementById("id_btn_TE").innerHTML =
+    language["deactivate_theme_date"];
+} else {
+  document.getElementById("id_btn_TE").innerHTML =
+    language["activate_theme_date"];
+}
+function getAllThemes() {
+  var oi = fs.readdirSync(__dirname + "/themes");
+  oi.forEach((el) => {
+    const opt = document.createElement("option");
+    opt.value = el;
+    opt.innerHTML = patha.basename(__dirname + "/themes/" + el).split(".")[0];
+    document.getElementById("themeselector").appendChild(opt);
+  });
+}
+getAllThemes();
+async function WConv() {
+  webp.grant_permission();
+  var dir = fs.readdirSync(CosmicComicsData + "/FirstImageOfAll/");
+  for (var i = 0; i < dir.length; i++) {
+    var file = fs.readdirSync(CosmicComicsData + "/FirstImageOfAll/" + dir[i]);
+    try {
+      if (patha.extname(file[0]) != ".webp") {
+        oldfile =
+          CosmicComicsData + "/FirstImageOfAll/" + dir[i] + "/" + file[0];
+        newfile =
+          CosmicComicsData + "/FirstImageOfAll/" + dir[i] + "/cover.webp";
+        await webp
+          .cwebp(
+            oldfile,
+            newfile,
+            "-q 80 -noalpha -resize 250 380",
+            (logging = "-v")
+          )
+          .then((response) => {
+            console.log(response);
+            fs.unlinkSync(oldfile);
+            document.getElementById("prgs").style.width =
+              (i * 100) / dir.length + "%";
+            remote.getCurrentWindow().setProgressBar(i / dir.length);
+          });
+      }
+    } catch (error) {
+      console.log(error);
+    }
+  }
+}
+
+function saveToTheme(el, value, d = "", d2 = "") {
+  if (d == "" && d2 == "") {
+    var mod = el.value;
+  } else {
+    if (el.checked == true) {
+      var mod = d2;
+    } else {
+      var mod = d;
+    }
+  }
+
+  Modify_JSON_For_Config(
+    __dirname + "/themes/[CUSTOM] - Custom.json",
+    value,
+    mod
+  );
+}
+
+function recoverThemeCustom() {
+  var id = [
+    "colorBG",
+    "colorFG",
+    "colorO2",
+    "O2BG_id",
+    "colorNotifBG",
+    "btn_card_id",
+    "progress_color_id",
+    "BTNHC_id",
+    "BTNFG_id",
+    "BTNBG_id",
+    "BTNBC_id",
+    "BTNH_id",
+    "FGSBC_id",
+    "BGSBC_id",
+    "BSC_id",
+    "HSC_id",
+    "HLVC_id",
+    "BGCI_id",
+    "NBGC_id",
+    "SCID",
+    "PGRSBW_id",
+    "LBG_id",
+    "MUSIC_id",
+    "PRGSBC_id",
+  ];
+  var name = [
+    "BG",
+    "FG",
+    "O2",
+    "O2",
+    "notifBG",
+    "button_card",
+    "progress",
+    "hover_close",
+    "btn_FG",
+    "btn_BG",
+    "btn_border",
+    "btn_hover",
+    "btn_FG_s",
+    "btn_BG_s",
+    "btn_border_s",
+    "btn_hover_s",
+    "hover_listview",
+    "BG_CI",
+    "nav_BG",
+    "scrollbar",
+    "progressbar_progresswhite_progressblack",
+    "linkBG",
+    "Music",
+    "progress_color",
+  ];
+  for (var i = 0; i < id.length; i++) {
+    var config_JSON = fs.readFileSync(
+      __dirname + "/themes/[CUSTOM] - Custom.json"
+    );
+    var parsedJSON = JSON.parse(config_JSON);
+    var val = Get_From_Config(name[i], parsedJSON);
+    console.log(val);
+    try {
+      console.log(document.getElementById(id[i]).getAttribute("type"));
+      if (document.getElementById(id[i]).getAttribute("type") == "checkbox") {
+        document.getElementById(id[i]).setAttribute("checked", val);
+      } else {
+        document.getElementById(id[i]).value = val;
+      }
+    } catch (error) {
+      console.log(error);
+    }
+  }
+}
+recoverThemeCustom();
+function openFileImageTheme(id, v) {
+  let result = remote.dialog.showOpenDialogSync({
+    properties: ["openFile"],
+  });
+  document.getElementById(id).value = result[0].replaceAll("\\", "/");
+  saveToTheme(document.getElementById(id), v);
+}
+document.getElementById("selectTheme_id").innerHTML =
+  language["select_a_theme"];
+document.getElementById("id_thememod").innerHTML = language["theme_customizer"];
+document.getElementById("colorBG_txt").innerHTML = language["colorBG_txt"];
+document.getElementById("colorFG_txt").innerHTML = language["colorFG_txt"];
+document.getElementById("colorO2_txt").innerHTML = language["colorO2_txt"];
+document.getElementById("overlay_background_txt").innerHTML =
+  language["overlay_background_txt"];
+document.getElementById("browseFileTheme_txt").innerHTML =
+  language["browseFileTheme_txt"];
+document.getElementById("colorNotifBG_txt").innerHTML =
+  language["colorNotifBG_txt"];
+document.getElementById("btn_card_txt").innerHTML = language["btn_card_txt"];
+document.getElementById("progress_color_txt").innerHTML =
+  language["progress_color_txt"];
+document.getElementById("BTNHC_txt").innerHTML = language["BTNHC_txt"];
+document.getElementById("BTNFG_txt").innerHTML = language["BTNFG_txt"];
+document.getElementById("BTNBG_txt").innerHTML = language["BTNBG_txt"];
+document.getElementById("BTNBC_txt").innerHTML = language["BTNBC_txt"];
+document.getElementById("BTNH_txt").innerHTML = language["BTNH_txt"];
+document.getElementById("FGSBC_txt").innerHTML = language["FGSBC_txt"];
+document.getElementById("BGSBC_txt").innerHTML = language["BGSBC_txt"];
+document.getElementById("BSC_txt").innerHTML = language["BSC_txt"];
+document.getElementById("HSC_txt").innerHTML = language["HSC_txt"];
+document.getElementById("HLVC_txt").innerHTML = language["HLVC_txt"];
+document.getElementById("BGCI_txt").innerHTML = language["BGCI_txt"];
+document.getElementById("NBGC_txt").innerHTML = language["NBGC_txt"];
+document.getElementById("SCID_txt").innerHTML = language["SCID_txt"];
+document.getElementById("PGRSBW_txt").innerHTML = language["PGRSBW_txt"];
+document.getElementById("MUSIC_txt").innerHTML = language["MUSIC_txt"];
+document.getElementById("LBG_txt").innerHTML = language["LBG_txt"];
+document.getElementById("browse_fileImageTheme_txt").innerHTML =
+  language["browse_fileImageTheme_txt"];
+document.getElementById("PRGSBC_txt").innerHTML = language["PRGSBC_txt"];

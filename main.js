@@ -15,6 +15,7 @@ along with Cosmic-Comics.  If not, see <https://www.gnu.org/licenses/>.*/
 const { app, BrowserWindow } = require("electron");
 var fs = require("fs");
 const { platform } = require("os");
+require("@electron/remote/main").initialize();
 var AppDataDir = app.getPath("userData");
 var TempDir = app.getPath("temp");
 if (fs.existsSync(TempDir + "/CosmicComics") == false) {
@@ -31,18 +32,18 @@ if (fs.existsSync(parentfolder3 + "/portable.txt")) {
   TempDir = parentfolder3 + "/TMP";
 }
 try {
-  fs.readdirSync(AppDataDir)
-  fs.readdirSync(TempDir)
+  fs.readdirSync(AppDataDir);
+  fs.readdirSync(TempDir);
 } catch (error) {
-  console.log(error)
+  console.log(error);
   AppDataDir = __dirname + "/AppData";
   TempDir = __dirname + "/TMP";
 }
-if (fs.existsSync(AppDataDir) == false){
-  fs.mkdirSync(AppDataDir)
+if (fs.existsSync(AppDataDir) == false) {
+  fs.mkdirSync(AppDataDir);
 }
-if (fs.existsSync(TempDir) == false){
-  fs.mkdirSync(TempDir)
+if (fs.existsSync(TempDir) == false) {
+  fs.mkdirSync(TempDir);
 }
 function GetElFromInforPath(search, info) {
   for (var i in info[0]) {
@@ -69,6 +70,7 @@ function createWindow() {
   });
 
   win.loadFile("updater.html");
+  require("@electron/remote/main").enable(win.webContents);
 }
 
 app.on("window-all-closed", function () {
@@ -112,7 +114,11 @@ if (!fs.existsSync(AppDataDir + "/CosmicComics_data/config.json")) {
       magnifier_Height: 100,
       magnifier_Radius: 0,
       reset_zoom: false,
-      force_update : false
+      force_update: false,
+      skip: false,
+      display_style: 0,
+      theme: "default.json",
+      theme_date: true,
     },
   ];
   fs.writeFileSync(
@@ -139,7 +145,9 @@ if (fs.existsSync(AppDataDir + "/CosmicComics_data/unrar_bin") == false) {
   fs.mkdirSync(AppDataDir + "/CosmicComics_data/unrar_bin");
 }
 if (
-  fs.existsSync(AppDataDir + "/CosmicComics_data/unrar_bin/UnRAR.exe") == false && process.platform == "win32"
+  fs.existsSync(AppDataDir + "/CosmicComics_data/unrar_bin/UnRAR.exe") ==
+    false &&
+  process.platform == "win32"
 ) {
   fs.copyFileSync(
     __dirname + "/node_modules/unrar-binaries/bin/win32/unrar.exe",
@@ -164,7 +172,48 @@ function openWindow() {
 
   win.loadURL(__dirname + "/viewer.html?" + process.argv[1]);
 }
+var tdate = new Date().getMonth();
+var themebydate = Get_From_Config(
+  "theme_date",
+  JSON.parse(fs.readFileSync(AppDataDir + "/CosmicComics_data/config.json"))
+);
+if (themebydate == true) {
+  if (tdate == 09) {
+    Modify_JSON_For_Config(
+      AppDataDir + "/CosmicComics_data/config.json",
+      "theme",
+      "[EVENT] - Halloween.json"
+    );
+  } else if (tdate == 11) {
+    Modify_JSON_For_Config(
+      AppDataDir + "/CosmicComics_data/config.json",
+      "theme",
+      "[EVENT] - X-Mas.json"
+    );
+  } else {
+    console.log("No theme correspond to this date");
+  }
+} else {
+  console.log("Theme by Date disabled");
+}
 
+function Modify_JSON_For_Config(json, tomodify, modification) {
+  var config_JSON = fs.readFileSync(json);
+  var config = JSON.parse(config_JSON);
+  for (var i in config) {
+    config[i][tomodify] = modification;
+  }
+  var config_JSON_Final = JSON.stringify(config, null, 2);
+  fs.writeFileSync(json, config_JSON_Final);
+}
+function Get_From_Config(what_you_want, data) {
+  for (var i in data[0]) {
+    if (i == what_you_want) {
+      return data[0][i];
+    }
+  }
+  return null;
+}
 app.whenReady().then(() => {
   try {
     if (

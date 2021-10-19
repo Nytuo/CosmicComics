@@ -14,9 +14,15 @@ You should have received a copy of the GNU General Public License
 along with Cosmic-Comics.  If not, see <https://www.gnu.org/licenses/>.*/
 
 html {
+/*   background-color: white;
+  color: black; */
   background-color: #181818;
+  color: white;
   --speed: 0.65s;
   --font: "Roboto", sans-serif;
+  background-repeat: no-repeat;
+  background-size: cover;
+  background-attachment: fixed;
 }
 a {
   text-decoration: none;
@@ -29,7 +35,7 @@ a {
   line-height: 20px;
   text-align: center;
 
-  color: white;
+
   font-size: 20px;
 
   background-size: contain;
@@ -65,7 +71,7 @@ a {
 .logo > span:after {
   content: "";
   position: absolute;
-  color: white;
+
   font-size: 18px;
   top: 36px;
   left: 50%;
@@ -79,7 +85,7 @@ a {
 .logo > span:before {
   content: "";
   position: absolute;
-  color: white;
+
   font-size: 18px;
   top: 36px;
   left: 50%;
@@ -110,19 +116,35 @@ a {
 img {
   image-rendering: initial;
 }
-::-webkit-scrollbar {
+.white::-webkit-scrollbar {
+  width: 5px;
+  border-radius: 0px;
+}
+
+.white::-webkit-scrollbar-thumb {
+  background-color: #b3b3b3;
+}
+
+.white::-webkit-scrollbar-thumb:hover {
+  background-color: #808080;
+}
+
+.white::-webkit-scrollbar-track {
+  background-color: #ffffff;
+}
+.black::-webkit-scrollbar {
   width: 5px;
 }
 
-::-webkit-scrollbar-thumb {
+.black::-webkit-scrollbar-thumb {
   background-color: #444444;
 }
 
-::-webkit-scrollbar-thumb:hover {
+.black::-webkit-scrollbar-thumb:hover {
   background-color: #333333;
 }
 
-::-webkit-scrollbar-track {
+.black::-webkit-scrollbar-track {
   background-color: #222222;
 }
 .SpaceX {
@@ -142,9 +164,30 @@ img {
   left: 0;
   right: 0;
   bottom: 0;
-  background-color: #222222;
+background-color: #222222;
   /* Black background with opacity */
   z-index: 1000;
+  /* Specify a stack order in case you're using a different order for other elements */
+  cursor: normal;
+  /* Add a pointer on hover */
+}
+#overlay2 {
+  position: fixed;
+  /* Sit on top of the page content */
+  display: none;
+  /* Hidden by default */
+  width: 100%;
+  /* Full width (cover the whole page) */
+  height: 100%;
+  /* Full height (cover the whole page) */
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+/*   background-color: #222222; */
+background-color: #181818;
+  /* Black background with opacity */
+  z-index: 999;
   /* Specify a stack order in case you're using a different order for other elements */
   cursor: normal;
   /* Add a pointer on hover */
@@ -420,7 +463,7 @@ a {
 .rating-css input + label {
   text-align: center;
   font-size: 24px;
-  color: #ffc107;
+  color: rgb(255, 191, 0);
   cursor: pointer;
 }
 
@@ -517,7 +560,7 @@ body {
   width: 100%;
 }
 
-.card {
+.cardcusto {
   position: relative;
   grid-area: card;
   align-self: center;
@@ -535,7 +578,7 @@ body {
   margin: 20px;
 }
 
-.card:hover {
+.cardcusto:hover {
   box-shadow: 0 40px 130px rgba(0, 0, 0, 0.6);
   -webkit-transform: scale(1.1, 1.1);
   transform: scale(1.1, 1.1);
@@ -561,7 +604,7 @@ body {
   background-color: rgba(255, 255, 255, 0);
 }
 
-.card:hover .card__rating {
+.cardcusto:hover .card__rating {
   opacity: 0.6;
 }
 
@@ -575,11 +618,6 @@ body {
 
 .card__rating:hover i {
   color: rgba(255, 255, 255, 0.8);
-}
-
-.card__rating:active,
-.card__rating.active {
-  opacity: 1 !important;
 }
 
 .card__rating:active i,
@@ -607,13 +645,14 @@ body {
   background-color: rgba(255, 255, 255, 0);
 }
 
-.card:hover .card__save {
+.cardcusto:hover .card__save {
   opacity: 0.6;
 }
 
 .card__save i {
   font-size: 24px;
-  color: rgba(255, 0, 0, 0.6);
+  color: rgba(255, 255, 255, 0.6);
+
   cursor: pointer;
   -webkit-transition: all var(--speed) ease;
   transition: all var(--speed) ease;
@@ -623,14 +662,55 @@ body {
   color: rgba(255, 0, 0, 0.8);
 }
 
-.card__save:active,
-.card__save.active {
-  opacity: 1 !important;
-}
+
 
 .card__save:active i,
 .card__save.active i {
   color: rgb(255, 0, 0);
+}
+.card__saveblack {
+  position: absolute;
+  top: 10px;
+  right: 10px;
+  display: block;
+  width: 35px;
+  height: 35px;
+  background: transparent;
+  border: 0;
+  opacity: 0;
+  border-radius: 3px;
+  -webkit-transition: all var(--speed) ease;
+  transition: all var(--speed) ease;
+  z-index: 2;
+}
+
+.card__saveblack:focus {
+  outline: 0;
+  background-color: rgba(255, 255, 255, 0);
+}
+
+.cardcusto:hover .card__saveblack {
+  opacity: 0.6;
+}
+
+.card__saveblack i {
+  font-size: 24px;
+  color: rgba(0, 0, 0, 0.6);
+
+  cursor: pointer;
+  -webkit-transition: all var(--speed) ease;
+  transition: all var(--speed) ease;
+}
+
+.card__saveblack:hover i {
+  color: rgba(180, 0, 0, 0.8);
+}
+
+
+
+.card__saveblack:active i,
+.card__saveblack.active i {
+  color: rgb(180, 0, 0);
 }
 .card__close {
   position: absolute;
@@ -653,13 +733,13 @@ body {
   background-color: rgba(255, 255, 255, 0);
 }
 
-.card:hover .card__close {
+.cardcusto:hover .card__close {
   opacity: 0.6;
 }
 
 .card__close i {
   font-size: 24px;
-  color: rgba(255, 0, 0, 0.6);
+  color: rgba(255, 255, 255, 0.6);
   cursor: pointer;
   -webkit-transition: all var(--speed) ease;
   transition: all var(--speed) ease;
@@ -669,14 +749,50 @@ body {
   color: rgba(255, 0, 0, 0.8);
 }
 
-.card__close:active,
-.card__close.active {
-  opacity: 1 !important;
-}
-
 .card__close:active i,
 .card__close.active i {
   color: rgb(255, 0, 0);
+}
+.card__closeblack {
+  position: absolute;
+  top: 10px;
+  right: 40px;
+  display: block;
+  width: 35px;
+  height: 35px;
+  background: transparent;
+  border: 0;
+  opacity: 0;
+  border-radius: 3px;
+  -webkit-transition: all var(--speed) ease;
+  transition: all var(--speed) ease;
+  z-index: 2;
+}
+
+.card__closeblack:focus {
+  outline: 0;
+  background-color: rgba(255, 255, 255, 0);
+}
+
+.cardcusto:hover .card__closeblack {
+  opacity: 0.6;
+}
+
+.card__closeblack i {
+  font-size: 24px;
+  color: rgba(0, 0, 0, 0.6);
+  cursor: pointer;
+  -webkit-transition: all var(--speed) ease;
+  transition: all var(--speed) ease;
+}
+
+.card__closeblack:hover i {
+  color: rgba(180, 0, 0, 0.8);
+}
+
+.card__closeblack:active i,
+.card__closeblack.active i {
+  color: rgb(180,0, 0);
 }
 .card__reading {
   position: absolute;
@@ -699,13 +815,14 @@ body {
   background-color: rgba(255, 115, 0, 0);
 }
 
-.card:hover .card__reading {
+.cardcusto:hover .card__reading {
   opacity: 0.6;
 }
 
 .card__reading i {
   font-size: 24px;
-  color: rgba(255, 145, 0, 0.4);
+  color: rgba(255, 255, 255, 0.6);
+
   cursor: pointer;
   -webkit-transition: all var(--speed) ease;
   transition: all var(--speed) ease;
@@ -715,14 +832,53 @@ body {
   color: rgba(255, 145, 0, 0.8);
 }
 
-.card__reading:active,
-.card__reading.active {
-  opacity: 1 !important;
-}
 
 .card__reading:active i,
 .card__reading.active i {
   color: rgb(255, 145, 0);
+}
+.card__readingblack {
+  position: absolute;
+  top: 10px;
+  right: 80px;
+  display: block;
+  width: 35px;
+  height: 35px;
+  background: transparent;
+  border: 0;
+  opacity: 0;
+  border-radius: 3px;
+  -webkit-transition: all var(--speed) ease;
+  transition: all var(--speed) ease;
+  z-index: 2;
+}
+
+.card__readingblack:focus {
+  outline: 0;
+  background-color: rgba(255, 115, 0, 0);
+}
+
+.cardcusto:hover .card__readingblack {
+  opacity: 0.6;
+}
+
+.card__readingblack i {
+  font-size: 24px;
+  color: rgba(0, 0, 0, 0.6);
+
+  cursor: pointer;
+  -webkit-transition: all var(--speed) ease;
+  transition: all var(--speed) ease;
+}
+
+.card__readingblack:hover i {
+  color: rgba(194, 110, 0, 0.8);
+}
+
+
+.card__readingblack:active i,
+.card__readingblack.active i {
+  color: rgb(194, 110, 0);
 }
 .card__read {
   position: absolute;
@@ -745,13 +901,13 @@ body {
   background-color: rgba(255, 255, 255, 0);
 }
 
-.card:hover .card__read {
+.cardcusto:hover .card__read {
   opacity: 0.6;
 }
 
 .card__read i {
   font-size: 24px;
-  color: rgba(0, 223, 11, 0.6);
+  color: rgba(255, 255, 255, 0.6);
   cursor: pointer;
   -webkit-transition: all var(--speed) ease;
   transition: all var(--speed) ease;
@@ -761,14 +917,52 @@ body {
   color: rgba(0, 223, 11, 0.8);
 }
 
-.card__read:active,
-.card__read.active {
-  opacity: 1 !important;
-}
 
 .card__read:active i,
 .card__read.active i {
   color: rgb(0, 223, 11);
+}
+.card__readblack {
+  position: absolute;
+  top: 10px;
+  right: 120px;
+  display: block;
+  width: 35px;
+  height: 35px;
+  background: transparent;
+  border: 0;
+  opacity: 0;
+  border-radius: 3px;
+  -webkit-transition: all var(--speed) ease;
+  transition: all var(--speed) ease;
+  z-index: 2;
+}
+
+.card__readblack:focus {
+  outline: 0;
+  background-color: rgba(255, 255, 255, 0);
+}
+
+.cardcusto:hover .card__readblack {
+  opacity: 0.6;
+}
+
+.card__readblack i {
+  font-size: 24px;
+  color: rgba(0, 0, 0, 0.6);
+  cursor: pointer;
+  -webkit-transition: all var(--speed) ease;
+  transition: all var(--speed) ease;
+}
+
+.card__readblack:hover i {
+  color: rgba(0, 139, 7, 0.8);
+}
+
+
+.card__readblack:active i,
+.card__readblack.active i {
+  color: rgb(0, 139, 7);
 }
 .card__play {
   position: absolute;
@@ -791,7 +985,7 @@ body {
   background-color: rgba(255, 255, 255, 0);
 }
 
-.card:hover .card__play {
+.cardcusto:hover .card__play {
   opacity: 0.6;
 }
 
@@ -837,7 +1031,7 @@ body {
   background-color: rgba(255, 255, 255, 0);
 }
 
-.card:hover .card__info {
+.cardcusto:hover .card__info {
   opacity: 0.6;
 }
 
@@ -850,7 +1044,42 @@ body {
 }
 
 .card__info:hover i {
-  color: rgba(0, 162, 255, 0.8);
+  color: rgba(0, 138, 218, 0.8);
+}
+.card__infoblack {
+  position: absolute;
+  top: 10px;
+  right: 160px;
+  display: block;
+  width: 35px;
+  height: 35px;
+  background: transparent;
+  border: 0;
+  opacity: 0;
+  border-radius: 3px;
+  -webkit-transition: all var(--speed) ease;
+  transition: all var(--speed) ease;
+  z-index: 2;
+}
+
+.card__infoblack:focus {
+  outline: 0;
+  background-color: rgba(255, 255, 255, 0);
+}
+
+.cardcusto:hover .card__infoblack {
+  opacity: 0.6;
+}
+.card__infoblack i {
+  font-size: 24px;
+  color: rgba(0, 0, 0, 0.76);
+  cursor: pointer;
+  -webkit-transition: all var(--speed) ease;
+  transition: all var(--speed) ease;
+}
+
+.card__infoblack:hover i {
+  color: rgba(0, 138, 218, 0.8);
 }
 .card__image {
   position: absolute;
@@ -876,7 +1105,7 @@ body {
   transition: all var(--speed) ease;
 }
 
-.card:hover .card__image img {
+.cardcusto:hover .card__image img {
   -webkit-transform: scale(1, 1);
   transform: scale(1, 1);
   opacity: 0.1;
@@ -917,7 +1146,7 @@ body {
   backface-visibility: hidden;
 }
 
-.card:hover .card__profile img {
+.cardcusto:hover .card__profile img {
   -webkit-transform: scale(1, 1) translateZ(0);
   transform: scale(1, 1) translateZ(0);
 }
@@ -945,7 +1174,7 @@ body {
   transition: all var(--speed) ease;
 }
 
-.card:hover .card__name {
+.cardcusto:hover .card__name {
   background: -webkit-linear-gradient(white, #c1c1c1);
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
@@ -966,7 +1195,7 @@ body {
   transition: all var(--speed) ease;
 }
 
-.card:hover .card__bio {
+.cardcusto:hover .card__bio {
   -webkit-transform: translateY(0);
   transform: translateY(0);
   opacity: 1;

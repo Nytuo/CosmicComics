@@ -4699,11 +4699,12 @@ textarea.form-control-lg {
 }
 
 .list-group {
-  display: flex;
+  display: inline-flex;
   flex-direction: column;
   padding-left: 0;
   margin-bottom: 0;
   border-radius: 0.25rem;
+  width : 100%;
 }
 
 .list-group-numbered {
@@ -4734,7 +4735,7 @@ textarea.form-control-lg {
 .list-group-item {
   position: relative;
   display: block;
-  padding: 0.5rem 1rem;
+  padding: 20px 20px;
   color: #212529;
   text-decoration: none;
   background-color: #fff;

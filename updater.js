@@ -18,9 +18,11 @@ const os = require("os");
 var osarch = os.arch();
 const fs = require("fs");
 const download = require("download");
-const { shell, remote } = require("electron");
-const app = remote.app;
 
+const { shell, webContents } = require("electron");
+const remote = require("@electron/remote");
+const app = remote.app;
+var debuging = false;
 var CosmicComicsData = app.getPath("userData") + "/CosmicComics_data";
 const parentfolder1 = require("path").dirname(__dirname);
 const parentfolder2 = require("path").dirname(parentfolder1);
@@ -51,7 +53,7 @@ function GetElFromInforPath(search, info) {
 
 //Opening a new window (the main one (index.html))
 function openWindow() {
-  const BrowserWindow = require("electron").remote.BrowserWindow;
+  const BrowserWindow = require("@electron/remote").BrowserWindow;
   const path = require("path");
   const win = new BrowserWindow({
     width: 1280,
@@ -69,6 +71,8 @@ function openWindow() {
   });
 
   win.loadFile("index.html");
+  remote.require("@electron/remote/main").enable(win.webContents);
+
   close();
 }
 
@@ -130,6 +134,7 @@ function ModifyJSONFileForPath(json, tomod, mod) {
 //getting the version file from GitHub
 gc.file("Version.txt", function (err, file) {
   if (err) return console.log(err);
+  if (debuging == true) return 0;
   OnlineVersion = file.contents.toString();
   OnlineVersion = OnlineVersion.split("\n");
   OnlineVersion = OnlineVersion[0];
@@ -423,3 +428,60 @@ async function DLUpdate(executable, endname = "") {
     sendMessage(language["not_supported"]);
   }
 }
+var currenttheme = Get_From_Config(
+  "theme",
+  JSON.parse(fs.readFileSync(CosmicComicsData + "/config.json"))
+);
+function Themes() {
+  if (currenttheme != "default.json") {
+    if (currenttheme == "Halloween.json") {
+      document.getElementById("logo_id").src = "Images/Logo_h.png";
+    } else if (currenttheme == "Xmas.json") {
+      document.getElementById("logo_id").src = "Images/Logo_n.png";
+    }
+    var config_JSON = fs.readFileSync(__dirname + "/themes/" + currenttheme);
+    var parsedJSON = JSON.parse(config_JSON);
+    linkBG = Get_From_Config("linkBG", parsedJSON);
+    theme_BG = Get_From_Config("BG", parsedJSON);
+    theme_FG = Get_From_Config("FG", parsedJSON);
+    theme_O2 = Get_From_Config("O2", parsedJSON);
+    theme_notifBG = Get_From_Config("notifBG", parsedJSON);
+    theme_button_card = Get_From_Config("button_card", parsedJSON);
+    theme_progress = Get_From_Config("progress", parsedJSON);
+    theme_hover_close = Get_From_Config("hover_close", parsedJSON);
+    theme_btn_FG = Get_From_Config("btn_FG", parsedJSON);
+    theme_btn_BG = Get_From_Config("btn_BG", parsedJSON);
+    theme_btn_border = theme_btn_BG;
+    theme_btn_hover = Get_From_Config("btn_hover", parsedJSON);
+    theme_btn_FG_s = Get_From_Config("btn_FG_s", parsedJSON);
+    theme_btn_BG_s = Get_From_Config("btn_BG_s", parsedJSON);
+    theme_btn_border_s = theme_btn_BG_s;
+    theme_btn_hover_s = Get_From_Config("btn_hover_s", parsedJSON);
+
+    document.getElementById("prgs").style.backgroundColor = Get_From_Config(
+      "progress_color",
+      parsedJSON
+    );
+    theme_hover_listview = Get_From_Config("hover_listview", parsedJSON);
+    document.getElementById("progressbar").className = Get_From_Config(
+      "progressbar_progresswhite_progressblack",
+      parsedJSON
+    );
+    theme_BG_CI = Get_From_Config("BG_CI", parsedJSON);
+
+    for (let i = 0; i < document.querySelectorAll("p").length; i++) {
+      document.getElementsByTagName("p")[i].style.color = theme_FG;
+    }
+
+    if (theme_O2.includes("http")) {
+      document.getElementsByTagName("html")[0].style.backgroundRepeat =
+        "no-repeat";
+      document.getElementsByTagName("html")[0].style.backgroundSize = "cover";
+      document.getElementsByTagName("html")[0].style.backgroundImage =
+        "url('" + theme_O2 + "')";
+    } else {
+      document.getElementsByTagName("html")[0].style.backgroundColor = theme_BG;
+    }
+  }
+}
+Themes();

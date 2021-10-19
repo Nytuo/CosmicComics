@@ -14,11 +14,12 @@ You should have received a copy of the GNU General Public License
 along with Cosmic-Comics.  If not, see <https://www.gnu.org/licenses/>.*/
 //#region Variables
 //importing the modules required
-const {shell} = require("electron")
+const { shell } = require("electron");
 const fs = require("fs");
 const patha = require("path");
 var popper = require("@popperjs/core");
 var bootstrap = require("bootstrap");
+const remote = require("@electron/remote");
 const app = remote.app;
 const { Client } = require("anilist.js");
 //declaring the popovers
@@ -40,13 +41,13 @@ var CosmicComicsData = app.getPath("userData") + "/CosmicComics_data";
 const parentfolder1 = require("path").dirname(__dirname);
 const parentfolder2 = require("path").dirname(parentfolder1);
 const parentfolder3 = require("path").dirname(parentfolder2);
-if (fs.existsSync(parentfolder3+"/portable.txt")){
-  CosmicComicsData = parentfolder3+"/AppData"
+if (fs.existsSync(parentfolder3 + "/portable.txt")) {
+  CosmicComicsData = parentfolder3 + "/AppData";
 }
 try {
-  fs.readdirSync(CosmicComicsData)
+  fs.readdirSync(CosmicComicsData);
 } catch (error) {
-  console.log(error)
+  console.log(error);
   CosmicComicsData = __dirname + "/AppData";
 }
 //Declaring and initializing the Anilist API
@@ -199,10 +200,10 @@ async function Manga(name, n) {
       opt.innerHTML = search.Results[i]["info"]["title"].romaji;
       document.getElementById("selectAnother").appendChild(opt);
     }
-    const Conly = document.createElement("option")
-    Conly.value = "Search for Comics"
-    Conly.innerHTML = "Search for Comics"
-    document.getElementById("selectAnother").appendChild(Conly)
+    const Conly = document.createElement("option");
+    Conly.value = "Search for Comics";
+    Conly.innerHTML = "Search for Comics";
+    document.getElementById("selectAnother").appendChild(Conly);
 
     //Notify the user
     Toastifycation(language["found"], "#00C33C");
@@ -276,12 +277,12 @@ async function Manga(name, n) {
 
     //favorites
     document.getElementById("Favo").innerHTML =
-     language["favorite"]+ ": " + result["info"]["favourites"];
+      language["favorite"] + ": " + result["info"]["favourites"];
     //Format
     document.getElementById("Format").innerHTML =
-      language["format"]+": " + result["info"]["format"];
+      language["format"] + ": " + result["info"]["format"];
     //Genres
-    document.getElementById("Genres").innerHTML = language["genres"]+":";
+    document.getElementById("Genres").innerHTML = language["genres"] + ":";
     result["info"]["genres"].forEach((el) => {
       document.getElementById("Genres").innerHTML += " " + el;
     });
@@ -293,19 +294,23 @@ async function Manga(name, n) {
     document.getElementById("MeanScore").innerHTML =
       "Mean Score: " + result["info"]["meanScore"];
     //relation
-    document.getElementById("relationsTXT").innerHTML = language["relations"]+": ";
+    document.getElementById("relationsTXT").innerHTML =
+      language["relations"] + ": ";
     result["info"]["relations"]["edges"].forEach((el) => {
       const reltxt = document.createElement("div");
       reltxt.innerHTML =
         el.node.title.romaji +
         "<br></br>" +
-        language["this_is_a_n"]+": " +
+        language["this_is_a_n"] +
+        ": " +
         el.relationType +
         "<br></br>" +
-        language["format"]+": " +
+        language["format"] +
+        ": " +
         el.node.format +
         "<br></br>" +
-        language["type"]+": " +
+        language["type"] +
+        ": " +
         el.node.type;
       const relimage = document.createElement("img");
       relimage.src = el.node.coverImage.large;
@@ -322,17 +327,18 @@ async function Manga(name, n) {
       reldiv.appendChild(ContentDiv);
     });
     //rankings
-    var tmp = language["ranking"]+": ";
+    var tmp = language["ranking"] + ": ";
     result["info"]["rankings"].forEach((el) => {
       tmp += " / " + el.context;
     });
     document.getElementById("rankings").innerHTML = tmp;
     //popularity
     document.getElementById("popu").innerHTML =
-      language["popularity"]+": " + result["info"]["popularity"];
+      language["popularity"] + ": " + result["info"]["popularity"];
     //Start date
     document.getElementById("startdate").innerHTML =
-      language["starting_date"]+": " +
+      language["starting_date"] +
+      ": " +
       result["info"]["startDate"].day +
       "/" +
       result["info"]["startDate"].month +
@@ -340,19 +346,20 @@ async function Manga(name, n) {
       result["info"]["startDate"].year;
     //status
     document.getElementById("status").innerHTML =
-      language["status"]+": " + result["info"]["status"];
+      language["status"] + ": " + result["info"]["status"];
     //Type
     document.getElementById("type").innerHTML =
-      language["type"]+": " + result["info"]["type"];
+      language["type"] + ": " + result["info"]["type"];
     //Trending
     document.getElementById("trending").innerHTML =
-      language["trending"]+": " + result["info"]["trending"];
+      language["trending"] + ": " + result["info"]["trending"];
     //Volumes
     document.getElementById("volume").innerHTML =
-      language["volumes"]+": " + result["info"]["volumes"];
+      language["volumes"] + ": " + result["info"]["volumes"];
 
     //Link Title
-    document.getElementById("link").innerHTML = language["see_more_on"]+" Anilist.co";
+    document.getElementById("link").innerHTML =
+      language["see_more_on"] + " Anilist.co";
     //Website URL
     document.getElementById("link").href = "#";
     document
@@ -418,54 +425,54 @@ function Comics(name, n) {
               //When the comic is found
               Toastifycation(language["found"], "#00C33C");
               //removing maybe exinsting informations from Manga function
-              document.getElementById("cover").src ="";
-    document.getElementById("Title").innerHTML =""
-    document.getElementById("description").innerHTML =""
-    document.getElementById("rating").innerHTML =""
-    document.getElementById("chapt").innerHTML =""
-    document.getElementById("charct").innerHTML =""
-    document.getElementById("OriginCountry").innerHTML =""
-    
-      document.getElementById("EndDate").innerHTML =""
+              document.getElementById("cover").src = "";
+              document.getElementById("Title").innerHTML = "";
+              document.getElementById("description").innerHTML = "";
+              document.getElementById("rating").innerHTML = "";
+              document.getElementById("chapt").innerHTML = "";
+              document.getElementById("charct").innerHTML = "";
+              document.getElementById("OriginCountry").innerHTML = "";
 
-    document.getElementById("Favo").innerHTML =""
-    document.getElementById("Format").innerHTML =""
-    document.getElementById("Genres").innerHTML = ""
-    document.getElementById("ID").innerHTML =""
-    document.getElementById("MeanScore").innerHTML =""
-    document.getElementById("relationsTXT").innerHTML = ""
-    
-    document.getElementById("rankings").innerHTML = ""
-    document.getElementById("popu").innerHTML =""
-    document.getElementById("startdate").innerHTML =""
-    document.getElementById("status").innerHTML =""
-    document.getElementById("type").innerHTML =""
-    document.getElementById("trending").innerHTML =""
-    document.getElementById("volume").innerHTML =""
-    document.getElementById("link").innerHTML = ""
-    document
-      .getElementById("link")
-      .setAttribute(
-        "onclick",
-        ""
-      );
-    
-    document.getElementById("bgimage").style.backgroundImage =""
+              document.getElementById("EndDate").innerHTML = "";
 
+              document.getElementById("Favo").innerHTML = "";
+              document.getElementById("Format").innerHTML = "";
+              document.getElementById("Genres").innerHTML = "";
+              document.getElementById("ID").innerHTML = "";
+              document.getElementById("MeanScore").innerHTML = "";
+              document.getElementById("relationsTXT").innerHTML = "";
 
-      //Getting the info for comics
+              document.getElementById("rankings").innerHTML = "";
+              document.getElementById("popu").innerHTML = "";
+              document.getElementById("startdate").innerHTML = "";
+              document.getElementById("status").innerHTML = "";
+              document.getElementById("type").innerHTML = "";
+              document.getElementById("trending").innerHTML = "";
+              document.getElementById("volume").innerHTML = "";
+              document.getElementById("link").innerHTML = "";
+              document.getElementById("link").setAttribute("onclick", "");
+
+              document.getElementById("bgimage").style.backgroundImage = "";
+
+              //Getting the info for comics
               document.getElementById("cover").src = resulta[i]["cover"];
               document.getElementById("Title").innerHTML = resulta[i]["name"];
               document.getElementById("description").innerHTML =
                 resulta[i]["description"];
               document.getElementById("publisher").innerHTML =
-                language["publisher"]+": " + resulta[i]["publisher"];
+                language["publisher"] + ": " + resulta[i]["publisher"];
               document.getElementById("startdate").innerHTML =
-                language["published_the"]+": " + day + "/" + month + "/" + year;
+                language["published_the"] +
+                ": " +
+                day +
+                "/" +
+                month +
+                "/" +
+                year;
               document.getElementById("rating").innerHTML =
-                language["rating"]+": " + resulta[i]["rating"];
+                language["rating"] + ": " + resulta[i]["rating"];
               document.getElementById("link").innerHTML =
-                language["see_more_on"]+" LeagueOfComicGeek.com";
+                language["see_more_on"] + " LeagueOfComicGeek.com";
               document.getElementById("link").href = "#";
               document
                 .getElementById("link")
@@ -490,21 +497,20 @@ function Comics(name, n) {
 
 //Start the search
 Manga(name_ID, 0);
-var current_provider = "Manga"
+var current_provider = "Manga";
 //Select another book
 function selectAnother() {
   var test = document.querySelector("#selectAnother").selectedIndex;
-  var test2 = document.querySelector("#selectAnother").value
-  console.log(test2)
-  if (test2 == "Search for Comics"){
-    current_provider = "Comics"
+  var test2 = document.querySelector("#selectAnother").value;
+  console.log(test2);
+  if (test2 == "Search for Comics") {
+    current_provider = "Comics";
   }
   Toastifycation(language["fetching_metadata"], "#292929");
-  if (current_provider == "Manga"){
+  if (current_provider == "Manga") {
     Manga(name_ID, test);
-
-  }else{
-    Comics(name_ID,test)
+  } else {
+    Comics(name_ID, test);
   }
 }
 

@@ -137,7 +137,7 @@
       ]
     }
   },
-  "version": "1.1.1",
+  "version": "1.2.0",
   "description": "Comics and Manga Reader with collectionner",
   "main": "main.js",
   "author": {
@@ -148,7 +148,7 @@
   "license": "GPL-3.0-only",
   "private": false,
   "devDependencies": {
-    "electron": "^13.1.6",
+    "electron": "^15.2.0",
     "electron-builder": "^22.11.7"
   },
   "scripts": {
@@ -160,12 +160,12 @@
   },
   "dependencies": {
     "7zip-bin": "^5.1.1",
+    "@electron/remote": "^2.0.1",
     "@popperjs/core": "^2.9.2",
     "anilist.js": "^1.2.1",
     "bootstrap": "^5.0.2",
     "color-thief-browser": "^2.0.2",
     "comicgeeks": "^1.1.0",
-    "discord-rich-presence": "^0.0.8",
     "discord-rpc": "^4.0.1",
     "download": "^8.0.0",
     "github-content": "^1.0.1",
@@ -173,6 +173,6 @@
     "node-7z": "^3.0.0",
     "unrar": "^0.2.0",
     "unrar-binaries": "^1.1.0",
-    "upscaler": "^0.8.22"
+    "webp-converter": "^2.3.3"
   }
 }

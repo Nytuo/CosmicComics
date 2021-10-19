@@ -12,8 +12,8 @@ GNU General Public License for more details.
 
 You should have received a copy of the GNU General Public License
 along with Cosmic-Comics.  If not, see <https://www.gnu.org/licenses/>.*/
-const { remote } = require("electron"); // Importing remote from Electron
-const getWindow = () => remote.BrowserWindow.getFocusedWindow(); // Get the current window
+/* const { remote } = require("@electron/remote"); // Importing remote from Electron
+ */ const getWindow = () => remote.BrowserWindow.getFocusedWindow(); // Get the current window
 
 //Closing the window
 function closeWindow() {

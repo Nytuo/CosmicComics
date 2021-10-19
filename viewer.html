@@ -39,7 +39,7 @@ along with Cosmic-Comics.  If not, see <https://www.gnu.org/licenses/>.-->
           ><img
             src="Images/Logo.png"
             alt=""
-            width="auto"
+            id="logo_id"
             height=60px"
             class="navbar-brand rotate linear infinite"
             style="-webkit-app-region: drag"
@@ -519,6 +519,10 @@ along with Cosmic-Comics.  If not, see <https://www.gnu.org/licenses/>.-->
         </div>
         <label for="exampleColorInput" class="form-label" id="colorpicker_txt_id">Set Background Color</label>
         <input type="color" class="form-control form-control-color" id="exampleColorInput" value="#212121" title="Choose your color" onchange="changeBGColorByPicker()">
+        <div class="form-check form-switch">
+          <input class="form-check-input" type="checkbox" id="BGBT" onchange="BGBTF()">
+          <label class="form-check-label" for="BGBT" id="BGBTTXT">BackGround defined by theme (Background color will be disabled)</label>
+        </div>
           </div>
           <div class="modal-footer">
             <button
