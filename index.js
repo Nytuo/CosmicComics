@@ -2034,7 +2034,9 @@ function unarchive_first(
         const file = entries[i]["name"];
         var currentName = file;
         currentName = currentName.toString();
-        currentName = currentName.toLowerCase();
+        if (process.platform == "win32") {
+          currentName = currentName.toLowerCase();
+        }
         if (
           currentName.includes(".png") ||
           currentName.includes(".jpg") ||
@@ -2053,12 +2055,19 @@ function unarchive_first(
             return;
           });
 
-          if (fs.existsSync(ExtractDir + "/0.jpg") == false) {
+          if (
+            fs.existsSync(ExtractDir + "/0.jpg") == false ||
+            fs.existsSync(ExtractDir + "/cover.webp") == false
+          ) {
             var x = fs.createWriteStream(ExtractDir + "/0.jpg");
             stream.pipe(x);
             GetTheFirstImageOfComicsByFolder(filesInFolder, indice + 1);
             return;
           }
+        }
+        if (process.platform == "linux" || process.platform == "darwin") {
+          GetTheFirstImageOfComicsByFolder(filesInFolder, indice + 1);
+          return;
         }
       }
     });
