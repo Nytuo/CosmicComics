@@ -1922,32 +1922,30 @@ async function delete_all_exept_the_first() {
   console.log(dir);
   for (var i = 0; i < dir.length; i++) {
     try {
-      var files = fs.readdirSync(CosmicComicsData + "/FirstImageOfAll/" + dir[i]);
+      var files = fs.readdirSync(
+        CosmicComicsData + "/FirstImageOfAll/" + dir[i]
+      );
       if (files.length > 1) {
-      files.sort((a, b) => {
-        let fa = a.toLowerCase(),
-          fb = b.toLowerCase();
-        if (fa < fb) {
-          return -1;
+        files.sort((a, b) => {
+          let fa = a.toLowerCase(),
+            fb = b.toLowerCase();
+          if (fa < fb) {
+            return -1;
+          }
+          if (fa > fb) {
+            return 1;
+          }
+          return 0;
+        });
+        for (var j = 1; j < files.length; j++) {
+          fs.unlinkSync(
+            CosmicComicsData + "/FirstImageOfAll/" + dir[i] + "/" + files[j]
+          );
         }
-        if (fa > fb) {
-          return 1;
-        }
-        return 0;
-      });
-      for (var j = 1; j < files.length; j++) {
-
-        fs.unlinkSync(
-          CosmicComicsData + "/FirstImageOfAll/" + dir[i] + "/" + files[j]
-        );
       }
-    }
     } catch (error) {
-      console.log("Error when reading the folder to delete")
+      console.log("Error when reading the folder to delete");
     }
-    
-
-    
   }
   await WConv();
   //Scan le dossier
@@ -2391,8 +2389,7 @@ document.getElementById("id_did_you_know").innerHTML = language["did_you_know"];
 document.getElementById("id_tip_1").innerHTML = language["tips_1"];
 document.getElementById("id_tip_2").innerHTML = language["tips_2"];
 document.getElementById("id_tip_3").innerHTML = language["tips_3"];
-document.getElementById("extract_thumbnails").innerHTML =
-  language["extracting_thumb"];
+document.getElementById("extract_thumbnails").innerHTML = language["skip_tb"];
 document.getElementById("id_btn_update_provider").innerHTML =
   language["btn_update_provider"];
 document.getElementById("id_btn_appdata").innerHTML = language["btn_appdata"];
@@ -2758,14 +2755,15 @@ getAllThemes();
 async function WConv() {
   try {
     webp.grant_permission();
-    
   } catch (error) {
-    console.log("error")
-  } 
+    console.log("error");
+  }
   var dir = fs.readdirSync(CosmicComicsData + "/FirstImageOfAll/");
   for (var i = 0; i < dir.length; i++) {
     try {
-      var file = fs.readdirSync(CosmicComicsData + "/FirstImageOfAll/" + dir[i]);
+      var file = fs.readdirSync(
+        CosmicComicsData + "/FirstImageOfAll/" + dir[i]
+      );
       if (patha.extname(file[0]) != ".webp") {
         oldfile =
           CosmicComicsData + "/FirstImageOfAll/" + dir[i] + "/" + file[0];
