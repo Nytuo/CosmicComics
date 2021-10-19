@@ -1921,8 +1921,9 @@ async function delete_all_exept_the_first() {
   var dir = fs.readdirSync(CosmicComicsData + "/FirstImageOfAll/");
   console.log(dir);
   for (var i = 0; i < dir.length; i++) {
-    var files = fs.readdirSync(CosmicComicsData + "/FirstImageOfAll/" + dir[i]);
-    if (files.length > 1) {
+    try {
+      var files = fs.readdirSync(CosmicComicsData + "/FirstImageOfAll/" + dir[i]);
+      if (files.length > 1) {
       files.sort((a, b) => {
         let fa = a.toLowerCase(),
           fb = b.toLowerCase();
@@ -1935,11 +1936,18 @@ async function delete_all_exept_the_first() {
         return 0;
       });
       for (var j = 1; j < files.length; j++) {
+
         fs.unlinkSync(
           CosmicComicsData + "/FirstImageOfAll/" + dir[i] + "/" + files[j]
         );
       }
     }
+    } catch (error) {
+      console.log("Error when reading the folder to delete")
+    }
+    
+
+    
   }
   await WConv();
   //Scan le dossier
@@ -2751,8 +2759,8 @@ async function WConv() {
   webp.grant_permission();
   var dir = fs.readdirSync(CosmicComicsData + "/FirstImageOfAll/");
   for (var i = 0; i < dir.length; i++) {
-    var file = fs.readdirSync(CosmicComicsData + "/FirstImageOfAll/" + dir[i]);
     try {
+      var file = fs.readdirSync(CosmicComicsData + "/FirstImageOfAll/" + dir[i]);
       if (patha.extname(file[0]) != ".webp") {
         oldfile =
           CosmicComicsData + "/FirstImageOfAll/" + dir[i] + "/" + file[0];
