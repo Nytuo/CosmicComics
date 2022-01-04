@@ -13,7 +13,7 @@ GNU General Public License for more details.
 You should have received a copy of the GNU General Public License
 along with Cosmic-Comics.  If not, see <https://www.gnu.org/licenses/>.--->
 <!DOCTYPE html>
-<html style="overflow-x: hidden">
+<html style="overflow-x: hidden" lang="fr">
   <head>
     <meta charset="UTF-8" />
     <!--Declaring the stylesheets-->
@@ -149,7 +149,6 @@ along with Cosmic-Comics.  If not, see <https://www.gnu.org/licenses/>.--->
       style="display: none"
       id="iframe_yt_music"
       src=""
-      frameborder="0"
       allowfullscreen
     ></iframe>
     <!-- Modal navigation -->
@@ -227,6 +226,15 @@ along with Cosmic-Comics.  If not, see <https://www.gnu.org/licenses/>.--->
                 id="id_refreshFolder"
               >
                 <i class="material-icons">refresh</i>
+              </button>
+              <button
+                      class="btn"
+                      style="margin: 10px"
+                      id="id_openDL"
+                      data-bs-toggle="modal"
+                      data-bs-target="#dlmodal"
+              >
+                <i class="material-icons">download</i>
               </button>
 
               <button
@@ -341,6 +349,52 @@ along with Cosmic-Comics.  If not, see <https://www.gnu.org/licenses/>.--->
         </div>
       </div>
     </div>
+    <!-- Modal DL-->
+    <div
+            class="modal animate__animated animate__zoomIn animate__faster"
+            id="dlmodal"
+            tabindex="-1"
+            aria-labelledby="id_openDLtxt"
+            aria-hidden="true"
+            style="overflow: hidden"
+    >
+      <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content">
+          <div class="modal-header">
+            <h5 class="modal-title" id="id_openDLtxt">Downloader</h5>
+            <button
+                    type="button"
+                    class="btn-close"
+                    id="btn_close_icon_dld"
+                    data-bs-dismiss="modal"
+                    aria-label="Close"
+            ></button>
+          </div>
+          <div class="modal-body" style="text-align: center">
+            <p class="red">This functionality not work on all websites, such as the one's which use Google Drive or no-direct image link.</p>
+            <div class="mb-3">
+              <input class="form-control" type="text" placeholder="Insert a URL of a website to download All images on it." id="id_URLDL">
+            </div>
+            <button class="btn btn-primary" onclick="downloader();" id="id_btnDLStart">Start Download</button>
+            <div class="progress" id="progressbarDL">
+              <div id="prgsDL" class="determinate"></div>
+            </div>
+        <p id="DLtxt"></p>
+            <button class="btn btn-primary invisible" id="id_btnDLOpen" onclick="OpenDownloadDir();">Open</button>
+          </div>
+          <div class="modal-footer">
+            <button
+                    type="button"
+                    class="btn btn-secondary"
+                    data-bs-dismiss="modal"
+                    id="close_openDL"
+            >
+              Close
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
     <!-- Modal Tips-->
     <div
       class="modal animate__animated animate__zoomIn animate__faster"
@@ -374,7 +428,7 @@ along with Cosmic-Comics.  If not, see <https://www.gnu.org/licenses/>.--->
               type="button"
               class="btn btn-secondary"
               data-bs-dismiss="modal"
-              id="close_about"
+              id="close_tips"
             >
               Close
             </button>
@@ -844,7 +898,7 @@ along with Cosmic-Comics.  If not, see <https://www.gnu.org/licenses/>.--->
               type="button"
               class="btn btn-secondary"
               data-bs-dismiss="modal"
-              id="close_settings"
+              id="close_theme"
             >
               Close
             </button>

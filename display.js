@@ -17,8 +17,8 @@ along with Cosmic-Comics.  If not, see <https://www.gnu.org/licenses/>.*/
 const { shell } = require("electron");
 const fs = require("fs");
 const patha = require("path");
-var popper = require("@popperjs/core");
-var bootstrap = require("bootstrap");
+const popper = require("@popperjs/core");
+const bootstrap = require("bootstrap");
 const remote = require("@electron/remote");
 const app = remote.app;
 const { Client } = require("anilist.js");
@@ -69,7 +69,7 @@ var name_ID = Get_the_name_id(Name_Without_Ext);
 //Get Element from the config.json
 function Get_From_Config(what_to_search_for, data) {
   for (var i in data[0]) {
-    if (i == what_to_search_for) {
+    if (i === what_to_search_for) {
       return data[0][i];
     }
   }
@@ -117,29 +117,29 @@ function Get_the_name_id(the_name = "") {
   //removing all the unwanted words
   for (var i = 0; i < temp.length; i++) {
     const el = temp[i];
-    if (Name_Exception.includes(el) == true) {
+    if (Name_Exception.includes(el) === true) {
       temp[i] = "";
     }
   }
 
   //removing all empty in the list
   temp = temp.filter(function (el) {
-    return el != "";
+    return el !== "";
   });
 
   //Removing all numbers from the Name
   var Name_without_number = "";
   temp.forEach((el) => {
-    if (el != "") {
+    if (el !== "") {
       if (hasNumbers(el)) {
       } else if (isNaN(parseInt(el))) {
-        if (Name_without_number == "") {
+        if (Name_without_number === "") {
           Name_without_number += el;
         } else {
           Name_without_number += " " + el;
         }
       } else {
-        if (Name_without_number == "") {
+        if (Name_without_number === "") {
           Name_without_number += el;
         } else {
           Name_without_number += " " + el;
@@ -175,7 +175,7 @@ async function Manga(name, n) {
   });
 
   //If the result as found something
-  if (search.Results.length != 0) {
+  if (search.Results.length !== 0) {
     //Creating the list of other mangas in the select tag
 
     //Removing all previous child from the select tag and the relations
@@ -193,7 +193,7 @@ async function Manga(name, n) {
     //creating the new select tag
     for (var i = 0; i < search.Results.length; i++) {
       const opt = document.createElement("option");
-      if (i == n) {
+      if (i === n) {
         opt.setAttribute("selected", "");
       }
       opt.value = i;
@@ -237,7 +237,7 @@ async function Manga(name, n) {
         el.node.name.full +
         " / " +
         el.node.name.native +
-        "<br></br>";
+        "<br/>";
     });
     document.getElementById("charct").innerHTML =
       "<h1>" +
@@ -250,7 +250,7 @@ async function Manga(name, n) {
       language["of"] +
       " " +
       result["info"]["characters"]["pageInfo"]["total"] +
-      "<br></br>" +
+      "<br/>" +
       tmpchara;
 
     //Origins Conutry
@@ -300,15 +300,15 @@ async function Manga(name, n) {
       const reltxt = document.createElement("div");
       reltxt.innerHTML =
         el.node.title.romaji +
-        "<br></br>" +
+        "<br/>" +
         language["this_is_a_n"] +
         ": " +
         el.relationType +
-        "<br></br>" +
+        "<br/>" +
         language["format"] +
         ": " +
         el.node.format +
-        "<br></br>" +
+        "<br/>" +
         language["type"] +
         ": " +
         el.node.type;
@@ -396,7 +396,7 @@ function Comics(name, n) {
       //creating the select tag list
       for (var i = 0; i < result.length; i++) {
         const opt = document.createElement("option");
-        if (i == n) {
+        if (i === n) {
           opt.setAttribute("selected", "");
         }
         opt.value = i;
@@ -503,11 +503,11 @@ function selectAnother() {
   var test = document.querySelector("#selectAnother").selectedIndex;
   var test2 = document.querySelector("#selectAnother").value;
   console.log(test2);
-  if (test2 == "Search for Comics") {
+  if (test2 === "Search for Comics") {
     current_provider = "Comics";
   }
   Toastifycation(language["fetching_metadata"], "#292929");
-  if (current_provider == "Manga") {
+  if (current_provider === "Manga") {
     Manga(name_ID, test);
   } else {
     Comics(name_ID, test);

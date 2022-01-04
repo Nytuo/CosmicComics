@@ -118,7 +118,7 @@ img {
 }
 .white::-webkit-scrollbar {
   width: 5px;
-  border-radius: 0px;
+  border-radius: 0;
 }
 
 .white::-webkit-scrollbar-thumb {
@@ -168,7 +168,7 @@ background-color: #222222;
   /* Black background with opacity */
   z-index: 1000;
   /* Specify a stack order in case you're using a different order for other elements */
-  cursor: normal;
+cursor: initial;
   /* Add a pointer on hover */
 }
 #overlay2 {
@@ -189,14 +189,13 @@ background-color: #181818;
   /* Black background with opacity */
   z-index: 999;
   /* Specify a stack order in case you're using a different order for other elements */
-  cursor: normal;
+  cursor: initial;
   /* Add a pointer on hover */
 }
 
 #textoverlay {
   position: absolute;
   font-family: "Oswald", sans-serif;
-  font-size: 14px;
   top: 50%;
   left: 50%;
   font-size: 50px;
@@ -292,10 +291,8 @@ ul li {
   -webkit-transition: background-color 0.3s;
   transition: background-color 0.3s;
   float: left;
-  padding: 0;
-  margin: 5px;
-  padding-top: 0px;
-  margin-top: 0px;
+  padding: 0 0 0;
+  margin: 0 5px 5px;
   cursor: pointer;
 }
 a {
@@ -438,7 +435,7 @@ a {
 
 /* (D) SHOW/HIDE */
 .hovercap {
-  visibility: none;
+  visibility: hidden;
   opacity: 0;
   transition: opacity 0.3s;
 }
@@ -508,12 +505,10 @@ a {
 
 body {
   font-family: var(--font);
-  font-weight: var(--fontOrigin);
   font-size: 1rem;
   line-height: 1.2;
   letter-spacing: 0.005rem;
   -webkit-font-smoothing: subpixel-antialiased;
-  font-smoothing: subpixel-antialiased;
 }
 
 .menu {
@@ -529,8 +524,6 @@ body {
   position: relative;
   display: inline-block;
   padding: 10px 20px;
-  font-size: var(--fontMedium);
-  font-weight: var(--fontRegular);
   text-transform: uppercase;
   color: #a9a9a9;
   cursor: pointer;
@@ -570,7 +563,6 @@ body {
   width: 100%;
   max-width: 250px;
   height: 380px;
-  font-size: var(--fontOrigin);
   border-radius: 8px;
   box-shadow: 0 16px 60px rgba(0, 0, 0, 0.3);
   -webkit-transition: all var(--speed) ease;
@@ -1161,8 +1153,6 @@ body {
   justify-self: center;
   margin-bottom: 2px;
   color: white;
-  font-size: var(--fontLarge);
-  font-weight: var(--fontLight);
   letter-spacing: 0.1rem;
   text-align: center;
   text-transform: uppercase;
@@ -1186,8 +1176,6 @@ body {
   transform: translateY(30%);
   display: block;
   margin: 22px 0 16px 0;
-  font-size: var(--fontMedium);
-  font-weight: var(--fontLight);
   /*text-shadow: 0 0.5px 1px rgba(0, 0, 0, 0.35);*/
   color: rgb(255, 255, 255);
   opacity: 0;

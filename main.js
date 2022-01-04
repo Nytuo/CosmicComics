@@ -24,6 +24,9 @@ if (fs.existsSync(TempDir + "/CosmicComics") == false) {
 if (fs.existsSync(TempDir + "/CosmicComics/current_book") == false) {
   fs.mkdirSync(TempDir + "/CosmicComics/current_book");
 }
+if (fs.existsSync(TempDir + "/CosmicComics/downloaded_book") == false) {
+  fs.mkdirSync(TempDir + "/CosmicComics/downloaded_book");
+}
 const parentfolder1 = require("path").dirname(__dirname);
 const parentfolder2 = require("path").dirname(parentfolder1);
 const parentfolder3 = require("path").dirname(parentfolder2);
@@ -177,14 +180,14 @@ var themebydate = Get_From_Config(
   "theme_date",
   JSON.parse(fs.readFileSync(AppDataDir + "/CosmicComics_data/config.json"))
 );
-if (themebydate == true) {
-  if (tdate == 09) {
+if (themebydate === true) {
+  if (tdate === 09) {
     Modify_JSON_For_Config(
       AppDataDir + "/CosmicComics_data/config.json",
       "theme",
       "[EVENT] - Halloween.json"
     );
-  } else if (tdate == 11) {
+  }else if (tdate === 11) {
     Modify_JSON_For_Config(
       AppDataDir + "/CosmicComics_data/config.json",
       "theme",

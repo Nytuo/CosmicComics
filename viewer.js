@@ -666,6 +666,18 @@ function Viewer() {
         );
         window.location.href = "index.html";
       }
+      listofImg.sort((a, b) => {
+        let fa = a.substring(a.lastIndexOf(".") + 1);
+        let fb = b.substring(b.lastIndexOf(".") + 1);
+        if (fa < fb) {
+          return 1;
+        }
+        if (fa > fb) {
+          return -1;
+        }
+        return 0;
+      });
+      console.log(listofImg)
       var filepage = GetFilePage();
       preloadImage(listofImg);
       console.log(filepage);
@@ -885,6 +897,7 @@ function GetListOfImg(dirPath) {
       console.log(file + " has an no compatible Viewer Extension: " + ext);
     }
   });
+
   if (mangaMode == true) {
     return invertList(listOfImage);
   } else {
