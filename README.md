@@ -1,3 +1,4 @@
+# Notice that CosmicComics is in active reconstruction to brings you a server-side solution without electron and a compatibility for any browser within your local network and beyond to render your Comics...
 # CosmicComics
 [![cosmiccomics](https://snapcraft.io/cosmiccomics/badge.svg)](https://snapcraft.io/cosmiccomics)
 [![cosmiccomics](https://snapcraft.io/cosmiccomics/trending.svg?name=0)](https://snapcraft.io/cosmiccomics)
