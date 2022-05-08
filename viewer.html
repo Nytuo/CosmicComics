@@ -14,8 +14,10 @@ You should have received a copy of the GNU General Public License
 along with Cosmic-Comics.  If not, see <https://www.gnu.org/licenses/>.-->
 <html>
   <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <link rel="stylesheet" href="css/bootstrap.css" />
-    <link rel="stylesheet" href="css/index.css" />
+    <link rel="stylesheet" href="css/base.css" />
     <link
       href="https://fonts.googleapis.com/icon?family=Material+Icons"
       rel="stylesheet"
@@ -25,8 +27,9 @@ along with Cosmic-Comics.  If not, see <https://www.gnu.org/licenses/>.-->
       href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/4.1.1/animate.min.css"
     />
     <link href="css/materialize.css" rel="stylesheet" />
+    <link rel="icon" type="image/x-icon" href="/Images/Logo.ico">
     <script type="text/javascript" src="js/html-magnifier.js"></script>
-    <script type="text/javascript" src="js/menu.js"></script>
+
     <title>CosmicComics Viewer</title>
   </head>
   <header>
@@ -45,37 +48,12 @@ along with Cosmic-Comics.  If not, see <https://www.gnu.org/licenses/>.-->
             style="-webkit-app-region: drag"
         /></a>
 
-        <ul id="nav-mobile" class="right hide-on-med-and-down">          
-
-          <li>
-            <a onclick="minimizeWindow()"               class="btnw"style="-webkit-app-region: no-drag"
-              ><i class="material-icons">minimize</i></a
-            >
-          </li>
-          <li>
-            <a
-              onclick="maximizeWindow()"
-              class="btnw"
-              style="-webkit-app-region: no-drag"
-              id="maximize"
-              ><i class="material-icons">check_box_outline_blank</i></a
-            >
-          </li>
-
-          <li>
-            <a
-              onclick="closeWindow()"
-              class="closebtn"
-              style="-webkit-app-region: no-drag"
-              ><i class="material-icons">close</i></a
-            >
-          </li>
-        </ul>
+      
         <div style="padding-left: 45px">
           <button
             class="btn"
             style="margin: 5px; height: 40px; -webkit-app-region: no-drag"
-            onclick="window.location.href = 'index.html'"
+            onclick="window.location.href = '/'"
             id="goback_id"
           >
             <i class="material-icons" style="line-height: 1; height: 40px"
@@ -232,11 +210,12 @@ along with Cosmic-Comics.  If not, see <https://www.gnu.org/licenses/>.-->
           
 
     <div style="padding-top: 55px"></div>
-    <p id="currentpage" style="color: white;position: fixed;background-color:rgba(0,0,0,0.50);text-align: right;bottom: 0;right: 5px;z-index: 5;"></p>
   </header>
 
   <body onload="Viewer();">
-    <!-- Modal -->
+  <p id="currentpage" style="color: white;position: fixed;background-color:rgba(0,0,0,0.50);text-align: right;bottom: 0;right: 5px;z-index: 5;"></p>
+
+  <!-- Modal -->
     <div
       class="modal animate__animated animate__zoomIn animate__faster"
       id="magnifiersettings"
@@ -559,7 +538,11 @@ along with Cosmic-Comics.  If not, see <https://www.gnu.org/licenses/>.-->
       <img id="imgViewer_0"><img id="imgViewer_1" class=""/></img>
     </div>
     <div id="snackbar">Some text some message..</div>
-    <script type="text/javascript" src="viewer.js"></script>
+<!--    <div class="fab-container">
+      <div class="button iconbutton">
+        <i class="material-icons">visibility</i>
+      </div>
+    </div>-->
     <script>
       var magnifier = new HTMLMagnifier();
       function MagnifierT() {
@@ -572,6 +555,9 @@ along with Cosmic-Comics.  If not, see <https://www.gnu.org/licenses/>.-->
       function MagnifierDestroy() {
         magnifier.hide();
       }
-    </script>
+      </script>
+    <script type="text/javascript" src="/modules/bootstrapJS"></script>
+    <script type="text/javascript" src="viewer.js"></script>
+
   </body>
 </html>

@@ -1,0 +1,107 @@
+/*This file is part of Cosmic-comics.
+
+Cosmic-Comics is free software: you can redistribute it and/or modify
+it under the terms of the GNU General Public License as published by
+the Free Software Foundation, either version 3 of the License, or
+(at your option) any later version.
+
+Cosmic-Comics is distributed in the hope that it will be useful,
+but WITHOUT ANY WARRANTY; without even the implied warranty of
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+GNU General Public License for more details.
+
+You should have received a copy of the GNU General Public License
+along with Cosmic-Comics.  If not, see <https://www.gnu.org/licenses/>.*/
+:root {
+    --squarePP: 7vw;
+    --text : #ffff;
+    --color-bg-primary: #d0d6df;
+    --color-bg-primary-offset: #f1f3f7;
+    --color-bg-secondary: #262626;
+    --color-text-primary: #3a3c42;
+    --color-text-primary-offset: #898c94;
+    --color-orange: #dc9960;
+    --color-green: #1eb8b1;
+    --color-purple: #657cc4;
+    --color-black: var(--color-text-primary);
+    --color-red: #d92027;
+    --spinner-size: 5;
+    --line-color: #2e53ed;
+    --line-alpha: 1;
+    --ring-color: #000000;
+    --ring-alpha: 0;
+    --ring-size: 4;
+    --libHover: rgba(0,0,0,.1);
+    --averageScore: 0;
+    --layer : rgba(0,0,0,.6);
+    --sideBar : #404040;
+    --cardCustoShadow : rgba(0, 0, 0, 0.3);
+    --cardCustoShadowHover : rgba(0, 0, 0, 0.6);
+}
+html {
+    background: linear-gradient(to top left, #4a5865, #1b232a) no-repeat fixed;
+    color: white;
+    --font: "Roboto", sans-serif;
+    background-size: cover;
+    --speed: 0.65s;
+
+}
+
+.black::-webkit-scrollbar {
+    width: 5px;
+}
+
+.black::-webkit-scrollbar-thumb {
+    background-color: #444444;
+}
+
+.black::-webkit-scrollbar-thumb:hover {
+    background-color: #333333;
+}
+
+.black::-webkit-scrollbar-track {
+    background-color: #222222;
+}
+
+.white::-webkit-scrollbar {
+    width: 5px;
+    border-radius: 0;
+}
+
+.white::-webkit-scrollbar-thumb {
+    background-color: #b3b3b3;
+}
+
+.white::-webkit-scrollbar-thumb:hover {
+    background-color: #808080;
+}
+
+.white::-webkit-scrollbar-track {
+    background-color: #ffffff;
+}
+
+#overlay {
+    background-color: rgba(0, 0, 0, 0);
+}
+
+#overlay2 {
+    background-color: transparent;
+}
+.contextMenu {
+    background-color: var(--color-bg-secondary);
+    box-shadow: 0 10px 20px rgba(40, 40, 40, 0.15);
+
+}
+.contextMenu > li{
+    background-color: var(--color-bg-secondary);
+
+}
+.contextMenu >li:hover{
+    background-color: var(--color-black);
+
+}
+
+.librariesSideBar{
+    background-color: rgba(0, 0, 0, 0.4);
+
+}

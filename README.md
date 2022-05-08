@@ -1,5 +1,9 @@
-# Notice that CosmicComics is in active reconstruction to brings you a server-side solution without electron and a compatibility for any browser within your local network and beyond to render your Comics...
-# CosmicComics
+<img style="width: 50%;margin-left:auto;margin-right:auto" src="https://nytuo.yo.fr/images/LogoStretch_cc.png">
+
+# Cosmic Comics 
+
+## Notice that CosmicComics is in active reconstruction, some features are not available yet or may not work. 
+
 [![cosmiccomics](https://snapcraft.io/cosmiccomics/badge.svg)](https://snapcraft.io/cosmiccomics)
 [![cosmiccomics](https://snapcraft.io/cosmiccomics/trending.svg?name=0)](https://snapcraft.io/cosmiccomics)
 
@@ -11,13 +15,16 @@
   <img alt="Get it from the Snap Store" src="https://snapcraft.io/static/images/badges/en/snap-store-black.svg"  style='width: 284px; height: auto'/>
 </a>
 
-Open Source, Pure Javascript, NodeJS / Electron, Comics and Manga Viewer
+ Comics and Manga Collectionner & Reader
+
+## Important changes
+This new version of CosmicComics use a server to work,rRunning on the computer where the comics and mangas are stored.
+For displaying you will need only a browser of your choice. (Chrom)
+
+If you have used the old version of CosmicComics
 
 ## Introduction
 I wanted a software easy to use and looking great in which I can display all my comics/mangas collection and read them with cool features.
-
-### Why this project ?
-I beginning reading comics and manga and found some softwares to do it but none of them correspond to me. So I decided to create my own software.
 
 ## Features:
 This is all you can do with this software and more:

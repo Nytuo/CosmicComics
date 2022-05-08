@@ -264,9 +264,10 @@ progress {
 
 nav {
   color: #fff;
-  background-color: #000000be;
-  width: 100%;
+  background-color: rgba(0, 0, 0, 0.4);
+  width: calc(100% - 10px);
   height: 56px;
+  margin: 5px;
   line-height: 56px;
 }
 
@@ -300,6 +301,8 @@ nav i.material-icons {
 
 nav .nav-wrapper {
   position: relative;
+  display: flex;
+  flex-direction: row;
   height: 100%;
 }
 
