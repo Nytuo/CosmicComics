@@ -16,34 +16,16 @@ along with Cosmic-Comics.  If not, see <https://www.gnu.org/licenses/>.*/
     --squarePP: 7vw;
     --averageScore: 0;
 }
+
 html {
     background: var(--background);
-    color: white;
-    --font: "Roboto", sans-serif;
-    background-size: cover;
+    color: var(--text);
+    background-size: var(--HTMLBGSize);
     --speed: 0.65s;
-
 }
+
 a {
     text-decoration: none;
-}
-
-/* Cosmic Comics logo */
-.logo {
-    display: block;
-    width: 300px;
-    height: 450px;
-    background-repeat: no-repeat;
-    line-height: 20px;
-    text-align: center;
-    font-size: 20px;
-    background-size: contain;
-    background-position: center;
-    -webkit-transform-style: preserve-3d;
-    transform-style: preserve-3d;
-    -webkit-transform: perspective(500px);
-    transform: perspective(500px);
-    margin-bottom: 150px;
 }
 
 /* Display elements */
@@ -70,6 +52,24 @@ a {
     flex-wrap: nowrap;
     overflow-y: auto;
 
+}
+
+/* Cosmic Comics logo */
+.logo {
+    display: block;
+    width: 300px;
+    height: 450px;
+    background-repeat: no-repeat;
+    line-height: 20px;
+    text-align: center;
+    font-size: 20px;
+    background-size: contain;
+    background-position: center;
+    -webkit-transform-style: preserve-3d;
+    transform-style: preserve-3d;
+    -webkit-transform: perspective(500px);
+    transform: perspective(500px);
+    margin-bottom: 150px;
 }
 
 .logo > span {
@@ -137,7 +137,8 @@ img {
     left: 16vw;
     right: 0;
     bottom: 0;
-    z-index: 5;
+    z-index: 9;
+    background-color: var(--overlayBG);
 }
 
 #overlay2 {
@@ -149,7 +150,8 @@ img {
     left: 0;
     right: 0;
     bottom: 0;
-    z-index: 4;
+    z-index: 8;
+    background-color: var(--overlay2BG);
 }
 
 .rotate {
@@ -194,7 +196,7 @@ img {
     position: relative;
     left: 0;
     right: 0;
-    z-index: 1000;
+    z-index: 3;
     margin-left: 20px;
     margin-right: 20px;
 }
@@ -210,7 +212,7 @@ img {
 
 
 .btnw:hover {
-    background-color: rgb(41, 41, 41);
+    background-color: var(--topBtnHover);
 }
 
 ul:not(.browser-default) > li {
@@ -233,47 +235,6 @@ a {
     color: var(--line-color);
 }
 
-.animate-RtL {
-    position: relative;
-    animation: RtL 0.4s;
-}
-
-.animate-LtR {
-    position: relative;
-    animation: LtR 0.4s;
-}
-
-@keyframes RtL {
-    from {
-        right: -100%;
-    }
-    to {
-        right: 0;
-    }
-}
-
-@keyframes LtR {
-    from {
-        left: -100%;
-    }
-    to {
-        left: 0;
-    }
-}
-
-.animate-CtL {
-    position: relative;
-    animation: CtL 0.4s;
-}
-
-@keyframes CtL {
-    from {
-        left: 0;
-    }
-    to {
-        left: -100%;
-    }
-}
 
 /* The snackbar - position it at the bottom and in the middle of the screen */
 #snackbar {
@@ -285,7 +246,7 @@ a {
     border-radius: 2px; /* Rounded borders */
     padding: 16px; /* Padding */
     position: fixed; /* Sit on top of the screen */
-    z-index: 500000; /* Add a z-index if needed */
+    z-index: 10; /* Add a z-index if needed */
     bottom: 30px; /* 30px from the bottom */
 }
 
@@ -344,45 +305,6 @@ a {
     }
 }
 
-
-/* (A) WRAPPER */
-.hoverwrap {
-    position: relative;
-}
-
-/* (B) RESPONSIVE IMAGE */
-.hoverwrap img {
-    width: 100%;
-}
-
-/* (C) CAPTION */
-.hovercap {
-    /* (C1) DIMENSIONS */
-    box-sizing: border-box;
-    width: 100%;
-    height: 100%;
-    /* (C2) BOTTOM */
-    text-align: center;
-    top: 0;
-    position: absolute;
-    padding-top: 30%;
-    /* (C3) COLORS */
-    background-color: rgba(0, 0, 0, 0.836);
-    color: white;
-}
-
-/* (D) SHOW/HIDE */
-.hovercap {
-    visibility: hidden;
-    opacity: 0;
-    transition: opacity 0.3s;
-}
-
-.hoverwrap:hover .hovercap {
-    visibility: visible;
-    opacity: 1;
-}
-
 .SideBar_current {
     background-color: var(--sideBar);
 }
@@ -401,7 +323,7 @@ a {
 .rating-css input + label {
     text-align: center;
     font-size: 24px;
-    color: rgb(255, 191, 0);
+    color: var(--ratingColor);
     cursor: pointer;
 }
 
@@ -475,47 +397,6 @@ body {
     transform: scale(1.1, 1.1);
 }
 
-.card__rating {
-    position: absolute;
-    top: 10px;
-    left: 0;
-    display: block;
-    width: 35px;
-    height: 35px;
-    background: transparent;
-    border: 0;
-    opacity: 0;
-    border-radius: 3px;
-    -webkit-transition: all var(--speed) ease;
-    transition: all var(--speed) ease;
-    z-index: 2;
-}
-
-.card__rating:focus {
-    outline: 0;
-    background-color: rgba(255, 255, 255, 0);
-}
-
-.cardcusto:hover .card__rating {
-    opacity: 0.6;
-}
-
-.card__rating i {
-    font-size: 18px;
-    color: rgba(255, 255, 255, 0.6);
-    cursor: pointer;
-    -webkit-transition: all var(--speed) ease;
-    transition: all var(--speed) ease;
-}
-
-.card__rating:hover i {
-    color: rgba(255, 255, 255, 0.8);
-}
-
-.card__rating:active i,
-.card__rating.active i {
-    color: white;
-}
 
 .card__save {
     position: absolute;
@@ -535,7 +416,7 @@ body {
 
 .card__save:focus {
     outline: 0;
-    background-color: rgba(255, 255, 255, 0);
+    background-color: var(--DisabledColor);
 }
 
 .cardcusto:hover .card__save {
@@ -544,7 +425,7 @@ body {
 
 .card__save i {
     font-size: 24px;
-    color: rgba(255, 255, 255, 0.6);
+    color: var(--DisabledColor);
 
     cursor: pointer;
     -webkit-transition: all var(--speed) ease;
@@ -552,57 +433,13 @@ body {
 }
 
 .card__save:hover i {
-    color: rgba(255, 0, 0, 0.8);
+    color: var(--saveActivedColor);
 }
 
 
 .card__save:active i,
 .card__save.active i {
-    color: rgb(255, 0, 0);
-}
-
-.card__saveblack {
-    position: absolute;
-    top: 10px;
-    right: 10px;
-    display: block;
-    width: 35px;
-    height: 35px;
-    background: transparent;
-    border: 0;
-    opacity: 0;
-    border-radius: 3px;
-    -webkit-transition: all var(--speed) ease;
-    transition: all var(--speed) ease;
-    z-index: 2;
-}
-
-.card__saveblack:focus {
-    outline: 0;
-    background-color: rgba(255, 255, 255, 0);
-}
-
-.cardcusto:hover .card__saveblack {
-    opacity: 0.6;
-}
-
-.card__saveblack i {
-    font-size: 24px;
-    color: rgba(0, 0, 0, 0.6);
-
-    cursor: pointer;
-    -webkit-transition: all var(--speed) ease;
-    transition: all var(--speed) ease;
-}
-
-.card__saveblack:hover i {
-    color: rgba(180, 0, 0, 0.8);
-}
-
-
-.card__saveblack:active i,
-.card__saveblack.active i {
-    color: rgb(180, 0, 0);
+    color: var(--saveActivedColor);
 }
 
 .card__close {
@@ -623,7 +460,7 @@ body {
 
 .card__close:focus {
     outline: 0;
-    background-color: rgba(255, 255, 255, 0);
+    background-color: var(--DisabledColor)
 }
 
 .cardcusto:hover .card__close {
@@ -632,61 +469,19 @@ body {
 
 .card__close i {
     font-size: 24px;
-    color: rgba(255, 255, 255, 0.6);
+    color: var(--DisabledColor);
     cursor: pointer;
     -webkit-transition: all var(--speed) ease;
     transition: all var(--speed) ease;
 }
 
 .card__close:hover i {
-    color: rgba(255, 0, 0, 0.8);
+    color: var(--saveActivedColor)
 }
 
 .card__close:active i,
 .card__close.active i {
-    color: rgb(255, 0, 0);
-}
-
-.card__closeblack {
-    position: absolute;
-    top: 10px;
-    right: 40px;
-    display: block;
-    width: 35px;
-    height: 35px;
-    background: transparent;
-    border: 0;
-    opacity: 0;
-    border-radius: 3px;
-    -webkit-transition: all var(--speed) ease;
-    transition: all var(--speed) ease;
-    z-index: 2;
-}
-
-.card__closeblack:focus {
-    outline: 0;
-    background-color: rgba(255, 255, 255, 0);
-}
-
-.cardcusto:hover .card__closeblack {
-    opacity: 0.6;
-}
-
-.card__closeblack i {
-    font-size: 24px;
-    color: rgba(0, 0, 0, 0.6);
-    cursor: pointer;
-    -webkit-transition: all var(--speed) ease;
-    transition: all var(--speed) ease;
-}
-
-.card__closeblack:hover i {
-    color: rgba(180, 0, 0, 0.8);
-}
-
-.card__closeblack:active i,
-.card__closeblack.active i {
-    color: rgb(180, 0, 0);
+    color: var(--saveActivedColor)
 }
 
 .card__reading {
@@ -707,7 +502,7 @@ body {
 
 .card__reading:focus {
     outline: 0;
-    background-color: rgba(255, 115, 0, 0);
+    background-color: var(--DisabledColor);
 }
 
 .cardcusto:hover .card__reading {
@@ -716,7 +511,7 @@ body {
 
 .card__reading i {
     font-size: 24px;
-    color: rgba(255, 255, 255, 0.6);
+    color: var(--DisabledColor);
 
     cursor: pointer;
     -webkit-transition: all var(--speed) ease;
@@ -724,57 +519,13 @@ body {
 }
 
 .card__reading:hover i {
-    color: rgba(255, 145, 0, 0.8);
+    color: var(--color-orange)
 }
 
 
 .card__reading:active i,
 .card__reading.active i {
-    color: rgb(255, 145, 0);
-}
-
-.card__readingblack {
-    position: absolute;
-    top: 10px;
-    right: 80px;
-    display: block;
-    width: 35px;
-    height: 35px;
-    background: transparent;
-    border: 0;
-    opacity: 0;
-    border-radius: 3px;
-    -webkit-transition: all var(--speed) ease;
-    transition: all var(--speed) ease;
-    z-index: 2;
-}
-
-.card__readingblack:focus {
-    outline: 0;
-    background-color: rgba(255, 115, 0, 0);
-}
-
-.cardcusto:hover .card__readingblack {
-    opacity: 0.6;
-}
-
-.card__readingblack i {
-    font-size: 24px;
-    color: rgba(0, 0, 0, 0.6);
-
-    cursor: pointer;
-    -webkit-transition: all var(--speed) ease;
-    transition: all var(--speed) ease;
-}
-
-.card__readingblack:hover i {
-    color: rgba(194, 110, 0, 0.8);
-}
-
-
-.card__readingblack:active i,
-.card__readingblack.active i {
-    color: rgb(194, 110, 0);
+    color: var(--color-orange)
 }
 
 .card__read {
@@ -795,7 +546,7 @@ body {
 
 .card__read:focus {
     outline: 0;
-    background-color: rgba(255, 255, 255, 0);
+    background-color: var(--color-green)
 }
 
 .cardcusto:hover .card__read {
@@ -804,63 +555,20 @@ body {
 
 .card__read i {
     font-size: 24px;
-    color: rgba(255, 255, 255, 0.6);
+    color: var(--DisabledColor);
     cursor: pointer;
     -webkit-transition: all var(--speed) ease;
     transition: all var(--speed) ease;
 }
 
 .card__read:hover i {
-    color: rgba(0, 223, 11, 0.8);
+    color: var(--color-green)
 }
 
 
 .card__read:active i,
 .card__read.active i {
-    color: rgb(0, 223, 11);
-}
-
-.card__readblack {
-    position: absolute;
-    top: 10px;
-    right: 120px;
-    display: block;
-    width: 35px;
-    height: 35px;
-    background: transparent;
-    border: 0;
-    opacity: 0;
-    border-radius: 3px;
-    -webkit-transition: all var(--speed) ease;
-    transition: all var(--speed) ease;
-    z-index: 2;
-}
-
-.card__readblack:focus {
-    outline: 0;
-    background-color: rgba(255, 255, 255, 0);
-}
-
-.cardcusto:hover .card__readblack {
-    opacity: 0.6;
-}
-
-.card__readblack i {
-    font-size: 24px;
-    color: rgba(0, 0, 0, 0.6);
-    cursor: pointer;
-    -webkit-transition: all var(--speed) ease;
-    transition: all var(--speed) ease;
-}
-
-.card__readblack:hover i {
-    color: rgba(0, 139, 7, 0.8);
-}
-
-
-.card__readblack:active i,
-.card__readblack.active i {
-    color: rgb(0, 139, 7);
+    color: var(--color-green)
 }
 
 .card__play {
@@ -881,7 +589,7 @@ body {
 
 .card__play:focus {
     outline: 0;
-    background-color: rgba(255, 255, 255, 0);
+    background-color: var(--DisabledColor)
 }
 
 .cardcusto:hover .card__play {
@@ -890,14 +598,14 @@ body {
 
 .card__play i {
     font-size: 40px;
-    color: rgba(255, 255, 255, 0.6);
+    color: var(--DisabledColor);
     cursor: pointer;
     -webkit-transition: all var(--speed) ease;
     transition: all var(--speed) ease;
 }
 
 .card__play:hover i {
-    color: rgba(255, 255, 255, 0.8);
+    color: var(--DisabledColor)
 }
 
 .card__play:active,
@@ -907,81 +615,7 @@ body {
 
 .card__play:active i,
 .card__play.active i {
-    color: white;
-}
-
-.card__info {
-    position: absolute;
-    top: 10px;
-    right: 160px;
-    display: block;
-    width: 35px;
-    height: 35px;
-    background: transparent;
-    border: 0;
-    opacity: 0;
-    border-radius: 3px;
-    -webkit-transition: all var(--speed) ease;
-    transition: all var(--speed) ease;
-    z-index: 2;
-}
-
-.card__info:focus {
-    outline: 0;
-    background-color: rgba(255, 255, 255, 0);
-}
-
-.cardcusto:hover .card__info {
-    opacity: 0.6;
-}
-
-.card__info i {
-    font-size: 24px;
-    color: rgba(0, 162, 255, 0.76);
-    cursor: pointer;
-    -webkit-transition: all var(--speed) ease;
-    transition: all var(--speed) ease;
-}
-
-.card__info:hover i {
-    color: rgba(0, 138, 218, 0.8);
-}
-
-.card__infoblack {
-    position: absolute;
-    top: 10px;
-    right: 160px;
-    display: block;
-    width: 35px;
-    height: 35px;
-    background: transparent;
-    border: 0;
-    opacity: 0;
-    border-radius: 3px;
-    -webkit-transition: all var(--speed) ease;
-    transition: all var(--speed) ease;
-    z-index: 2;
-}
-
-.card__infoblack:focus {
-    outline: 0;
-    background-color: rgba(255, 255, 255, 0);
-}
-
-.cardcusto:hover .card__infoblack {
-    opacity: 0.6;
-}
-
-.card__infoblack i {
-    font-size: 24px;
-    color: rgba(0, 0, 0, 0.76);
-    cursor: pointer;
-    -webkit-transition: all var(--speed) ease;
-    transition: all var(--speed) ease;
-}
-
-.card__infoblack:hover i {
-    color: rgba(0, 138, 218, 0.8);
+    color: var(--text);
 }
 
 .card__image {
@@ -994,7 +628,7 @@ body {
     width: 100%;
     height: 100%;
     pointer-events: none;
-    background-color: rgba(0, 0, 0, 0.753);
+    background-color: var(--cardImageColor);
 }
 
 .card__image img {
@@ -1068,8 +702,7 @@ body {
     letter-spacing: 0.1rem;
     text-align: center;
     text-transform: uppercase;
-    text-shadow: 0 1px 2px rgba(0, 0, 0, 0.35);
-    background: -webkit-linear-gradient(white, #a1a1a1);
+    text-shadow: 0 1px 2px var(--cardCustoShadow);
     -webkit-background-clip: text;
     -webkit-text-fill-color: transparent;
     -webkit-transition: all var(--speed) ease;
@@ -1077,7 +710,6 @@ body {
 }
 
 .cardcusto:hover .card__name {
-    background: -webkit-linear-gradient(white, #c1c1c1);
     -webkit-background-clip: text;
     -webkit-text-fill-color: transparent;
 }
@@ -1088,8 +720,7 @@ body {
     transform: translateY(30%);
     display: block;
     margin: 22px 0 16px 0;
-    /*text-shadow: 0 0.5px 1px rgba(0, 0, 0, 0.35);*/
-    color: rgb(255, 255, 255);
+    color: var(--text);
     opacity: 0;
     -webkit-transition: all var(--speed) ease;
     transition: all var(--speed) ease;
@@ -1122,7 +753,7 @@ body {
     right: 0;
     bottom: 0;
     /* Black background with opacity */
-    z-index: 1000;
+    z-index: 4;
     /* Specify a stack order in case you're using a different order for other elements */
     cursor: initial;
     /* Add a pointer on hover */
@@ -1133,7 +764,7 @@ body {
 }
 
 #ColTitle {
-    color: white;
+    color: var(--text);
     background-color: transparent;
     font-family: 'Roboto-condensed', sans-serif;
     margin-top: 10vh;
@@ -1146,7 +777,7 @@ body {
     width: 20vw;
     height: auto;
     margin-left: 20vw;
-    box-shadow: 20px 20px 15px rgba(0, 0, 0, 0.6);
+    box-shadow: 20px 20px 15px var(--cardCustoShadowHover);
 }
 
 #ColCover {
@@ -1155,14 +786,14 @@ body {
 }
 
 #id, #averageProgress, #OriginCountry, #startDate, #description, #endDate, #Trending, #genres, #chapters {
-    color: white;
+    color: var(--text);
     margin-left: 45vw;
     margin-right: 2vw;
     margin-top: 2vh;
 }
 
 #SiteURL, #Staff, #OtherTitles, #Volumes, #characters, #price {
-    color: white;
+    color: var(--text);
     margin-left: 20vw;
     margin-right: 2vw;
     margin-top: 2vh;
@@ -1177,13 +808,13 @@ body {
     top: 15vh;
     right: 3vw;
     color: var(--text);
-    background-color: var(--releasing);
+    background-color: var(--color-orange);
 
 }
 
 .released {
-    color: white;
-    background-color: darkgreen;
+    color: var(--text);
+    background-color: var(--color-green);
     position: absolute;
     top: 15vh;
     right: 3vw;
@@ -1191,7 +822,7 @@ body {
 
 .NotYet {
     color: white;
-    background-color: darkred;
+    background-color: var(--color-red);
     position: absolute;
     top: 15vh;
     right: 3vw;
@@ -1380,8 +1011,10 @@ body {
     min-width: 240px;
     width: 15vw;
     text-align: center;
-    z-index: 1001;
+    z-index: 7;
     overflow-y: auto;
+    background-color: var(--libraryBG);
+
 }
 
 /* context menu style */
@@ -1393,6 +1026,8 @@ body {
     margin: 0;
     width: 200px;
     padding: 8px;
+    background-color: var(--color-bg-secondary);
+    box-shadow: 0 10px 20px var(--cardCustoShadow);
 }
 
 /* The context menu items style*/
@@ -1406,6 +1041,13 @@ body {
     display: flex;
     align-items: center;
     position: relative;
+    background-color: var(--color-bg-secondary);
+
+}
+
+.contextMenu > li:hover {
+    background-color: var(--color-black);
+
 }
 
 /* The home page style*/
@@ -1416,7 +1058,7 @@ body {
 
 
 /* disposition for recently added abd continue reading */
-#recentlyAdded,#continueReadingHome {
+#recentlyAdded, #continueReadingHome {
     display: flex;
     flex-direction: row;
     flex-wrap: nowrap;

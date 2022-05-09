@@ -43,7 +43,7 @@ along with Cosmic-Comics.  If not, see <https://www.gnu.org/licenses/>.*/
     --snackBarThumbHover: #212121;
     --ProgressBG: #343035;
     --ProgressFG: #2e52eb;
-    --background: linear-gradient(to top left, #1c1c1c, #000000) no-repeat fixed;
+    --background: rgb(0,0,0);
     --overlayBG: rgba(0, 0, 0, 0);
     --overlay2BG: transparent;
     --libraryBG: rgba(0, 0, 0, .4);

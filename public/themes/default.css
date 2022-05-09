@@ -14,7 +14,7 @@ You should have received a copy of the GNU General Public License
 along with Cosmic-Comics.  If not, see <https://www.gnu.org/licenses/>.*/
 :root {
     --squarePP: 7vw;
-    --text : #ffff;
+    --text: #ffff;
     --color-bg-primary: #d0d6df;
     --color-bg-primary-offset: #f1f3f7;
     --color-bg-secondary: #262626;
@@ -31,47 +31,27 @@ along with Cosmic-Comics.  If not, see <https://www.gnu.org/licenses/>.*/
     --ring-color: #000000;
     --ring-alpha: 0;
     --ring-size: 4;
-    --libHover: rgba(0,0,0,.1);
+    --libHover: rgba(0, 0, 0, .1);
     --averageScore: 0;
-    --layer : rgba(0,0,0,.6);
-    --sideBar : #404040;
-    --cardCustoShadow : rgba(0, 0, 0, 0.3);
-    --cardCustoShadowHover : rgba(0, 0, 0, 0.6);
-    --ratingBG : #555;
-    --releasing : #93500;
-    --snackBarTrack : #292929;
-    --snackBarThumb : #181818;
-    --snackBarThumbHover : #212121;
-    --ProgressBG : #343035;
-    --ProgressFG : #2e52eb;
-    --background : linear-gradient(to top left, #4a5865, #1b232a) no-repeat fixed;
-}
-
-
-
-
-#overlay {
-    background-color: rgba(0, 0, 0, 0);
-}
-
-#overlay2 {
-    background-color: transparent;
-}
-.contextMenu {
-    background-color: var(--color-bg-secondary);
-    box-shadow: 0 10px 20px rgba(40, 40, 40, 0.15);
-
-}
-.contextMenu > li{
-    background-color: var(--color-bg-secondary);
-
-}
-.contextMenu >li:hover{
-    background-color: var(--color-black);
-
-}
-
-.librariesSideBar{
-    background-color: rgba(0, 0, 0, 0.4);
-
+    --layer: rgba(0, 0, 0, .6);
+    --sideBar: #404040;
+    --cardCustoShadow: rgba(0, 0, 0, 0.3);
+    --cardCustoShadowHover: rgba(0, 0, 0, 0.6);
+    --ratingBG: #555;
+    --snackBarTrack: #292929;
+    --snackBarThumb: #181818;
+    --snackBarThumbHover: #212121;
+    --ProgressBG: #343035;
+    --ProgressFG: #2e52eb;
+    --background: linear-gradient(to top left, #4a5865, #1b232a) no-repeat fixed;
+    --overlayBG: rgba(0, 0, 0, 0);
+    --overlay2BG: transparent;
+    --libraryBG: rgba(0, 0, 0, .4);
+    --font: "Roboto", sans-serif;
+    --HTMLBGSize: cover;
+    --topBtnHover: rgb(41, 41, 41);
+    --ratingColor: rgb(255, 191, 0);
+    --saveActivedColor :rgb(255, 0, 0);
+    --DisabledColor :rgba(255, 255, 255, 0.6);
+    --cardImageColor : rgba(0,0,0,0.753)
 }

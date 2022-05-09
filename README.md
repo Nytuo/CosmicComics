@@ -18,15 +18,13 @@
  Comics and Manga Collectionner & Reader
 
 ## Important changes
-This new version of CosmicComics use a server to work,rRunning on the computer where the comics and mangas are stored.
-For displaying you will need only a browser of your choice. (Chrom)
+This new version of CosmicComics use a server to work, Running on the computer where the comics and mangas are stored.
+For displaying you will need only a browser of your choice. (Chrome is recommanded)
 
-If you have used the old version of CosmicComics
-
-## Introduction
-I wanted a software easy to use and looking great in which I can display all my comics/mangas collection and read them with cool features.
+The old versions of ComsicComics are not retro compatible with this version.
 
 ## Features:
+### Please note that some features may not work
 This is all you can do with this software and more:
 - Read `CBR`, `CBZ`, `CB7`, `CBT`, `ZIP`, `RAR`, `7z`, `TAR`, `Folder` which contains `PNG`, `JPG`, `JPEG`, `BMP`.
 - Display your books and navigate your folders with custom covers (automaticatly by extraction or manually set)
@@ -43,49 +41,29 @@ This is all you can do with this software and more:
 - Continue reading where you stopped and more...
 
 ## Installation
-### For Windows
-- Directly on the Microsoft Windows Store (see above or by searching for `Cosmic Comics` in the store)
-- As an `exe` file (OneClick NSIS Installer, installed in `Program Files`)
-- As a `zip` file containing the app for portable edition (see more under the [Portable](https://github.com/Nytuo/CosmicComics/tree/master#portable-edition) section)
+To determinate...
 
-### Linux
-- Directly on the SnapCraft Store (see above or by searching for `Cosmic Comics` in the store)
-- As a `Snap` file (to manually install the same version as the snapcraft one)
-- As a `Deb` file (for using in all Debian Based distribution)
-- As a `RPM` file (for using with all Red Hat based distribution)
-- As an `AppImage` (image normally running on all distribution)
-- As a `ZIP` file (for portable version, see more on the portable edition)
-
-### MacOS
-Note: Since I am not familiar to MacOS, don't have a MacOS machine and don't really love Apple, this version of the software can have some issues that I will do my best to correct. (I use a Virtual Machine to build the soft on Windows to MacOS)
-- As a `DMG`
-- As a `ZIP`
+As from now, you can only install the app by the scripts by they not work at 100% and need nodeJS installed on your computer or begin development.
 
 ### Portable Edition
-This software will have a portable edition support that you can enable by following those steps:
-1. Download the `ZIP` version for your OS.
-2. Create where you want a folder (name of your choice) in which you will create 3 other folders, the app (name of your choice), the temporary (named `TMP`), and the AppData (named `AppData`).
-3. Extract the archive in the app folder
-4. Adding a text file nammed `portable` with the extension `TXT` in the main directory (where the other 3 folders are).
-5. Run the cosmic-comics file in the app folder and select The ZIP version corresponding to your OS as an update provider.
+CosmicComics is now fully portable !
+
+The server is launched in a folder, and you use a browser to render.
+Note that you may need some dependencies like nodeJS installed.
 
 ## Update
-I implemented a custom updater it will let you know when an update is available.
-If you are on a store version you will have to update through this store.
-If you have selected DevMode you will have to download manually the new version on Github.
-If you have selected a `ZIP` version you will have to update manually but the `ZIP` is downloaded and openned directly.
-If you have selected AppImage you will have to delete the old one and replace it by the new one downloaded directly.
-If you have selected other than thoses choices then you will deal with the normal installation.
-Note : Remerber to close the app when the update is download / the installation process begin
+To determinate, for the moment this version do not have a working out-of-the-box updater and will depend on how I will handle the installation.
 
 ## Languages
-You can change the language of the app in the settings by clicking on the flags.
-English (symbolized by the USA Flags) and French (symbolized by the French Flags) are made by me and officially supported (If you discover a traduction error, please tell me).
-But you can add your languages too!
-Dead simple, go the App folder (where the application is installed or launched), then open the "resources/app/languages" folder, on it you will see actual languages, duplicate(copy&paste) a `JSON` file (for example the english one), rename it with your country ID (for the flags (english = us.json to display the American flag)). Open the file and start translating the values. When you have finished, then start the application and you will see on the settings the flags and when you click on it the language you made.
-Note: You can also open an issue if you want a language to be added or submit your own. In the last case, I will verified it, and add it to the project.
+Since CosmicComics use your own web browser to render, and the most modern browsers have a translation plugin, you will be able to translate to your language the application.
+
+The default language of the application is english. Note that the translation may not be 100% accurate and depends on the browser / extensions.
+
+The old JSON way will still being used.
 
 ## Keyboard and Mouse shortcuts
+
+### Note that some shortcuts may not work during the rebuild of the app, some will changes or be deleted in the future.
 Home page (index, where your files are):
 - C : Continue reading
 - F : Forget the actual folder
@@ -118,7 +96,7 @@ Viewer page (viewer, where you read the book):
 ## License
 The Cosmic-Comics is licensed under the `GNU GPL v3` License, You can find info on it on the source code and on the internet.
 
-## How to start Devlopment?
+## How to start Development?
 Run the following on a command prompt (shell)
 Note: Here I use `Yarn` but you can also use  `NPM`
 ```shell
@@ -130,15 +108,18 @@ yarn start
 ```
 
 ## Known Issues
-- Global: The no good visibily of the cover's icons (read,reading,unread,favorite) when activate and persistant.
+Very much at this time...
 
 ## Mobile Version ?
-Well, my software use Electron which is not possible to export to Android (and I don't talk about IOS), I try many way to convert my project to Android but still no success.
-In the future I have the plan to make an android application.
-If you have any tips on how to brings Electron / NodeJS to Android, let's me know in the issues section. And if you want make it and send it as a PR.
+Cosmic Comics now runs on a server, that means you can actually connect to any servers within your favorite web browser. No matter if you are on mobile, desktop or console.
+That said, an android and android TV application is in plan to offer a better experience.
+
+However, you will NEED A RUNNING SERVER on a supported platform (Linux, Windows or macos) in order to access it.
+The application WILL NOT work standalone. The app use many libraries that not work on android like unrar and this will take me too much time to create a dedicated mobile application. Some for a standalone use I recommand you using TAKIOMI OR CDisplayEX android.
+
 
 ## Got an idea of something which could be added or enhanced ?
 Then open an issue on GitHub or make a Pull Request if you have implemented it already.
 
 ## Got issues, have a feedback, want helps ?
-Then Open an issue on Github.
+Then Open an issue on GitHub.
