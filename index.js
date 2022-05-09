@@ -1288,6 +1288,7 @@ shortname
                                     clres.forEach((el) => {
                                         const divs = document.createElement("div");
                                         divs.innerHTML = "<a target='_blank' href=" + JSON.parse(el.url)[0].url + ">" + "<img src='" + JSON.parse(el.image).path + "/detail." + JSON.parse(el.image).extension + "' class='img-charac'/>" + el.name + "</a>";
+                                        
                                         divs.style.marginLeft = "10px";
                                         container.appendChild(divs);
                                     })
@@ -3393,7 +3394,6 @@ function Toastifycation(message, BGColor = "#333", FrontColor = "#ffffff") {
 }
 
 
-
 //Handle the drag and drop to open files in the app
 document.addEventListener("drop", (event) => {
     event.preventDefault();
@@ -4061,11 +4061,18 @@ getFromDB("Books", "* FROM Books WHERE reading = 1").then(async (resa) => {
 
         }
     }
+    if (TheBookun.length == 0) {
+        const element = document.getElementById("continueReadingHome");
+        let node = document.createElement("p")
+        node.innerHTML = "Nothing to display here !<br/>Open a new book or try one of the one's below."
+        element.appendChild(node);
+    }
 
 })
 getFromDB("Books", "* FROM Books ORDER BY ID_DB DESC LIMIT 10").then(async (resa) => {
     var TheBookun = JSON.parse(resa);
     console.log(TheBookun);
+
     for (let i = 0; i < TheBookun.length; i++) {
         var TheBook = TheBookun[i];
         var imagelink = TheBook["URLCover"];
@@ -4347,6 +4354,12 @@ getFromDB("Books", "* FROM Books ORDER BY ID_DB DESC LIMIT 10").then(async (resa
 
 
         }
+    }
+    if (TheBookun.length == 0) {
+        const element = document.getElementById("recentlyAdded");
+        let node = document.createElement("p")
+        node.innerHTML = "Nothing to display here !"
+        element.appendChild(node);
     }
 
 })
