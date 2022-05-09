@@ -37,48 +37,18 @@ along with Cosmic-Comics.  If not, see <https://www.gnu.org/licenses/>.*/
     --sideBar : #404040;
     --cardCustoShadow : rgba(0, 0, 0, 0.3);
     --cardCustoShadowHover : rgba(0, 0, 0, 0.6);
-}
-html {
-    background: linear-gradient(to top left, #4a5865, #1b232a) no-repeat fixed;
-    color: white;
-    --font: "Roboto", sans-serif;
-    background-size: cover;
-    --speed: 0.65s;
-
-}
-
-.black::-webkit-scrollbar {
-    width: 5px;
+    --ratingBG : #555;
+    --releasing : #93500;
+    --snackBarTrack : #292929;
+    --snackBarThumb : #181818;
+    --snackBarThumbHover : #212121;
+    --ProgressBG : #343035;
+    --ProgressFG : #2e52eb;
+    --background : linear-gradient(to top left, #4a5865, #1b232a) no-repeat fixed;
 }
 
-.black::-webkit-scrollbar-thumb {
-    background-color: #444444;
-}
 
-.black::-webkit-scrollbar-thumb:hover {
-    background-color: #333333;
-}
 
-.black::-webkit-scrollbar-track {
-    background-color: #222222;
-}
-
-.white::-webkit-scrollbar {
-    width: 5px;
-    border-radius: 0;
-}
-
-.white::-webkit-scrollbar-thumb {
-    background-color: #b3b3b3;
-}
-
-.white::-webkit-scrollbar-thumb:hover {
-    background-color: #808080;
-}
-
-.white::-webkit-scrollbar-track {
-    background-color: #ffffff;
-}
 
 #overlay {
     background-color: rgba(0, 0, 0, 0);

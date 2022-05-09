@@ -16,7 +16,14 @@ along with Cosmic-Comics.  If not, see <https://www.gnu.org/licenses/>.*/
     --squarePP: 7vw;
     --averageScore: 0;
 }
+html {
+    background: var(--background);
+    color: white;
+    --font: "Roboto", sans-serif;
+    background-size: cover;
+    --speed: 0.65s;
 
+}
 a {
     text-decoration: none;
 }
@@ -271,7 +278,7 @@ a {
 /* The snackbar - position it at the bottom and in the middle of the screen */
 #snackbar {
     visibility: hidden; /* Hidden by default. Visible on click */
-    background-color: #333; /* Black background color */
+    background-color: var(--color-bg-secondary); /* Black background color */
     min-width: 100%;
     color: var(--text); /* White text color */
     text-align: center; /* Centered text */
@@ -399,7 +406,7 @@ a {
 }
 
 .rating-css input:checked + label ~ label {
-    color: #555;
+    color: var(--ratingBG);
 }
 
 .rating-css.hover-effect input:checked + label ~ label,
@@ -1101,28 +1108,6 @@ body {
     cursor: pointer;
 }
 
-.iconbutton {
-    width: 50px;
-    height: 50px;
-    border-radius: 100%;
-    background: #2c4922;
-    box-shadow: 5px 5px 5px rgba(0, 0, 0, 0.25);
-}
-
-.button {
-    width: 60px;
-    height: 60px;
-    background: #1e2c86;
-}
-
-.iconbutton i {
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    height: 100%;
-    color: white;
-}
-
 #contentViewer {
     position: fixed;
     /* Sit on top of the page content */
@@ -1191,8 +1176,8 @@ body {
     position: absolute;
     top: 15vh;
     right: 3vw;
-    color: white;
-    background-color: #935000;
+    color: var(--text);
+    background-color: var(--releasing);
 
 }
 
@@ -1219,15 +1204,15 @@ body {
 }
 
 ::-webkit-scrollbar-track {
-    background: #292929;
+    background: var(--snackBarTrack);
 }
 
 ::-webkit-scrollbar-thumb {
-    background: #181818;
+    background: var(--snackBarThumb);
 }
 
 ::-webkit-scrollbar-thumb:hover {
-    background: #212121;
+    background: var(--snackBarThumbHover);
 }
 
 .circle-small {
@@ -1246,13 +1231,13 @@ body {
 .circle-small .bg {
     fill: none;
     stroke-width: 6px;
-    stroke: #343035;
+    stroke: var(--ProgressBG);
 }
 
 .circle-small .progress {
     fill: none;
     stroke-width: 6px;
-    stroke: #2e52eb;
+    stroke: var(--ProgressFG);
     stroke-linecap: round;
     stroke-dasharray: 232.36;
     transform: rotate(-90deg);

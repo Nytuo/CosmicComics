@@ -943,7 +943,7 @@ function loadView(FolderRes, libraryPath, date = "", provider = 2) {
                             }
                             if (cdata["data"]["total"] > 0) {
                                 cdata = cdata["data"]["results"][0];
-                                await InsertIntoDB("Books", "", `('${shortname}','${realname}',${0},${0},${1},${0},${0},${0},'${path}','${cdata["thumbnail"].path + "/detail." + cdata["thumbnail"].extension}','${cdata["issueNumber"]}','${cdata["description"].replaceAll("'", "''")}','${cdata["format"]}',${cdata["pageCount"]},'${JSON.stringify(cdata["urls"])}','${JSON.stringify(cdata["series"])}','${JSON.stringify(cdata["creators"])}','${JSON.stringify(cdata["characters"])}','${JSON.stringify(cdata["prices"])}','${JSON.stringify(cdata["dates"])}','${JSON.stringify(cdata["collectedIssues"])}','${JSON.stringify(cdata["collections"])}','${JSON.stringify(cdata["variants"])}')`).then(() => {
+                                await InsertIntoDB("Books", "", `(?,'${shortname}','${realname}',${0},${0},${1},${0},${0},${0},'${path}','${cdata["thumbnail"].path + "/detail." + cdata["thumbnail"].extension}','${cdata["issueNumber"]}','${cdata["description"].replaceAll("'", "''")}','${cdata["format"]}',${cdata["pageCount"]},'${JSON.stringify(cdata["urls"])}','${JSON.stringify(cdata["series"])}','${JSON.stringify(cdata["creators"])}','${JSON.stringify(cdata["characters"])}','${JSON.stringify(cdata["prices"])}','${JSON.stringify(cdata["dates"])}','${JSON.stringify(cdata["collectedIssues"])}','${JSON.stringify(cdata["collections"])}','${JSON.stringify(cdata["variants"])}')`).then(() => {
 
                                     console.log("inserted");
 
@@ -993,7 +993,7 @@ function loadView(FolderRes, libraryPath, date = "", provider = 2) {
 
                                 })
                             } else {
-                                await InsertIntoDB("Books", "", `('${shortname}','${realname}',${0},${0},${1},${0},${0},${0},'${path}','${null}','${null}','${null}','${null}',${null},'${null}','${null}','${null}','${null}','${null}','${null}','${null}','${null}','${null}')`).then(() => {
+                                await InsertIntoDB("Books", "", `(?,'${shortname}','${realname}',${0},${0},${1},${0},${0},${0},'${path}','${null}','${null}','${null}','${null}',${null},'${null}','${null}','${null}','${null}','${null}','${null}','${null}','${null}','${null}')`).then(() => {
                                     console.log("inserted");
                                     TheBook = {
                                         ID_book: shortname,
@@ -1027,7 +1027,7 @@ function loadView(FolderRes, libraryPath, date = "", provider = 2) {
                         })
 
                     } else if (provider == 2) {
-                        await InsertIntoDB("Books", "", `('${shortname}','${realname}',${0},${0},${1},${0},${0},${0},'${path}','${null}','${null}','${null}','${null}',${null},'${null}','${null}','${null}','${null}','${null}','${null}','${null}','${null}','${null}')`).then(() => {
+                        await InsertIntoDB("Books", "", `(?,'${shortname}','${realname}',${0},${0},${1},${0},${0},${0},'${path}','${null}','${null}','${null}','${null}',${null},'${null}','${null}','${null}','${null}','${null}','${null}','${null}','${null}','${null}')`).then(() => {
                             console.log("inserted");
                             TheBook = {
                                 ID_book: shortname,
