@@ -17,10 +17,41 @@ along with Cosmic-Comics.  If not, see <https://www.gnu.org/licenses/>.*/
     --averageScore: 0;
 }
 
+[class^=ribbon-] {
+    position: relative;
+    top: 10px;
+}
+[class^=ribbon-]:before, [class^=ribbon-]:after {
+    content: "";
+    position: absolute;
+}
+.ribbon-1 {
+    width: 20px;
+    height: 40px;
+    background: #ee583a;
+    top: -270px;
+    left: 220px;
+}
+.ribbon-1:before {
+    height: 0;
+    width: 0;
+    border-bottom: 6px solid #ca3011;
+    border-right: 6px solid transparent;
+    right: -6px;
+}
+.ribbon-1:after {
+    height: 0;
+    width: 0;
+    border-left: 10px solid #ee583a;
+    border-right: 10px solid #ee583a;
+    border-bottom: 10px solid transparent;
+    bottom: -10px;
+}
 html {
     background: var(--background);
     color: var(--text);
     background-size: var(--HTMLBGSize);
+    background-attachment: fixed;
     --speed: 0.65s;
 }
 
@@ -1058,7 +1089,7 @@ body {
 
 
 /* disposition for recently added abd continue reading */
-#recentlyAdded, #continueReadingHome {
+#recentlyAdded, #continueReadingHome, #toRead {
     display: flex;
     flex-direction: row;
     flex-wrap: nowrap;

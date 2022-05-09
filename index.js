@@ -86,201 +86,6 @@ var linkBG = "";
 document.getElementsByTagName("html")[0].className = "black";
 document.getElementById("btn_close_icon_about").className = "btn-close btn-close-white";
 
-function Themes() {
-    if (currenttheme !== "[DEFAULT] - Default.json") {
-        if (currenttheme === "[EVENT] - Halloween.json") {
-            document.getElementById("logo_id_txt").src = "Images/LogoTxt_h.png";
-            document.getElementById("logo_id").src = "Images/Logo_h.png";
-        } else if (currenttheme === "[EVENT] - X-Mas.json") {
-            document.getElementById("logo_id_txt").src = "Images/LogoTxt_n.png";
-            document.getElementById("logo_id").src = "Images/Logo_n.png";
-        }
-        fetch("http://" + domain + ":" + port + "/themes/read/" + currenttheme).then(function (response) {
-            return response.text();
-        }).then(function (data) {
-            var config_JSON = data
-            var parsedJSON = JSON.parse(config_JSON)[0];
-            linkBG = Get_From_Config("linkBG", parsedJSON);
-            theme_BG = Get_From_Config("BG", parsedJSON);
-            theme_FG = Get_From_Config("FG", parsedJSON);
-            theme_O2 = Get_From_Config("O2", parsedJSON);
-            theme_notifBG = Get_From_Config("notifBG", parsedJSON);
-            theme_button_card = Get_From_Config("button_card", parsedJSON);
-            theme_progress = Get_From_Config("progress", parsedJSON);
-            theme_hover_close = Get_From_Config("hover_close", parsedJSON);
-            theme_btn_FG = Get_From_Config("btn_FG", parsedJSON);
-            theme_btn_BG = Get_From_Config("btn_BG", parsedJSON);
-            theme_btn_border = theme_btn_BG;
-            theme_btn_hover = Get_From_Config("btn_hover", parsedJSON);
-            theme_btn_FG_s = Get_From_Config("btn_FG_s", parsedJSON);
-            theme_btn_BG_s = Get_From_Config("btn_BG_s", parsedJSON);
-            theme_btn_border_s = theme_btn_BG_s;
-            theme_btn_hover_s = Get_From_Config("btn_hover_s", parsedJSON);
-
-            document.getElementById("prgs").style.backgroundColor = Get_From_Config("progress_color", parsedJSON);
-            document.getElementsByTagName("html")[0].className = Get_From_Config("scrollbar", parsedJSON);
-            document.getElementsByTagName("nav")[0].style.backgroundColor = Get_From_Config("nav_BG", parsedJSON);
-            theme_hover_listview = Get_From_Config("hover_listview", parsedJSON);
-            document.getElementById("progressbar").className = Get_From_Config("progressbar_progresswhite_progressblack", parsedJSON);
-            theme_BG_CI = Get_From_Config("BG_CI", parsedJSON);
-
-            document.getElementById("iframe_yt_music").src = Get_From_Config("Music", parsedJSON);
-
-            for (let i = 0; i < document.querySelectorAll(".modal-content").length; i++) {
-                document.getElementsByClassName("modal-content")[i].style.backgroundColor = theme_BG;
-            }
-            for (let i = 0; i < document.querySelectorAll(".btn").length; i++) {
-                if (document
-                    .getElementsByClassName("btn")
-                    [i].classList.contains("btn-primary") || document
-                    .getElementsByClassName("btn")
-                    [i].classList.contains("btn-secondary")) {
-                    if (document
-                        .getElementsByClassName("btn")
-                        [i].classList.contains("btn-primary")) {
-                        document.getElementsByClassName("btn")[i].style.color = theme_btn_FG;
-                        document.getElementsByClassName("btn")[i].style.backgroundColor = theme_btn_BG;
-                        document.getElementsByClassName("btn")[i].style.borderColor = theme_btn_BG;
-                        document
-                            .getElementsByClassName("btn")
-                            [i].addEventListener("mouseover", function () {
-                            document.getElementsByClassName("btn")[i].style.backgroundColor = theme_btn_hover;
-                        });
-                        document
-                            .getElementsByClassName("btn")
-                            [i].addEventListener("mouseout", function () {
-                            document.getElementsByClassName("btn")[i].style.backgroundColor = theme_btn_BG;
-                        });
-                        document
-                            .getElementsByClassName("btn")
-                            [i].addEventListener("mousedown", function () {
-                            document.getElementsByClassName("btn")[i].style.borderColor = theme_btn_BG;
-                        });
-                    } else {
-                        document.getElementsByClassName("btn")[i].style.color = theme_btn_FG_s;
-                        document.getElementsByClassName("btn")[i].style.backgroundColor = theme_btn_BG_s;
-                        document.getElementsByClassName("btn")[i].style.borderColor = theme_btn_BG_s;
-                        document
-                            .getElementsByClassName("btn")
-                            [i].addEventListener("mouseover", function () {
-                            document.getElementsByClassName("btn")[i].style.backgroundColor = theme_btn_hover_s;
-                        });
-                        document
-                            .getElementsByClassName("btn")
-                            [i].addEventListener("mouseout", function () {
-                            document.getElementsByClassName("btn")[i].style.backgroundColor = theme_btn_BG_s;
-                        });
-                    }
-                } else {
-                    document.getElementsByClassName("btn")[i].style.color = theme_FG;
-                    document
-                        .getElementsByClassName("btn")
-                        [i].addEventListener("mouseover", function () {
-                        document.getElementsByClassName("btn")[i].style.backgroundColor = theme_hover_listview;
-                    });
-                    document
-                        .getElementsByClassName("btn")
-                        [i].addEventListener("mouseout", function () {
-                        document.getElementsByClassName("btn")[i].style.backgroundColor = theme_nohover_listview;
-                    });
-                }
-            }
-            for (let i = 0; i < document.querySelectorAll(".modal-title").length; i++) {
-                document.getElementsByClassName("modal-title")[i].style.color = theme_FG;
-            }
-            for (let i = 0; i < document.querySelectorAll("p").length; i++) {
-                document.getElementsByTagName("p")[i].style.color = theme_FG;
-            }
-            for (let i = 0; i < document.querySelectorAll("h1").length; i++) {
-                document.getElementsByTagName("h1")[i].style.color = theme_FG;
-            }
-            for (let i = 0; i < document.querySelectorAll(".btnw").length; i++) {
-                document.getElementsByClassName("btnw")[i].style.color = theme_FG;
-                document
-                    .getElementsByClassName("btnw")
-                    [i].addEventListener("mouseover", function () {
-                    document.getElementsByClassName("btnw")[i].style.backgroundColor = theme_hover_listview;
-                });
-                document
-                    .getElementsByClassName("btnw")
-                    [i].addEventListener("mouseout", function () {
-                    document.getElementsByClassName("btnw")[i].style.backgroundColor = theme_nohover_listview;
-                });
-            }
-            for (let i = 0; i < document.querySelectorAll("label").length; i++) {
-                document.getElementsByTagName("label")[i].style.color = theme_FG;
-            }
-            document.getElementsByClassName("closebtn")[0].style.color = theme_FG;
-            document
-                .getElementsByClassName("closebtn")[0]
-                .addEventListener("mouseover", function () {
-                    document.getElementsByClassName("closebtn")[0].style.backgroundColor = theme_hover_close;
-                });
-            document
-                .getElementsByClassName("closebtn")[0]
-                .addEventListener("mouseout", function () {
-                    document.getElementsByClassName("closebtn")[0].style.backgroundColor = theme_nohover_listview;
-                });
-            for (let i = 0; i < document.querySelectorAll("li").length; i++) {
-                document.getElementsByTagName("li")[i].style.color = theme_FG;
-            }
-            for (let i = 0; i < document.querySelectorAll("h4").length; i++) {
-                document.getElementsByTagName("h4")[i].style.color = theme_FG;
-            }
-            document.getElementById("btn_close_icon_about").className = "btn-close";
-            if (linkBG !== "") {
-                document.getElementsByTagName("html")[0].style.backgroundImage = "url('" + linkBG + "')";
-            }
-            document.getElementById("overlaymsg").style.color = theme_FG;
-            if (theme_O2.includes("https://") || theme_O2.includes("http://") || theme_O2.includes("/") || theme_O2.includes("\\")) {
-                document.getElementById("overlay2").style.backgroundRepeat = "no-repeat";
-                document.getElementById("overlay2").style.backgroundSize = "cover";
-                document.getElementById("overlay2").style.backgroundImage = "url('" + theme_O2 + "')";
-                document.getElementById("overlay").style.backgroundRepeat = "no-repeat";
-                document.getElementById("overlay").style.backgroundSize = "cover";
-                document.getElementById("overlay").style.backgroundImage = "url('" + theme_O2 + "')";
-            } else {
-                document.getElementById("overlay").style.backgroundColor = theme_BG;
-                document.getElementById("overlay2").style.backgroundColor = theme_O2;
-            }
-            document.getElementById("snackbar").style.color = theme_FG;
-            document.getElementById("snackbar").style.backgroundColor = theme_notifBG;
-            document.getElementsByTagName("html")[0].style.backgroundColor = theme_BG;
-
-        }).catch(function (error) {
-            console.log(error);
-        });
-    }
-}
-
-if (currenttheme === 99) {
-    //Custom theme
-    document.getElementById("iframe_yt_music").src = "placeholder";
-
-    theme_BG = "black";
-    theme_FG = "white";
-    theme_O2 = "black";
-    theme_notifBG = "rgb(0, 0, 0)";
-    theme_button_card = "";
-    theme_progress = "";
-    theme_hover_close = "rgb(170, 40, 40)";
-    theme_btn_FG = "white";
-    theme_btn_BG = "black";
-    theme_btn_border = theme_btn_BG;
-    theme_btn_hover = "gray";
-    theme_btn_FG_s = "white";
-    theme_btn_BG_s = "black";
-    theme_btn_border_s = theme_btn_BG_s;
-    theme_btn_hover_s = "gray";
-
-    document.getElementsByTagName("html")[0].className = "black";
-    document.getElementsByTagName("nav")[0].style.backgroundColor = "rgba(0, 0, 0, 0.8)";
-    theme_hover_listview = "rgb(40, 40, 40)";
-    document.getElementById("progressbar").className = "progress";
-    theme_BG_CI = "rgba(0, 0, 255,0.753)";
-    Themes();
-}
-
 function _01toBool(number) {
     return number === 0;
 }
@@ -301,6 +106,23 @@ fetch("http://" + domain + ":" + port + "/dirname").then(function (response) {
     console.log(error);
 });
 
+function setTheme(theme) {
+    document.head.getElementsByTagName("link")[5].href = "/themes/"+theme;
+
+}
+
+fetch("http://"+domain+":"+port+"/config/getConfig").then(function (response) {
+    return response.text();
+}).then(function (data) {
+    let currenttheme = GetElFromInforPath(
+        "theme",
+        JSON.parse(data))
+    console.log(currenttheme)
+setTheme(currenttheme);
+
+}).catch(function (error) {
+    console.log(error);
+});
 var GetAllIMG = false;
 
 //ToolTips
@@ -338,7 +160,7 @@ async function getResponse() {
 fetch("http://" + domain + ":" + port + "/getVersion").then(function (response) {
     return response.text();
 }).then(function (data) {
-    document.getElementById("version").innerHTML = data;
+    document.getElementById("version").innerHTML = "Version : " + data;
 }).catch(function (error) {
     console.log(error);
 });
@@ -472,6 +294,11 @@ function discoverFolders() {
             var btn = document.createElement("button");
             btn.id = el["NAME"];
             btn.addEventListener("click", function () {
+                document.getElementById("ContainerExplorer").innerHTML = "";
+                document.getElementById("overlay").style.display = "none"
+                document.getElementById("overlay2").style.display = "none"
+                document.getElementById("contentViewer").style.display = "none"
+
                 openFolder_logic(el["PATH"], el["API_ID"]);
             });
             if (el["API_ID"] === 1) {
@@ -584,7 +411,28 @@ function changeUpdateProvider() {
     Modify_JSON_For_Config(CosmicComicsData + "/config.json", "update_provider", "");
     Toastifycation(language["next_time"], "#00C33C");
 }
+function modifyConfigJson(json, tomod, mod) {
+    //check si obj exist pour remplacer valeur
 
+    fetch("http://"+domain+":"+port+"/config/getConfig").then(function (response) {
+        return response.text();
+    }).then(function (data) {
+        var configFile = data;
+        var config = JSON.parse(configFile);
+        for (var i in config) {
+            config[tomod] = mod;
+        }
+        const option = {
+            method: 'POST',
+            headers: {'Content-Type': 'application/json'},
+            body: JSON.stringify(config, null, 2)
+        };
+        fetch('/config/writeConfig', option);
+    }).catch(function (error) {
+        console.log(error);
+    });
+
+}
 //Modify the JSON for config.json
 function Modify_JSON_For_Config(json, tomodify, modification) {
     var config_JSON = fs.readFileSync(json);
@@ -647,8 +495,6 @@ async function DetectFolderInLibrary(result) {
 //Open folder logic
 function openFolder_logic(folder, provider = 3) {
     document.getElementById("home").style.display = "none";
-    document.getElementById("opnfld").onclick = "";
-    document.getElementById("opnfld").setAttribute("disabled", "");
     document.getElementById("overlay").style.display = "block";
 
     setTimeout(() => {
@@ -1118,6 +964,10 @@ shortname
                 const carddiv = document.createElement("div");
                 carddiv.style.cursor = "pointer";
                 if (cardMode === true) {
+const rib = document.createElement("div");
+                    if (TheBook["unread"] == 1){
+rib.className = "ribbon-1";
+                    }
                     carddiv.className = "cardcusto";
                     carddiv.setAttribute("data-effect", "zoom");
                     //button card_save
@@ -1288,7 +1138,7 @@ shortname
                                     clres.forEach((el) => {
                                         const divs = document.createElement("div");
                                         divs.innerHTML = "<a target='_blank' href=" + JSON.parse(el.url)[0].url + ">" + "<img src='" + JSON.parse(el.image).path + "/detail." + JSON.parse(el.image).extension + "' class='img-charac'/>" + el.name + "</a>";
-                                        
+
                                         divs.style.marginLeft = "10px";
                                         container.appendChild(divs);
                                     })
@@ -1394,6 +1244,8 @@ shortname
                     const element = document.getElementById("ContentView");
                     const divrating = document.createElement("div");
                     carddiv.appendChild(divrating);
+                    carddiv.appendChild(rib)
+
                     element.appendChild(carddiv);
 
                     /* if (stat.isDirectory()) {
@@ -3322,63 +3174,6 @@ document.getElementById("id_btn_ComicsFolder").innerHTML =
 document.getElementById("id_btn_Temp").innerHTML = language["btn_Temp"];
 document.getElementById("tutotxt").innerHTML = language["tuto_txt"];*/
 
-//Get Available Languages
-function getAvailableLanguages() {
-    return ["en.json"];
-    return fs.readdirSync(__dirname + "/languages");
-}
-
-//Get the flags by a cdn
-function getFlags() {
-    var lang = getAvailableLanguages();
-    var flagslist = [];
-    lang.forEach((language) => {
-        var l = language.split(".");
-        l = l[0];
-        flagslist.push("https://flagcdn.com/h24/" + l + ".png");
-    });
-    return flagslist;
-}
-
-//Insert the flags in the settings
-function insertFlags() {
-    var flagslist = getFlags();
-    console.log(flagslist);
-    flagslist.forEach((flag) => {
-        const flagI = document.createElement("img");
-        const AContainer = document.createElement("a");
-        var l = flag.split("h24/");
-        l = l[1];
-        l = l.split(".png");
-        l = l[0];
-        flagI.src = flag;
-        flagI.style.width = "40px";
-        flagI.style.height = "auto";
-
-        AContainer.href = "#";
-        AContainer.id = "id_lang" + l;
-
-        AContainer.addEventListener("click", () => {
-            changeLang(l);
-        });
-        AContainer.style.margin = "10px";
-        AContainer.appendChild(flagI);
-        document.getElementById("lang_container").appendChild(AContainer);
-        /*new bootstrap.Tooltip(document.getElementById("id_lang" + l), {
-            title: l,
-            placement: "bottom",
-        });*/
-    });
-}
-
-//Change the language of the app
-function changeLang(langues) {
-    Modify_JSON_For_Config(CosmicComicsData + "/config.json", "language", langues);
-    window.location.reload();
-}
-
-//Loading flags
-insertFlags();
 
 //Send Notification
 function Toastifycation(message, BGColor = "#333", FrontColor = "#ffffff") {
@@ -3521,8 +3316,9 @@ function changeVM() {
 }*/
 
 function selectTheme() {
-    Modify_JSON_For_Config(CosmicComicsData + "/config.json", "theme", document.getElementById("themeselector").value);
-    window.location.reload();
+document.head.getElementsByTagName("link")[5].href = "/themes/"+document.getElementById("themeselector").value;
+    modifyConfigJson(CosmicComicsTemp + "/config.json", "theme",document.getElementById("themeselector").value );
+
 }
 
 function ToggleTBY() {
@@ -3548,19 +3344,20 @@ function ToggleTBY() {
         language["activate_theme_date"];
 }*/
 
-function getAllThemes() {
-    var oi = fs.readdirSync(__dirname + "/themes");
-    oi.forEach((el) => {
-        const opt = document.createElement("option");
-        opt.value = el;
-        opt.innerHTML = patha.basename(__dirname + "/themes/" + el).split(".")[0];
-        document.getElementById("themeselector").appendChild(opt);
-    });
-}
+fetch('http://' + domain + ":" + port + "/getThemes").then((response) => {
+    return response.text();
+}).then(function (res) {
+    res = JSON.parse(res);
 
-/*
-getAllThemes();
-*/
+    for (let i = 0; i < res.length; i += 2) {
+        let opt = document.createElement("option");
+        opt.value = res[i];
+        opt.innerHTML = res[i + 1];
+        document.getElementById("themeselector").appendChild(opt);
+    }
+}).catch(function (error) {
+    console.log(error);
+})
 
 async function WConv() {
     try {
@@ -3772,9 +3569,6 @@ async function updateLibrary(forma, id) {
     });
 }
 
-function launchTuto() {
-
-}
 
 getFromDB("Books", "* FROM Books WHERE reading = 1").then(async (resa) => {
     var TheBookun = JSON.parse(resa);
@@ -4363,3 +4157,306 @@ getFromDB("Books", "* FROM Books ORDER BY ID_DB DESC LIMIT 10").then(async (resa
     }
 
 })
+getFromDB("Books", "* FROM Books WHERE unread = 1").then(async (resa) => {
+    var TheBookun = JSON.parse(resa);
+    console.log(TheBookun);
+    for (let i = 0; i < TheBookun.length; i++) {
+        var TheBook = TheBookun[i];
+        var imagelink = TheBook["URLCover"];
+        var node = document.createTextNode(TheBook["NOM"]);
+        const carddiv = document.createElement("div");
+        carddiv.style.cursor = "pointer";
+        if (cardMode === true) {
+            carddiv.className = "cardcusto";
+            carddiv.setAttribute("data-effect", "zoom");
+            //button card_save
+            const buttonfav = document.createElement("button");
+            buttonfav.className = "card__save js-fav";
+            buttonfav.type = "button";
+            buttonfav.addEventListener("click", function () {
+                favorite();
+            });
+            buttonfav.id = "btn_id_fav_" + TheBook["ID_book"];
+
+            //icon
+            const favicon = document.createElement("i");
+            favicon.className = "material-icons";
+            favicon.innerHTML = "favorite";
+            if (currenttheme > 1) buttonfav.className = "js-fav card__save" + theme_button_card;
+
+            buttonfav.appendChild(favicon);
+            carddiv.appendChild(buttonfav);
+
+            //button card__close
+            const button_unread = document.createElement("button");
+            button_unread.className = "card__close js-unread";
+
+            button_unread.type = "button";
+            button_unread.addEventListener("click", function () {
+                markasunread();
+            });
+            button_unread.id = "btn_id_unread_" + TheBook["ID_book"];
+
+            //icon
+            const unread_icon = document.createElement("i");
+            unread_icon.className = "material-icons";
+            unread_icon.innerHTML = "close";
+            if (currenttheme > 1) button_unread.className = "js-unread card__close" + theme_button_card;
+
+            button_unread.appendChild(unread_icon);
+            carddiv.appendChild(button_unread);
+            //button card__reading
+            const button_reading = document.createElement("button");
+            button_reading.className = "card__reading js-reading";
+            button_reading.type = "button";
+            button_reading.addEventListener("click", function () {
+                markasreading();
+            });
+            button_reading.id = "btn_id_reading_" + TheBook["ID_book"];
+
+            //icon
+            const reading_icon = document.createElement("i");
+            reading_icon.className = "material-icons";
+            reading_icon.innerHTML = "auto_stories";
+            if (currenttheme > 1) button_reading.className = "js-reading card__reading" + theme_button_card;
+
+            button_reading.appendChild(reading_icon);
+            carddiv.appendChild(button_reading);
+            //button card__read
+            const button_read = document.createElement("button");
+            button_read.className = "card__read js-read";
+            button_read.type = "button";
+
+            button_read.addEventListener("click", function () {
+                markasread();
+            });
+            button_read.id = "btn_id_read_" + TheBook["ID_book"];
+
+            //ico
+            const read_ion = document.createElement("i");
+            read_ion.className = "material-icons";
+            read_ion.innerHTML = "done";
+            if (currenttheme > 1) button_read.className = "js-read card__read" + theme_button_card;
+
+            button_read.appendChild(read_ion);
+            carddiv.appendChild(button_read);
+            //figure card__image
+            const cardimage = document.createElement("div");
+            cardimage.className = "card__image";
+            cardimage.style.backgroundColor = theme_BG_CI;
+            const imgcard = document.createElement("img");
+            imgcard.style.width = "100%";
+            imgcard.id = "card_img_id_" + TheBook["ID_book"];
+            imgcard.src = imagelink;
+
+
+            cardimage.appendChild(imgcard);
+            carddiv.appendChild(cardimage);
+            //card__body
+            const bodycard = document.createElement("div");
+            bodycard.className = "card__body";
+            //button play
+            const playbtn = document.createElement("button");
+
+            playbtn.className = "card__play js-play";
+            playbtn.type = "button";
+            const playarr = document.createElement("i");
+            playarr.className = "material-icons";
+            playarr.innerHTML = "play_arrow";
+            playarr.style.color = theme_button_card;
+            playbtn.appendChild(playarr);
+            bodycard.appendChild(playbtn);
+
+            const pcard_bio = document.createElement("p");
+            pcard_bio.className = "card__bio";
+            pcard_bio.style = "text-align: center;";
+            pcard_bio.style.color = theme_FG;
+            pcard_bio.innerHTML = node.textContent;
+
+            bodycard.appendChild(pcard_bio);
+            carddiv.appendChild(bodycard);
+            carddiv.id = "id_vol" + TheBook["ID_book"];
+
+            if (playbtn.addEventListener) {
+
+                playbtn.addEventListener("click", function () {
+                    /*            ModifyJSONFile(
+                                    CosmicComicsData + "/ListOfComics.json",
+                                    "reading",
+                                    true,
+                                    shortname
+                                );
+                                ModifyJSONFile(
+                                    CosmicComicsData + "/ListOfComics.json",
+                                    "unread",
+                                    false,
+                                    shortname
+                                );
+                                Modify_JSON_For_Config(
+                                    CosmicComicsData + "/config.json",
+                                    "last_opened",
+                                    path
+                                );*/
+                    alert("ici4")
+                    let encoded = encodeURIComponent(path.replaceAll("/", "%C3%B9"))
+
+                    window.location.href = "viewer.html?" + encoded;
+
+                });
+                carddiv.addEventListener("click", async function () {
+                    if (provider == 1) {
+
+
+                        //TODO FD
+
+                        document.getElementById("relations").innerHTML = "";
+
+                        document.getElementById("id").innerHTML = "This is a : " + TheBook.format + " and it have : " + TheBook.pageCount + " pages. <br/> This is part of the series : " + JSON.parse(TheBook.series).name;
+                        document.getElementById("averageProgress").style.display = "none";
+                        document.getElementById("ContentView").innerHTML = "";
+                        document.getElementById("ColTitle").innerHTML = TheBook.NOM
+                        document.getElementById("ImgColCover").src = TheBook.URLCover
+                        document.getElementById("Status").innerHTML = "";
+                        if (TheBook.description != null && TheBook.description != "null") {
+                            document.getElementById("description").innerHTML = TheBook.description;
+                        } else {
+                            document.getElementById("description").innerHTML = "";
+                        }
+                        // TODO : add the character list
+
+                        var NameToFetchList = [];
+                        JSON.parse(TheBook.characters)["items"].forEach((el) => {
+                            NameToFetchList.push("'" + el.name + "'");
+                        });
+                        var NameToFetch = NameToFetchList.join(",");
+                        var container = document.createElement("div");
+                        await getFromDB("Characters", "* FROM Characters WHERE name IN (" + NameToFetch + ")").then((clres) => {
+                            clres = JSON.parse(clres)
+                            console.log(clres)
+                            container.className = "item-list";
+                            clres.forEach((el) => {
+                                const divs = document.createElement("div");
+                                divs.innerHTML = "<a target='_blank' href=" + JSON.parse(el.url)[0].url + ">" + "<img src='" + JSON.parse(el.image).path + "/detail." + JSON.parse(el.image).extension + "' class='img-charac'/>" + el.name + "</a>";
+                                divs.style.marginLeft = "10px";
+                                container.appendChild(divs);
+                            })
+                        })
+
+                        /* tmpchara += "<a href=" + el.resourceURI + ">" + el.name + "</a>" + "<br/>";*/
+                        document.getElementById("characters").innerHTML = "<h1>" + "characters" + ":</h1> " + "Number of characters : " + JSON.parse(TheBook.characters)["available"] + "<br/>";
+                        document.getElementById("characters").appendChild(container);
+                        //Genres
+
+                        document.getElementById("SiteURL").innerHTML = "URL : <a target='_blank' href=" + JSON.parse(TheBook.URLs)[0].url + ">" + JSON.parse(TheBook.URLs)[0].url + "</a>";
+                        // TODO : add the relations
+                        document.getElementById("OtherTitles").innerHTML = "Variants of this comic (for a complete view check the Marvel's website)" + " : ";
+
+                        await getFromDB("variants", "* FROM variants WHERE series = '" + TheBook.ID_Series + "'").then((clres) => {
+                            clres = JSON.parse(clres)
+                            console.log(clres)
+                            const divlist = document.createElement("div");
+                            divlist.className = "cards-list2"
+                            clres.forEach((el) => {
+                                const reltxt = document.createElement("div");
+                                reltxt.innerHTML = el.name;
+                                reltxt.onclick = function () {
+                                    window.open(JSON.parse(el.url)[0].url);
+                                }
+                                reltxt.className = "cardcusto";
+                                const imgcard = document.createElement("img");
+                                imgcard.src = JSON.parse(el.image).path + "/detail." + JSON.parse(el.image).extension;
+                                imgcard.style.width = "100%";
+                                reltxt.appendChild(imgcard);
+                                divlist.appendChild(reltxt);
+                            })
+                            document.getElementById("OtherTitles").appendChild(divlist);
+                        })
+
+
+                        // TODO : add the staff list
+                        var tmpstaff = "Number of people : " + JSON.parse(TheBook["creators"])["available"] + "<br/>";
+                        var StaffToFetchList = [];
+                        JSON.parse(TheBook.creators)["items"].forEach((el) => {
+                            StaffToFetchList.push("'" + el.name.replaceAll("'", "''") + "'");
+                        });
+                        var StaffToFetch = StaffToFetchList.join(",");
+                        var container2 = document.createElement("div");
+
+                        await getFromDB("Creators", "* FROM Creators WHERE name IN (" + StaffToFetch + ")").then((clres) => {
+                            clres = JSON.parse(clres)
+                            container2.className = "item-list";
+
+                            for (var i = 0; i < clres.length; i++) {
+                                var el = clres[i];
+                                const divs = document.createElement("div");
+                                for (var j = 0; j < clres.length; j++) {
+                                    if (el.name == JSON.parse(TheBook["creators"])["items"][j].name) {
+                                        divs.innerHTML = "<a target='_blank' href=" + JSON.parse(el.url)[0].url + ">" + "<img src='" + JSON.parse(el.image).path + "/detail." + JSON.parse(el.image).extension + "' class='img-charac'/>" + el.name + "<br/>" + JSON.parse(TheBook["creators"])["items"][j]["role"] + "</a>";
+                                        divs.style.marginLeft = "10px";
+                                        container2.appendChild(divs);
+                                    }
+
+                                }
+                            }
+
+                        })
+
+                        for (var a = 0; a < JSON.parse(TheBook.collectedIssues).length; a++) {
+
+                            document.getElementById("colissue").innerHTML += JSON.parse(TheBook.collectedIssues)[a].name + "<br/>";
+                        }
+                        for (var a = 0; a < JSON.parse(TheBook.collections).length; a++) {
+
+                            document.getElementById("col").innerHTML += JSON.parse(TheBook.collections)[a].name + "<br/>";
+                        }
+
+
+                        document.getElementById("Staff").innerHTML = "<h1>" + "Staff" + ":</h1> " + "<br/>" + tmpstaff;
+                        document.getElementById("Staff").appendChild(container2);
+                        document.getElementById("chapters").innerHTML = "Number of this comic within the series : " + TheBook.issueNumber;
+                        document.getElementById("price").innerHTML += "Prices : <br/>";
+                        for (var a = 0; a < JSON.parse(TheBook.prices).length; a++) {
+                            console.log(JSON.parse(TheBook.prices)[a])
+                            document.getElementById("price").innerHTML += JSON.parse(TheBook.prices)[a].type.replace(/([A-Z])/g, ' $1').trim() + " : " + JSON.parse(TheBook.prices)[a].price + "<br/>";
+                        }
+                        document.getElementById("startDate").innerHTML = "Dates : <br/>"
+                        for (var b = 0; b < JSON.parse(TheBook.dates).length; b++) {
+                            document.getElementById("startDate").innerHTML += JSON.parse(TheBook.dates)[b].type.replace(/([A-Z])/g, ' $1').trim() + " : " + convertDate(JSON.parse(TheBook.dates)[b].date) + "<br/>";
+                        }
+
+                        animateCSS(document.getElementById("contentViewer"), "fadeOut").then((message) => {
+                            animateCSS(document.getElementById("contentViewer"), "fadeIn").then((message) => {
+                                document.getElementById("contentViewer").style.display = "block";
+                            });
+                        });
+
+                    }
+                });
+
+            }
+            const element = document.getElementById("toRead");
+            const divrating = document.createElement("div");
+            carddiv.appendChild(divrating);
+            element.appendChild(carddiv);
+
+
+        }
+    }
+    if (TheBookun.length == 0) {
+        const element = document.getElementById("toRead");
+        let node = document.createElement("p")
+        node.innerHTML = "Nothing to display here !<br/>Look's like you read all your books. Consider to import new ones!"
+        element.appendChild(node);
+    }
+
+})
+
+function returnToHome() {
+
+    document.getElementById("ContainerExplorer").innerHTML = "";
+    document.getElementById("overlay").style.display = "none"
+    document.getElementById("overlay2").style.display = "none"
+    document.getElementById("contentViewer").style.display = "none"
+
+    document.getElementById('home').style.display = 'block';
+}

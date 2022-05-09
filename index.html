@@ -102,7 +102,7 @@ along with Cosmic-Comics.  If not, see <https://www.gnu.org/licenses/>.--->
 
     <div class="folderExplorer librariesSideBar" id="folderExplorer">
         <div>
-            <button class="btn btns libbtn" onclick=""><i
+            <button class="btn btns libbtn" onclick="returnToHome()"><i
                     class="material-icons"
                     style="line-height: 1;float: left;">home</i>Home
             </button>
@@ -201,15 +201,7 @@ along with Cosmic-Comics.  If not, see <https://www.gnu.org/licenses/>.--->
             </div>
             <div class="modal-body">
                 <div id="controller">
-                    <button
-                            onclick="openFolder()"
-                            class="btn"
-                            style="margin: 10px"
-                            id="opnfld"
-                            data-bs-dismiss="modal"
-                    >
-                        <i class="material-icons">create_new_folder</i>
-                    </button>
+
                     <button
                             class="btn"
                             style="margin: 10px"
@@ -218,15 +210,6 @@ along with Cosmic-Comics.  If not, see <https://www.gnu.org/licenses/>.--->
                             id="id_bm"
                     >
                         <i class="material-icons">bookmarks</i>
-                    </button>
-                    <button
-                            class="btn"
-                            style="margin: 10px"
-                            onclick="obliviate();"
-                            data-bs-dismiss="modal"
-                            id="id_forgetfolder"
-                    >
-                        <i class="material-icons">delete</i>
                     </button>
                     <button
                             class="btn"
@@ -343,13 +326,13 @@ along with Cosmic-Comics.  If not, see <https://www.gnu.org/licenses/>.--->
                     class="navbar-brand"
                     height="80px"
             />
-                <p id="version"></p>
+                <p id="version">Version : </p>
                 <p id="createdby">Created by Nytuo (Arnaud BEUX)</p>
-                <p id="usewhat"></p>
-                <p id="seewhere"></p>
-                <p id="project"></p>
+                <p id="usewhat">This application is a web server based Comics & Manga reader & Collectionner.</p>
+                <p id="seewhere">See the project on <a style='cursor: pointer' target='seemore' href='https://github.com/Nytuo/CosmicComics'>GitHub</a>, and feel free to open an issue on GitHub for any problems you may have, ask for functionalities.</p>
+                <p id="project">All the code is available on GitHub, under the <a style='cursor: pointer' target='seemore' href='https://www.gnu.org/licenses/gpl-3.0.html'>GNU GPL-3.0</a> license.</p>
                 <p id="translated"></p>
-                <p id="beta_test">THEO LEPRINCE</p>
+                <p id="beta_test">Thanks to the beta tester : THEO LEPRINCE</p>
                 <a href="#" onclick="shell.openExternal('https://nytuo.yo.fr/')"
                 ><img
                         src="Images/Nytuo_softwares.png"
@@ -524,56 +507,7 @@ along with Cosmic-Comics.  If not, see <https://www.gnu.org/licenses/>.--->
                 ></button>
             </div>
             <div class="modal-body" style="text-align: center">
-                <p id="languages">Langues:</p>
-                <div id="lang_container"></div>
-                <button
-                        id="id_btn_update_provider"
-                        class="btn btn-primary"
-                        style="width: 100%"
-                        onclick="changeUpdateProvider()"
-                >
-                    Change Update Provider
-                </button>
-                <button
-                        id="id_btn_appdata"
-                        class="btn btn-primary"
-                        style="width: 100%"
-                        onclick="OpenAppDataFolder()"
-                >
-                    Open Cosmic-Comics Folder's In AppData
-                </button>
-                <button
-                        id="id_btn_Temp"
-                        class="btn btn-primary"
-                        style="width: 100%"
-                        onclick="OpenTempDirectory()"
-                >
-                    Open Cosmic-Comics Folder's In Temp
-                </button>
-                <button
-                        id="id_btn_ComicsFolder"
-                        class="btn btn-primary"
-                        style="width: 100%"
-                        onclick="OpenComicsFolder()"
-                >
-                    Open Loaded Comics Folder
-                </button>
-                <button
-                        id="id_btn_FU"
-                        class="btn btn-primary"
-                        style="width: 100%"
-                        onclick="setFU()"
-                >
-                    Force Update
-                </button>
-                <button
-                        id="id_btn_STB"
-                        class="btn btn-primary"
-                        style="width: 100%"
-                        onclick="toggleSkip()"
-                >
-                    Toggle Skip the thumbnails
-                </button>
+
                 <button
                         id="id_btn_CTN"
                         class="btn btn-primary"
@@ -948,6 +882,8 @@ along with Cosmic-Comics.  If not, see <https://www.gnu.org/licenses/>.--->
 <div id="continueReadingHome"></div>
 <p>Recently added : </p>
 <div id="recentlyAdded"></div>
+    <p>To read : </p>
+<div id="toRead"></div>
 </div>
 <!--The overlay-->
 <div id="overlay">
