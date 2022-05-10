@@ -14,8 +14,8 @@ var CosmicComicsTempI = CosmicComicsTemp + "/current_book/";
 var sqlite3 = require("sqlite3");
 const anilist = require("anilist-node");
 const AniList = new anilist();
-const {Client} = require("anilist.js");
-const AniList2 = new Client();
+/* const {Client} = require("anilist.js");
+const AniList2 = new Client(); */
 const ValidatedExtension = [
     "cbr",
     "cbz",
@@ -97,7 +97,7 @@ if (!fs.existsSync(__dirname + "/public/CosmicComics_local/config.json")) {
         force_update: false,
         skip: false,
         display_style: 0,
-        theme: "[DEFAULT] - Default.json",
+        theme: "default.css",
         theme_date: true,
     };
     fs.writeFileSync(
@@ -452,7 +452,7 @@ app.get("/api/anilist/character/:id", (req, res) => {
         console.log(e);
     }
 })
-app.get("/api/anilist/relations/:name", (req, res) => {
+/* app.get("/api/anilist/relations/:name", (req, res) => {
     try {
         AniList2.searchMedia({
             search: req.params.name,
@@ -467,7 +467,7 @@ app.get("/api/anilist/relations/:name", (req, res) => {
     } catch (e) {
         console.log(e);
     }
-})
+}) */
 app.get("/getThemes", (req, res) => {
         var oi = fs.readdirSync(__dirname + "/public/themes");
         let result = [];
