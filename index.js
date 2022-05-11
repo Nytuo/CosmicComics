@@ -107,18 +107,18 @@ fetch("http://" + domain + ":" + port + "/dirname").then(function (response) {
 });
 
 function setTheme(theme) {
-    document.head.getElementsByTagName("link")[5].href = "/themes/"+theme;
+    document.head.getElementsByTagName("link")[5].href = "/themes/" + theme;
 
 }
 
-fetch("http://"+domain+":"+port+"/config/getConfig").then(function (response) {
+fetch("http://" + domain + ":" + port + "/config/getConfig").then(function (response) {
     return response.text();
 }).then(function (data) {
     let currenttheme = GetElFromInforPath(
         "theme",
         JSON.parse(data))
     console.log(currenttheme)
-setTheme(currenttheme);
+    setTheme(currenttheme);
 
 }).catch(function (error) {
     console.log(error);
@@ -294,11 +294,15 @@ function discoverFolders() {
             var btn = document.createElement("button");
             btn.id = el["NAME"];
             btn.addEventListener("click", function () {
+                document.querySelectorAll(".selectLib").forEach((el) => {
+                    el.classList.remove("selectLib");
+                })
+                btn.classList.add("selectLib");
                 document.getElementById("ContainerExplorer").innerHTML = "";
                 document.getElementById("overlay").style.display = "none"
                 document.getElementById("overlay2").style.display = "none"
                 document.getElementById("contentViewer").style.display = "none"
-
+                document.getElementById("LibTitle").innerHTML = el["NAME"]
                 openFolder_logic(el["PATH"], el["API_ID"]);
             });
             if (el["API_ID"] === 1) {
@@ -363,9 +367,6 @@ function discoverFolders() {
                 ul.addEventListener("click", function () {
                     ul.style.display = "none";
                 });
-                ul.addEventListener("mouseleave", function () {
-                    ul.style.display = "none";
-                });
                 document.addEventListener("click", function (e) {
                     if (e.target != menu && e.target != ul && e.target != li && e.target != li2 && e.target != li3 && e.target != li4 && e.target != btn && e.target != menu.children[0]) {
                         ul.style.display = "none";
@@ -411,10 +412,11 @@ function changeUpdateProvider() {
     Modify_JSON_For_Config(CosmicComicsData + "/config.json", "update_provider", "");
     Toastifycation(language["next_time"], "#00C33C");
 }
+
 function modifyConfigJson(json, tomod, mod) {
     //check si obj exist pour remplacer valeur
 
-    fetch("http://"+domain+":"+port+"/config/getConfig").then(function (response) {
+    fetch("http://" + domain + ":" + port + "/config/getConfig").then(function (response) {
         return response.text();
     }).then(function (data) {
         var configFile = data;
@@ -433,6 +435,7 @@ function modifyConfigJson(json, tomod, mod) {
     });
 
 }
+
 //Modify the JSON for config.json
 function Modify_JSON_For_Config(json, tomodify, modification) {
     var config_JSON = fs.readFileSync(json);
@@ -964,9 +967,9 @@ shortname
                 const carddiv = document.createElement("div");
                 carddiv.style.cursor = "pointer";
                 if (cardMode === true) {
-const rib = document.createElement("div");
-                    if (TheBook["unread"] == 1){
-rib.className = "ribbon-1";
+                    const rib = document.createElement("div");
+                    if (TheBook["unread"] == 1) {
+                        rib.className = "ribbon-1";
                     }
                     carddiv.className = "cardcusto";
                     carddiv.setAttribute("data-effect", "zoom");
@@ -3316,8 +3319,8 @@ function changeVM() {
 }*/
 
 function selectTheme() {
-document.head.getElementsByTagName("link")[5].href = "/themes/"+document.getElementById("themeselector").value;
-    modifyConfigJson(CosmicComicsTemp + "/config.json", "theme",document.getElementById("themeselector").value );
+    document.head.getElementsByTagName("link")[5].href = "/themes/" + document.getElementById("themeselector").value;
+    modifyConfigJson(CosmicComicsTemp + "/config.json", "theme", document.getElementById("themeselector").value);
 
 }
 
@@ -4451,12 +4454,72 @@ getFromDB("Books", "* FROM Books WHERE unread = 1").then(async (resa) => {
 
 })
 
-function returnToHome() {
+document.getElementById("LibTitle").innerHTML = "Home"
+
+function returnToHome(e) {
+    document.querySelectorAll(".selectLib").forEach((el) => {
+        el.classList.remove("selectLib");
+    })
+    e.classList.add("selectLib");
+    document.getElementById("LibTitle").innerHTML = "Home"
 
     document.getElementById("ContainerExplorer").innerHTML = "";
     document.getElementById("overlay").style.display = "none"
     document.getElementById("overlay2").style.display = "none"
     document.getElementById("contentViewer").style.display = "none"
-
     document.getElementById('home').style.display = 'block';
 }
+
+theSearchList = [];
+getFromDB("Books", "NOM FROM Books").then(async (resa) => {
+    resa = JSON.parse(resa);
+    for (var i = 0; i < resa.length; i++) {
+        theSearchList.push(resa[i]);
+    }
+})
+
+function setSearch(res) {
+    for (const key in res) {
+        const resItem = document.createElement("li")
+        resItem.classList.add("resItem");
+        const text = document.createTextNode(res[key].NOM);
+        resItem.appendChild(text)
+        document.getElementById("searchResults").appendChild(resItem)
+
+    }
+    if (res.length == 0) {
+        const resItem = document.createElement("li")
+        resItem.classList.add("resItem");
+        const text = document.createTextNode("No results found");
+        resItem.appendChild(text)
+        document.getElementById("searchResults").appendChild(resItem)
+    }
+}
+
+function clearList() {
+    while (document.getElementById("searchResults").firstChild) {
+        document.getElementById("searchResults").removeChild(document.getElementById("searchResults").firstChild);
+    }
+}
+
+document.getElementById('searchField').addEventListener('input', function (e) {
+    document.getElementById('searchResults').style.display = 'block';
+    clearList()
+    let value = e.target.value;
+    if (value && value.trim().length > 0) {
+        value = value.trim().toLowerCase();
+        setSearch(theSearchList.filter(item => {
+            return item.NOM.toLowerCase().includes(value);
+        }));
+
+    } else {
+        document.getElementById("searchResults").style.display = "none";
+        clearList()
+    }
+})
+document.addEventListener('click', function (e) {
+    document.getElementById("searchResults").style.display = "none";
+
+    clearList();
+
+})

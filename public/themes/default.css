@@ -27,6 +27,7 @@ along with Cosmic-Comics.  If not, see <https://www.gnu.org/licenses/>.*/
     --color-red: #d92027;
     --spinner-size: 5;
     --line-color: #2e53ed;
+    --line-color-transparent : rgba(46, 83, 237, 0.05);
     --line-alpha: 1;
     --ring-color: #000000;
     --ring-alpha: 0;

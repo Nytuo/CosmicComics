@@ -21,10 +21,12 @@ along with Cosmic-Comics.  If not, see <https://www.gnu.org/licenses/>.*/
     position: relative;
     top: 10px;
 }
+
 [class^=ribbon-]:before, [class^=ribbon-]:after {
     content: "";
     position: absolute;
 }
+
 .ribbon-1 {
     width: 20px;
     height: 40px;
@@ -32,6 +34,7 @@ along with Cosmic-Comics.  If not, see <https://www.gnu.org/licenses/>.*/
     top: -270px;
     left: 220px;
 }
+
 .ribbon-1:before {
     height: 0;
     width: 0;
@@ -39,6 +42,7 @@ along with Cosmic-Comics.  If not, see <https://www.gnu.org/licenses/>.*/
     border-right: 6px solid transparent;
     right: -6px;
 }
+
 .ribbon-1:after {
     height: 0;
     width: 0;
@@ -47,6 +51,7 @@ along with Cosmic-Comics.  If not, see <https://www.gnu.org/licenses/>.*/
     border-bottom: 10px solid transparent;
     bottom: -10px;
 }
+
 html {
     background: var(--background);
     color: var(--text);
@@ -1083,7 +1088,7 @@ body {
 
 /* The home page style*/
 #home {
-    margin-top: 8vh;
+    margin-top: 14vh;
     margin-left: 18vw;
 }
 
@@ -1093,4 +1098,65 @@ body {
     display: flex;
     flex-direction: row;
     flex-wrap: nowrap;
+}
+
+.selectLib {
+    background-color: var(--line-color-transparent);
+    color: var(--line-color)
+}
+
+#LibTitle {
+    font-family: 'Roboto-condensed', sans-serif;
+    font-size: 22px;
+    position: absolute;
+    top: 8vh;
+    left: 18vw;
+}
+
+#searchField {
+    background-color: var(--cardCustoShadow);
+    margin-left: 20vw;
+    height: 40px;
+    width: 40vw;
+    border-radius: 5px;
+    padding-left: 10px;
+    color: var(--text);
+    font-size: 18px;
+    font-family: 'Roboto-condensed', sans-serif;
+    border: 0;
+    outline: none;
+    box-shadow: none;
+    transition: all 0.3s ease;
+
+}
+
+#searchResults {
+    position: absolute;
+    top: 50px;
+    left: 20vw;
+    width: 40vw;
+    height: 40vh;
+    background-color: var(--cardCustoShadow);
+    border-radius: 5px;
+    box-shadow: 0 10px 20px var(--cardCustoShadow);
+    z-index: 10;
+    display: none;
+}
+
+#searchResults > li {
+    left: 0;
+    font-family: 'Roboto-condensed', sans-serif;
+    font-size: 18px;
+    width: 100%;
+    color: var(--text);
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    flex-wrap: nowrap;
+    flex-direction: column;
+margin: 0;
+}
+
+#searchResults > li:hover {
+    background-color: var(--cardCustoShadowHover);
 }

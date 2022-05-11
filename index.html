@@ -54,11 +54,17 @@ along with Cosmic-Comics.  If not, see <https://www.gnu.org/licenses/>.--->
                 />
             </a>
             <!--The Navigation Menu-->
+
+            <label>
+                <input type="text" placeholder="Search in your libraries..." id="searchField"/>
+            </label>
+            <ul id="searchResults"></ul>
+
             <button
                     class="btn"
                     data-bs-toggle="modal"
                     data-bs-target="#buttonp"
-                    style="height: 40px; margin: 10px 10px 10px 86vw;"
+                    style="height: 40px; margin: 10px 10px 10px calc(100vw - 1480px);"
                     id="menuid"
             >
                 <i class="material-icons" style="line-height: 1; height: 40px"
@@ -96,13 +102,26 @@ along with Cosmic-Comics.  If not, see <https://www.gnu.org/licenses/>.--->
                 >view_list</i
                 >
             </button>
+            <button
+                    class="btn"
+                    style="margin: 10px 5px 5px; height: 40px;"
+                    onclick="alert('Account system is not implemented yet!')"
+                    id="id_accountSystem"
+            >
+                <i
+                        class="material-icons"
+                        id="icon_id_accountSystem"
+                        style="line-height: 1; height: 40px"
+                >account_circle</i
+                >
+            </button>
         </div>
     </nav>
 
 
     <div class="folderExplorer librariesSideBar" id="folderExplorer">
         <div>
-            <button class="btn btns libbtn" onclick="returnToHome()"><i
+            <button class="btn btns libbtn" onclick="returnToHome(this)"><i
                     class="material-icons"
                     style="line-height: 1;float: left;">home</i>Home
             </button>
@@ -150,6 +169,7 @@ along with Cosmic-Comics.  If not, see <https://www.gnu.org/licenses/>.--->
                 <br>
                 <label class="input-group-text" for="locationa">Location on the server : </label>
                 <input class="form-control" type="text" id="locationa" name="locationa" autocomplete="off"/>
+
                 <br>
                 <label>
                     <select class="form-select" id="providerID" name="providerID">
@@ -876,7 +896,7 @@ along with Cosmic-Comics.  If not, see <https://www.gnu.org/licenses/>.--->
     </div>
 </div>
 <div id="snackbar">Some text some message..</div>
-<!--The Tutorial text-->
+<p id="LibTitle"></p>
 <div id="home">
 <p>Continue reading : </p>
 <div id="continueReadingHome"></div>
