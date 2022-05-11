@@ -3491,62 +3491,10 @@ const download = (url, destination) => new Promise((resolve, reject) => {
     });
 });
 
-async function downloader() {
-    fs.rm(CosmicComicsTemp + "/downloaded_book/", {recursive: true}, () => {
-        fs.mkdirSync(CosmicComicsTemp + "/downloaded_book")
+async function downloader(url) {
+    await fetch('http://' + domain + ":" + port + '/downloadBook/' + url).then(() => {
+        console.log("downloaded");
     });
-    document.getElementById("prgsDL").className = "indeterminate";
-
-    document.getElementById("id_URLDL").setAttribute("disabled", "true");
-    document.getElementById("id_btnDLStart").setAttribute("disabled", "true");
-    const browser = await puppeteer.launch();
-    const page = await browser.newPage();
-
-    let result;
-    const providedURL = document.getElementById("id_URLDL").value;
-    await page.goto(providedURL);
-    var images = await page.$$eval('img', imgs => imgs.map(img => img.getAttribute('src')));
-    var img2DL = []
-    console.log(images)
-    images.forEach((image, index) => {
-        if ((image != null) && (image.includes("http")) && (!image.includes("svg"))) {
-            if (image.includes("drive.google.com") && image.includes("export=view")) {
-                img2DL.push(image.replace("export=view", "export=download"));
-            } else {
-                img2DL.push(image);
-            }
-        }
-    })
-    document.getElementById("prgsDL").className = "determinate";
-
-    for (let i = 0; i < img2DL.length; i++) {
-        var i2 = i;
-        if (i2 < 10) {
-            i2 = "000" + i2
-        } else if (i2 < 100) {
-            i2 = "00" + i2
-        } else if (i2 < 1000) {
-            i2 = "0" + i2
-        }
-        result = await download(img2DL[i], CosmicComicsTemp + "/downloaded_book/image" + i2 + ".png");
-
-        if (result === true) {
-            console.log('Success:', img2DL[i], 'has been downloaded successfully.');
-        } else {
-            document.getElementById("DLtxt").style.color = "red";
-            console.log('Error:', img2DL[i], 'was not downloaded.');
-            console.error(result);
-        }
-        document.getElementById("DLtxt").innerHTML = i + " images downloaded on " + (img2DL.length - 1) + " in total.";
-        document.getElementById("prgsDL").style.width = (i * 100) / (img2DL.length - 1) + "%";
-        remote.getCurrentWindow().setProgressBar(i / (img2DL.length - 1));
-    }
-    document.getElementById("id_btnDLOpen").classList.remove("invisible");
-    document.getElementById("id_URLDL").removeAttribute("disabled");
-    document.getElementById("id_btnDLStart").removeAttribute("disabled");
-    remote.getCurrentWindow().setProgressBar(-1);
-
-    await browser.close();
 }
 
 function OpenDownloadDir() {

@@ -6,7 +6,7 @@ const SevenBin = require("7zip-bin");
 const unrarBin = require("unrar-binaries");
 var Unrar = require("unrar");
 const Seven = require("node-7z");
-const {getColorFromURL} = require('color-thief-node');
+const { getColorFromURL } = require('color-thief-node');
 const Path27Zip = SevenBin.path7za;
 app.use(express.static('public'))
 var CosmicComicsTemp = __dirname + "/public/CosmicComics_local";
@@ -40,7 +40,7 @@ const ValidatedExtensionV = [
 ];
 
 
-fs.mkdirSync(__dirname + "/public/CosmicComics_local/", {recursive: true});
+fs.mkdirSync(__dirname + "/public/CosmicComics_local/", { recursive: true });
 
 var mangaMode = false;
 
@@ -102,7 +102,7 @@ if (!fs.existsSync(__dirname + "/public/CosmicComics_local/config.json")) {
     };
     fs.writeFileSync(
         __dirname + "/public/CosmicComics_local/config.json",
-        JSON.stringify(obj, null, 2), {encoding: "utf8"}
+        JSON.stringify(obj, null, 2), { encoding: "utf8" }
     );
 
 
@@ -156,13 +156,29 @@ if (!fs.existsSync(CosmicComicsTemp + "/downloaded_book")) {
     fs.mkdirSync(CosmicComicsTemp + "/downloaded_book")
 }
 const cors = require('cors');
+const { ChildProcess } = require("child_process");
+const { fork } = require('node:child_process');
 app.use(cors());
-app.use(express.json({limit: "50mb"}))
-app.use(express.urlencoded({extended: true}));
+app.use(express.json({ limit: "50mb" }))
+app.use(express.urlencoded({ extended: true }));
 app.listen(8000, "0.0.0.0", function () {
     const host = this.address().address;
     const port = this.address().port;
     console.log("Listening on port %s:%s!", host, port);
+});
+function download(url) {
+    const controller = new AbortController();
+    const { signal } = controller;
+    const child = fork(__filename, ['child'], { signal });
+    child.on('error', (err) => {
+      // This will be called with err being an AbortError if the controller aborts
+    });
+    controller.abort(); // Stops the child process
+
+}
+app.get("/downloadBook/:url", function (req, res) {
+    download(req.params.url);
+    res.sendStatus(200);
 });
 app.get("/", function (req, res) {
     res.sendFile(__dirname + "/index.html");
@@ -469,11 +485,11 @@ app.get("/api/anilist/character/:id", (req, res) => {
     }
 }) */
 app.get("/getThemes", (req, res) => {
-        var oi = fs.readdirSync(__dirname + "/public/themes");
-        let result = [];
-        oi.forEach((el) => {
-            result.push(el,path.basename(__dirname + "/themes/" + el).split(".")[0]);
-        });
+    var oi = fs.readdirSync(__dirname + "/public/themes");
+    let result = [];
+    oi.forEach((el) => {
+        result.push(el, path.basename(__dirname + "/themes/" + el).split(".")[0]);
+    });
 
     res.send(result);
 });
