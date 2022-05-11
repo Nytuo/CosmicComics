@@ -798,6 +798,13 @@ body {
     background-size: 100%;
     background-repeat: no-repeat;
 }
+.onContentViewer {
+    position: absolute;
+    width: 100%;
+    height: auto;
+    backdrop-filter: blur(50px) brightness(0.5);
+
+}
 
 #ColTitle {
     color: var(--text);
@@ -1094,7 +1101,7 @@ body {
 
 
 /* disposition for recently added abd continue reading */
-#recentlyAdded, #continueReadingHome, #toRead {
+#recentlyAdded, #continueReadingHome, #toRead,#myfavoriteHome {
     display: flex;
     flex-direction: row;
     flex-wrap: nowrap;

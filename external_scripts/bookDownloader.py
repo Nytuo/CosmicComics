@@ -5,6 +5,7 @@ import bs4
 import requests
 import shutil
 import os
+import sys
 from alive_progress import alive_bar
 
 
@@ -95,18 +96,8 @@ def extract(data, type):
                 bar()
         print('[!] Downloaded Successfully...')
     print("[!] All Done!")
-
-
-def main():
-    typa = input("[?] Import by URL or by file [url/file]: ")
-    if typa == 'file':
-        typb = True
-    else:
-        typb = False
-    way = "path" if typb == True else "URL"
-    data = input('[?] Enter the '+way+': ')
-    extract(data, typb)
-
-
-# Calling the main function
-main()
+print(str(sys.argv))
+if len(sys.argv) == 2 and sys.argv[1] != 'undefined':
+    extract(sys.argv[1], False)
+else:
+    print("[!] No URL specified!")

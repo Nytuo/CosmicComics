@@ -1109,7 +1109,14 @@ shortname
                         });
                         carddiv.addEventListener("click", async function () {
                             if (provider == 1) {
+                                console.log(TheBook)
+                                document.getElementById("DLBOOK").addEventListener("click", function (e) {
 
+                                    let path = TheBook.PATH;
+                                    console.log(path);
+                                    downloadBook(path);
+
+                                })
 
                                 //TODO FD
 
@@ -1229,11 +1236,14 @@ shortname
                                     document.getElementById("startDate").innerHTML += JSON.parse(TheBook.dates)[b].type.replace(/([A-Z])/g, ' $1').trim() + " : " + convertDate(JSON.parse(TheBook.dates)[b].date) + "<br/>";
                                 }
 
+
+
                                 animateCSS(document.getElementById("contentViewer"), "fadeOut").then((message) => {
                                     animateCSS(document.getElementById("contentViewer"), "fadeIn").then((message) => {
                                         document.getElementById("contentViewer").style.display = "block";
                                     });
                                 });
+
 
                             }
                         });
@@ -1945,7 +1955,7 @@ async function loadContent(provider, FolderRes, libraryPath) {
                                         loadView(path, libraryPath, JSON.parse(res[0].start_date), provider);
                                         document.getElementById("id").innerText = "This series ID from Marvel : " + parseInt(res[0].ID_Series);
                                         document.getElementById("averageProgress").style.display = "none";
-                                        document.getElementById("contentViewer").style.background = "rgba(0,0,0,0.9) url(" + JSON.parse(res[0].BG).path + "/detail." + JSON.parse(res[0].cover).extension + ")";
+                                        document.getElementById("contentViewer").style.backgroundImage = "url(" + JSON.parse(res[0].BG).path + "/detail." + JSON.parse(res[0].cover).extension + ")";
                                         document.getElementById("ColTitle").innerHTML = JSON.parse(res[0].title)
                                         document.getElementById("ImgColCover").src = JSON.parse(res[0].cover).path + "/detail." + JSON.parse(res[0].cover).extension
                                         if (res[0].description != null && res[0].description != "null") {
@@ -3491,9 +3501,21 @@ const download = (url, destination) => new Promise((resolve, reject) => {
     });
 });
 
-async function downloader(url) {
-    await fetch('http://' + domain + ":" + port + '/downloadBook/' + url).then(() => {
+async function downloader() {
+    let url = document.getElementById("id_URLDL").value;
+    console.log(url);
+    const option = {
+        method: 'POST', headers: {'Content-Type': 'application/json'}, body: JSON.stringify({
+            "url": url,
+        }, null, 2)
+    };
+    await fetch('http://' + domain + ":" + port + '/downloadBook', option).then(() => {
+
         console.log("downloaded");
+        Toastifycation("Downloaded");
+    }).catch(err => {
+        console.log(err);
+        Toastifycation("Error while downloading");
     });
 }
 
@@ -4401,6 +4423,299 @@ getFromDB("Books", "* FROM Books WHERE unread = 1").then(async (resa) => {
     }
 
 })
+getFromDB("Books", "* FROM Books WHERE favorite = 1").then(async (resa) => {
+    var TheBookun = JSON.parse(resa);
+    console.log(TheBookun);
+    for (let i = 0; i < TheBookun.length; i++) {
+        var TheBook = TheBookun[i];
+        var imagelink = TheBook["URLCover"];
+        var node = document.createTextNode(TheBook["NOM"]);
+        const carddiv = document.createElement("div");
+        carddiv.style.cursor = "pointer";
+        if (cardMode === true) {
+            carddiv.className = "cardcusto";
+            carddiv.setAttribute("data-effect", "zoom");
+            //button card_save
+            const buttonfav = document.createElement("button");
+            buttonfav.className = "card__save js-fav";
+            buttonfav.type = "button";
+            buttonfav.addEventListener("click", function () {
+                favorite();
+            });
+            buttonfav.id = "btn_id_fav_" + TheBook["ID_book"];
+
+            //icon
+            const favicon = document.createElement("i");
+            favicon.className = "material-icons";
+            favicon.innerHTML = "favorite";
+            if (currenttheme > 1) buttonfav.className = "js-fav card__save" + theme_button_card;
+
+            buttonfav.appendChild(favicon);
+            carddiv.appendChild(buttonfav);
+
+            //button card__close
+            const button_unread = document.createElement("button");
+            button_unread.className = "card__close js-unread";
+
+            button_unread.type = "button";
+            button_unread.addEventListener("click", function () {
+                markasunread();
+            });
+            button_unread.id = "btn_id_unread_" + TheBook["ID_book"];
+
+            //icon
+            const unread_icon = document.createElement("i");
+            unread_icon.className = "material-icons";
+            unread_icon.innerHTML = "close";
+            if (currenttheme > 1) button_unread.className = "js-unread card__close" + theme_button_card;
+
+            button_unread.appendChild(unread_icon);
+            carddiv.appendChild(button_unread);
+            //button card__reading
+            const button_reading = document.createElement("button");
+            button_reading.className = "card__reading js-reading";
+            button_reading.type = "button";
+            button_reading.addEventListener("click", function () {
+                markasreading();
+            });
+            button_reading.id = "btn_id_reading_" + TheBook["ID_book"];
+
+            //icon
+            const reading_icon = document.createElement("i");
+            reading_icon.className = "material-icons";
+            reading_icon.innerHTML = "auto_stories";
+            if (currenttheme > 1) button_reading.className = "js-reading card__reading" + theme_button_card;
+
+            button_reading.appendChild(reading_icon);
+            carddiv.appendChild(button_reading);
+            //button card__read
+            const button_read = document.createElement("button");
+            button_read.className = "card__read js-read";
+            button_read.type = "button";
+
+            button_read.addEventListener("click", function () {
+                markasread();
+            });
+            button_read.id = "btn_id_read_" + TheBook["ID_book"];
+
+            //ico
+            const read_ion = document.createElement("i");
+            read_ion.className = "material-icons";
+            read_ion.innerHTML = "done";
+            if (currenttheme > 1) button_read.className = "js-read card__read" + theme_button_card;
+
+            button_read.appendChild(read_ion);
+            carddiv.appendChild(button_read);
+            //figure card__image
+            const cardimage = document.createElement("div");
+            cardimage.className = "card__image";
+            cardimage.style.backgroundColor = theme_BG_CI;
+            const imgcard = document.createElement("img");
+            imgcard.style.width = "100%";
+            imgcard.id = "card_img_id_" + TheBook["ID_book"];
+            imgcard.src = imagelink;
+
+
+            cardimage.appendChild(imgcard);
+            carddiv.appendChild(cardimage);
+            //card__body
+            const bodycard = document.createElement("div");
+            bodycard.className = "card__body";
+            //button play
+            const playbtn = document.createElement("button");
+
+            playbtn.className = "card__play js-play";
+            playbtn.type = "button";
+            const playarr = document.createElement("i");
+            playarr.className = "material-icons";
+            playarr.innerHTML = "play_arrow";
+            playarr.style.color = theme_button_card;
+            playbtn.appendChild(playarr);
+            bodycard.appendChild(playbtn);
+
+            const pcard_bio = document.createElement("p");
+            pcard_bio.className = "card__bio";
+            pcard_bio.style = "text-align: center;";
+            pcard_bio.style.color = theme_FG;
+            pcard_bio.innerHTML = node.textContent;
+
+            bodycard.appendChild(pcard_bio);
+            carddiv.appendChild(bodycard);
+            carddiv.id = "id_vol" + TheBook["ID_book"];
+
+            if (playbtn.addEventListener) {
+
+                playbtn.addEventListener("click", function () {
+                    /*            ModifyJSONFile(
+                                    CosmicComicsData + "/ListOfComics.json",
+                                    "reading",
+                                    true,
+                                    shortname
+                                );
+                                ModifyJSONFile(
+                                    CosmicComicsData + "/ListOfComics.json",
+                                    "unread",
+                                    false,
+                                    shortname
+                                );
+                                Modify_JSON_For_Config(
+                                    CosmicComicsData + "/config.json",
+                                    "last_opened",
+                                    path
+                                );*/
+                    alert("ici4")
+                    let encoded = encodeURIComponent(path.replaceAll("/", "%C3%B9"))
+
+                    window.location.href = "viewer.html?" + encoded;
+
+                });
+                carddiv.addEventListener("click", async function () {
+                    if (provider == 1) {
+
+
+                        //TODO FD
+
+                        document.getElementById("relations").innerHTML = "";
+
+                        document.getElementById("id").innerHTML = "This is a : " + TheBook.format + " and it have : " + TheBook.pageCount + " pages. <br/> This is part of the series : " + JSON.parse(TheBook.series).name;
+                        document.getElementById("averageProgress").style.display = "none";
+                        document.getElementById("ContentView").innerHTML = "";
+                        document.getElementById("ColTitle").innerHTML = TheBook.NOM
+                        document.getElementById("ImgColCover").src = TheBook.URLCover
+                        document.getElementById("Status").innerHTML = "";
+                        if (TheBook.description != null && TheBook.description != "null") {
+                            document.getElementById("description").innerHTML = TheBook.description;
+                        } else {
+                            document.getElementById("description").innerHTML = "";
+                        }
+                        // TODO : add the character list
+
+                        var NameToFetchList = [];
+                        JSON.parse(TheBook.characters)["items"].forEach((el) => {
+                            NameToFetchList.push("'" + el.name + "'");
+                        });
+                        var NameToFetch = NameToFetchList.join(",");
+                        var container = document.createElement("div");
+                        await getFromDB("Characters", "* FROM Characters WHERE name IN (" + NameToFetch + ")").then((clres) => {
+                            clres = JSON.parse(clres)
+                            console.log(clres)
+                            container.className = "item-list";
+                            clres.forEach((el) => {
+                                const divs = document.createElement("div");
+                                divs.innerHTML = "<a target='_blank' href=" + JSON.parse(el.url)[0].url + ">" + "<img src='" + JSON.parse(el.image).path + "/detail." + JSON.parse(el.image).extension + "' class='img-charac'/>" + el.name + "</a>";
+                                divs.style.marginLeft = "10px";
+                                container.appendChild(divs);
+                            })
+                        })
+
+                        /* tmpchara += "<a href=" + el.resourceURI + ">" + el.name + "</a>" + "<br/>";*/
+                        document.getElementById("characters").innerHTML = "<h1>" + "characters" + ":</h1> " + "Number of characters : " + JSON.parse(TheBook.characters)["available"] + "<br/>";
+                        document.getElementById("characters").appendChild(container);
+                        //Genres
+
+                        document.getElementById("SiteURL").innerHTML = "URL : <a target='_blank' href=" + JSON.parse(TheBook.URLs)[0].url + ">" + JSON.parse(TheBook.URLs)[0].url + "</a>";
+                        // TODO : add the relations
+                        document.getElementById("OtherTitles").innerHTML = "Variants of this comic (for a complete view check the Marvel's website)" + " : ";
+
+                        await getFromDB("variants", "* FROM variants WHERE series = '" + TheBook.ID_Series + "'").then((clres) => {
+                            clres = JSON.parse(clres)
+                            console.log(clres)
+                            const divlist = document.createElement("div");
+                            divlist.className = "cards-list2"
+                            clres.forEach((el) => {
+                                const reltxt = document.createElement("div");
+                                reltxt.innerHTML = el.name;
+                                reltxt.onclick = function () {
+                                    window.open(JSON.parse(el.url)[0].url);
+                                }
+                                reltxt.className = "cardcusto";
+                                const imgcard = document.createElement("img");
+                                imgcard.src = JSON.parse(el.image).path + "/detail." + JSON.parse(el.image).extension;
+                                imgcard.style.width = "100%";
+                                reltxt.appendChild(imgcard);
+                                divlist.appendChild(reltxt);
+                            })
+                            document.getElementById("OtherTitles").appendChild(divlist);
+                        })
+
+
+                        // TODO : add the staff list
+                        var tmpstaff = "Number of people : " + JSON.parse(TheBook["creators"])["available"] + "<br/>";
+                        var StaffToFetchList = [];
+                        JSON.parse(TheBook.creators)["items"].forEach((el) => {
+                            StaffToFetchList.push("'" + el.name.replaceAll("'", "''") + "'");
+                        });
+                        var StaffToFetch = StaffToFetchList.join(",");
+                        var container2 = document.createElement("div");
+
+                        await getFromDB("Creators", "* FROM Creators WHERE name IN (" + StaffToFetch + ")").then((clres) => {
+                            clres = JSON.parse(clres)
+                            container2.className = "item-list";
+
+                            for (var i = 0; i < clres.length; i++) {
+                                var el = clres[i];
+                                const divs = document.createElement("div");
+                                for (var j = 0; j < clres.length; j++) {
+                                    if (el.name == JSON.parse(TheBook["creators"])["items"][j].name) {
+                                        divs.innerHTML = "<a target='_blank' href=" + JSON.parse(el.url)[0].url + ">" + "<img src='" + JSON.parse(el.image).path + "/detail." + JSON.parse(el.image).extension + "' class='img-charac'/>" + el.name + "<br/>" + JSON.parse(TheBook["creators"])["items"][j]["role"] + "</a>";
+                                        divs.style.marginLeft = "10px";
+                                        container2.appendChild(divs);
+                                    }
+
+                                }
+                            }
+
+                        })
+
+                        for (var a = 0; a < JSON.parse(TheBook.collectedIssues).length; a++) {
+
+                            document.getElementById("colissue").innerHTML += JSON.parse(TheBook.collectedIssues)[a].name + "<br/>";
+                        }
+                        for (var a = 0; a < JSON.parse(TheBook.collections).length; a++) {
+
+                            document.getElementById("col").innerHTML += JSON.parse(TheBook.collections)[a].name + "<br/>";
+                        }
+
+
+                        document.getElementById("Staff").innerHTML = "<h1>" + "Staff" + ":</h1> " + "<br/>" + tmpstaff;
+                        document.getElementById("Staff").appendChild(container2);
+                        document.getElementById("chapters").innerHTML = "Number of this comic within the series : " + TheBook.issueNumber;
+                        document.getElementById("price").innerHTML += "Prices : <br/>";
+                        for (var a = 0; a < JSON.parse(TheBook.prices).length; a++) {
+                            console.log(JSON.parse(TheBook.prices)[a])
+                            document.getElementById("price").innerHTML += JSON.parse(TheBook.prices)[a].type.replace(/([A-Z])/g, ' $1').trim() + " : " + JSON.parse(TheBook.prices)[a].price + "<br/>";
+                        }
+                        document.getElementById("startDate").innerHTML = "Dates : <br/>"
+                        for (var b = 0; b < JSON.parse(TheBook.dates).length; b++) {
+                            document.getElementById("startDate").innerHTML += JSON.parse(TheBook.dates)[b].type.replace(/([A-Z])/g, ' $1').trim() + " : " + convertDate(JSON.parse(TheBook.dates)[b].date) + "<br/>";
+                        }
+
+                        animateCSS(document.getElementById("contentViewer"), "fadeOut").then((message) => {
+                            animateCSS(document.getElementById("contentViewer"), "fadeIn").then((message) => {
+                                document.getElementById("contentViewer").style.display = "block";
+                            });
+                        });
+
+                    }
+                });
+
+            }
+            const element = document.getElementById("myfavoriteHome");
+            const divrating = document.createElement("div");
+            carddiv.appendChild(divrating);
+            element.appendChild(carddiv);
+
+
+        }
+    }
+    if (TheBookun.length == 0) {
+        const element = document.getElementById("myfavoriteHome");
+        let node = document.createElement("p")
+        node.innerHTML = "Nothing to display here !<br/>Look's like you don't love any comic book yet !";
+        element.appendChild(node);
+    }
+
+})
 
 document.getElementById("LibTitle").innerHTML = "Home"
 
@@ -4419,19 +4734,153 @@ function returnToHome(e) {
 }
 
 theSearchList = [];
-getFromDB("Books", "NOM FROM Books").then(async (resa) => {
+getFromDB("Books", "NOM,PATH FROM Books").then(async (resa) => {
     resa = JSON.parse(resa);
     for (var i = 0; i < resa.length; i++) {
         theSearchList.push(resa[i]);
     }
 })
 
-function setSearch(res) {
+async function setSearch(res) {
     for (const key in res) {
         const resItem = document.createElement("li")
         resItem.classList.add("resItem");
         const text = document.createTextNode(res[key].NOM);
         resItem.appendChild(text)
+
+        resItem.addEventListener("click", async (e) => {
+            document.getElementById("home").style.display = "none";
+
+            await getFromDB("Books", "* FROM Books WHERE PATH = '" + res[key].PATH + "'").then(async (resa) => {
+                let bookList = JSON.parse(resa);
+                let TheBook = bookList[0];
+
+
+                //TODO FD
+
+                document.getElementById("relations").innerHTML = "";
+
+                document.getElementById("id").innerHTML = "This is a : " + TheBook.format + " and it have : " + TheBook.pageCount + " pages. <br/> This is part of the series : " + JSON.parse(TheBook.series).name;
+                document.getElementById("averageProgress").style.display = "none";
+                document.getElementById("ContentView").innerHTML = "";
+                document.getElementById("ColTitle").innerHTML = TheBook.NOM
+                document.getElementById("ImgColCover").src = TheBook.URLCover
+                document.getElementById("Status").innerHTML = "";
+                if (TheBook.description != null && TheBook.description != "null") {
+                    document.getElementById("description").innerHTML = TheBook.description;
+                } else {
+                    document.getElementById("description").innerHTML = "";
+                }
+                // TODO : add the character list
+
+                var NameToFetchList = [];
+                JSON.parse(TheBook.characters)["items"].forEach((el) => {
+                    NameToFetchList.push("'" + el.name + "'");
+                });
+                var NameToFetch = NameToFetchList.join(",");
+                var container = document.createElement("div");
+                await getFromDB("Characters", "* FROM Characters WHERE name IN (" + NameToFetch + ")").then((clres) => {
+                    clres = JSON.parse(clres)
+                    console.log(clres)
+                    container.className = "item-list";
+                    clres.forEach((el) => {
+                        const divs = document.createElement("div");
+                        divs.innerHTML = "<a target='_blank' href=" + JSON.parse(el.url)[0].url + ">" + "<img src='" + JSON.parse(el.image).path + "/detail." + JSON.parse(el.image).extension + "' class='img-charac'/>" + el.name + "</a>";
+
+                        divs.style.marginLeft = "10px";
+                        container.appendChild(divs);
+                    })
+                })
+
+                /* tmpchara += "<a href=" + el.resourceURI + ">" + el.name + "</a>" + "<br/>";*/
+                document.getElementById("characters").innerHTML = "<h1>" + "characters" + ":</h1> " + "Number of characters : " + JSON.parse(TheBook.characters)["available"] + "<br/>";
+                document.getElementById("characters").appendChild(container);
+                //Genres
+
+                document.getElementById("SiteURL").innerHTML = "URL : <a target='_blank' href=" + JSON.parse(TheBook.URLs)[0].url + ">" + JSON.parse(TheBook.URLs)[0].url + "</a>";
+                // TODO : add the relations
+                document.getElementById("OtherTitles").innerHTML = "Variants of this comic (for a complete view check the Marvel's website)" + " : ";
+
+                await getFromDB("variants", "* FROM variants WHERE series = '" + TheBook.ID_Series + "'").then((clres) => {
+                    clres = JSON.parse(clres)
+                    console.log(clres)
+                    const divlist = document.createElement("div");
+                    divlist.className = "cards-list2"
+                    clres.forEach((el) => {
+                        const reltxt = document.createElement("div");
+                        reltxt.innerHTML = el.name;
+                        reltxt.onclick = function () {
+                            window.open(JSON.parse(el.url)[0].url);
+                        }
+                        reltxt.className = "cardcusto";
+                        const imgcard = document.createElement("img");
+                        imgcard.src = JSON.parse(el.image).path + "/detail." + JSON.parse(el.image).extension;
+                        imgcard.style.width = "100%";
+                        reltxt.appendChild(imgcard);
+                        divlist.appendChild(reltxt);
+                    })
+                    document.getElementById("OtherTitles").appendChild(divlist);
+                })
+
+
+                // TODO : add the staff list
+                var tmpstaff = "Number of people : " + JSON.parse(TheBook["creators"])["available"] + "<br/>";
+                var StaffToFetchList = [];
+                JSON.parse(TheBook.creators)["items"].forEach((el) => {
+                    StaffToFetchList.push("'" + el.name.replaceAll("'", "''") + "'");
+                });
+                var StaffToFetch = StaffToFetchList.join(",");
+                var container2 = document.createElement("div");
+
+                await getFromDB("Creators", "* FROM Creators WHERE name IN (" + StaffToFetch + ")").then((clres) => {
+                    clres = JSON.parse(clres)
+                    container2.className = "item-list";
+
+                    for (var i = 0; i < clres.length; i++) {
+                        var el = clres[i];
+                        const divs = document.createElement("div");
+                        for (var j = 0; j < clres.length; j++) {
+                            if (el.name == JSON.parse(TheBook["creators"])["items"][j].name) {
+                                divs.innerHTML = "<a target='_blank' href=" + JSON.parse(el.url)[0].url + ">" + "<img src='" + JSON.parse(el.image).path + "/detail." + JSON.parse(el.image).extension + "' class='img-charac'/>" + el.name + "<br/>" + JSON.parse(TheBook["creators"])["items"][j]["role"] + "</a>";
+                                divs.style.marginLeft = "10px";
+                                container2.appendChild(divs);
+                            }
+
+                        }
+                    }
+
+                })
+
+                for (var a = 0; a < JSON.parse(TheBook.collectedIssues).length; a++) {
+
+                    document.getElementById("colissue").innerHTML += JSON.parse(TheBook.collectedIssues)[a].name + "<br/>";
+                }
+                for (var a = 0; a < JSON.parse(TheBook.collections).length; a++) {
+
+                    document.getElementById("col").innerHTML += JSON.parse(TheBook.collections)[a].name + "<br/>";
+                }
+
+                document.getElementById("contentViewer").style.backgroundImage = "url(" + TheBook.URLCover + ")";
+
+                document.getElementById("Staff").innerHTML = "<h1>" + "Staff" + ":</h1> " + "<br/>" + tmpstaff;
+                document.getElementById("Staff").appendChild(container2);
+                document.getElementById("chapters").innerHTML = "Number of this comic within the series : " + TheBook.issueNumber;
+                document.getElementById("price").innerHTML += "Prices : <br/>";
+                for (var a = 0; a < JSON.parse(TheBook.prices).length; a++) {
+                    console.log(JSON.parse(TheBook.prices)[a])
+                    document.getElementById("price").innerHTML += JSON.parse(TheBook.prices)[a].type.replace(/([A-Z])/g, ' $1').trim() + " : " + JSON.parse(TheBook.prices)[a].price + "<br/>";
+                }
+                document.getElementById("startDate").innerHTML = "Dates : <br/>"
+                for (var b = 0; b < JSON.parse(TheBook.dates).length; b++) {
+                    document.getElementById("startDate").innerHTML += JSON.parse(TheBook.dates)[b].type.replace(/([A-Z])/g, ' $1').trim() + " : " + convertDate(JSON.parse(TheBook.dates)[b].date) + "<br/>";
+                }
+
+
+                document.getElementById("contentViewer").style.display = "block";
+
+            });
+        })
+
         document.getElementById("searchResults").appendChild(resItem)
 
     }
@@ -4458,7 +4907,9 @@ document.getElementById('searchField').addEventListener('input', function (e) {
         value = value.trim().toLowerCase();
         setSearch(theSearchList.filter(item => {
             return item.NOM.toLowerCase().includes(value);
-        }));
+        })).then(r => {
+
+        })
 
     } else {
         document.getElementById("searchResults").style.display = "none";
@@ -4471,3 +4922,16 @@ document.addEventListener('click', function (e) {
     clearList();
 
 })
+
+async function downloadBook(path) {
+    const option = {
+        method: 'POST', headers: {'Content-Type': 'application/json'}, body: JSON.stringify({
+            path: path
+        }, null, 2)
+    };
+    console.log(option)
+    await fetch('http://' + domain + ":" + port + '/DL', option).then(() => {
+        window.open("http://" + domain + ":" + port + "/getDLBook", "_blank");
+    });
+
+}

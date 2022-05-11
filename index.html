@@ -150,7 +150,7 @@ along with Cosmic-Comics.  If not, see <https://www.gnu.org/licenses/>.--->
         data-bs-backdrop="static" data-bs-keyboard="false"
         style="overflow: hidden"
 >
-    <div class="modal-dialog modal-dialog-centered" >
+    <div class="modal-dialog modal-dialog-centered">
         <div class="modal-content">
             <div class="modal-header">
                 <h5 class="modal-title" id="id_lib">Adding a library:</h5>
@@ -349,8 +349,13 @@ along with Cosmic-Comics.  If not, see <https://www.gnu.org/licenses/>.--->
                 <p id="version">Version : </p>
                 <p id="createdby">Created by Nytuo (Arnaud BEUX)</p>
                 <p id="usewhat">This application is a web server based Comics & Manga reader & Collectionner.</p>
-                <p id="seewhere">See the project on <a style='cursor: pointer' target='seemore' href='https://github.com/Nytuo/CosmicComics'>GitHub</a>, and feel free to open an issue on GitHub for any problems you may have, ask for functionalities.</p>
-                <p id="project">All the code is available on GitHub, under the <a style='cursor: pointer' target='seemore' href='https://www.gnu.org/licenses/gpl-3.0.html'>GNU GPL-3.0</a> license.</p>
+                <p id="seewhere">See the project on <a style='cursor: pointer' target='seemore'
+                                                       href='https://github.com/Nytuo/CosmicComics'>GitHub</a>, and feel
+                    free to open an issue on GitHub for any problems you may have, ask for functionalities.</p>
+                <p id="project">All the code is available on GitHub, under the <a style='cursor: pointer'
+                                                                                  target='seemore'
+                                                                                  href='https://www.gnu.org/licenses/gpl-3.0.html'>GNU
+                    GPL-3.0</a> license.</p>
                 <p id="translated"></p>
                 <p id="beta_test">Thanks to the beta tester : THEO LEPRINCE</p>
                 <a href="#" onclick="shell.openExternal('https://nytuo.yo.fr/')"
@@ -406,8 +411,8 @@ along with Cosmic-Comics.  If not, see <https://www.gnu.org/licenses/>.--->
                 <p class="red">This functionality not work on all websites, such as the one's which use Google Drive or
                     no-direct image link.</p>
                 <div class="mb-3">
-                    <input class="form-control" type="text"
-                           placeholder="Insert a URL of a website to download All images on it." id="id_URLDL">
+                    <label for="id_URLDL"></label><input class="form-control" type="text"
+                                                         placeholder="" id="id_URLDL">
                 </div>
                 <button class="btn btn-primary" onclick="downloader();" id="id_btnDLStart">Start Download</button>
                 <div class="progress" id="progressbarDL">
@@ -898,12 +903,16 @@ along with Cosmic-Comics.  If not, see <https://www.gnu.org/licenses/>.--->
 <div id="snackbar">Some text some message..</div>
 <p id="LibTitle"></p>
 <div id="home">
-<p>Continue reading : </p>
-<div id="continueReadingHome"></div>
-<p>Recently added : </p>
-<div id="recentlyAdded"></div>
+    <p>Continue reading : </p>
+    <div id="continueReadingHome"></div>
+    <p>My list : </p>
+    <div id="myListHome"></div>
+    <p>My favorites : </p>
+    <div id="myfavoriteHome"></div>
+    <p>Recently added : </p>
+    <div id="recentlyAdded"></div>
     <p>To read : </p>
-<div id="toRead"></div>
+    <div id="toRead"></div>
 </div>
 <!--The overlay-->
 <div id="overlay">
@@ -931,52 +940,56 @@ along with Cosmic-Comics.  If not, see <https://www.gnu.org/licenses/>.--->
 <div class="SpaceX"></div>
 <!--List of the books-->
 <div class="cards-list" id="ContainerExplorer"></div>
-<div class="contentViewer" id="contentViewer">
-    <div id="ColTitle">Demon Slayer</div>
-    <div id="ColContent">
-        <div id="startDate"></div>
-        <div><p id="Status"></p></div>
-        <div id="description"></div>
-        <div id="averageProgress">
 
-            <div class="circle-small">
-                <div class="text">
-                    <div id="averageScore"></div>
+<div class="contentViewer" id="contentViewer">
+    <div class="onContentViewer">
+        <div id="ColTitle">Demon Slayer</div>
+        <div id="ColContent">
+            <div id="startDate"></div>
+            <div><p id="Status"></p></div>
+            <div id="description"></div>
+            <div id="averageProgress">
+
+                <div class="circle-small">
+                    <div class="text">
+                        <div id="averageScore"></div>
+                    </div>
+                    <svg>
+                        <circle class="bg" cx="40" cy="40" r="37"></circle>
+                        <circle class="progress one" cx="40" cy="40" r="37"></circle>
+                    </svg>
                 </div>
-                <svg>
-                    <circle class="bg" cx="40" cy="40" r="37"></circle>
-                    <circle class="progress one" cx="40" cy="40" r="37"></circle>
-                </svg>
+
             </div>
 
+            <div id="genres"></div>
+            <div id="chapters"></div>
+            <div id="id"></div>
+            <div style="margin-top:30vh;"></div>
+
+            <div id="ContentView"><h2>Volumes : </h2></div>
+            <div id="characters"></div>
+            <div id="colissue"></div>
+            <div id="col"></div>
+            <div id="Volumes"></div>
+            <div id="Trending"></div>
+            <div id="Staff"></div>
+            <div id="SiteURL"></div>
+            <div id="price"></div>
+            <div id="OtherTitles"></div>
+            <div id="relations" class="relationsDiv cards-list"></div>
+            <a class="btn btn-primary" id="DLBOOK" onclick="">Download locally</a>
+            <a class="btn btn-primary" href="">Edit Serie</a>
+            <a class="btn btn-primary" href="">Reload data</a>
+
+            <p>All the information displayed on this page, as well as the images (exepted the ones you provided and the
+                ones
+                extracted) are provided by the MARVEL API and belongs to MARVEL</p>
         </div>
-
-        <div id="genres"></div>
-        <div id="chapters"></div>
-        <div id="id"></div>
-        <div style="margin-top:30vh;"></div>
-
-        <div id="ContentView"><h2>Volumes : </h2></div>
-        <div id="characters"></div>
-        <div id="colissue"></div>
-        <div id="col"></div>
-        <div id="Volumes"></div>
-        <div id="Trending"></div>
-        <div id="Staff"></div>
-        <div id="SiteURL"></div>
-        <div id="price"></div>
-        <div id="OtherTitles"></div>
-        <div id="relations" class="relationsDiv cards-list"></div>
-        <a class="btn btn-primary" href="">Edit Serie</a>
-        <a class="btn btn-primary" href="">Reload data</a>
-
-        <p>All the information displayed on this page, as well as the images (exepted the ones you provided and the ones
-            extracted) are provided by the MARVEL API and belongs to MARVEL</p>
+        <div id="ColCover">
+            <img src="" id="ImgColCover" alt="#">
+        </div>
     </div>
-    <div id="ColCover">
-        <img src="" id="ImgColCover" alt="#">
-    </div>
-
 </div>
 <!--Loading scripts-->
 <script type="text/javascript" src="index.js"></script>
