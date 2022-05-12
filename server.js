@@ -44,6 +44,7 @@ fs.mkdirSync(__dirname + "/public/CosmicComics_local/", {recursive: true});
 
 var mangaMode = false;
 
+
 //Creating the database
 
 let db = new sqlite3.Database(__dirname + '/public/CosmicComics_local/ComicsComics.db', (err) => {
@@ -65,6 +66,11 @@ db.run("CREATE TABLE IF NOT EXISTS Characters (ID_CHAR VARCHAR(255) PRIMARY KEY 
 db.run("CREATE TABLE IF NOT EXISTS variants (ID_variant VARCHAR(255) PRIMARY KEY NOT NULL UNIQUE,name VARCHAR(255),image varchar(255),description VARCHAR(255),url VARCHAR(255),series VARCHAR(255), FOREIGN KEY (series) REFERENCES Series (ID_Series))")
 
 db.run("CREATE TABLE IF NOT EXISTS Libraries (ID_LIBRARY INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, NAME VARCHAR(255) NOT NULL,PATH VARCHAR(4096) NOT NULL,API_ID INTEGER NOT NULL,FOREIGN KEY (API_ID) REFERENCES API(ID_API));")
+
+    const obj = {
+        "Token": [],
+    }
+    fs.writeFileSync(__dirname + "/public/CosmicComics_local/serverconfig.json", JSON.stringify(obj), {encoding: 'utf8'});
 
 if (!fs.existsSync(__dirname + "/public/CosmicComics_local/config.json")) {
     const obj = {
@@ -186,7 +192,7 @@ app.post("/DL", function (req, res) {
     res.sendStatus(200);
 })
 app.get("/getDLBook", function (req, res) {
-  res.download(DLBOOKPATH);
+    res.download(DLBOOKPATH);
 })
 app.get("/", function (req, res) {
     res.sendFile(__dirname + "/index.html");
@@ -234,6 +240,14 @@ app.get("/css/animate", (req, res) => {
 })
 app.get("/js/html-magnifier.js", (req, res) => {
     res.sendFile(__dirname + "/js/html-magnifier.js");
+})
+app.get("/login", (req, res) => {
+    res.sendFile(__dirname + "/login.html");
+
+})
+app.get("/js/login", (req, res) => {
+    res.sendFile(__dirname + "/login.js");
+
 })
 
 
@@ -420,6 +434,57 @@ app.get("/getListOfFolder/:path", (req, res) => {
     });
     res.send(listOfFolder);
 })
+app.get("/profile/discover", (req, res) => {
+    let result = [];
+    fs.readdirSync(__dirname + "/public/CosmicComics_local/profiles").forEach(function (file) {
+        let resultOBJ = {};
+        resultOBJ.name = path.basename(file, path.extname(file));
+        resultOBJ.image = "/CosmicComics_local/profiles/" + file + "/pp.png";
+        if (fs.existsSync(__dirname + "/public/CosmicComics_local/profiles/" + file + "/passcode.txt")) {
+            resultOBJ.passcode = true;
+        } else {
+            resultOBJ.passcode = false;
+        }
+        result.push(resultOBJ);
+    })
+    res.send(result);
+})
+var rand = function() {
+    return Math.random().toString(36).substr(2); // remove `0.`
+};
+
+var tokena = function() {
+    return rand() + rand(); // to make it longer
+};
+setInterval(() => {
+    console.log("Resetting Tokens")
+    var configFile = fs.readFileSync(__dirname + "/public/CosmicComics_local/serverconfig.json", "utf8");
+    var config = JSON.parse(configFile);
+    for (var i in config) {
+        config["Token"] = [];
+    }
+    fs.writeFileSync(__dirname + "/public/CosmicComics_local/serverconfig.json", JSON.stringify(config));
+},2*60*60*1000);
+app.get("/profile/login/:name/:passcode", (req, res) => {
+    if (fs.existsSync(__dirname + "/public/CosmicComics_local/profiles/" + req.params.name + "/passcode.txt")) {
+        var passcode = fs.readFileSync(__dirname + "/public/CosmicComics_local/profiles/" + req.params.name + "/passcode.txt", "utf8");
+        if (passcode == req.params.passcode) {
+            let token = tokena();
+            var configFile = fs.readFileSync(__dirname + "/public/CosmicComics_local/serverconfig.json", "utf8");
+            var config = JSON.parse(configFile);
+            for (var i in config) {
+                config["Token"].push(token);
+            }
+            fs.writeFileSync(__dirname + "/public/CosmicComics_local/serverconfig.json", JSON.stringify(config));
+            res.send(token);
+        } else {
+            res.send(false);
+        }
+    } else {
+        res.send(false);
+    }
+})
+
 app.get("/getListOfFilesAndFolders/:path", (req, res) => {
     var dir = req.params.path;
     dir = replaceHTMLAdressPath(dir);

@@ -798,6 +798,7 @@ body {
     background-size: 100%;
     background-repeat: no-repeat;
 }
+
 .onContentViewer {
     position: absolute;
     width: 100%;
@@ -1101,7 +1102,7 @@ body {
 
 
 /* disposition for recently added abd continue reading */
-#recentlyAdded, #continueReadingHome, #toRead,#myfavoriteHome {
+#recentlyAdded, #continueReadingHome, #toRead, #myfavoriteHome {
     display: flex;
     flex-direction: row;
     flex-wrap: nowrap;
@@ -1137,6 +1138,23 @@ body {
 
 }
 
+#menuid {
+    height: 40px;
+    margin: 10px 10px 10px calc(100vw - 1460px);
+}
+@media (max-width: 1250px) {
+    #searchField {
+        margin-left: 10vw;
+    }
+    #menuid {
+        margin: 10px 10px 10px calc(100vw - 510px);
+    }
+    #logo_id_txt{
+        display:none;
+        transition : display 0.3s ease;
+    }
+}
+
 #searchResults {
     position: absolute;
     top: 50px;
@@ -1161,9 +1179,33 @@ body {
     align-items: center;
     flex-wrap: nowrap;
     flex-direction: column;
-margin: 0;
+    margin: 0;
 }
 
 #searchResults > li:hover {
     background-color: var(--cardCustoShadowHover);
+}
+#login_discover{
+    margin-left: auto;
+    margin-right: auto;
+    margin-top : 40vh;
+}
+.login_elements{
+    display:flex;
+    flex-direction:column;
+    flex-wrap:nowrap;
+    justify-content:center;
+    align-items:center;
+    cursor: pointer;
+}
+.login_elements>h3{
+    font-size:30px;
+    font-family: 'Roboto-condensed', sans-serif;
+}
+
+.login_elements>img{
+    width:200px;
+}
+#login_discover_passcode{
+    display:none;
 }
