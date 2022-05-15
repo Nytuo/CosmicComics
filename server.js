@@ -68,7 +68,7 @@ db.run("CREATE TABLE IF NOT EXISTS variants (ID_variant VARCHAR(255) PRIMARY KEY
 db.run("CREATE TABLE IF NOT EXISTS Libraries (ID_LIBRARY INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, NAME VARCHAR(255) NOT NULL,PATH VARCHAR(4096) NOT NULL,API_ID INTEGER NOT NULL,FOREIGN KEY (API_ID) REFERENCES API(ID_API));")
 
     const obj = {
-        "Token": [],
+        "Token": {},
     }
     fs.writeFileSync(__dirname + "/public/CosmicComics_local/serverconfig.json", JSON.stringify(obj), {encoding: 'utf8'});
 
@@ -165,6 +165,7 @@ const cors = require('cors');
 const {ChildProcess} = require("child_process");
 const {fork} = require('node:child_process');
 const {spawn} = require('child_process');
+const {debug} = require("nodemon/lib/utils");
 
 app.use(cors());
 app.use(express.json({limit: "50mb"}))
@@ -174,6 +175,7 @@ app.listen(8000, "0.0.0.0", function () {
     const port = this.address().port;
     console.log("Listening on port %s:%s!", host, port);
 });
+
 app.post("/downloadBook", function (req, res) {
     const python = spawn("python", [__dirname + "/external_scripts/bookDownloader.py", req.body.url]);
     python.stdout.on('data', (data) => {
@@ -461,7 +463,7 @@ setInterval(() => {
     var configFile = fs.readFileSync(__dirname + "/public/CosmicComics_local/serverconfig.json", "utf8");
     var config = JSON.parse(configFile);
     for (var i in config) {
-        config["Token"] = [];
+        config["Token"] = {};
     }
     fs.writeFileSync(__dirname + "/public/CosmicComics_local/serverconfig.json", JSON.stringify(config));
 },2*60*60*1000);
@@ -473,7 +475,7 @@ app.get("/profile/login/:name/:passcode", (req, res) => {
             var configFile = fs.readFileSync(__dirname + "/public/CosmicComics_local/serverconfig.json", "utf8");
             var config = JSON.parse(configFile);
             for (var i in config) {
-                config["Token"].push(token);
+                config["Token"][req.params.name] = token;
             }
             fs.writeFileSync(__dirname + "/public/CosmicComics_local/serverconfig.json", JSON.stringify(config));
             res.send(token);
@@ -483,6 +485,20 @@ app.get("/profile/login/:name/:passcode", (req, res) => {
     } else {
         res.send(false);
     }
+})
+
+app.get("/profile/logcheck/:token", (req, res) => {
+    var configFile = fs.readFileSync(__dirname + "/public/CosmicComics_local/serverconfig.json", "utf8");
+    var config = JSON.parse(configFile);
+    for (var i in config) {
+        for (var j in config["Token"]) {
+            if (config["Token"][j] == req.params.token) {
+                res.send(j);
+                return;
+            }
+        }
+    }
+    res.send(false);
 })
 
 app.get("/getListOfFilesAndFolders/:path", (req, res) => {
@@ -761,3 +777,15 @@ function GetListOfImg(dirPath) {
     }
     return listOfImage;
 }
+app.all('*', (req, res) => {
+    // code logic
+    res.sendFile(__dirname + '/404.html');
+})
+const server = app.listen(8000)
+process.on('SIGINT', () => {
+    console.log('SIGINT signal received: closing server')
+    server.close(() => {
+        console.log('Server closed')
+        process.exit(0);
+    })
+})

@@ -166,7 +166,6 @@
     "html-magnifier": "^2.0.2",
     "node-7z": "^3.0.0",
     "nodemon": "^2.0.15",
-    "puppeteer": "^13.5.1",
     "sqlite3": "^4.2.0",
     "unrar": "^0.2.0",
     "unrar-binaries": "^1.1.0",

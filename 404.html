@@ -2,39 +2,12 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <title>CosmicLogin</title>
-    <link href="css/materialize.css" rel="stylesheet"/>
-    <link rel="stylesheet" href="css/bootstrap.css"/>
-    <link rel="stylesheet" href="/css/animate">
-    <link rel="stylesheet" href="/css/base.css">
-    <link rel="stylesheet" href="/themes/default.css">
+    <title>404</title>
+    <link rel="stylesheet" href="css/base.css">
+    <link rel="stylesheet" href="css/animate">    <link rel="stylesheet" href="css/bootstrap.css"/>
 
+    <link rel="stylesheet" href="themes/default.css">
 </head>
-<header>
-    <nav class="fixed-top">
-        <div class="nav-wrapper">
-            <a class="brand-logo center">
-                <img
-                        src="Images/Logo.png"
-                        alt=""
-                        width="auto"
-                        height="60px"
-                        id="logo_id"
-                        class="navbar-brand rotate linear infinite"
-                />
-                <img
-                        src="Images/LogoTxt.png"
-                        alt=""
-                        id="logo_id_txt"
-                        class="navbar-brand"
-                        height="60px"
-                />
-            </a>
-            <!--The Navigation Menu-->
-
-        </div>
-    </nav>
-</header>
 <body>
 <style>
     html {
@@ -94,6 +67,27 @@
         background: transparent;
         box-shadow: 908px 1143px #FFF , 922px 293px #FFF , 177px 1825px #FFF , 1154px 1702px #FFF , 1238px 684px #FFF , 1508px 104px #FFF , 1423px 1279px #FFF , 1958px 465px #FFF , 186px 777px #FFF , 65px 1910px #FFF , 382px 1438px #FFF , 938px 1402px #FFF , 1646px 550px #FFF , 1580px 918px #FFF , 591px 475px #FFF , 992px 654px #FFF , 1970px 1300px #FFF , 1545px 469px #FFF , 1626px 664px #FFF , 183px 1714px #FFF , 1910px 144px #FFF , 1614px 1216px #FFF , 126px 942px #FFF , 467px 1849px #FFF , 505px 269px #FFF , 950px 1736px #FFF , 364px 385px #FFF , 157px 1254px #FFF , 1495px 1935px #FFF , 1595px 181px #FFF , 1555px 908px #FFF , 857px 354px #FFF , 1263px 1230px #FFF , 1557px 1316px #FFF , 1629px 1259px #FFF , 355px 1915px #FFF , 996px 1606px #FFF , 54px 593px #FFF , 691px 1631px #FFF , 1729px 1000px #FFF , 277px 1500px #FFF , 971px 273px #FFF , 10px 1513px #FFF , 1126px 1564px #FFF , 669px 645px #FFF , 277px 166px #FFF , 319px 757px #FFF , 1285px 1013px #FFF , 183px 1172px #FFF , 658px 1212px #FFF , 488px 1745px #FFF , 1448px 918px #FFF , 1791px 762px #FFF , 1324px 86px #FFF , 288px 388px #FFF , 402px 1838px #FFF , 694px 682px #FFF , 367px 495px #FFF , 1235px 864px #FFF , 1575px 1757px #FFF , 1863px 1637px #FFF , 1034px 451px #FFF , 1067px 1819px #FFF , 607px 27px #FFF , 1681px 1068px #FFF , 216px 411px #FFF , 751px 1242px #FFF , 441px 895px #FFF , 1914px 1367px #FFF , 1385px 428px #FFF , 1568px 1049px #FFF , 957px 702px #FFF , 350px 918px #FFF , 1356px 587px #FFF , 737px 1561px #FFF , 1146px 248px #FFF , 1822px 1110px #FFF , 1566px 1231px #FFF , 693px 786px #FFF , 700px 790px #FFF , 23px 1696px #FFF , 1666px 325px #FFF , 42px 633px #FFF , 589px 408px #FFF , 605px 1649px #FFF , 563px 658px #FFF , 110px 824px #FFF , 1733px 1369px #FFF , 59px 821px #FFF , 1821px 145px #FFF , 832px 1206px #FFF , 1947px 1863px #FFF , 1682px 945px #FFF , 1151px 1744px #FFF , 701px 1120px #FFF , 793px 202px #FFF , 1529px 251px #FFF , 623px 340px #FFF , 210px 306px #FFF , 1642px 860px #FFF;
     }
+
+    #title {
+        position: absolute;
+        top: 50%;
+        left: 0;
+        right: 0;
+        color: #FFF;
+        text-align: center;
+        font-family: "lato", sans-serif;
+        font-weight: 300;
+        font-size: 50px;
+        letter-spacing: 10px;
+        margin-top: -60px;
+        padding-left: 10px;
+    }
+    #title span {
+        background: -webkit-linear-gradient(white, #38495a);
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
+    }
+
     @keyframes animStar {
         from {
             transform: translateY(0px);
@@ -107,46 +101,22 @@
 <div id='stars'></div>
 <div id='stars2'></div>
 <div id='stars3'></div>
-<div id="login_discover"></div>
-<div
-        class="modal"
-        id="passcode"
-        tabindex="-1"
-        aria-labelledby="passcode"
-        aria-hidden="true"
->
-    <div class="modal-dialog modal-dialog-centered">
-        <div class="modal-content">
-            <div class="modal-header">
-                <h5 class="modal-title" id="id_log">Login</h5>
-                <button
-                        type="button"
-                        class="btn-close btn-close-white"
-                        data-bs-dismiss="modal"
-                        aria-label="Close"
-                ></button>
-            </div>
-            <div class="modal-body">
-                <label>
-                    <input type="password" id="ThePassToWord">
-                </label><br>
-                <button class="btn btn-primary" style="width: 100%;" id="loginInBtn">Log In</button>
-            </div>
-            <div class="modal-footer">
-                <button
-                        type="button"
-                        class="btn btn-secondary"
-                        data-bs-dismiss="modal"
-                        id="close_nav"
-                >
-                    Close
-                </button>
-            </div>
-        </div>
-    </div>
-</div>
-</body>
-<script type="text/javascript" src="js/login"></script>
-<script type="text/javascript" src="/modules/bootstrapJS"></script>
+<div id='title'>
 
+</div>
+    <p style="text-align: center;font-size: 50px;">Page not found.<br/>You are lost in the cosmos...</p>
+<div style="width: 430px;margin-left: calc(50vw - 215px);margin-top:20vh;">
+    <h1 style="font-size: 10rem;">4  <img
+            src="Images/Logo.png"
+            alt=""
+            width="auto"
+            height="150px"
+            id="logo_id"
+            class="navbar-brand rotate linear infinite"
+    /> 4</h1>
+    <a href="/" class="btn btn-primary" style="width:430px">Retrieve home</a></div>
+</body>
+<script>
+    window.scrollTo(0, 0);
+</script>
 </html>

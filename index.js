@@ -233,6 +233,34 @@ async function deleteLib(elElement) {
     }
 }
 
+function getCookie(cName) {
+    const name = cName + "=";
+    const cDecoded = decodeURIComponent(document.cookie); //to be careful
+    const cArr = cDecoded .split('; ');
+    let res;
+    cArr.forEach(val => {
+        if (val.indexOf(name) === 0) res = val.substring(name.length);
+    })
+    return res;
+}
+var currentUser = "";
+var connected = getCookie("selectedProfile");
+console.log(connected);
+if (connected == null){
+    window.location.href = "login";
+}else{
+    fetch("http://" + domain + ":" + port + "/profile/logcheck/"+connected).then(function (response) {
+        return response.text();
+    }).then(function (data) {
+        if (data === "false"){
+            window.location.href = "login";
+        }else{
+            currentUser = data;
+        }
+    }).catch(function (error) {
+        console.log(error);
+    });
+}
 
 function modifyLib(elElement) {
     document.getElementById("id_lib").innerHTML = "Modify a library";

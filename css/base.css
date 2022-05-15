@@ -1153,6 +1153,9 @@ body {
         display:none;
         transition : display 0.3s ease;
     }
+    #login_discover{
+        flex-direction : column;
+    }
 }
 
 #searchResults {
@@ -1186,16 +1189,15 @@ body {
     background-color: var(--cardCustoShadowHover);
 }
 #login_discover{
-    margin-left: auto;
-    margin-right: auto;
-    margin-top : 40vh;
+    padding: 35vh;
+display : flex;
+flex-direction : row;
+align-items : center;
+justify-content : space-evenly;
+    flex-wrap: nowrap;
+    text-align: center;
 }
 .login_elements{
-    display:flex;
-    flex-direction:column;
-    flex-wrap:nowrap;
-    justify-content:center;
-    align-items:center;
     cursor: pointer;
 }
 .login_elements>h3{
@@ -1206,6 +1208,23 @@ body {
 .login_elements>img{
     width:200px;
 }
-#login_discover_passcode{
-    display:none;
+.profile_image{
+    max-width: 200px;
+    max-height:200px;
+    width: auto;
+    border-radius:10%;
+}
+
+#ThePassToWord{
+    background-color: var(--cardCustoShadow);
+    height: 40px;
+    width: 465px;
+    border-radius: 5px;
+    padding-left: 10px;
+    color: var(--text);
+    font-size: 18px;
+    font-family: 'Roboto-condensed', sans-serif;
+    border: 0;
+    outline: none;
+    box-shadow: none;
 }
