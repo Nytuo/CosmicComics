@@ -1297,7 +1297,7 @@ async function getFromDB(dbname, request) {
             "request": request
         }, null, 2)
     };
-    return fetch('http://192.168.1.84:8000/DB/get/' + dbname, option).then(function (response) {
+    return fetch('http://192.168.1.84:8000/DB/get/'+currentUser+"/" + dbname, option).then(function (response) {
         return response.text();
     }).then(function (data) {
         return data;
@@ -1375,13 +1375,40 @@ function markasunread() {
 
 
 }
-
+function getCookie(cName) {
+    const name = cName + "=";
+    const cDecoded = decodeURIComponent(document.cookie); //to be careful
+    const cArr = cDecoded .split('; ');
+    let res;
+    cArr.forEach(val => {
+        if (val.indexOf(name) === 0) res = val.substring(name.length);
+    })
+    return res;
+}
+var currentUser = "";
+var connected = getCookie("selectedProfile");
+console.log(connected);
+if (connected == null){
+    window.location.href = "login";
+}else{
+    fetch("http://" + domain + ":" + port + "/profile/logcheck/"+connected).then(function (response) {
+        return response.text();
+    }).then(function (data) {
+        if (data === "false"){
+            window.location.href = "login";
+        }else{
+            currentUser = data;
+        }
+    }).catch(function (error) {
+        console.log(error);
+    });
+}
 async function ModifyDB(dbName, ColName, value, id) {
-    return fetch('http://192.168.1.84:8000/DB/update/' + dbName + "/" + ColName + "/" + value + "/" + id);
+    return fetch('http://192.168.1.84:8000/DB/update/'+currentUser+"/" + dbName + "/" + ColName + "/" + value + "/" + id);
 }
 
 async function DeleteFromDB(dbName, id, option) {
-    return fetch('http://192.168.1.84:8000/DB/delete/' + dbName + "/" + id + "/" + option);
+    return fetch('http://192.168.1.84:8000/DB/delete/'+currentUser+"/" + dbName + "/" + id + "/" + option);
 }
 
 async function InsertIntoDB(dbname, dbinfo, values) {
@@ -1393,7 +1420,7 @@ async function InsertIntoDB(dbname, dbinfo, values) {
             "val": values
         }, null, 2)
     };
-    return fetch('http://192.168.1.84:8000/DB/insert/' + dbname, option);
+    return fetch('http://192.168.1.84:8000/DB/insert/'+currentUser+"/" + dbname, option);
 }
 
 //Send BE

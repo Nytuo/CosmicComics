@@ -37,6 +37,7 @@ fetch("http://" + domain + ":" + port + "/profile/discover").then(function (resp
 
                             } else {
                                 setCookie('selectedProfile', data, 2);
+                                setCookie('selectedProfileName', profile.name, 2);
                                 window.location.href = "/";
                             }
                         });
@@ -46,6 +47,8 @@ fetch("http://" + domain + ":" + port + "/profile/discover").then(function (resp
             } else {
                 profileDiv.addEventListener("click", function () {
                     setCookie('selectedProfile', profile.name, 2);
+                    setCookie('selectedProfileName', profile.name, 2);
+
                     window.location.href = "/";
 
                 })

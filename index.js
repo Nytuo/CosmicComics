@@ -57,6 +57,24 @@ var theme_BG = "#181818";
 var theme_FG = "white";
 var theme_BG_CI = "rgba(0,0,0,0.753)";
 var currenttheme;
+var currentUser = getCookie("selectedProfileName");
+var connected = getCookie("selectedProfile");
+console.log(connected);
+if (connected == null){
+    window.location.href = "login";
+}else{
+    fetch("http://" + domain + ":" + port + "/profile/logcheck/"+connected).then(function (response) {
+        return response.text();
+    }).then(function (data) {
+        if (data === "false"){
+            window.location.href = "login";
+        }else{
+            currentUser = data;
+        }
+    }).catch(function (error) {
+        console.log(error);
+    });
+}
 fetch("http://" + domain + ":" + port + "/config/getConfig").then(function (response) {
     return response.text();
 }).then(function (data) {
@@ -203,7 +221,7 @@ async function getFromDB(dbname, request) {
             "request": request
         }, null, 2)
     };
-    return fetch('http://' + domain + ":" + port + '/DB/get/' + dbname, option).then(function (response) {
+    return fetch('http://' + domain + ":" + port + '/DB/get/'+currentUser+"/" + dbname, option).then(function (response) {
         return response.text();
     }).then(function (data) {
         return data;
@@ -218,14 +236,14 @@ async function InsertIntoDB(dbname, dbinfo, values) {
             "into": dbinfo, "val": values
         }, null, 2)
     };
-    return fetch('http://' + domain + ":" + port + '/DB/insert/' + dbname, option);
+    return fetch('http://' + domain + ":" + port + '/DB/insert/'+currentUser+"/" + dbname, option);
 }
 
 
 async function deleteLib(elElement) {
     let confirmDelete = confirm("Would you like to delete " + elElement["NAME"] + " ?");
     if (confirmDelete) {
-        await fetch('http://' + domain + ":" + port + '/DB/lib/delete/' + elElement["ID_LIBRARY"]).then(() => {
+        await fetch('http://' + domain + ":" + port + '/DB/lib/delete/'+currentUser+"/" + elElement["ID_LIBRARY"]).then(() => {
             alert("The library has been deleted");
             location.reload();
         });
@@ -243,24 +261,7 @@ function getCookie(cName) {
     })
     return res;
 }
-var currentUser = "";
-var connected = getCookie("selectedProfile");
-console.log(connected);
-if (connected == null){
-    window.location.href = "login";
-}else{
-    fetch("http://" + domain + ":" + port + "/profile/logcheck/"+connected).then(function (response) {
-        return response.text();
-    }).then(function (data) {
-        if (data === "false"){
-            window.location.href = "login";
-        }else{
-            currentUser = data;
-        }
-    }).catch(function (error) {
-        console.log(error);
-    });
-}
+
 
 function modifyLib(elElement) {
     document.getElementById("id_lib").innerHTML = "Modify a library";
@@ -3565,7 +3566,7 @@ async function updateLibrary(forma, id) {
             "name": forma.form[0].value, "path": forma.form[1].value, "api_id": forma.form[2].value
         }, null, 2)
     };
-    await fetch('http://' + domain + ":" + port + '/DB/lib/update/' + id, option).then(() => {
+    await fetch('http://' + domain + ":" + port + '/DB/lib/update/'+currentUser+"/" + id, option).then(() => {
         window.location.href = window.location.href.split("?")[0];
     });
 }
