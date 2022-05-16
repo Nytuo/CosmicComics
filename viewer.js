@@ -68,7 +68,24 @@ fetch("http://192.168.1.84:8000/viewer/view/current").then(
         )
     }
 )
-
+var currentUser = "";
+var connected = getCookie("selectedProfile");
+console.log(connected);
+if (connected == null){
+    window.location.href = "login";
+}else{
+    fetch("http://" + domain + ":" + port + "/profile/logcheck/"+connected).then(function (response) {
+        return response.text();
+    }).then(function (data) {
+        if (data === "false"){
+            window.location.href = "login";
+        }else{
+            currentUser = data;
+        }
+    }).catch(function (error) {
+        console.log(error);
+    });
+}
 var name1 = GetFilePath().split("/").pop();
 console.log(name1)
 var realname1 = name1.split(".")[0];
@@ -93,7 +110,7 @@ console.log(language)
 
 async function getResponse() {
     console.log("begin Request")
-    const response = await fetch("http://192.168.1.84:8000/config/getConfig");
+    const response = await fetch("http://192.168.1.84:8000/config/getConfig/"+connected);
     console.log("Requested")
 
     const dataa = await response.json().then((data) => {
@@ -335,7 +352,7 @@ var theme_BG = "#181818";
 var theme_FG = "white";
 var theme_BG_CI = "rgba(0,0,0,0.753)";
 var currenttheme;
-fetch("http://192.168.1.84:8000/config/getConfig").then(function (response) {
+fetch("http://192.168.1.84:8000/config/getConfig/"+connected).then(function (response) {
     return response.text();
 }).then(function (data) {
     currenttheme = GetElFromInforPath(
@@ -1297,7 +1314,7 @@ async function getFromDB(dbname, request) {
             "request": request
         }, null, 2)
     };
-    return fetch('http://192.168.1.84:8000/DB/get/'+currentUser+"/" + dbname, option).then(function (response) {
+    return fetch('http://192.168.1.84:8000/DB/get/'+connected+"/" + dbname, option).then(function (response) {
         return response.text();
     }).then(function (data) {
         return data;
@@ -1385,30 +1402,13 @@ function getCookie(cName) {
     })
     return res;
 }
-var currentUser = "";
-var connected = getCookie("selectedProfile");
-console.log(connected);
-if (connected == null){
-    window.location.href = "login";
-}else{
-    fetch("http://" + domain + ":" + port + "/profile/logcheck/"+connected).then(function (response) {
-        return response.text();
-    }).then(function (data) {
-        if (data === "false"){
-            window.location.href = "login";
-        }else{
-            currentUser = data;
-        }
-    }).catch(function (error) {
-        console.log(error);
-    });
-}
+
 async function ModifyDB(dbName, ColName, value, id) {
-    return fetch('http://192.168.1.84:8000/DB/update/'+currentUser+"/" + dbName + "/" + ColName + "/" + value + "/" + id);
+    return fetch('http://192.168.1.84:8000/DB/update/'+connected+"/" + dbName + "/" + ColName + "/" + value + "/" + id);
 }
 
 async function DeleteFromDB(dbName, id, option) {
-    return fetch('http://192.168.1.84:8000/DB/delete/'+currentUser+"/" + dbName + "/" + id + "/" + option);
+    return fetch('http://192.168.1.84:8000/DB/delete/'+connected+"/" + dbName + "/" + id + "/" + option);
 }
 
 async function InsertIntoDB(dbname, dbinfo, values) {
@@ -1420,7 +1420,7 @@ async function InsertIntoDB(dbname, dbinfo, values) {
             "val": values
         }, null, 2)
     };
-    return fetch('http://192.168.1.84:8000/DB/insert/'+currentUser+"/" + dbname, option);
+    return fetch('http://192.168.1.84:8000/DB/insert/'+connected+"/" + dbname, option);
 }
 
 //Send BE
@@ -1546,7 +1546,7 @@ window.addEventListener("keydown", (e) => {
 function modifyConfigJson(json, tomod, mod) {
     //check si obj exist pour remplacer valeur
 
-    fetch("http://192.168.1.84:8000/config/getConfig").then(function (response) {
+    fetch("http://192.168.1.84:8000/config/getConfig/"+connected).then(function (response) {
         return response.text();
     }).then(function (data) {
         var configFile = data;
@@ -1559,7 +1559,7 @@ function modifyConfigJson(json, tomod, mod) {
             headers: {'Content-Type': 'application/json'},
             body: JSON.stringify(config, null, 2)
         };
-        fetch('/config/writeConfig', option);
+        fetch('/config/writeConfig/'+connected, option);
     }).catch(function (error) {
         console.log(error);
     });
@@ -2457,7 +2457,7 @@ function setScrollbar() {
 //Load the parameters
 //Send BE
 function loadParameters() {
-    fetch("http://192.168.1.84:8000/config/getConfig").then(function (response) {
+    fetch("http://192.168.1.84:8000/config/getConfig/"+connected).then(function (response) {
         return response.text();
     }).then(function (data) {
         var configFile = data

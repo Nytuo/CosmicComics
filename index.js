@@ -32,7 +32,25 @@ const url = document.createElement("a");
 url.setAttribute("href", window.location.href);
 var domain = url.hostname;
 var port = url.port;
-fetch("http://" + domain + ":" + port + "/config/getConfig").then(function (response) {
+var currentUser = ""
+var connected = getCookie("selectedProfile");
+console.log(connected);
+if (connected == null){
+    window.location.href = "login";
+}else{
+    fetch("http://" + domain + ":" + port + "/profile/logcheck/"+connected).then(function (response) {
+        return response.text();
+    }).then(function (data) {
+        if (data === "false"){
+            window.location.href = "login";
+        }else{
+            currentUser = data;
+        }
+    }).catch(function (error) {
+        console.log(error);
+    });
+}
+fetch("http://" + domain + ":" + port + "/config/getConfig/"+connected).then(function (response) {
     return response.text();
 }).then(function (data) {
     d = GetElFromInforPath("display_style", JSON.parse(data))
@@ -57,25 +75,8 @@ var theme_BG = "#181818";
 var theme_FG = "white";
 var theme_BG_CI = "rgba(0,0,0,0.753)";
 var currenttheme;
-var currentUser = getCookie("selectedProfileName");
-var connected = getCookie("selectedProfile");
-console.log(connected);
-if (connected == null){
-    window.location.href = "login";
-}else{
-    fetch("http://" + domain + ":" + port + "/profile/logcheck/"+connected).then(function (response) {
-        return response.text();
-    }).then(function (data) {
-        if (data === "false"){
-            window.location.href = "login";
-        }else{
-            currentUser = data;
-        }
-    }).catch(function (error) {
-        console.log(error);
-    });
-}
-fetch("http://" + domain + ":" + port + "/config/getConfig").then(function (response) {
+
+fetch("http://" + domain + ":" + port + "/config/getConfig/"+connected).then(function (response) {
     return response.text();
 }).then(function (data) {
     currenttheme = GetElFromInforPath("theme", JSON.parse(data))
@@ -126,10 +127,9 @@ fetch("http://" + domain + ":" + port + "/dirname").then(function (response) {
 
 function setTheme(theme) {
     document.head.getElementsByTagName("link")[5].href = "/themes/" + theme;
-
 }
 
-fetch("http://" + domain + ":" + port + "/config/getConfig").then(function (response) {
+fetch("http://" + domain + ":" + port + "/config/getConfig/"+connected).then(function (response) {
     return response.text();
 }).then(function (data) {
     let currenttheme = GetElFromInforPath(
@@ -155,7 +155,7 @@ console.log(language)
 
 async function getResponse() {
     console.log("begin Request")
-    const response = await fetch("http://" + domain + ":" + port + "/config/getConfig");
+    const response = await fetch("http://" + domain + ":" + port + "/config/getConfig/"+connected);
     console.log("Requested")
 
     const dataa = await response.json().then((data) => {
@@ -202,26 +202,14 @@ const animateCSS = (element, animation, prefix = "animate__") => // We create a 
         node.addEventListener("animationend", handleAnimationEnd, {once: true});
     });
 
-//if you have a folder used lasted time then it's loaded
-/*if (get_Folder_Path_JSON != null && get_Folder_Path_JSON !== "") {
-    document.getElementById("overlaymsg").innerHTML =
-        language["overlaymsg_refolder"];
-    setTimeout(() => {
-        document.getElementById("overlaymsg").innerHTML =
-            language["overlaymsg_piracy"];
-    }, 5000);
-    var listfolder = [];
-    listfolder.push(get_Folder_Path_JSON);
-    folderRootPath.push(listfolder[0]);
-    openFolder_logic(listfolder);
-}*/
+
 async function getFromDB(dbname, request) {
     const option = {
         method: 'POST', headers: {'Content-Type': 'application/json'}, body: JSON.stringify({
             "request": request
         }, null, 2)
     };
-    return fetch('http://' + domain + ":" + port + '/DB/get/'+currentUser+"/" + dbname, option).then(function (response) {
+    return fetch('http://' + domain + ":" + port + '/DB/get/'+connected+"/" + dbname, option).then(function (response) {
         return response.text();
     }).then(function (data) {
         return data;
@@ -236,14 +224,14 @@ async function InsertIntoDB(dbname, dbinfo, values) {
             "into": dbinfo, "val": values
         }, null, 2)
     };
-    return fetch('http://' + domain + ":" + port + '/DB/insert/'+currentUser+"/" + dbname, option);
+    return fetch('http://' + domain + ":" + port + '/DB/insert/'+connected+"/" + dbname, option);
 }
 
 
 async function deleteLib(elElement) {
     let confirmDelete = confirm("Would you like to delete " + elElement["NAME"] + " ?");
     if (confirmDelete) {
-        await fetch('http://' + domain + ":" + port + '/DB/lib/delete/'+currentUser+"/" + elElement["ID_LIBRARY"]).then(() => {
+        await fetch('http://' + domain + ":" + port + '/DB/lib/delete/'+connected+"/" + elElement["ID_LIBRARY"]).then(() => {
             alert("The library has been deleted");
             location.reload();
         });
@@ -445,7 +433,7 @@ function changeUpdateProvider() {
 function modifyConfigJson(json, tomod, mod) {
     //check si obj exist pour remplacer valeur
 
-    fetch("http://" + domain + ":" + port + "/config/getConfig").then(function (response) {
+    fetch("http://" + domain + ":" + port + "/config/getConfig/"+connected).then(function (response) {
         return response.text();
     }).then(function (data) {
         var configFile = data;
@@ -458,7 +446,7 @@ function modifyConfigJson(json, tomod, mod) {
             headers: {'Content-Type': 'application/json'},
             body: JSON.stringify(config, null, 2)
         };
-        fetch('/config/writeConfig', option);
+        fetch('/config/writeConfig/'+connected, option);
     }).catch(function (error) {
         console.log(error);
     });
@@ -3566,7 +3554,7 @@ async function updateLibrary(forma, id) {
             "name": forma.form[0].value, "path": forma.form[1].value, "api_id": forma.form[2].value
         }, null, 2)
     };
-    await fetch('http://' + domain + ":" + port + '/DB/lib/update/'+currentUser+"/" + id, option).then(() => {
+    await fetch('http://' + domain + ":" + port + '/DB/lib/update/'+connected+"/" + id, option).then(() => {
         window.location.href = window.location.href.split("?")[0];
     });
 }

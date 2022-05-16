@@ -127,6 +127,17 @@ function makeDB(forwho){
     db.run("CREATE TABLE IF NOT EXISTS Libraries (ID_LIBRARY INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, NAME VARCHAR(255) NOT NULL,PATH VARCHAR(4096) NOT NULL,API_ID INTEGER NOT NULL,FOREIGN KEY (API_ID) REFERENCES API(ID_API));")
 
 }
+function resolveToken(token){
+    var configFile = fs.readFileSync(__dirname + "/public/CosmicComics_local/serverconfig.json", "utf8");
+    var config = JSON.parse(configFile);
+    for (var i in config) {
+        for (var j in config["Token"]) {
+            if (config["Token"][j] == token) {
+                return j;
+            }
+        }
+    }
+}
 function getDB(forwho){
     return new sqlite3.Database(__dirname + '/public/CosmicComics_local/profiles/' + forwho + '/ComicsComics.db', (err) => {
         if (err) {
@@ -159,8 +170,9 @@ app.post("/createUser/:name/:passcode", function (req, res) {
     const name = req.params.name;
     const passcode = req.params.passcode;
     fs.mkdirSync(CosmicComicsTemp + "/profiles/" + name, {recursive: true});
+    console.log("Creating dir " + name);
     fs.writeFileSync(CosmicComicsTemp + "/profiles/" + name + "/passcode.txt", passcode, {encoding: "utf8"});
-    if (!fs.existsSync(__dirname + "/public/CosmicComics_local/profiles/"+name+"config.json")) {
+    if (!fs.existsSync(__dirname + "/public/CosmicComics_local/profiles/"+name+"/config.json")) {
         const obj = {
             path: "",
             last_opened: "",
@@ -195,13 +207,14 @@ app.post("/createUser/:name/:passcode", function (req, res) {
             theme_date: true,
         };
         fs.writeFileSync(
-            __dirname + "/public/CosmicComics_local/profiles/"+name+"config.json",
+            __dirname + "/public/CosmicComics_local/profiles/"+name+"/config.json",
             JSON.stringify(obj, null, 2), {encoding: "utf8"}
         );
 
 
     }
     makeDB(name);
+    console.log("User created");
     res.sendStatus(200);
 })
 app.post("/DL", function (req, res) {
@@ -264,14 +277,15 @@ app.get("/js/login", (req, res) => {
 })
 var currentBookPath = "";
 var SendToUnZip = "";
-app.get("/Unzip/:path", (req, res) => {
+app.get("/Unzip/:path/:token", (req, res) => {
+    const token = req.params.token;
     var currentPath = replaceHTMLAdressPath(req.params.path);
     currentBookPath = currentPath.split("&page=")[1];
     var patho = currentPath;
     var named = path.basename(patho);
     named = named.split(".");
     var ext = named.pop();
-    UnZip(currentPath, CosmicComicsTempI, "00000", ext)
+    UnZip(currentPath, CosmicComicsTempI, "00000", ext,token)
     inter = setInterval(() => {
         if (SendToUnZip != "") {
             res.send(SendToUnZip)
@@ -292,8 +306,9 @@ app.get("/viewer/view/current/:page", (req, res) => {
     var listOfImg = GetListOfImg(CosmicComicsTempI);
     res.send(CosmicComicsTempI + listOfImg[page])
 })
-app.get("/config/getConfig", (req, res) => {
-    res.send(fs.readFileSync("public/CosmicComics_local/config.json"));
+app.get("/config/getConfig/:token", (req, res) => {
+    const token = resolveToken(req.params.token);
+    res.send(fs.readFileSync("public/CosmicComics_local/profiles/"+token+"/config.json"));
 })
 app.get("/BM/getBM", (req, res) => {
     res.send(fs.readFileSync("public/CosmicComics_local/bookmarks.json"));
@@ -316,9 +331,10 @@ app.get("/view/readFile/:path", (req, res) => {
     var p = fs.readFileSync(o, "utf8");
     res.send(JSON.stringify(p));
 })
-app.post('/config/writeConfig', (req, res) => {
+app.post('/config/writeConfig/:token', (req, res) => {
     console.log(req.body);
-    fs.writeFileSync("public/CosmicComics_local/config.json", JSON.stringify(req.body, null, 2));
+    const token = resolveToken(req.params.token);
+    fs.writeFileSync("public/CosmicComics_local/profiles/"+token+"/config.json", JSON.stringify(req.body, null, 2));
     res.sendStatus(200)
 })
 app.post('/DB/write/:jsonFile', (req, res) => {
@@ -331,70 +347,70 @@ app.get("/DB/read/:jsonFile", (req, res) => {
 app.get("/themes/read/:jsonFile", (req, res) => {
     res.send(fs.readFileSync(__dirname + "/themes/" + req.params.jsonFile));
 })
-app.get("/DB/update/:user/:dbName/:colName/:value/:id", (req, res) => {
+app.get("/DB/update/:token/:dbName/:colName/:value/:id", (req, res) => {
     try {
-        getDB(req.params.user).run("UPDATE " + req.params.dbName + " SET " + req.params.colName + " = " + req.params.value + " WHERE ID_book='" + req.params.id + "';")
+        getDB(resolveToken(req.params.token)).run("UPDATE " + req.params.dbName + " SET " + req.params.colName + " = " + req.params.value + " WHERE ID_book='" + req.params.id + "';")
     } catch (e) {
         console.log(e);
     }
     res.sendStatus(200)
 
 })
-app.post("/DB/lib/update/:user/:id", (req, res) => {
+app.post("/DB/lib/update/:token/:id", (req, res) => {
     console.log(req.body)
     const name = req.body.name;
     const path = req.body.path;
     const api = req.body.api_id;
-    const user = req.params.user;
+    const token = resolveToken(req.params.token);
     console.log(name, path, api)
     console.log("UPDATE Libraries SET NAME='" + name + "', PATH='" + path + "', API_ID=" + api + " WHERE ID_LIBRARY=" + req.params.id + ";")
     try {
-        getDB(user).run("UPDATE Libraries SET NAME='" + name + "', PATH='" + path + "', API_ID=" + api + " WHERE ID_LIBRARY=" + req.params.id + ";")
+        getDB(token).run("UPDATE Libraries SET NAME='" + name + "', PATH='" + path + "', API_ID=" + api + " WHERE ID_LIBRARY=" + req.params.id + ";")
     } catch (e) {
         console.log(e);
     }
     res.sendStatus(200)
 
 })
-app.post("/DB/insert/:user/:dbName", (req, res) => {
+app.post("/DB/insert/:token/:dbName", (req, res) => {
     try {
         const dbinfo = req.body.into
         const values = req.body.val
-        const user = req.params.user;
+        const token = resolveToken(req.params.token);
         console.log(dbinfo + values)
-        getDB(user).run("INSERT OR IGNORE INTO " + req.params.dbName + " " + dbinfo + " VALUES " + values + ";")
+        getDB(token).run("INSERT OR IGNORE INTO " + req.params.dbName + " " + dbinfo + " VALUES " + values + ";")
     } catch (e) {
         console.log(e);
     }
     res.sendStatus(200)
 
 })
-app.get("/DB/delete/:user/:dbName/:id/:option", (req, res) => {
+app.get("/DB/delete/:token/:dbName/:id/:option", (req, res) => {
     try {
-        const user = req.params.user;
-        getDB(user).run("DELETE FROM " + req.params.dbName + " WHERE BOOK_ID='" + req.params.id + "' " + req.params.option + ";")
+        const token = resolveToken(req.params.token);
+        getDB(token).run("DELETE FROM " + req.params.dbName + " WHERE BOOK_ID='" + req.params.id + "' " + req.params.option + ";")
     } catch (e) {
         console.log(e);
     }
     res.sendStatus(200)
 
 })
-app.get("/DB/lib/delete/:user/:id", (req, res) => {
+app.get("/DB/lib/delete/:token/:id", (req, res) => {
     try {
-        const user = req.params.user;
-        getDB(user).run("DELETE FROM Libraries WHERE ID_LIBRARY=" + req.params.id + ";")
+        const token = resolveToken(req.params.token);
+        getDB(token).run("DELETE FROM Libraries WHERE ID_LIBRARY=" + req.params.id + ";")
     } catch (e) {
         console.log(e);
     }
     res.sendStatus(200)
 
 })
-app.post("/DB/get/:user/:dbName", (req, res) => {
+app.post("/DB/get/:token/:dbName", (req, res) => {
     try {
         var result = [];
-        const user = req.params.user;
+        const token = resolveToken(req.params.token);
         const requestToDB = req.body.request
-        getDB(user).all("SELECT " + requestToDB + ";", function (err, resD) {
+        getDB(token).all("SELECT " + requestToDB + ";", function (err, resD) {
             if (err) return console.log("Error getting element", err)
             resD.forEach((row) => {
                 result.push(row);
@@ -583,7 +599,6 @@ function replaceHTMLAdressPath(path) {
 ////////////////////////////////////////////////////////////////////////////////////////////////////////
 /////////////////////////////////////////  Viewer  /////////////////////////////////////////////////////
 ////////////////////////////////////////////////////////////////////////////////////////////////////////
-//get element from config.json
 function GetElFromInforPath(search, info) {
     for (var i in info) {
         if (i == search) {
@@ -599,7 +614,7 @@ function SendTo(val) {
 }
 
 //UnZip the archive
-function UnZip(zipPath, ExtractDir, name, ext) {
+function UnZip(zipPath, ExtractDir, name, ext,token) {
     var listofImg;
     try {
         var n = 0;
@@ -645,7 +660,7 @@ function UnZip(zipPath, ExtractDir, name, ext) {
                 try {
                     try {
                         var result = [];
-                        getDB().all("SELECT last_page FROM Books WHERE ID_Book='" + shortname + "';", function (err, resD) {
+                        getDB(resolveToken(token)).all("SELECT last_page FROM Books WHERE ID_Book='" + shortname + "';", function (err, resD) {
                             if (err) return console.log("Error getting element", err)
                             resD.forEach((row) => {
                                 console.log(row)
@@ -673,7 +688,7 @@ function UnZip(zipPath, ExtractDir, name, ext) {
         }
 
         if (ext == "rar" || ext == "cbr") {
-            var configFile = fs.readFileSync(CosmicComicsTemp + "/config.json");
+            var configFile = fs.readFileSync(CosmicComicsTemp +"/profiles/"+token+ "/config.json");
             var parsedJSON = JSON.parse(configFile);
             var provider = GetElFromInforPath("update_provider", parsedJSON);
             if (provider == "msstore") {
