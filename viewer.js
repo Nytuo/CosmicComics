@@ -81,6 +81,20 @@ if (connected == null){
             window.location.href = "login";
         }else{
             currentUser = data;
+            getResponse();
+            fetch("http://192.168.1.84:8000/config/getConfig/"+connected).then(function (response) {
+                return response.text();
+            }).then(function (data) {
+                currenttheme = GetElFromInforPath(
+                    "theme",
+                    JSON.parse(data))
+                console.log(currenttheme)
+                Themes();
+
+            }).catch(function (error) {
+                console.log(error);
+            });
+
         }
     }).catch(function (error) {
         console.log(error);
@@ -105,7 +119,6 @@ var wasDPM = false;
 var PPwasDPM = false;
 var mangaMode = false;
 var language;
-getResponse();
 console.log(language)
 
 async function getResponse() {
@@ -352,18 +365,7 @@ var theme_BG = "#181818";
 var theme_FG = "white";
 var theme_BG_CI = "rgba(0,0,0,0.753)";
 var currenttheme;
-fetch("http://192.168.1.84:8000/config/getConfig/"+connected).then(function (response) {
-    return response.text();
-}).then(function (data) {
-    currenttheme = GetElFromInforPath(
-        "theme",
-        JSON.parse(data))
-    console.log(currenttheme)
-    Themes();
 
-}).catch(function (error) {
-    console.log(error);
-});
 
 
 var theme_O2 = "black";
