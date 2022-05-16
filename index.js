@@ -45,20 +45,45 @@ if (connected == null){
             window.location.href = "login";
         }else{
             currentUser = data;
+            fetch("http://" + domain + ":" + port + "/config/getConfig/"+connected).then(function (response) {
+                return response.text();
+            }).then(function (data) {
+                d = GetElFromInforPath("display_style", JSON.parse(data))
+                var cardMode = _01toBool(d);
+
+            }).catch(function (error) {
+                console.log(error);
+            });
+            fetch("http://" + domain + ":" + port + "/config/getConfig/"+connected).then(function (response) {
+                return response.text();
+            }).then(function (data) {
+                currenttheme = GetElFromInforPath("theme", JSON.parse(data))
+                console.log(currenttheme)
+                Themes();
+
+            }).catch(function (error) {
+                console.log(error);
+            });
+            fetch("http://" + domain + ":" + port + "/config/getConfig/"+connected).then(function (response) {
+                return response.text();
+            }).then(function (data) {
+                let currenttheme = GetElFromInforPath(
+                    "theme",
+                    JSON.parse(data))
+                console.log(currenttheme)
+                setTheme(currenttheme);
+
+            }).catch(function (error) {
+                console.log(error);
+            });
+            getResponse();
+
         }
     }).catch(function (error) {
         console.log(error);
     });
 }
-fetch("http://" + domain + ":" + port + "/config/getConfig/"+connected).then(function (response) {
-    return response.text();
-}).then(function (data) {
-    d = GetElFromInforPath("display_style", JSON.parse(data))
-    var cardMode = _01toBool(d);
 
-}).catch(function (error) {
-    console.log(error);
-});
 var cardMode = true;
 
 function GetElFromInforPath(search, info) {
@@ -76,16 +101,7 @@ var theme_FG = "white";
 var theme_BG_CI = "rgba(0,0,0,0.753)";
 var currenttheme;
 
-fetch("http://" + domain + ":" + port + "/config/getConfig/"+connected).then(function (response) {
-    return response.text();
-}).then(function (data) {
-    currenttheme = GetElFromInforPath("theme", JSON.parse(data))
-    console.log(currenttheme)
-    Themes();
 
-}).catch(function (error) {
-    console.log(error);
-});
 var theme_O2 = "black";
 var theme_notifBG = "rgb(143, 143, 143)";
 var theme_button_card = "";
@@ -129,18 +145,7 @@ function setTheme(theme) {
     document.head.getElementsByTagName("link")[5].href = "/themes/" + theme;
 }
 
-fetch("http://" + domain + ":" + port + "/config/getConfig/"+connected).then(function (response) {
-    return response.text();
-}).then(function (data) {
-    let currenttheme = GetElFromInforPath(
-        "theme",
-        JSON.parse(data))
-    console.log(currenttheme)
-    setTheme(currenttheme);
 
-}).catch(function (error) {
-    console.log(error);
-});
 var GetAllIMG = false;
 
 //ToolTips
@@ -150,7 +155,6 @@ var tooltipList = tooltipTriggerList.map(function (tooltipTriggerEl) {
 });
 
 var language;
-getResponse();
 console.log(language)
 
 async function getResponse() {
