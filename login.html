@@ -148,9 +148,13 @@
 <div id="createAccount" style="display: block;">
 
     <p>First time configuration of the server : </p>
-    <input type="text" id="TheUserName">
-    <input type="password" id="ThePassToWord">
-    <button class="btn btn-primary" onclick="servConfig(document.getElementById('TheUserName'),document.getElementById('ThePassToWord'))">Create user</button>
+    <label for="TheUserName">Your Username : </label>
+    <input type="text" id="TheUserName"><br>
+    <label for="ThePassToWord">User password : </label>
+    <input type="password" id="ThePassToWord"><br>
+    <label for="servName">Server Port (Choose wisely) : </label>
+    <input type="text" id="servName"><br>
+    <button class="btn btn-primary" onclick="servConfig(document.getElementById('TheUserName'),document.getElementById('ThePassToWord'),document.getElementById('servName'))">Create user</button>
 
 </div>
 </body>

@@ -50,9 +50,7 @@ fetch("http://" + domain + ":" + port + "/profile/discover").then(function (resp
             } else {
                 profileDiv.addEventListener("click", function () {
                     setCookie('selectedProfile', profile.name, 2);
-
                     window.location.href = "/";
-
                 })
             }
             profilesDiv.appendChild(profileDiv);
@@ -70,6 +68,10 @@ function setCookie(cName, cValue, expHours) {
     const expires = "expires=" + date.toUTCString();
     document.cookie = cName + "=" + cValue + "; " + expires + "; path=/";
 }
-function servConfig(){
+function servConfig(name,pass,port){
+    
+    fetch("/configServ/"+name+"/"+pass+"/"+port).then(()=>{
+        window.location.reload();
+    })
     
 }

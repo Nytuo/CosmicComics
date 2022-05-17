@@ -1215,7 +1215,7 @@ justify-content : space-evenly;
     border-radius:10%;
 }
 
-#ThePassToWord,#TheUserName{
+#ThePassToWord,#TheUserName,#servName{
     background-color: var(--cardCustoShadow);
     height: 40px;
     width: 465px;
