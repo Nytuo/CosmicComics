@@ -8,6 +8,10 @@ fetch("http://" + domain + ":" + port + "/profile/discover").then(function (resp
     return response.text();
 }).then(async function (data) {
         data = JSON.parse(data);
+        if (data.length == 0 ){
+
+            return;
+        }
         for (let i = 0; i < data.length; i++) {
             let profile = data[i];
             let profileDiv = document.createElement("div");
@@ -65,4 +69,7 @@ function setCookie(cName, cValue, expHours) {
     date.setTime(date.getTime() + (expHours * 60 * 60 * 1000));
     const expires = "expires=" + date.toUTCString();
     document.cookie = cName + "=" + cValue + "; " + expires + "; path=/";
+}
+function servConfig(){
+    
 }
