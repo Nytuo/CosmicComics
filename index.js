@@ -4956,3 +4956,55 @@ async function downloadBook(path) {
     });
 
 }
+async function logout(){
+    const option = {
+        method: 'POST', headers: {'Content-Type': 'application/json'}
+    };
+    await fetch('http://' + domain + ":" + port +'/profile/logout/'+connected,option).then(()=>{
+        window.location.href = 'login';
+    });
+}
+function AccountMenu(){
+
+const ul = document.createElement("ul");
+const li = document.createElement("li");
+const li2 = document.createElement("li");
+const li3 = document.createElement("li");
+const li4 = document.createElement("li");
+li.innerHTML = "";
+li2.innerHTML = "Modify your account";
+li2.setAttribute("data-bs-toggle", "modal");
+li2.setAttribute("data-bs-target", "#lib");
+li3.innerHTML = "Create a new user";
+li4.innerHTML = "Logout";
+li.addEventListener("click", function () {
+});
+li2.addEventListener("click", function () {
+});
+li3.addEventListener("click", function () {
+});
+li4.addEventListener("click", function () {
+});
+ul.appendChild(li);
+ul.appendChild(li2);
+ul.appendChild(li3);
+ul.appendChild(li4);
+ul.className = "contextMenu";
+ul.style.right = "0vw";
+ul.style.display = "block";
+
+
+document.body.appendChild(ul);
+
+    ul.style.top = 70 + "px";
+    ul.style.display = "flex";
+    ul.addEventListener("click", function () {
+        ul.style.display = "none";
+    });
+    document.addEventListener("click", function (e) {
+        if (e.target != menu && e.target != ul && e.target != li && e.target != li2 && e.target != li3 && e.target != li4 && e.target != btn && e.target != menu.children[0]) {
+            ul.style.display = "none";
+        }
+
+    });
+}

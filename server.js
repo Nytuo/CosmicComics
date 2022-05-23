@@ -43,14 +43,24 @@ const ValidatedExtensionV = [
 fs.mkdirSync(__dirname + "/public/CosmicComics_local/", {recursive: true});
 
 var mangaMode = false;
-
+var devMode = true;
 
 //Creating the database
+if (!fs.existsSync(__dirname+"/public/CosmicComics_local/serverconfig.json")){
 
     const obj = {
         "Token": {},
+        "port":4696
     }
     fs.writeFileSync(__dirname + "/public/CosmicComics_local/serverconfig.json", JSON.stringify(obj), {encoding: 'utf8'});
+}else{
+    if (devMode == false) {
+        var configFile = fs.readFileSync(__dirname + "/public/CosmicComics_local/serverconfig.json");
+        var config = JSON.parse(configFile);
+        config["Token"] = {};
+        fs.writeFileSync(__dirname + "/public/CosmicComics_local/serverconfig.json", JSON.stringify(config), {encoding: 'utf8'});
+    }
+}
 
 
 /**
@@ -149,7 +159,8 @@ function getDB(forwho){
 app.use(cors());
 app.use(express.json({limit: "50mb"}))
 app.use(express.urlencoded({extended: true}));
-app.listen(4851, "0.0.0.0", function () {
+
+app.listen(JSON.parse(fs.readFileSync(__dirname+"/public/CosmicComics_local/serverconfig.json").toString()).port, "0.0.0.0", function () {
     const host = this.address().address;
     const port = this.address().port;
     console.log("Listening on port %s:%s!", host, port);
@@ -503,6 +514,22 @@ app.get("/profile/logcheck/:token", (req, res) => {
         }
     }
     res.send(false);
+})
+app.post("/profile/logout/:token", (req, res) => {
+    var configFile = fs.readFileSync(__dirname + "/public/CosmicComics_local/serverconfig.json", "utf8");
+    var config = JSON.parse(configFile);
+    for (var i in config) {
+        for (var j in config["Token"]) {
+            if (config["Token"][j] == req.params.token) {
+                delete config["Token"][j]
+                fs.writeFileSync(__dirname + "/public/CosmicComics_local/serverconfig.json", JSON.stringify(config), {encoding: 'utf8'});
+
+    res.sendStatus(200);
+                return;
+            }
+        }
+    }
+    res.sendStatus(402);
 })
 app.get("/getListOfFilesAndFolders/:path", (req, res) => {
     var dir = req.params.path;
