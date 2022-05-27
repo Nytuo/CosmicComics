@@ -4,12 +4,14 @@ const url = document.createElement("a");
 url.setAttribute("href", window.location.href);
 var domain = url.hostname;
 var port = url.port;
-fetch("http://" + domain + ":" + port + "/profile/discover").then(function (response) {
-    return response.text();
-}).then(async function (data) {
+async function discover(){
+    fetch("http://" + domain + ":" + port + "/profile/discover").then(function (response) {
+        return response.text();
+    }).then(async function (data) {
         data = JSON.parse(data);
-        if (data.length == 0 ){
-
+        if (data.length == 0) {
+            document.getElementById("createAccount").style.display = "block";
+    
             return;
         }
         for (let i = 0; i < data.length; i++) {
@@ -25,20 +27,20 @@ fetch("http://" + domain + ":" + port + "/profile/discover").then(function (resp
             profileDiv.className = "login_elements";
             if (profile.passcode == true) {
                 profileDiv.addEventListener("click", function () {
-                    document.getElementById("id_log").innerText = "Login for : "+profile.name;
+                    document.getElementById("id_log").innerText = "Login for : " + profile.name;
                     var myModal = new bootstrap.Modal(document.getElementById('passcode'), {
                         keyboard: false
                     })
                     var modalToggle = document.getElementById('passcode') // relatedTarget
                     myModal.show(modalToggle)
-
+    
                     document.getElementById("loginInBtn").addEventListener("click", async function () {
                         await fetch("http://" + domain + ":" + port + "/profile/login/" + profile.name + "/" + document.getElementById("ThePassToWord").value).then(function (response) {
                             return response.text();
                         }).then(function (data) {
                             if (data == "false") {
                                 alert("Wrong passcode");
-
+    
                             } else {
                                 setCookie('selectedProfile', data, 2);
                                 window.location.href = "/";
@@ -46,7 +48,7 @@ fetch("http://" + domain + ":" + port + "/profile/discover").then(function (resp
                         });
                     });
                 });
-
+    
             } else {
                 profileDiv.addEventListener("click", function () {
                     setCookie('selectedProfile', profile.name, 2);
@@ -55,11 +57,13 @@ fetch("http://" + domain + ":" + port + "/profile/discover").then(function (resp
             }
             profilesDiv.appendChild(profileDiv);
         }
-
+    
     }
-).catch(function (error) {
-    console.log(error);
-})
+    ).catch(function (error) {
+        console.log(error);
+    })
+}
+
 
 // Set a Cookie
 function setCookie(cName, cValue, expHours) {
@@ -68,10 +72,12 @@ function setCookie(cName, cValue, expHours) {
     const expires = "expires=" + date.toUTCString();
     document.cookie = cName + "=" + cValue + "; " + expires + "; path=/";
 }
-function servConfig(name,pass,port){
-    
-    fetch("/configServ/"+name+"/"+pass+"/"+port).then(()=>{
-        window.location.reload();
+
+function servConfig(name, pass, aport) {
+    document.getElementById("createAccount").style.display = "none";
+    fetch("http://" + domain + ":" + port + "/configServ/" + name.value + "/" + pass.value + "/" + aport.value, { method: 'POST' }).then(()=>{
+        discover();
     })
-    
+
 }
+discover();

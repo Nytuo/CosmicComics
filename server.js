@@ -224,6 +224,8 @@ app.post("/createUser/:name/:passcode", function (req, res) {
 
 
     }
+    let random = Math.floor(Math.random()*(fs.readdirSync(__dirname + "/public/Images/account_default/").length-1)+1)
+    fs.copyFileSync(__dirname + "/public/Images/account_default/"+random+".jpg",__dirname + "/public/CosmicComics_local/profiles/"+name+"/pp.png");
     makeDB(name);
     console.log("User created");
     res.sendStatus(200);
@@ -455,6 +457,8 @@ app.get("/getListOfFolder/:path", (req, res) => {
 
 app.get("/profile/discover", (req, res) => {
     let result = [];
+    try{
+
     fs.readdirSync(__dirname + "/public/CosmicComics_local/profiles").forEach(function (file) {
         let resultOBJ = {};
         resultOBJ.name = path.basename(file, path.extname(file));
@@ -466,6 +470,9 @@ app.get("/profile/discover", (req, res) => {
         }
         result.push(resultOBJ);
     })
+    }catch (e) {
+        console.log("No profile, First time setup...")
+    }
     res.send(result);
 })
 var rand = function() {
@@ -806,10 +813,7 @@ function GetListOfImg(dirPath) {
     }
     return listOfImage;
 }
-app.all('*', (req, res) => {
-    // code logic
-    res.sendFile(__dirname + '/404.html');
-})
+
 const server = app.listen(8000)
 process.on('SIGINT', () => {
     console.log('SIGINT signal received: closing server')
@@ -819,12 +823,13 @@ process.on('SIGINT', () => {
     })
 })
 app.post("/configServ/:name/:passcode/:port",(req,res)=>{
+    console.log("creating user")
     const name = req.params.name;
     const passcode = req.params.passcode;
-    const portServ = re.params.port;
-    fs.mkdirSync(CosmicComicsTemp + "/profiles/" + name, {recursive: true});
+    const portServ = req.params.port;
+    fs.mkdirSync(__dirname + "/public/CosmicComics_local/profiles/" + name, {recursive: true});
     console.log("Creating dir " + name);
-    fs.writeFileSync(CosmicComicsTemp + "/profiles/" + name + "/passcode.txt", passcode, {encoding: "utf8"});
+    fs.writeFileSync(__dirname + "/public/CosmicComics_local/profiles/" + name + "/passcode.txt", passcode, {encoding: "utf8"});
     if (!fs.existsSync(__dirname + "/public/CosmicComics_local/profiles/"+name+"/config.json")) {
         const obj = {
             path: "",
@@ -866,7 +871,27 @@ app.post("/configServ/:name/:passcode/:port",(req,res)=>{
 
 
     }
+    let random = Math.floor(Math.random()*(fs.readdirSync(__dirname + "/public/Images/account_default/").length-1)+1)
+    fs.copyFileSync(__dirname + "/public/Images/account_default/"+random+".jpg",__dirname + "/public/CosmicComics_local/profiles/"+name+"/pp.png");
+
     makeDB(name);
     console.log("User created");
     res.sendStatus(200);
+})
+
+app.get("/profile/getPP/:token",(req,res)=>{
+    const token = resolveToken(req.params.token);
+
+    res.sendFile(__dirname + "/public/CosmicComics_local/profiles/"+token+"/pp.png")
+})
+
+
+
+
+
+
+
+app.all('*', (req, res) => {
+    // code logic
+    res.sendFile(__dirname + '/404.html');
 })

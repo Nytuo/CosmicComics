@@ -1215,7 +1215,7 @@ justify-content : space-evenly;
     border-radius:10%;
 }
 
-#ThePassToWord,#TheUserName,#servName{
+#ThePassToWord,#TheUserName,#servName,#ThePassToWor{
     background-color: var(--cardCustoShadow);
     height: 40px;
     width: 465px;
@@ -1230,4 +1230,8 @@ justify-content : space-evenly;
 }
 #createAccount{
     background-color: rgba(66, 66, 66, 0.5);
+}
+#icon_id_accountSystem{
+    width: 40px;
+    height : 40px;
 }
