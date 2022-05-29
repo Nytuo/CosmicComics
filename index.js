@@ -45,8 +45,8 @@ if (connected == null) {
             window.location.href = "login";
         } else {
             currentUser = data;
-            document.getElementById("icon_id_accountSystem").src = "http://"+domain+":"+port+"/profile/getPP/"+connected
-  
+            document.getElementById("icon_id_accountSystem").src = "http://" + domain + ":" + port + "/profile/getPP/" + connected
+
 
             fetch("http://" + domain + ":" + port + "/config/getConfig/" + connected).then(function (response) {
                 return response.text();
@@ -3553,6 +3553,35 @@ async function addLibrary(forma) {
         window.location.href = window.location.href.split("?")[0];
     });
 }
+async function modifyAccount(forma) {
+    var form = forma.form;
+    var nuser = form[0]
+    var npass = form[1]
+    var npp = form[3]
+    
+    if (forma.form[0] == "") {
+        nuser = null;
+    }
+    if (forma.form[1] == "") {
+        npass = null;
+    }
+    if (forma.form[2].length == 0 && forma.form[3] == null) {
+        npp = null
+    }else if (forma.form[3] ==null){
+        npp = form[2]
+    }else{
+        npp = form[3]
+    }
+
+
+    const options = {
+        method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({
+            "nuser":nuser, "npass":npass, "npp":npp,"token":connected
+        }, null, 2)
+    };
+    await fetch("/profile/modification", options)
+    console.log(forma.form)
+}
 
 async function updateLibrary(forma, id) {
     var form = forma.form;
@@ -4975,12 +5004,9 @@ function AccountMenu() {
     const li4 = document.createElement("li");
     li2.innerHTML = "Modify your account";
     li2.setAttribute("data-bs-toggle", "modal");
-    li2.setAttribute("data-bs-target", "#lib");
+    li2.setAttribute("data-bs-target", "#modifAccount");
     li3.innerHTML = "Create a new user";
     li4.innerHTML = "Logout";
-
-    li2.addEventListener("click", function () {
-    });
     li3.addEventListener("click", function () {
     });
     li4.addEventListener("click", function () {
@@ -5008,3 +5034,26 @@ function AccountMenu() {
 
     });
 }
+
+fetch("/profile/custo/getNumber").then((res) => {
+    return res.json()
+
+}).then((data) => {
+    data = data.length
+    temp = document.getElementsByTagName("template")[0];
+    item = temp.content.querySelector("img");
+    for (let i = 1; i < data + 1; i++) {
+        const newone = document.importNode(item, true)
+        newone.src = "Images/account_default/" + i + ".jpg"
+        newone.addEventListener("click", () => {
+            console.log(document.getElementById(newone.id))
+            if (document.getElementById("newImage") == null) {
+                newone.id = "newImage"
+            } else {
+                document.getElementById("newImage").removeAttribute("id")
+                newone.id = "newImage"
+            }
+        })
+        document.getElementById("AMImages").appendChild(newone)
+    }
+})

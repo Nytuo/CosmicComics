@@ -14,20 +14,15 @@ You should have received a copy of the GNU General Public License
 along with Cosmic-Comics.  If not, see <https://www.gnu.org/licenses/>.--->
 <!DOCTYPE html>
 <html style="overflow-x: hidden" lang="fr">
+
 <head>
-    <meta charset="UTF-8"/>
+    <meta charset="UTF-8" />
     <!--Declaring the stylesheets-->
-    <link
-            rel="stylesheet"
-            href="css/animate"
-    />
-    <link
-            href="https://fonts.googleapis.com/icon?family=Material+Icons"
-            rel="stylesheet"
-    />
-    <link href="css/materialize.css" rel="stylesheet"/>
-    <link rel="stylesheet" href="css/bootstrap.css"/>
-    <link rel="stylesheet" href="css/base.css"/>
+    <link rel="stylesheet" href="css/animate" />
+    <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet" />
+    <link href="css/materialize.css" rel="stylesheet" />
+    <link rel="stylesheet" href="css/bootstrap.css" />
+    <link rel="stylesheet" href="css/base.css" />
     <link rel="stylesheet" href="themes/default.css">
     <!--The name of the page-->
     <title>Cosmic-Comics Collectionner</title>
@@ -37,78 +32,33 @@ along with Cosmic-Comics.  If not, see <https://www.gnu.org/licenses/>.--->
     <nav class="fixed-top">
         <div class="nav-wrapper">
             <a class="brand-logo">
-                <img
-                        src="Images/Logo.png"
-                        alt=""
-                        width="auto"
-                        height="60px"
-                        id="logo_id"
-                        class="navbar-brand rotate linear infinite"
-                />
-                <img
-                        src="Images/LogoTxt.png"
-                        alt=""
-                        id="logo_id_txt"
-                        class="navbar-brand"
-                        height="60px"
-                />
+                <img src="Images/Logo.png" alt="" width="auto" height="60px" id="logo_id"
+                    class="navbar-brand rotate linear infinite" />
+                <img src="Images/LogoTxt.png" alt="" id="logo_id_txt" class="navbar-brand" height="60px" />
             </a>
             <!--The Navigation Menu-->
 
             <label>
-                <input type="text" placeholder="Search in your libraries..." id="searchField"/>
+                <input type="text" placeholder="Search in your libraries..." id="searchField" />
             </label>
             <ul id="searchResults"></ul>
 
-            <button
-                    class="btn"
-                    data-bs-toggle="modal"
-                    data-bs-target="#buttonp"
-                    id="menuid"
-            >
-                <i class="material-icons" style="line-height: 1; height: 40px"
-                >menu</i
-                >
+            <button class="btn" data-bs-toggle="modal" data-bs-target="#buttonp" id="menuid">
+                <i class="material-icons" style="line-height: 1; height: 40px">menu</i>
             </button>
-            <button
-                    class="btn"
-                    style="height: 40px; margin: 10px 5px 5px;"
-                    id="gotoback"
-            >
-                <i class="material-icons" style="line-height: 1; height: 40px"
-                >arrow_back</i
-                >
+            <button class="btn" style="height: 40px; margin: 10px 5px 5px;" id="gotoback">
+                <i class="material-icons" style="line-height: 1; height: 40px">arrow_back</i>
             </button>
-            <button
-                    class="btn"
-                    style="margin: 10px 5px 5px; height: 40px;"
-                    data-bs-toggle="modal"
-                    data-bs-target="#lib"
-                    id="id_createLib"
-            >
+            <button class="btn" style="margin: 10px 5px 5px; height: 40px;" data-bs-toggle="modal" data-bs-target="#lib"
+                id="id_createLib">
                 <i class="material-icons" style="line-height: 1; height: 40px">library_add</i>
             </button>
-            <button
-                    class="btn"
-                    style="margin: 10px 5px 5px; height: 40px;"
-                    onclick="changeVM()"
-                    id="id_viewmode"
-            >
-                <i
-                        class="material-icons"
-                        id="icon_id_viewmode"
-                        style="line-height: 1; height: 40px"
-                >view_list</i
-                >
+            <button class="btn" style="margin: 10px 5px 5px; height: 40px;" onclick="changeVM()" id="id_viewmode">
+                <i class="material-icons" id="icon_id_viewmode" style="line-height: 1; height: 40px">view_list</i>
             </button>
-            <button
-                    class="btn"
-                    style="margin: 0px 5px -1px;"
-                    onclick="AccountMenu()"
-                    id="id_accountSystem"
-            >
-               
-                        
+            <button class="btn" style="margin: 0px 5px -1px;" onclick="AccountMenu()" id="id_accountSystem">
+
+
                 <img id="icon_id_accountSystem" alt="#">
             </button>
         </div>
@@ -117,8 +67,7 @@ along with Cosmic-Comics.  If not, see <https://www.gnu.org/licenses/>.--->
 
     <div class="folderExplorer librariesSideBar" id="folderExplorer">
         <div>
-            <button class="btn btns libbtn" onclick="returnToHome(this)"><i
-                    class="material-icons"
+            <button class="btn btns libbtn" onclick="returnToHome(this)"><i class="material-icons"
                     style="line-height: 1;float: left;">home</i>Home
             </button>
         </div>
@@ -127,866 +76,531 @@ along with Cosmic-Comics.  If not, see <https://www.gnu.org/licenses/>.--->
 </header>
 
 <body>
-<iframe
-        width="854"
-        height="480"
-        style="display: none"
-        id="iframe_yt_music"
-        src=""
-        allowfullscreen
-></iframe>
+    <iframe width="854" height="480" style="display: none" id="iframe_yt_music" src="" allowfullscreen></iframe>
 
-<!-- Modal Tips-->
-<div
-        class="modal animate__animated animate__zoomIn animate__faster"
-        id="lib"
-        tabindex="-1"
-        aria-labelledby="id_lib"
-        aria-hidden="true"
-        data-bs-backdrop="static" data-bs-keyboard="false"
-        style="overflow: hidden"
->
-    <div class="modal-dialog modal-dialog-centered">
-        <div class="modal-content">
-            <div class="modal-header">
-                <h5 class="modal-title" id="id_lib">Adding a library:</h5>
-                <button
-                        type="button"
-                        class="btn-close btn-close-white"
-                        data-bs-dismiss="modal"
-                        aria-label="Close"
-                        onclick="resetLibModal()"
-                ></button>
-            </div>
-            <div class="modal-body" style="text-align: center">
+    <!-- Modal Tips-->
+    <div class="modal animate__animated animate__zoomIn animate__faster" id="lib" tabindex="-1" aria-labelledby="id_lib"
+        aria-hidden="true" data-bs-backdrop="static" data-bs-keyboard="false" style="overflow: hidden">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="id_lib">Adding a library:</h5>
+                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"
+                        onclick="resetLibModal()"></button>
+                </div>
+                <div class="modal-body" style="text-align: center">
 
-                <label class="input-group-text" for="namelocation">Name of the library : </label>
-                <input class="form-control" type="text" id="namelocation" name="namelocation" autocomplete="off"/>
-                <br>
-                <label class="input-group-text" for="locationa">Location on the server : </label>
-                <input class="form-control" type="text" id="locationa" name="locationa" autocomplete="off"/>
+                    <label class="input-group-text" for="namelocation">Name of the library : </label>
+                    <input class="form-control" type="text" id="namelocation" name="namelocation" autocomplete="off" />
+                    <br>
+                    <label class="input-group-text" for="locationa">Location on the server : </label>
+                    <input class="form-control" type="text" id="locationa" name="locationa" autocomplete="off" />
 
-                <br>
-                <label>
-                    <select class="form-select" id="providerID" name="providerID">
-                        <option id="opt0" value="" disabled selected>Select a provider</option>
-                        <option id="opt1" value="1">Marvel API (Comics Marvel & Star Wars)</option>
-                        <option id="opt2" value="2">Anilist (Manga)</option>
-                        <option id="opt3" value="3">League Of Comics Geek (All)</option>
-                    </select>
-                </label>
-                <br>
-                <button id="sendlib" class="btn btns btn-primary"
+                    <br>
+                    <label>
+                        <select class="form-select" id="providerID" name="providerID">
+                            <option id="opt0" value="" disabled selected>Select a provider</option>
+                            <option id="opt1" value="1">Marvel API (Comics Marvel & Star Wars)</option>
+                            <option id="opt2" value="2">Anilist (Manga)</option>
+                            <option id="opt3" value="3">League Of Comics Geek (All)</option>
+                        </select>
+                    </label>
+                    <br>
+                    <button id="sendlib" class="btn btns btn-primary"
                         onclick="return addLibrary({'form':[document.getElementById('namelocation'),document.getElementById('locationa'),document.getElementById('providerID')]});">
-                    Add Library
-                </button>
-
-            </div>
-            <div class="modal-footer">
-                <button
-                        type="button"
-                        class="btn btn-secondary"
-                        data-bs-dismiss="modal"
-                        id="close_lib"
-                        onclick="resetLibModal()"
-                >
-                    Close
-                </button>
-            </div>
-        </div>
-    </div>
-</div>
-<!-- Modal navigation -->
-<div
-        class="modal animate__animated animate__zoomIn animate__faster"
-        id="buttonp"
-        tabindex="-1"
-        aria-labelledby="id_nav"
-        aria-hidden="true"
->
-    <div class="modal-dialog modal-dialog-centered">
-        <div class="modal-content">
-            <div class="modal-header">
-                <h5 class="modal-title" id="id_nav">Navigation</h5>
-                <button
-                        type="button"
-                        class="btn-close btn-close-white"
-                        data-bs-dismiss="modal"
-                        aria-label="Close"
-                ></button>
-            </div>
-            <div class="modal-body">
-                <div id="controller">
-
-                    <button
-                            class="btn"
-                            style="margin: 10px"
-                            data-bs-toggle="modal"
-                            data-bs-target="#bm"
-                            id="id_bm"
-                    >
-                        <i class="material-icons">bookmarks</i>
-                    </button>
-                    <button
-                            class="btn"
-                            style="margin: 10px"
-                            id="id_settings"
-                            data-bs-toggle="modal"
-                            data-bs-target="#settingsmodal"
-                    >
-                        <i class="material-icons">settings</i>
-                    </button>
-                    <button
-                            class="btn"
-                            style="margin: 10px"
-                            id="id_theme"
-                            data-bs-toggle="modal"
-                            data-bs-target="#thememodal"
-                    >
-                        <i class="material-icons">palette</i>
+                        Add Library
                     </button>
 
-                    <button
-                            class="btn"
-                            style="margin: 10px"
-                            onclick="refreshFolder();"
-                            data-bs-dismiss="modal"
-                            id="id_refreshFolder"
-                    >
-                        <i class="material-icons">refresh</i>
-                    </button>
-                    <button
-                            class="btn"
-                            style="margin: 10px"
-                            id="id_openDL"
-                            data-bs-toggle="modal"
-                            data-bs-target="#dlmodal"
-                    >
-                        <i class="material-icons">download</i>
-                    </button>
-
-                    <button
-                            class="btn"
-                            style="margin: 10px"
-                            onclick="OpenFileOnce()"
-                            data-bs-dismiss="modal"
-                            id="id_opnfile"
-                    >
-                        <i class="material-icons">note_add</i>
-                    </button>
-                    <button
-                            class="btn"
-                            data-bs-toggle="modal"
-                            data-bs-target="#about"
-                            style="margin: 10px; height: 40px"
-                            id="id_info"
-                    >
-                        <i class="material-icons">info</i>
-                    </button>
-                    <button
-                            class="btn"
-                            data-bs-toggle="modal"
-                            data-bs-target="#tips"
-                            style="margin: 10px; height: 40px"
-                            id="id_tips-btn"
-                    >
-                        <i class="material-icons">tips_and_updates</i>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal" id="close_lib"
+                        onclick="resetLibModal()">
+                        Close
                     </button>
                 </div>
             </div>
-            <div class="modal-footer">
-                <button
-                        type="button"
-                        class="btn btn-secondary"
-                        data-bs-dismiss="modal"
-                        id="close_nav"
-                >
-                    Close
-                </button>
+        </div>
+    </div>
+    <!-- Modal navigation -->
+    <div class="modal animate__animated animate__zoomIn animate__faster" id="buttonp" tabindex="-1"
+        aria-labelledby="id_nav" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="id_nav">Navigation</h5>
+                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"
+                        aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <div id="controller">
+
+                        <button class="btn" style="margin: 10px" data-bs-toggle="modal" data-bs-target="#bm" id="id_bm">
+                            <i class="material-icons">bookmarks</i>
+                        </button>
+                        <button class="btn" style="margin: 10px" id="id_settings" data-bs-toggle="modal"
+                            data-bs-target="#settingsmodal">
+                            <i class="material-icons">settings</i>
+                        </button>
+                        <button class="btn" style="margin: 10px" id="id_theme" data-bs-toggle="modal"
+                            data-bs-target="#thememodal">
+                            <i class="material-icons">palette</i>
+                        </button>
+
+                        <button class="btn" style="margin: 10px" onclick="refreshFolder();" data-bs-dismiss="modal"
+                            id="id_refreshFolder">
+                            <i class="material-icons">refresh</i>
+                        </button>
+                        <button class="btn" style="margin: 10px" id="id_openDL" data-bs-toggle="modal"
+                            data-bs-target="#dlmodal">
+                            <i class="material-icons">download</i>
+                        </button>
+
+                        <button class="btn" style="margin: 10px" onclick="OpenFileOnce()" data-bs-dismiss="modal"
+                            id="id_opnfile">
+                            <i class="material-icons">note_add</i>
+                        </button>
+                        <button class="btn" data-bs-toggle="modal" data-bs-target="#about"
+                            style="margin: 10px; height: 40px" id="id_info">
+                            <i class="material-icons">info</i>
+                        </button>
+                        <button class="btn" data-bs-toggle="modal" data-bs-target="#tips"
+                            style="margin: 10px; height: 40px" id="id_tips-btn">
+                            <i class="material-icons">tips_and_updates</i>
+                        </button>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal" id="close_nav">
+                        Close
+                    </button>
+                </div>
             </div>
         </div>
     </div>
-</div>
-<!-- Modal about-->
-<div
-        class="modal animate__animated animate__zoomIn animate__faster"
-        id="about"
-        tabindex="-1"
-        aria-labelledby="id_about"
-        aria-hidden="true"
-        style="overflow: hidden"
->
-    <div class="modal-dialog modal-dialog-centered">
-        <div class="modal-content">
-            <div class="modal-header">
-                <h5 class="modal-title" id="id_about">About</h5>
-                <button
-                        type="button"
-                        class="btn-close"
-                        id="btn_close_icon_about"
-                        data-bs-dismiss="modal"
-                        aria-label="Close"
-                ></button>
-            </div>
-            <div class="modal-body" style="text-align: center">
-                <h1>Cosmic Comics</h1>
-                <img
-                        src="Images/Logo.png"
-                        alt=""
-                        width="auto"
-                        height="80px"
-                        class="navbar-brand rotate linear infinite"
-                /><img
-                    src="Images/LogoTxt.png"
-                    alt=""
-                    class="navbar-brand"
-                    height="80px"
-            />
-                <p id="version">Version : </p>
-                <p id="createdby">Created by Nytuo (Arnaud BEUX)</p>
-                <p id="usewhat">This application is a web server based Comics & Manga reader & Collectionner.</p>
-                <p id="seewhere">See the project on <a style='cursor: pointer' target='seemore'
-                                                       href='https://github.com/Nytuo/CosmicComics'>GitHub</a>, and feel
-                    free to open an issue on GitHub for any problems you may have, ask for functionalities.</p>
-                <p id="project">All the code is available on GitHub, under the <a style='cursor: pointer'
-                                                                                  target='seemore'
-                                                                                  href='https://www.gnu.org/licenses/gpl-3.0.html'>GNU
-                    GPL-3.0</a> license.</p>
-                <p id="translated"></p>
-                <p id="beta_test">Thanks to the beta tester : THEO LEPRINCE</p>
-                <a href="#" onclick="shell.openExternal('https://nytuo.yo.fr/')"
-                ><img
-                        src="Images/Nytuo_softwares.png"
-                        alt=""
-                        class=""
-                        height="80px"
-                /></a>
-                <a href="#" onclick="shell.openExternal('https://nytuo.yo.fr/')"
-                ><img
-                        src="Images/Nytuo website.png"
-                        alt=""
-                        class=""
-                        height="80px"
-                /></a>
-            </div>
-            <div class="modal-footer">
-                <button
-                        type="button"
-                        class="btn btn-secondary"
-                        data-bs-dismiss="modal"
-                        id="close_about"
-                >
-                    Close
-                </button>
+    <!-- Modal about-->
+    <div class="modal animate__animated animate__zoomIn animate__faster" id="about" tabindex="-1"
+        aria-labelledby="id_about" aria-hidden="true" style="overflow: hidden">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="id_about">About</h5>
+                    <button type="button" class="btn-close" id="btn_close_icon_about" data-bs-dismiss="modal"
+                        aria-label="Close"></button>
+                </div>
+                <div class="modal-body" style="text-align: center">
+                    <h1>Cosmic Comics</h1>
+                    <img src="Images/Logo.png" alt="" width="auto" height="80px"
+                        class="navbar-brand rotate linear infinite" /><img src="Images/LogoTxt.png" alt=""
+                        class="navbar-brand" height="80px" />
+                    <p id="version">Version : </p>
+                    <p id="createdby">Created by Nytuo (Arnaud BEUX)</p>
+                    <p id="usewhat">This application is a web server based Comics & Manga reader & Collectionner.</p>
+                    <p id="seewhere">See the project on <a style='cursor: pointer' target='seemore'
+                            href='https://github.com/Nytuo/CosmicComics'>GitHub</a>, and feel
+                        free to open an issue on GitHub for any problems you may have, ask for functionalities.</p>
+                    <p id="project">All the code is available on GitHub, under the <a style='cursor: pointer'
+                            target='seemore' href='https://www.gnu.org/licenses/gpl-3.0.html'>GNU
+                            GPL-3.0</a> license.</p>
+                    <p id="translated"></p>
+                    <p id="beta_test">Thanks to the beta tester : THEO LEPRINCE</p>
+                    <a href="#" onclick="shell.openExternal('https://nytuo.yo.fr/')"><img
+                            src="Images/Nytuo_softwares.png" alt="" class="" height="80px" /></a>
+                    <a href="#" onclick="shell.openExternal('https://nytuo.yo.fr/')"><img src="Images/Nytuo website.png"
+                            alt="" class="" height="80px" /></a>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal" id="close_about">
+                        Close
+                    </button>
+                </div>
             </div>
         </div>
     </div>
-</div>
-<!-- Modal DL-->
-<div
-        class="modal animate__animated animate__zoomIn animate__faster"
-        id="dlmodal"
-        tabindex="-1"
-        aria-labelledby="id_openDLtxt"
-        aria-hidden="true"
-        style="overflow: hidden"
->
-    <div class="modal-dialog modal-dialog-centered">
-        <div class="modal-content">
-            <div class="modal-header">
-                <h5 class="modal-title" id="id_openDLtxt">Downloader</h5>
-                <button
-                        type="button"
-                        class="btn-close"
-                        id="btn_close_icon_dld"
-                        data-bs-dismiss="modal"
-                        aria-label="Close"
-                ></button>
-            </div>
-            <div class="modal-body" style="text-align: center">
-                <p class="red">This functionality not work on all websites, such as the one's which use Google Drive or
-                    no-direct image link.</p>
-                <div class="mb-3">
-                    <label for="id_URLDL"></label><input class="form-control" type="text"
-                                                         placeholder="" id="id_URLDL">
+    <!-- Modal DL-->
+    <div class="modal animate__animated animate__zoomIn animate__faster" id="dlmodal" tabindex="-1"
+        aria-labelledby="id_openDLtxt" aria-hidden="true" style="overflow: hidden">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="id_openDLtxt">Downloader</h5>
+                    <button type="button" class="btn-close" id="btn_close_icon_dld" data-bs-dismiss="modal"
+                        aria-label="Close"></button>
                 </div>
-                <button class="btn btn-primary" onclick="downloader();" id="id_btnDLStart">Start Download</button>
-                <div class="progress" id="progressbarDL">
-                    <div id="prgsDL" class="determinate"></div>
+                <div class="modal-body" style="text-align: center">
+                    <p class="red">This functionality not work on all websites, such as the one's which use Google Drive
+                        or
+                        no-direct image link.</p>
+                    <div class="mb-3">
+                        <label for="id_URLDL"></label><input class="form-control" type="text" placeholder=""
+                            id="id_URLDL">
+                    </div>
+                    <button class="btn btn-primary" onclick="downloader();" id="id_btnDLStart">Start Download</button>
+                    <div class="progress" id="progressbarDL">
+                        <div id="prgsDL" class="determinate"></div>
+                    </div>
+                    <p id="DLtxt"></p>
+                    <button class="btn btn-primary invisible" id="id_btnDLOpen"
+                        onclick="OpenDownloadDir();">Open</button>
                 </div>
-                <p id="DLtxt"></p>
-                <button class="btn btn-primary invisible" id="id_btnDLOpen" onclick="OpenDownloadDir();">Open</button>
-            </div>
-            <div class="modal-footer">
-                <button
-                        type="button"
-                        class="btn btn-secondary"
-                        data-bs-dismiss="modal"
-                        id="close_openDL"
-                >
-                    Close
-                </button>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal" id="close_openDL">
+                        Close
+                    </button>
+                </div>
             </div>
         </div>
     </div>
-</div>
-<!-- Modal Tips-->
-<div
-        class="modal animate__animated animate__zoomIn animate__faster"
-        id="tips"
-        tabindex="-1"
-        aria-labelledby="id_tips"
-        aria-hidden="true"
-        style="overflow: hidden"
->
-    <div class="modal-dialog modal-dialog-centered">
-        <div class="modal-content">
-            <div class="modal-header">
-                <h5 class="modal-title" id="id_tips">Tips:</h5>
-                <button
-                        type="button"
-                        class="btn-close btn-close-white"
-                        data-bs-dismiss="modal"
-                        aria-label="Close"
-                ></button>
-            </div>
-            <div class="modal-body" style="text-align: center">
-                <h4 id="id_did_you_know"></h4>
-                <ul>
-                    <li id="id_tip_1"></li>
-                    <li id="id_tip_2"></li>
-                    <li id="id_tip_3"></li>
-                </ul>
-            </div>
-            <div class="modal-footer">
-                <button
-                        type="button"
-                        class="btn btn-secondary"
-                        data-bs-dismiss="modal"
-                        id="close_tips"
-                >
-                    Close
-                </button>
+    <!-- Modal Tips-->
+    <div class="modal animate__animated animate__zoomIn animate__faster" id="tips" tabindex="-1"
+        aria-labelledby="id_tips" aria-hidden="true" style="overflow: hidden">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="id_tips">Tips:</h5>
+                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"
+                        aria-label="Close"></button>
+                </div>
+                <div class="modal-body" style="text-align: center">
+                    <h4 id="id_did_you_know"></h4>
+                    <ul>
+                        <li id="id_tip_1"></li>
+                        <li id="id_tip_2"></li>
+                        <li id="id_tip_3"></li>
+                    </ul>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal" id="close_tips">
+                        Close
+                    </button>
+                </div>
             </div>
         </div>
     </div>
-</div>
-<!-- Modal Bookmarks-->
-<div
-        class="modal animate__animated animate__zoomIn animate__faster"
-        id="bm"
-        tabindex="-1"
-        aria-labelledby="id_bmm"
-        aria-hidden="true"
-        style="overflow: hidden"
->
-    <div class="modal-dialog modal-dialog-centered modal-dialog-scrollable">
-        <div class="modal-content">
-            <div class="modal-header">
-                <h5 class="modal-title" id="id_bmm">Bookmarks</h5>
-                <button
-                        type="button"
-                        class="btn-close btn-close-white"
-                        data-bs-dismiss="modal"
-                        aria-label="Close"
-                ></button>
-            </div>
-            <div class="modal-body">
-                <div id="bookmarkContainer" style="text-align: center"></div>
-            </div>
-            <div class="modal-footer">
-                <button
-                        type="button"
-                        class="btn btn-secondary"
-                        data-bs-dismiss="modal"
-                        id="close_bm"
-                >
-                    Close
-                </button>
+    <!-- Modal Bookmarks-->
+    <div class="modal animate__animated animate__zoomIn animate__faster" id="bm" tabindex="-1" aria-labelledby="id_bmm"
+        aria-hidden="true" style="overflow: hidden">
+        <div class="modal-dialog modal-dialog-centered modal-dialog-scrollable">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="id_bmm">Bookmarks</h5>
+                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"
+                        aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <div id="bookmarkContainer" style="text-align: center"></div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal" id="close_bm">
+                        Close
+                    </button>
+                </div>
             </div>
         </div>
     </div>
-</div>
-<!-- Modal settings -->
-<div
-        class="modal animate__animated animate__zoomIn animate__faster"
-        id="settingsmodal"
-        tabindex="-1"
-        aria-labelledby="id_settingsmod"
-        aria-hidden="true"
-        style="overflow: hidden"
->
-    <div class="modal-dialog modal-dialog-centered">
-        <div class="modal-content">
-            <div class="modal-header">
-                <h5 class="modal-title" id="id_settingsmod">Settings</h5>
-                <button
-                        type="button"
-                        class="btn-close btn-close-white"
-                        data-bs-dismiss="modal"
-                        aria-label="Close"
-                ></button>
-            </div>
-            <div class="modal-body" style="text-align: center">
-
-                <button
-                        id="id_btn_CTN"
-                        class="btn btn-primary"
-                        style="width: 100%"
-                        onclick="clearTN()"
-                >
-                    Clear the thumbnails
-                </button>
-                <div style="margin: 10px">
-                    <select
-                            class="form-select"
-                            aria-label="Default select example"
-                            style="margin-bottom: 5px"
-                            onchange="selectTheme()"
-                            id="themeselector"
-                    >
-                        <option value="" id="selectTheme_id">Select a theme</option>
-                    </select>
+    <!-- Modal settings -->
+    <div class="modal animate__animated animate__zoomIn animate__faster" id="settingsmodal" tabindex="-1"
+        aria-labelledby="id_settingsmod" aria-hidden="true" style="overflow: hidden">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="id_settingsmod">Settings</h5>
+                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"
+                        aria-label="Close"></button>
                 </div>
-                <button
-                        id="id_btn_TE"
-                        class="btn btn-primary"
-                        style="width: 100%"
-                        onclick="ToggleTBY()"
-                >
-                    No theme by event
-                </button>
-            </div>
-            <div class="modal-footer">
-                <button
-                        type="button"
-                        class="btn btn-secondary"
-                        data-bs-dismiss="modal"
-                        id="close_settings"
-                >
-                    Close
-                </button>
+                <div class="modal-body" style="text-align: center">
+
+                    <button id="id_btn_CTN" class="btn btn-primary" style="width: 100%" onclick="clearTN()">
+                        Clear the thumbnails
+                    </button>
+                    <div style="margin: 10px">
+                        <select class="form-select" aria-label="Default select example" style="margin-bottom: 5px"
+                            onchange="selectTheme()" id="themeselector">
+                            <option value="" id="selectTheme_id">Select a theme</option>
+                        </select>
+                    </div>
+                    <button id="id_btn_TE" class="btn btn-primary" style="width: 100%" onclick="ToggleTBY()">
+                        No theme by event
+                    </button>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal" id="close_settings">
+                        Close
+                    </button>
+                </div>
             </div>
         </div>
     </div>
-</div>
-<!-- Modal Theme -->
-<div
-        class="modal animate__animated animate__zoomIn animate__faster"
-        id="thememodal"
-        tabindex="-1"
-        aria-labelledby="id_thememod"
-        aria-hidden="true"
-        style="overflow: hidden"
->
-    <div class="modal-dialog modal-dialog-centered modal-dialog-scrollable">
-        <div class="modal-content">
-            <div class="modal-header">
-                <h5 class="modal-title" id="id_thememod">Theme Customizer</h5>
-                <button
-                        type="button"
-                        class="btn-close btn-close-white"
-                        data-bs-dismiss="modal"
-                        aria-label="Close"
-                ></button>
-            </div>
-            <div class="modal-body" style="text-align: center">
-                <label for="colorBG" class="form-label" id="colorBG_txt"
-                >Set Background Color</label
-                >
-                <input
-                        type="color"
-                        class="form-control form-control-color"
-                        id="colorBG"
-                        value="#212121"
-                        title="Choose your color"
-                        onchange="saveToTheme(this,'BG')"
-                />
-                <label for="colorFG" class="form-label" id="colorFG_txt"
-                >Set Foreground Color</label
-                >
-                <input
-                        type="color"
-                        class="form-control form-control-color"
-                        id="colorFG"
-                        value="#212121"
-                        title="Choose your color"
-                        onchange="saveToTheme(this,'FG')"
-                />
-                <label for="colorO2" class="form-label" id="colorO2_txt"
-                >Set O2 Color</label
-                >
-                <input
-                        type="color"
-                        class="form-control form-control-color"
-                        id="colorO2"
-                        value="#212121"
-                        title="Choose your color"
-                        onchange="saveToTheme(this,'O2')"
-                />
-                <p id="overlay_background_txt">Overlay Background</p>
-                <input
-                        type="text"
-                        class="form-control"
-                        id="O2BG_id"
-                        aria-describedby="basic-addon3"
-                        onchange="saveToTheme(this,'O2')"
-                />
-                <button
-                        class="btn btn-primary"
-                        id="browseFileTheme_txt"
-                        onclick="openFileImageTheme('O2BG_id','O2')"
-                >
-                    browse
-                </button
-                >
-                <br/>
-                <label for="colorNotifBG" class="form-label" id="colorNotifBG_txt"
-                >notificaton Background</label
-                >
-                <input
-                        type="color"
-                        class="form-control form-control-color"
-                        id="colorNotifBG"
-                        value="#212121"
-                        title="Choose your color"
-                        onchange="saveToTheme(this,'notifBG')"
-                />
-                <div class="form-check form-switch">
-                    <input
-                            class="form-check-input"
-                            type="checkbox"
-                            id="btn_card_id"
-                            onchange="saveToTheme(this,'button_card','','black')"
-                    />
-                    <label
-                            class="form-check-label"
-                            for="btn_card_id"
-                            id="btn_card_txt"
-                    >button card (white or black)</label
-                    >
+    <!-- Modal Theme -->
+    <div class="modal animate__animated animate__zoomIn animate__faster" id="thememodal" tabindex="-1"
+        aria-labelledby="id_thememod" aria-hidden="true" style="overflow: hidden">
+        <div class="modal-dialog modal-dialog-centered modal-dialog-scrollable">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="id_thememod">Theme Customizer</h5>
+                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"
+                        aria-label="Close"></button>
                 </div>
-                <div class="form-check form-switch">
-                    <input
-                            class="form-check-input"
-                            type="checkbox"
-                            id="progress_color_id"
-                            onchange="saveToTheme(this,'progress','','white')"
-                    />
-                    <label
-                            class="form-check-label"
-                            for="progress_color_id"
-                            id="progress_color_txt"
-                    >progress color (black or white)</label
-                    >
+                <div class="modal-body" style="text-align: center">
+                    <label for="colorBG" class="form-label" id="colorBG_txt">Set Background Color</label>
+                    <input type="color" class="form-control form-control-color" id="colorBG" value="#212121"
+                        title="Choose your color" onchange="saveToTheme(this,'BG')" />
+                    <label for="colorFG" class="form-label" id="colorFG_txt">Set Foreground Color</label>
+                    <input type="color" class="form-control form-control-color" id="colorFG" value="#212121"
+                        title="Choose your color" onchange="saveToTheme(this,'FG')" />
+                    <label for="colorO2" class="form-label" id="colorO2_txt">Set O2 Color</label>
+                    <input type="color" class="form-control form-control-color" id="colorO2" value="#212121"
+                        title="Choose your color" onchange="saveToTheme(this,'O2')" />
+                    <p id="overlay_background_txt">Overlay Background</p>
+                    <input type="text" class="form-control" id="O2BG_id" aria-describedby="basic-addon3"
+                        onchange="saveToTheme(this,'O2')" />
+                    <button class="btn btn-primary" id="browseFileTheme_txt"
+                        onclick="openFileImageTheme('O2BG_id','O2')">
+                        browse
+                    </button>
+                    <br />
+                    <label for="colorNotifBG" class="form-label" id="colorNotifBG_txt">notificaton Background</label>
+                    <input type="color" class="form-control form-control-color" id="colorNotifBG" value="#212121"
+                        title="Choose your color" onchange="saveToTheme(this,'notifBG')" />
+                    <div class="form-check form-switch">
+                        <input class="form-check-input" type="checkbox" id="btn_card_id"
+                            onchange="saveToTheme(this,'button_card','','black')" />
+                        <label class="form-check-label" for="btn_card_id" id="btn_card_txt">button card (white or
+                            black)</label>
+                    </div>
+                    <div class="form-check form-switch">
+                        <input class="form-check-input" type="checkbox" id="progress_color_id"
+                            onchange="saveToTheme(this,'progress','','white')" />
+                        <label class="form-check-label" for="progress_color_id" id="progress_color_txt">progress color
+                            (black or white)</label>
+                    </div>
+
+                    <label for="BTNHC_id" class="form-label" id="BTNHC_txt">Set hover close button</label>
+                    <input type="color" class="form-control form-control-color" id="BTNHC_id" value="#212121"
+                        title="Choose your color" onchange="saveToTheme(this,'hover_close')" />
+
+                    <label for="BTNFG_id" class="form-label" id="BTNFG_txt">Set button Foreground Color</label>
+                    <input type="color" class="form-control form-control-color" id="BTNFG_id" value="#212121"
+                        title="Choose your color" onchange="saveToTheme(this,'btn_FG')" />
+
+                    <label for="BTNBG_id" class="form-label" id="BTNBG_txt">Set button background color</label>
+                    <input type="color" class="form-control form-control-color" id="BTNBG_id" value="#212121"
+                        title="Choose your color" onchange="saveToTheme(this,'btn_BG')" />
+
+                    <label for="BTNBC_id" class="form-label" id="BTNBC_txt">Set button border color</label>
+                    <input type="color" class="form-control form-control-color" id="BTNBC_id" value="#212121"
+                        title="Choose your color" onchange="saveToTheme(this,'btn_border')" />
+
+                    <label for="BTNH_id" class="form-label" id="BTNH_txt">Set button hover color</label>
+                    <input type="color" class="form-control form-control-color" id="BTNH_id" value="#212121"
+                        title="Choose your color" onchange="saveToTheme(this,'btn_hover')" />
+
+                    <label for="FGSBC_id" class="form-label" id="FGSBC_txt">Set foreground secondary button
+                        color</label>
+                    <input type="color" class="form-control form-control-color" id="FGSBC_id" value="#212121"
+                        title="Choose your color" onchange="saveToTheme(this,'btn_FG_s')" />
+
+                    <label for="BGSBC_id" class="form-label" id="BGSBC_txt">Set background secondary background
+                        color</label>
+                    <input type="color" class="form-control form-control-color" id="BGSBC_id" value="#212121"
+                        title="Choose your color" onchange="saveToTheme(this,'btn_BG_s')" />
+
+                    <label for="BSC_id" class="form-label" id="BSC_txt">Set border secondary color</label>
+                    <input type="color" class="form-control form-control-color" id="BSC_id" value="#212121"
+                        title="Choose your color" onchange="saveToTheme(this,'btn_border_s')" />
+                    <label for="HSC_id" class="form-label" id="HSC_txt">Set hover secondary color</label>
+                    <input type="color" class="form-control form-control-color" id="HSC_id" value="#212121"
+                        title="Choose your color" onchange="saveToTheme(this,'btn_hover_s')" />
+                    <label for="HLVC_id" class="form-label" id="HLVC_txt">Set hover listview color</label>
+                    <input type="color" class="form-control form-control-color" id="HLVC_id" value="#212121"
+                        title="Choose your color" onchange="saveToTheme(this,'hover_listview')" />
+
+                    <label for="BGCI_id" class="form-label" id="BGCI_txt">Set Background CI</label>
+                    <input type="color" class="form-control form-control-color" id="BGCI_id" value="#212121"
+                        title="Choose your color" onchange="saveToTheme(this,'BG_CI')" />
+                    <label for="NBGC_id" class="form-label" id="NBGC_txt">Set navigation background color</label>
+                    <input type="color" class="form-control form-control-color" id="NBGC_id" value="#212121"
+                        title="Choose your color" onchange="saveToTheme(this,'nav_BG')" />
+                    <!--RESTE à FAIRE-->
+                    <div class="form-check form-switch">
+                        <input class="form-check-input" type="checkbox" id="SCID"
+                            onchange="saveToTheme(this,'scrollbar','black','white')" />
+                        <label class="form-check-label" for="SCID" id="SCID_txt">ScrollBar</label>
+                    </div>
+                    <div class="form-check form-switch">
+                        <input class="form-check-input" type="checkbox" id="PGRSBW_id"
+                            onchange="saveToTheme(this,'progressbar_progresswhite_progressblack','progress','progresswhite')" />
+                        <label class="form-check-label" for="PGRSBW_id" id="PGRSBW_txt">Progressbar Black or
+                            White</label>
+                    </div>
+                    <label for="MUSIC_id" class="form-label" id="MUSIC_txt">Music Link</label>
+                    <input type="text" class="form-control" id="MUSIC_id" aria-describedby="basic-addon3"
+                        onchange="saveToTheme(this,'Music')" />
+                    <p id="LBG_txt">Link BG</p>
+                    <input type="text" class="form-control" id="LBG_id" aria-describedby="basic-addon3"
+                        onchange="saveToTheme(this,'linkBG')" />
+                    <button class="btn btn-primary" onclick="openFileImageTheme('LBG_id','linkBG')"
+                        id="browse_fileImageTheme_txt">
+                        browse
+                    </button>
+                    <br />
+
+                    <label for="PRGSBC_id" class="form-label" id="PRGSBC_txt">Set progress bar color</label>
+                    <input type="color" class="form-control form-control-color" value="#212121" id="PRGSBC_id"
+                        title="Choose your color" onchange="saveToTheme(this,'progress_color')" />
                 </div>
-
-                <label for="BTNHC_id" class="form-label" id="BTNHC_txt"
-                >Set hover close button</label
-                >
-                <input
-                        type="color"
-                        class="form-control form-control-color"
-                        id="BTNHC_id"
-                        value="#212121"
-                        title="Choose your color"
-                        onchange="saveToTheme(this,'hover_close')"
-                />
-
-                <label for="BTNFG_id" class="form-label" id="BTNFG_txt"
-                >Set button Foreground Color</label
-                >
-                <input
-                        type="color"
-                        class="form-control form-control-color"
-                        id="BTNFG_id"
-                        value="#212121"
-                        title="Choose your color"
-                        onchange="saveToTheme(this,'btn_FG')"
-                />
-
-                <label for="BTNBG_id" class="form-label" id="BTNBG_txt"
-                >Set button background color</label
-                >
-                <input
-                        type="color"
-                        class="form-control form-control-color"
-                        id="BTNBG_id"
-                        value="#212121"
-                        title="Choose your color"
-                        onchange="saveToTheme(this,'btn_BG')"
-                />
-
-                <label for="BTNBC_id" class="form-label" id="BTNBC_txt"
-                >Set button border color</label
-                >
-                <input
-                        type="color"
-                        class="form-control form-control-color"
-                        id="BTNBC_id"
-                        value="#212121"
-                        title="Choose your color"
-                        onchange="saveToTheme(this,'btn_border')"
-                />
-
-                <label for="BTNH_id" class="form-label" id="BTNH_txt"
-                >Set button hover color</label
-                >
-                <input
-                        type="color"
-                        class="form-control form-control-color"
-                        id="BTNH_id"
-                        value="#212121"
-                        title="Choose your color"
-                        onchange="saveToTheme(this,'btn_hover')"
-                />
-
-                <label for="FGSBC_id" class="form-label" id="FGSBC_txt"
-                >Set foreground secondary button color</label
-                >
-                <input
-                        type="color"
-                        class="form-control form-control-color"
-                        id="FGSBC_id"
-                        value="#212121"
-                        title="Choose your color"
-                        onchange="saveToTheme(this,'btn_FG_s')"
-                />
-
-                <label for="BGSBC_id" class="form-label" id="BGSBC_txt"
-                >Set background secondary background color</label
-                >
-                <input
-                        type="color"
-                        class="form-control form-control-color"
-                        id="BGSBC_id"
-                        value="#212121"
-                        title="Choose your color"
-                        onchange="saveToTheme(this,'btn_BG_s')"
-                />
-
-                <label for="BSC_id" class="form-label" id="BSC_txt"
-                >Set border secondary color</label
-                >
-                <input
-                        type="color"
-                        class="form-control form-control-color"
-                        id="BSC_id"
-                        value="#212121"
-                        title="Choose your color"
-                        onchange="saveToTheme(this,'btn_border_s')"
-                />
-                <label for="HSC_id" class="form-label" id="HSC_txt"
-                >Set hover secondary color</label
-                >
-                <input
-                        type="color"
-                        class="form-control form-control-color"
-                        id="HSC_id"
-                        value="#212121"
-                        title="Choose your color"
-                        onchange="saveToTheme(this,'btn_hover_s')"
-                />
-                <label for="HLVC_id" class="form-label" id="HLVC_txt"
-                >Set hover listview color</label
-                >
-                <input
-                        type="color"
-                        class="form-control form-control-color"
-                        id="HLVC_id"
-                        value="#212121"
-                        title="Choose your color"
-                        onchange="saveToTheme(this,'hover_listview')"
-                />
-
-                <label for="BGCI_id" class="form-label" id="BGCI_txt"
-                >Set Background CI</label
-                >
-                <input
-                        type="color"
-                        class="form-control form-control-color"
-                        id="BGCI_id"
-                        value="#212121"
-                        title="Choose your color"
-                        onchange="saveToTheme(this,'BG_CI')"
-                />
-                <label for="NBGC_id" class="form-label" id="NBGC_txt"
-                >Set navigation background color</label
-                >
-                <input
-                        type="color"
-                        class="form-control form-control-color"
-                        id="NBGC_id"
-                        value="#212121"
-                        title="Choose your color"
-                        onchange="saveToTheme(this,'nav_BG')"
-                /><!--RESTE à FAIRE-->
-                <div class="form-check form-switch">
-                    <input
-                            class="form-check-input"
-                            type="checkbox"
-                            id="SCID"
-                            onchange="saveToTheme(this,'scrollbar','black','white')"
-                    />
-                    <label class="form-check-label" for="SCID" id="SCID_txt"
-                    >ScrollBar</label
-                    >
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal" id="close_theme">
+                        Close
+                    </button>
                 </div>
-                <div class="form-check form-switch">
-                    <input
-                            class="form-check-input"
-                            type="checkbox"
-                            id="PGRSBW_id"
-                            onchange="saveToTheme(this,'progressbar_progresswhite_progressblack','progress','progresswhite')"
-                    />
-                    <label class="form-check-label" for="PGRSBW_id" id="PGRSBW_txt"
-                    >Progressbar Black or White</label
-                    >
-                </div>
-                <label for="MUSIC_id" class="form-label" id="MUSIC_txt"
-                >Music Link</label
-                >
-                <input
-                        type="text"
-                        class="form-control"
-                        id="MUSIC_id"
-                        aria-describedby="basic-addon3"
-                        onchange="saveToTheme(this,'Music')"
-                />
-                <p id="LBG_txt">Link BG</p>
-                <input
-                        type="text"
-                        class="form-control"
-                        id="LBG_id"
-                        aria-describedby="basic-addon3"
-                        onchange="saveToTheme(this,'linkBG')"
-                />
-                <button
-                        class="btn btn-primary"
-                        onclick="openFileImageTheme('LBG_id','linkBG')"
-                        id="browse_fileImageTheme_txt"
-                >
-                    browse
-                </button
-                >
-                <br/>
-
-                <label for="PRGSBC_id" class="form-label" id="PRGSBC_txt"
-                >Set progress bar color</label
-                >
-                <input
-                        type="color"
-                        class="form-control form-control-color"
-                        value="#212121"
-                        id="PRGSBC_id"
-                        title="Choose your color"
-                        onchange="saveToTheme(this,'progress_color')"
-                />
-            </div>
-            <div class="modal-footer">
-                <button
-                        type="button"
-                        class="btn btn-secondary"
-                        data-bs-dismiss="modal"
-                        id="close_theme"
-                >
-                    Close
-                </button>
             </div>
         </div>
     </div>
-</div>
-<div id="snackbar">Some text some message..</div>
-<p id="LibTitle"></p>
-<div id="home">
-    <p>Continue reading : </p>
-    <div id="continueReadingHome"></div>
-    <p>My favorites : </p>
-    <div id="myfavoriteHome"></div>
-    <p>Recently added : </p>
-    <div id="recentlyAdded"></div>
-    <p>To read : </p>
-    <div id="toRead"></div>
-</div>
-<!--The overlay-->
-<div id="overlay">
-    <div style="text-align: center; margin-top: 25%">
-        <!--         <div
+    <!-- Modal Tips-->
+    <div class="modal animate__animated animate__zoomIn animate__faster" id="modifAccount" tabindex="-1"
+        aria-labelledby="id_modifAccount" aria-hidden="true" data-bs-backdrop="static" data-bs-keyboard="false"
+        style="overflow: hidden">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="id_modifAccount">Account Management :</h5>
+                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"
+                        aria-label="Close"></button>
+                </div>
+                <div class="modal-body" style="text-align: center">
+
+                    <label class="input-group-text" for="usernameManager">Username : </label>
+                    <input class="form-control" type="text" id="usernameManager" name="usernameManager"
+                        autocomplete="off" />
+                    <br>
+                    <label class="input-group-text" for="passwordManager">Password : </label>
+                    <input class="form-control" type="text" id="passwordManager" name="passwordManager"
+                        autocomplete="off" />
+
+                    <br>
+                    <p>Choose a profile picture or import your own</p>
+                    <input id="AMCImages" type="file" accept=".jpg, .png, .jpeg, .gif, .bmp, .tif, .tiff, .webp|image/*">
+                    <div id="AMImages">
+                        <template id="template_AMI">
+                            <img src="Images/account_default/1.jpg" style="width: 60px;height:60px;margin-left:5px;" />
+                        </template>
+
+                    </div>
+                    <label for="">Download your database</label>
+                    <label for="">Remove account (this cannot be undone)</label>
+
+                    <br>
+                    <button id="sendlib" class="btn btns btn-primary"
+                        onclick="return modifyAccount({'form':[document.getElementById('usernameManager').value,document.getElementById('passwordManager').value,document.getElementById('AMCImages').files,document.getElementById('newImage')]});">
+                        Apply changes (You will need to reconnect)
+                    </button>
+
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal" id="close_lib">
+                        Close
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div id="snackbar">Some text some message..</div>
+    <p id="LibTitle"></p>
+    <div id="home">
+        <p>Continue reading : </p>
+        <div id="continueReadingHome"></div>
+        <p>My favorites : </p>
+        <div id="myfavoriteHome"></div>
+        <p>Recently added : </p>
+        <div id="recentlyAdded"></div>
+        <p>To read : </p>
+        <div id="toRead"></div>
+    </div>
+    <!--The overlay-->
+    <div id="overlay">
+        <div style="text-align: center; margin-top: 25%">
+            <!--         <div
                   class="spinner-border"
                   style="width: 70px; height: 70px"
                   role="status"
                 >
                   <span class="visually-hidden">Loading...</span>
                 </div>-->
-        <svg viewBox="0 0 50 50" class="spinner">
-            <circle class="ring" cx="25" cy="25" r="22.5"/>
-            <circle class="line" cx="25" cy="25" r="22.5"/>
-        </svg>
-        <div style="margin-left: auto;margin-right: auto" class="mdc-circular-progress"></div>
-        <p id="decompressfilename" style="margin-top: 10px"></p>
-        <p id="overlaymsg" style="margin-top: 10px">
-            We take care of your comics
-        </p>
+            <svg viewBox="0 0 50 50" class="spinner">
+                <circle class="ring" cx="25" cy="25" r="22.5" />
+                <circle class="line" cx="25" cy="25" r="22.5" />
+            </svg>
+            <div style="margin-left: auto;margin-right: auto" class="mdc-circular-progress"></div>
+            <p id="decompressfilename" style="margin-top: 10px"></p>
+            <p id="overlaymsg" style="margin-top: 10px">
+                We take care of your comics
+            </p>
+        </div>
     </div>
-</div>
-<!--The overlay2-->
-<div id="overlay2"></div>
-<div class="SpaceX"></div>
-<!--List of the books-->
-<div class="cards-list" id="ContainerExplorer"></div>
+    <!--The overlay2-->
+    <div id="overlay2"></div>
+    <div class="SpaceX"></div>
+    <!--List of the books-->
+    <div class="cards-list" id="ContainerExplorer"></div>
 
-<div class="contentViewer" id="contentViewer">
-    <div class="onContentViewer">
-        <div id="ColTitle">Demon Slayer</div>
-        <div id="ColContent">
-            <div id="startDate"></div>
-            <div><p id="Status"></p></div>
-            <div id="description"></div>
-            <div id="averageProgress">
+    <div class="contentViewer" id="contentViewer">
+        <div class="onContentViewer">
+            <div id="ColTitle">Demon Slayer</div>
+            <div id="ColContent">
+                <div id="startDate"></div>
+                <div>
+                    <p id="Status"></p>
+                </div>
+                <div id="description"></div>
+                <div id="averageProgress">
 
-                <div class="circle-small">
-                    <div class="text">
-                        <div id="averageScore"></div>
+                    <div class="circle-small">
+                        <div class="text">
+                            <div id="averageScore"></div>
+                        </div>
+                        <svg>
+                            <circle class="bg" cx="40" cy="40" r="37"></circle>
+                            <circle class="progress one" cx="40" cy="40" r="37"></circle>
+                        </svg>
                     </div>
-                    <svg>
-                        <circle class="bg" cx="40" cy="40" r="37"></circle>
-                        <circle class="progress one" cx="40" cy="40" r="37"></circle>
-                    </svg>
+
                 </div>
 
+                <div id="genres"></div>
+                <div id="chapters"></div>
+                <div id="id"></div>
+                <div style="margin-top:30vh;"></div>
+
+                <div id="ContentView">
+                    <h2>Volumes : </h2>
+                </div>
+                <div id="characters"></div>
+                <div id="colissue"></div>
+                <div id="col"></div>
+                <div id="Volumes"></div>
+                <div id="Trending"></div>
+                <div id="Staff"></div>
+                <div id="SiteURL"></div>
+                <div id="price"></div>
+                <div id="OtherTitles"></div>
+                <div id="relations" class="relationsDiv cards-list"></div>
+                <a class="btn btn-primary" id="DLBOOK" onclick="">Download locally</a>
+                <a class="btn btn-primary" href="">Edit Serie</a>
+                <a class="btn btn-primary" href="">Reload data</a>
+
+                <p>All the information displayed on this page, as well as the images (exepted the ones you provided and
+                    the
+                    ones
+                    extracted) are provided by the MARVEL API and belongs to MARVEL</p>
             </div>
-
-            <div id="genres"></div>
-            <div id="chapters"></div>
-            <div id="id"></div>
-            <div style="margin-top:30vh;"></div>
-
-            <div id="ContentView"><h2>Volumes : </h2></div>
-            <div id="characters"></div>
-            <div id="colissue"></div>
-            <div id="col"></div>
-            <div id="Volumes"></div>
-            <div id="Trending"></div>
-            <div id="Staff"></div>
-            <div id="SiteURL"></div>
-            <div id="price"></div>
-            <div id="OtherTitles"></div>
-            <div id="relations" class="relationsDiv cards-list"></div>
-            <a class="btn btn-primary" id="DLBOOK" onclick="">Download locally</a>
-            <a class="btn btn-primary" href="">Edit Serie</a>
-            <a class="btn btn-primary" href="">Reload data</a>
-
-            <p>All the information displayed on this page, as well as the images (exepted the ones you provided and the
-                ones
-                extracted) are provided by the MARVEL API and belongs to MARVEL</p>
-        </div>
-        <div id="ColCover">
-            <img src="" id="ImgColCover" alt="#">
+            <div id="ColCover">
+                <img src="" id="ImgColCover" alt="#">
+            </div>
         </div>
     </div>
-</div>
-<!--Loading scripts-->
-<script type="text/javascript" src="index.js"></script>
-<script type="text/javascript" src="/modules/bootstrapJS"></script>
+    <!--Loading scripts-->
+    <script type="text/javascript" src="index.js"></script>
+    <script type="text/javascript" src="/modules/bootstrapJS"></script>
 </body>
+
 </html>

@@ -885,6 +885,23 @@ app.get("/profile/getPP/:token",(req,res)=>{
     res.sendFile(__dirname + "/public/CosmicComics_local/profiles/"+token+"/pp.png")
 })
 
+app.get("/profile/custo/getNumber",(req,res)=>{
+    res.send({"length":fs.readdirSync(__dirname+"/public/Images/account_default").length})
+})
+app.post("/profile/modification",(req,res)=>{
+    const token = resolveToken(req.body.token)
+    if (req.body.npass != null){
+        fs.writeFileSync(__dirname+"/public/CosmicComics_local/profiles/"+token+"/passcode.txt",req.body.npass,{encoding: "utf-8"})
+    } 
+    if (req.body.npp != {}){
+        console.log(req.body.npp)
+    }
+    if (req.body.nuser != null){
+        fs.renameSync(__dirname+"/public/CosmicComics_local/profiles/"+token, __dirname+"/public/CosmicComics_local/profiles/"+req.body.nuser);
+    }
+  
+    res.sendStatus(200);
+})
 
 
 
