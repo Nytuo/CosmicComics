@@ -46,14 +46,14 @@ var mangaMode = false;
 var devMode = true;
 
 //Creating the database
-if (!fs.existsSync(__dirname+"/public/CosmicComics_local/serverconfig.json")){
+if (!fs.existsSync(__dirname + "/public/CosmicComics_local/serverconfig.json")) {
 
     const obj = {
         "Token": {},
-        "port":4696
+        "port": 4696
     }
     fs.writeFileSync(__dirname + "/public/CosmicComics_local/serverconfig.json", JSON.stringify(obj), {encoding: 'utf8'});
-}else{
+} else {
     if (devMode == false) {
         var configFile = fs.readFileSync(__dirname + "/public/CosmicComics_local/serverconfig.json");
         var config = JSON.parse(configFile);
@@ -115,8 +115,9 @@ const {ChildProcess} = require("child_process");
 const {fork} = require('node:child_process');
 const {spawn} = require('child_process');
 const {debug} = require("nodemon/lib/utils");
-function makeDB(forwho){
-    let db = new sqlite3.Database(__dirname + '/public/CosmicComics_local/profiles/'+forwho+'/ComicsComics.db', (err) => {
+
+function makeDB(forwho) {
+    let db = new sqlite3.Database(__dirname + '/public/CosmicComics_local/profiles/' + forwho + '/CosmicComics.db', (err) => {
         if (err) {
             return console.error(err.message);
         }
@@ -137,7 +138,8 @@ function makeDB(forwho){
     db.run("CREATE TABLE IF NOT EXISTS Libraries (ID_LIBRARY INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, NAME VARCHAR(255) NOT NULL,PATH VARCHAR(4096) NOT NULL,API_ID INTEGER NOT NULL,FOREIGN KEY (API_ID) REFERENCES API(ID_API));")
 
 }
-function resolveToken(token){
+
+function resolveToken(token) {
     var configFile = fs.readFileSync(__dirname + "/public/CosmicComics_local/serverconfig.json", "utf8");
     var config = JSON.parse(configFile);
     for (var i in config) {
@@ -148,19 +150,21 @@ function resolveToken(token){
         }
     }
 }
-function getDB(forwho){
-    return new sqlite3.Database(__dirname + '/public/CosmicComics_local/profiles/' + forwho + '/ComicsComics.db', (err) => {
+
+function getDB(forwho) {
+    return new sqlite3.Database(__dirname + '/public/CosmicComics_local/profiles/' + forwho + '/CosmicComics.db', (err) => {
         if (err) {
             return console.error(err.message);
         }
         console.log("Conected to the DB")
     })
 }
+
 app.use(cors());
 app.use(express.json({limit: "50mb"}))
 app.use(express.urlencoded({extended: true}));
 
-app.listen(JSON.parse(fs.readFileSync(__dirname+"/public/CosmicComics_local/serverconfig.json").toString()).port, "0.0.0.0", function () {
+app.listen(JSON.parse(fs.readFileSync(__dirname + "/public/CosmicComics_local/serverconfig.json").toString()).port, "0.0.0.0", function () {
     const host = this.address().address;
     const port = this.address().port;
     console.log("Listening on port %s:%s!", host, port);
@@ -183,7 +187,7 @@ app.post("/createUser/:name/:passcode", function (req, res) {
     fs.mkdirSync(CosmicComicsTemp + "/profiles/" + name, {recursive: true});
     console.log("Creating dir " + name);
     fs.writeFileSync(CosmicComicsTemp + "/profiles/" + name + "/passcode.txt", passcode, {encoding: "utf8"});
-    if (!fs.existsSync(__dirname + "/public/CosmicComics_local/profiles/"+name+"/config.json")) {
+    if (!fs.existsSync(__dirname + "/public/CosmicComics_local/profiles/" + name + "/config.json")) {
         const obj = {
             path: "",
             last_opened: "",
@@ -218,14 +222,14 @@ app.post("/createUser/:name/:passcode", function (req, res) {
             theme_date: true,
         };
         fs.writeFileSync(
-            __dirname + "/public/CosmicComics_local/profiles/"+name+"/config.json",
+            __dirname + "/public/CosmicComics_local/profiles/" + name + "/config.json",
             JSON.stringify(obj, null, 2), {encoding: "utf8"}
         );
 
 
     }
-    let random = Math.floor(Math.random()*(fs.readdirSync(__dirname + "/public/Images/account_default/").length-1)+1)
-    fs.copyFileSync(__dirname + "/public/Images/account_default/"+random+".jpg",__dirname + "/public/CosmicComics_local/profiles/"+name+"/pp.png");
+    let random = Math.floor(Math.random() * (fs.readdirSync(__dirname + "/public/Images/account_default/").length - 1) + 1)
+    fs.copyFileSync(__dirname + "/public/Images/account_default/" + random + ".jpg", __dirname + "/public/CosmicComics_local/profiles/" + name + "/pp.png");
     makeDB(name);
     console.log("User created");
     res.sendStatus(200);
@@ -288,6 +292,12 @@ app.get("/js/login", (req, res) => {
     res.sendFile(__dirname + "/login.js");
 
 })
+app.get("/profile/DLBDD/:token",(req,res)=>{
+    const token = resolveToken(req.params.token);
+    res.download(CosmicComicsTemp+"/profiles/"+token+"/CosmicComics.db",(err)=>{
+        if (err) console.log(err);
+    })
+})
 var currentBookPath = "";
 var SendToUnZip = "";
 app.get("/Unzip/:path/:token", (req, res) => {
@@ -298,7 +308,7 @@ app.get("/Unzip/:path/:token", (req, res) => {
     var named = path.basename(patho);
     named = named.split(".");
     var ext = named.pop();
-    UnZip(currentPath, CosmicComicsTempI, "00000", ext,token)
+    UnZip(currentPath, CosmicComicsTempI, "00000", ext, token)
     inter = setInterval(() => {
         if (SendToUnZip != "") {
             res.send(SendToUnZip)
@@ -321,7 +331,7 @@ app.get("/viewer/view/current/:page", (req, res) => {
 })
 app.get("/config/getConfig/:token", (req, res) => {
     const token = resolveToken(req.params.token);
-    res.send(fs.readFileSync("public/CosmicComics_local/profiles/"+token+"/config.json"));
+    res.send(fs.readFileSync("public/CosmicComics_local/profiles/" + token + "/config.json"));
 })
 app.get("/BM/getBM", (req, res) => {
     res.send(fs.readFileSync("public/CosmicComics_local/bookmarks.json"));
@@ -347,7 +357,7 @@ app.get("/view/readFile/:path", (req, res) => {
 app.post('/config/writeConfig/:token', (req, res) => {
     console.log(req.body);
     const token = resolveToken(req.params.token);
-    fs.writeFileSync("public/CosmicComics_local/profiles/"+token+"/config.json", JSON.stringify(req.body, null, 2));
+    fs.writeFileSync("public/CosmicComics_local/profiles/" + token + "/config.json", JSON.stringify(req.body, null, 2));
     res.sendStatus(200)
 })
 app.post('/DB/write/:jsonFile', (req, res) => {
@@ -457,28 +467,28 @@ app.get("/getListOfFolder/:path", (req, res) => {
 
 app.get("/profile/discover", (req, res) => {
     let result = [];
-    try{
+    try {
 
-    fs.readdirSync(__dirname + "/public/CosmicComics_local/profiles").forEach(function (file) {
-        let resultOBJ = {};
-        resultOBJ.name = path.basename(file, path.extname(file));
-        resultOBJ.image = "/CosmicComics_local/profiles/" + file + "/pp.png";
-        if (fs.existsSync(__dirname + "/public/CosmicComics_local/profiles/" + file + "/passcode.txt")) {
-            resultOBJ.passcode = true;
-        } else {
-            resultOBJ.passcode = false;
-        }
-        result.push(resultOBJ);
-    })
-    }catch (e) {
+        fs.readdirSync(__dirname + "/public/CosmicComics_local/profiles").forEach(function (file) {
+            let resultOBJ = {};
+            resultOBJ.name = path.basename(file, path.extname(file));
+            resultOBJ.image = "/CosmicComics_local/profiles/" + file + "/pp.png";
+            if (fs.existsSync(__dirname + "/public/CosmicComics_local/profiles/" + file + "/passcode.txt")) {
+                resultOBJ.passcode = true;
+            } else {
+                resultOBJ.passcode = false;
+            }
+            result.push(resultOBJ);
+        })
+    } catch (e) {
         console.log("No profile, First time setup...")
     }
     res.send(result);
 })
-var rand = function() {
+var rand = function () {
     return Math.random().toString(36).substr(2); // remove `0.`
 };
-var tokena = function() {
+var tokena = function () {
     return rand() + rand(); // to make it longer
 };
 setInterval(() => {
@@ -489,7 +499,7 @@ setInterval(() => {
         config["Token"] = {};
     }
     fs.writeFileSync(__dirname + "/public/CosmicComics_local/serverconfig.json", JSON.stringify(config));
-},2*60*60*1000);
+}, 2 * 60 * 60 * 1000);
 app.get("/profile/login/:name/:passcode", (req, res) => {
     if (fs.existsSync(__dirname + "/public/CosmicComics_local/profiles/" + req.params.name + "/passcode.txt")) {
         var passcode = fs.readFileSync(__dirname + "/public/CosmicComics_local/profiles/" + req.params.name + "/passcode.txt", "utf8");
@@ -531,7 +541,7 @@ app.post("/profile/logout/:token", (req, res) => {
                 delete config["Token"][j]
                 fs.writeFileSync(__dirname + "/public/CosmicComics_local/serverconfig.json", JSON.stringify(config), {encoding: 'utf8'});
 
-    res.sendStatus(200);
+                res.sendStatus(200);
                 return;
             }
         }
@@ -648,7 +658,7 @@ function SendTo(val) {
 }
 
 //UnZip the archive
-function UnZip(zipPath, ExtractDir, name, ext,token) {
+function UnZip(zipPath, ExtractDir, name, ext, token) {
     var listofImg;
     try {
         var n = 0;
@@ -722,7 +732,7 @@ function UnZip(zipPath, ExtractDir, name, ext,token) {
         }
 
         if (ext == "rar" || ext == "cbr") {
-            var configFile = fs.readFileSync(CosmicComicsTemp +"/profiles/"+token+ "/config.json");
+            var configFile = fs.readFileSync(CosmicComicsTemp + "/profiles/" + token + "/config.json");
             var parsedJSON = JSON.parse(configFile);
             var provider = GetElFromInforPath("update_provider", parsedJSON);
             if (provider == "msstore") {
@@ -822,7 +832,7 @@ process.on('SIGINT', () => {
         process.exit(0);
     })
 })
-app.post("/configServ/:name/:passcode/:port",(req,res)=>{
+app.post("/configServ/:name/:passcode/:port", (req, res) => {
     console.log("creating user")
     const name = req.params.name;
     const passcode = req.params.passcode;
@@ -830,7 +840,7 @@ app.post("/configServ/:name/:passcode/:port",(req,res)=>{
     fs.mkdirSync(__dirname + "/public/CosmicComics_local/profiles/" + name, {recursive: true});
     console.log("Creating dir " + name);
     fs.writeFileSync(__dirname + "/public/CosmicComics_local/profiles/" + name + "/passcode.txt", passcode, {encoding: "utf8"});
-    if (!fs.existsSync(__dirname + "/public/CosmicComics_local/profiles/"+name+"/config.json")) {
+    if (!fs.existsSync(__dirname + "/public/CosmicComics_local/profiles/" + name + "/config.json")) {
         const obj = {
             path: "",
             last_opened: "",
@@ -865,47 +875,52 @@ app.post("/configServ/:name/:passcode/:port",(req,res)=>{
             theme_date: true,
         };
         fs.writeFileSync(
-            __dirname + "/public/CosmicComics_local/profiles/"+name+"/config.json",
+            __dirname + "/public/CosmicComics_local/profiles/" + name + "/config.json",
             JSON.stringify(obj, null, 2), {encoding: "utf8"}
         );
 
 
     }
-    let random = Math.floor(Math.random()*(fs.readdirSync(__dirname + "/public/Images/account_default/").length-1)+1)
-    fs.copyFileSync(__dirname + "/public/Images/account_default/"+random+".jpg",__dirname + "/public/CosmicComics_local/profiles/"+name+"/pp.png");
+    let random = Math.floor(Math.random() * (fs.readdirSync(__dirname + "/public/Images/account_default/").length - 1) + 1)
+    fs.copyFileSync(__dirname + "/public/Images/account_default/" + random + ".jpg", __dirname + "/public/CosmicComics_local/profiles/" + name + "/pp.png");
 
     makeDB(name);
     console.log("User created");
     res.sendStatus(200);
 })
 
-app.get("/profile/getPP/:token",(req,res)=>{
+app.get("/profile/getPP/:token", (req, res) => {
     const token = resolveToken(req.params.token);
 
-    res.sendFile(__dirname + "/public/CosmicComics_local/profiles/"+token+"/pp.png")
+    res.sendFile(__dirname + "/public/CosmicComics_local/profiles/" + token + "/pp.png")
 })
 
-app.get("/profile/custo/getNumber",(req,res)=>{
-    res.send({"length":fs.readdirSync(__dirname+"/public/Images/account_default").length})
+app.get("/profile/custo/getNumber", (req, res) => {
+    res.send({"length": fs.readdirSync(__dirname + "/public/Images/account_default").length})
 })
-app.post("/profile/modification",(req,res)=>{
+app.post("/profile/modification", (req, res) => {
     const token = resolveToken(req.body.token)
-    if (req.body.npass != null){
-        fs.writeFileSync(__dirname+"/public/CosmicComics_local/profiles/"+token+"/passcode.txt",req.body.npass,{encoding: "utf-8"})
-    } 
-    if (req.body.npp != {}){
-        console.log(req.body.npp)
+    console.log(req.body.npp)
+    if (req.body.npass != null) {
+        fs.writeFileSync(__dirname + "/public/CosmicComics_local/profiles/" + token + "/passcode.txt", req.body.npass, {encoding: "utf-8"})
     }
-    if (req.body.nuser != null){
-        fs.renameSync(__dirname+"/public/CosmicComics_local/profiles/"+token, __dirname+"/public/CosmicComics_local/profiles/"+req.body.nuser);
+    if (req.body.npp !== {}) {
+        let nppPath = req.body.npp.toString().replace(/http:\/\/(([0-9]{1,3}\.){3}[0-9]{1,3}){0,1}(localhost){0,1}:[0-9]{4}/g, __dirname + "/public");
+
+        fs.copyFileSync(nppPath, __dirname + "/public/CosmicComics_local/profiles/" + token + "/pp.png")
     }
-  
+    if (req.body.nuser != null) {
+        fs.renameSync(__dirname + "/public/CosmicComics_local/profiles/" + token, __dirname + "/public/CosmicComics_local/profiles/" + req.body.nuser);
+    }
+
     res.sendStatus(200);
 })
-
-
-
-
+app.post("/profile/deleteAccount",(req,res)=>{
+    const token = resolveToken(req.body.token)
+    fs.rm(CosmicComicsTemp+"/profiles/"+token,{recursive: true, force: true},function(err){
+        console.log(err)
+    });
+})
 
 
 app.all('*', (req, res) => {

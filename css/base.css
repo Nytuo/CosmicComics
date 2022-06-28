@@ -1235,3 +1235,7 @@ justify-content : space-evenly;
     width: 40px;
     height : 40px;
 }
+#newImage{
+    border: solid #157347 5px;
+    transition: border .3s;
+}
