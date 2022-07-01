@@ -1142,19 +1142,23 @@ body {
     height: 40px;
     margin: 10px 10px 10px calc(100vw - 1460px);
 }
+
 @media (max-width: 1250px) {
     #searchField {
         margin-left: 10vw;
     }
+
     #menuid {
         margin: 10px 10px 10px calc(100vw - 510px);
     }
-    #logo_id_txt{
-        display:none;
-        transition : display 0.3s ease;
+
+    #logo_id_txt {
+        display: none;
+        transition: display 0.3s ease;
     }
-    #login_discover{
-        flex-direction : column;
+
+    #login_discover {
+        flex-direction: column;
     }
 }
 
@@ -1188,34 +1192,38 @@ body {
 #searchResults > li:hover {
     background-color: var(--cardCustoShadowHover);
 }
-#login_discover{
-    padding: 35vh;
-display : flex;
-flex-direction : row;
-align-items : center;
-justify-content : space-evenly;
+
+#login_discover {
+    padding: 20vh;
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    justify-content: space-evenly;
     flex-wrap: nowrap;
     text-align: center;
 }
-.login_elements{
+
+.login_elements {
     cursor: pointer;
 }
-.login_elements>h3{
-    font-size:30px;
+
+.login_elements > h3 {
+    font-size: 30px;
     font-family: 'Roboto-condensed', sans-serif;
 }
 
-.login_elements>img{
-    width:200px;
-}
-.profile_image{
-    max-width: 200px;
-    max-height:200px;
-    width: auto;
-    border-radius:10%;
+.login_elements > img {
+    width: 200px;
 }
 
-#ThePassToWord,#TheUserName,#servName,#ThePassToWor{
+.profile_image {
+    max-width: 200px;
+    max-height: 200px;
+    width: auto;
+    border-radius: 10%;
+}
+
+#ThePassToWord, #TheUserName, #servName, #ThePassToWor {
     background-color: var(--cardCustoShadow);
     height: 40px;
     width: 465px;
@@ -1228,14 +1236,17 @@ justify-content : space-evenly;
     outline: none;
     box-shadow: none;
 }
-#createAccount{
+
+#createAccount {
     background-color: rgba(66, 66, 66, 0.5);
 }
-#icon_id_accountSystem{
+
+#icon_id_accountSystem {
     width: 40px;
-    height : 40px;
+    height: 40px;
 }
-#newImage{
+
+#newImage {
     border: solid #157347 5px;
     transition: border .3s;
 }

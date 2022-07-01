@@ -13,8 +13,8 @@ var CosmicComicsTemp = __dirname + "/public/CosmicComics_local";
 var sqlite3 = require("sqlite3");
 const anilist = require("anilist-node");
 const AniList = new anilist();
-/* const {Client} = require("anilist.js");
-const AniList2 = new Client(); */
+const {Client} = require("anilist.js");
+const AniList2 = new Client();
 const ValidatedExtension = [
     "cbr",
     "cbz",
@@ -135,7 +135,7 @@ function makeDB(forwho) {
     db.run("CREATE TABLE IF NOT EXISTS variants (ID_variant VARCHAR(255) PRIMARY KEY NOT NULL UNIQUE,name VARCHAR(255),image varchar(255),description VARCHAR(255),url VARCHAR(255),series VARCHAR(255), FOREIGN KEY (series) REFERENCES Series (ID_Series))")
 
     db.run("CREATE TABLE IF NOT EXISTS Libraries (ID_LIBRARY INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, NAME VARCHAR(255) NOT NULL,PATH VARCHAR(4096) NOT NULL,API_ID INTEGER NOT NULL,FOREIGN KEY (API_ID) REFERENCES API(ID_API));")
-
+    db.close();
 }
 
 function resolveToken(token) {
@@ -150,13 +150,19 @@ function resolveToken(token) {
     }
 }
 
+
+let openedDB = new Map();
+
 function getDB(forwho) {
-    return new sqlite3.Database(__dirname + '/public/CosmicComics_local/profiles/' + forwho + '/CosmicComics.db', (err) => {
-        if (err) {
-            return console.error(err.message);
-        }
-        console.log("Conected to the DB")
-    })
+    if (!openedDB.has(forwho)) {
+        openedDB.set(forwho,new sqlite3.Database(__dirname + '/public/CosmicComics_local/profiles/' + forwho + '/CosmicComics.db', (err) => {
+            if (err) {
+                return console.error(err.message);
+            }
+            console.log("Conected to the DB")
+        }));
+    }
+    return openedDB.get(forwho);
 }
 
 app.use(cors());
@@ -227,11 +233,11 @@ app.post("/createUser", function (req, res) {
 
 
     }
-    if (req.body.pp =={}){
+    if (req.body.pp == {}) {
 
-    let random = Math.floor(Math.random() * (fs.readdirSync(__dirname + "/public/Images/account_default/").length - 1) + 1)
-    fs.copyFileSync(__dirname + "/public/Images/account_default/" + random + ".jpg", __dirname + "/public/CosmicComics_local/profiles/" + name + "/pp.png");
-    }else{
+        let random = Math.floor(Math.random() * (fs.readdirSync(__dirname + "/public/Images/account_default/").length - 1) + 1)
+        fs.copyFileSync(__dirname + "/public/Images/account_default/" + random + ".jpg", __dirname + "/public/CosmicComics_local/profiles/" + name + "/pp.png");
+    } else {
         let nppPath = req.body.pp.toString().replace(/http:\/\/(([0-9]{1,3}\.){3}[0-9]{1,3}){0,1}(localhost){0,1}:[0-9]{4}/g, __dirname + "/public");
 
         fs.copyFileSync(nppPath, __dirname + "/public/CosmicComics_local/profiles/" + name + "/pp.png");
@@ -267,7 +273,7 @@ app.get("/modules/bootstrapJS", (req, res) => {
 })
 app.get("/img/getColor/:img/:token", async (req, res) => {
     const token = resolveToken(req.params.token);
-    var img = CosmicComicsTemp+"/profiles/"+token+"/current_book/" + req.params.img;
+    var img = CosmicComicsTemp + "/profiles/" + token + "/current_book/" + req.params.img;
     const dominantColor = await getColorFromURL(img);
     res.send(dominantColor);
 })
@@ -300,9 +306,9 @@ app.get("/js/login", (req, res) => {
     res.sendFile(__dirname + "/login.js");
 
 })
-app.get("/profile/DLBDD/:token",(req,res)=>{
+app.get("/profile/DLBDD/:token", (req, res) => {
     const token = resolveToken(req.params.token);
-    res.download(CosmicComicsTemp+"/profiles/"+token+"/CosmicComics.db",(err)=>{
+    res.download(CosmicComicsTemp + "/profiles/" + token + "/CosmicComics.db", (err) => {
         if (err) console.log(err);
     })
 })
@@ -316,7 +322,7 @@ app.get("/Unzip/:path/:token", (req, res) => {
     var named = path.basename(patho);
     named = named.split(".");
     var ext = named.pop();
-    UnZip(currentPath, CosmicComicsTemp+"/profiles/"+resolveToken(token)+"/current_book", "00000", ext, token)
+    UnZip(currentPath, CosmicComicsTemp + "/profiles/" + resolveToken(token) + "/current_book", "00000", ext, token)
     inter = setInterval(() => {
         if (SendToUnZip != "") {
             res.send(SendToUnZip)
@@ -327,15 +333,15 @@ app.get("/Unzip/:path/:token", (req, res) => {
 
 })
 app.get("/viewer/view/current/:token", (req, res) => {
-    res.send(GetListOfImg(CosmicComicsTemp+"/profiles/"+resolveToken(req.params.token)+"/current_book/"));
+    res.send(GetListOfImg(CosmicComicsTemp + "/profiles/" + resolveToken(req.params.token) + "/current_book/"));
 })
 app.get("/dirname", (req, res) => {
     res.send(__dirname)
 })
 app.get("/viewer/view/current/:page/:token", (req, res) => {
     var page = req.params.page;
-    var listOfImg = GetListOfImg(CosmicComicsTemp+"/profiles/"+resolveToken(req.params.token)+"/current_book/");
-    res.send(CosmicComicsTemp+"/profiles/"+resolveToken(req.params.token)+"/current_book/" + listOfImg[page])
+    var listOfImg = GetListOfImg(CosmicComicsTemp + "/profiles/" + resolveToken(req.params.token) + "/current_book/");
+    res.send(CosmicComicsTemp + "/profiles/" + resolveToken(req.params.token) + "/current_book/" + listOfImg[page])
 })
 app.get("/config/getConfig/:token", (req, res) => {
     const token = resolveToken(req.params.token);
@@ -613,7 +619,7 @@ app.get("/api/anilist/character/:id", (req, res) => {
         console.log(e);
     }
 })
-/* app.get("/api/anilist/relations/:name", (req, res) => {
+app.get("/api/anilist/relations/:name", (req, res) => {
     try {
         AniList2.searchMedia({
             search: req.params.name,
@@ -628,7 +634,7 @@ app.get("/api/anilist/character/:id", (req, res) => {
     } catch (e) {
         console.log(e);
     }
-}) */
+})
 app.get("/getThemes", (req, res) => {
     var oi = fs.readdirSync(__dirname + "/public/themes");
     let result = [];
@@ -670,15 +676,15 @@ function UnZip(zipPath, ExtractDir, name, ext, token) {
     var listofImg;
     try {
         var n = 0;
-        if (fs.existsSync(CosmicComicsTemp+"/profiles/" +resolveToken(token)+"/current_book")) {
-            fs.rmSync(CosmicComicsTemp+"/profiles/"+resolveToken(token)+"/current_book", {
+        if (fs.existsSync(CosmicComicsTemp + "/profiles/" + resolveToken(token) + "/current_book")) {
+            fs.rmSync(CosmicComicsTemp + "/profiles/" + resolveToken(token) + "/current_book", {
                 recursive: true,
             });
-            fs.mkdirSync(CosmicComicsTemp+"/profiles/"+resolveToken(token)+"/current_book");
+            fs.mkdirSync(CosmicComicsTemp + "/profiles/" + resolveToken(token) + "/current_book");
         } else {
-            fs.mkdirSync(CosmicComicsTemp+"/profiles/"+resolveToken(token)+"/current_book");
+            fs.mkdirSync(CosmicComicsTemp + "/profiles/" + resolveToken(token) + "/current_book");
         }
-        fs.writeFileSync(CosmicComicsTemp+"/profiles/"+resolveToken(token)+"/current_book/path.txt", zipPath);
+        fs.writeFileSync(CosmicComicsTemp + "/profiles/" + resolveToken(token) + "/current_book/path.txt", zipPath);
 
         if (ext === "pdf") {
             alert(language[0]["pdf"]);
@@ -702,7 +708,7 @@ function UnZip(zipPath, ExtractDir, name, ext, token) {
             var resEnd;
             Stream.on("end", () => {
 
-                listofImg = GetListOfImg(CosmicComicsTemp+"/profiles/"+resolveToken(token)+"/current_book");
+                listofImg = GetListOfImg(CosmicComicsTemp + "/profiles/" + resolveToken(token) + "/current_book");
                 console.log("finish")
 
                 var name1 = path.basename(zipPath);
@@ -776,8 +782,8 @@ function UnZip(zipPath, ExtractDir, name, ext, token) {
                             var stream = archive.stream(currentName);
                             stream.on("error", console.error);
 
-                            if (!fs.existsSync(CosmicComicsTemp+"/profiles/"+resolveToken(token)+"/current_book")) {
-                                fs.mkdirSync(CosmicComicsTemp+"/profiles/"+resolveToken(token)+"/current_book");
+                            if (!fs.existsSync(CosmicComicsTemp + "/profiles/" + resolveToken(token) + "/current_book")) {
+                                fs.mkdirSync(CosmicComicsTemp + "/profiles/" + resolveToken(token) + "/current_book");
                             }
                             if (
                                 currentName.includes("png") ||
@@ -791,7 +797,7 @@ function UnZip(zipPath, ExtractDir, name, ext, token) {
                                 currentName.includes("webp")
                             ) {
                                 stream.pipe(
-                                    fs.createWriteStream(CosmicComicsTemp+"/profiles/"+resolveToken(token)+"/current_book/" + name + ".jpg")
+                                    fs.createWriteStream(CosmicComicsTemp + "/profiles/" + resolveToken(token) + "/current_book/" + name + ".jpg")
                                 );
                                 n = parseInt(name) + 1;
                                 name = Array(5 - String(n).length + 1).join("0") + n;
@@ -923,9 +929,9 @@ app.post("/profile/modification", (req, res) => {
 
     res.sendStatus(200);
 })
-app.post("/profile/deleteAccount",(req,res)=>{
+app.post("/profile/deleteAccount", (req, res) => {
     const token = resolveToken(req.body.token)
-    fs.rm(CosmicComicsTemp+"/profiles/"+token,{recursive: true, force: true},function(err){
+    fs.rm(CosmicComicsTemp + "/profiles/" + token, {recursive: true, force: true}, function (err) {
         console.log(err)
     });
 })

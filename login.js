@@ -4,6 +4,8 @@ const url = document.createElement("a");
 url.setAttribute("href", window.location.href);
 var domain = url.hostname;
 var port = url.port;
+
+
 async function discover(){
     fetch("http://" + domain + ":" + port + "/profile/discover").then(function (response) {
         return response.text();

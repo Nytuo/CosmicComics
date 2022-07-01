@@ -1826,7 +1826,6 @@ async function loadContent(provider, FolderRes, libraryPath) {
 
 
                             await GETANILISTAPI_RELATION(data["title"]["english"]).then(async (ccdata) => {
-
                                 for (let i = 0; i < ccdata.length; i++) {
 
                                     var dataR = ccdata[i]["node"];
@@ -3883,7 +3882,7 @@ getFromDB("Books", "* FROM Books WHERE reading = 1").then(async (resa) => {
     if (TheBookun.length == 0) {
         const element = document.getElementById("continueReadingHome");
         let node = document.createElement("p")
-        node.innerHTML = "Nothing to display here !<br/>Open a new book or try one of the one's below."
+        node.innerHTML = "Nothing to display here !<br/>Open a new book or try one of those below."
         element.appendChild(node);
     }
 
