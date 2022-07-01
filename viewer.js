@@ -45,32 +45,19 @@ var dirnameFE;
 var CosmicComicsData = "C:/Users/Public/Cosmic-Comics/data";
 var CosmicComicsTemp = "C:/Users/Public/Cosmic-Comics/data";
 var CosmicComicsTempI = "C:/Users/Public/Cosmic-Comics/data";
-fetch("http://192.168.1.84:8000/dirname").then(function (response) {
-    return response.text();
-}).then(function (data) {
-    dirnameFE = data;
-    CosmicComicsData = dirnameFE + "/CosmicComics_data";
-    CosmicComicsTemp = dirnameFE + "/public/CosmicComics_local";
-    CosmicComicsTempI = CosmicComicsTemp + "/current_book/";
-    console.log(CosmicComicsTempI);
 
-}).catch(function (error) {
-    console.log(error);
-});
 
 var listofImg;
-fetch("http://192.168.1.84:8000/viewer/view/current").then(
-    (response) => {
-        response.json().then((data) => {
-                listofImg = data
-                console.log(listofImg);
-            }
-        )
-    }
-)
+const url = document.createElement("a");
+url.setAttribute("href", window.location.href);
+var domain = url.hostname;
+var port = url.port;
 var currentUser = "";
 var connected = getCookie("selectedProfile");
 console.log(connected);
+function setTheme(theme) {
+    document.head.getElementsByTagName("link")[6].href = "/themes/" + theme;
+}
 if (connected == null){
     window.location.href = "login";
 }else{
@@ -81,25 +68,45 @@ if (connected == null){
             window.location.href = "login";
         }else{
             currentUser = data;
-            getResponse();
-            fetch("http://192.168.1.84:8000/config/getConfig/"+connected).then(function (response) {
+            fetch("http://" + domain + ":" + port + "/config/getConfig/" + connected).then(function (response) {
                 return response.text();
             }).then(function (data) {
-                currenttheme = GetElFromInforPath(
+                let currenttheme = GetElFromInforPath(
                     "theme",
                     JSON.parse(data))
                 console.log(currenttheme)
-                Themes();
+                setTheme(currenttheme);
 
             }).catch(function (error) {
                 console.log(error);
             });
-
+            getResponse();
         }
     }).catch(function (error) {
         console.log(error);
     });
 }
+fetch("http://" + domain + ":" + port +"/viewer/view/current/"+connected).then(
+    (response) => {
+        response.json().then((data) => {
+                listofImg = data
+                console.log(listofImg);
+            }
+        )
+    }
+)
+fetch("http://" + domain + ":" + port +"/dirname").then(function (response) {
+    return response.text();
+}).then(function (data) {
+    dirnameFE = data;
+    CosmicComicsData = dirnameFE + "/CosmicComics_data";
+    CosmicComicsTemp = dirnameFE + "/public/CosmicComics_local";
+    CosmicComicsTempI = CosmicComicsTemp +"/profiles/"+currentUser +"/current_book/";
+    console.log(CosmicComicsTempI);
+
+}).catch(function (error) {
+    console.log(error);
+});
 var name1 = GetFilePath().split("/").pop();
 console.log(name1)
 var realname1 = name1.split(".")[0];
@@ -123,7 +130,7 @@ console.log(language)
 
 async function getResponse() {
     console.log("begin Request")
-    const response = await fetch("http://192.168.1.84:8000/config/getConfig/"+connected);
+    const response = await fetch("http://" + domain + ":" + port +"/config/getConfig/"+connected);
     console.log("Requested")
 
     const dataa = await response.json().then((data) => {
@@ -133,7 +140,7 @@ async function getResponse() {
         var parsedJSON = JSON.parse(configFile);
         var configlang = GetElFromInforPath("language", parsedJSON);
         console.log(configlang);
-        fetch("http://192.168.1.84:8000/lang/" + configlang).then(
+        fetch("http://" + domain + ":" + port +"/lang/" + configlang).then(
             (response) => {
                 response.json().then((datoo) => {
                     console.log(datoo);
@@ -291,7 +298,7 @@ var popoverList = popoverTriggerList.map(function (popoverTriggerEl) {
 
 //get language reference for the selected language
 function lang(langg) {
-    fetch("http://192.168.1.84:8000/lang/" + langg).then(
+    fetch("http://" + domain + ":" + port +"/lang/" + langg).then(
         (response) => {
             response.json().then((data) => {
                 return data;
@@ -393,7 +400,7 @@ function Themes() {
         } else if (currenttheme == "[EVENT] - X-Mas.json") {
             document.getElementById("logo_id").src = "Images/Logo_n.png";
         }
-        fetch("http://192.168.1.84:8000/themes/read/" + currenttheme).then(function (response) {
+        fetch("http://" + domain + ":" + port +"/themes/read/" + currenttheme).then(function (response) {
             return response.text();
         }).then(function (data) {
             console.log("theme loaded")
@@ -665,16 +672,16 @@ function Viewer() {
     //Else, the folder is created, as well as the path.txt and already contains the images
     var path = GetFilePath();
     console.log(path);
-    fetch("http://192.168.1.84:8000/view/isDir/" + window.location.search.replace("?", "").split("&")[0]).then((response) => {
+    fetch("http://" + domain + ":" + port +"/view/isDir/" + window.location.search.replace("?", "").split("&")[0]).then((response) => {
         response.json().then((isDir) => {
 
             if (isDir === true) {
                 CosmicComicsTempI = path + "/";
             }
-            fetch("http://192.168.1.84:8000/view/exist/" + CosmicComicsTempI.replaceAll("/", "ù").replaceAll("\\", "ù")).then((response) => {
+            fetch("http://" + domain + ":" + port +"/view/exist/" + CosmicComicsTempI.replaceAll("/", "ù").replaceAll("\\", "ù")).then((response) => {
                 response.json().then((existCCI) => {
                     if (!existCCI) {
-                        fetch("http://192.168.1.84:8000/Unzip/" + window.location.search.replace("?", "")).then((response) => {
+                        fetch("http://" + domain + ":" + port +"/Unzip/" + window.location.search.replace("?", "")+"/"+connected).then((response) => {
                             console.log(response);
                             console.log("here 3");
 
@@ -731,11 +738,11 @@ function Viewer() {
                             }
                             Toastifycation(language[0]["loaded_local"], "#00C33C");
                         } else {
-                            fetch("http://192.168.1.84:8000/view/exist/" + ((CosmicComicsTempI + "/path.txt").replaceAll("/", "ù").replaceAll("\\", "ù"))).then((response) => {
+                            fetch("http://" + domain + ":" + port +"/view/exist/" + ((CosmicComicsTempI + "/path.txt").replaceAll("/", "ù").replaceAll("\\", "ù"))).then((response) => {
                                 response.json().then((existCCIP) => {
                                     console.log("path : " + existCCIP)
                                     if (existCCIP) {
-                                        fetch("http://192.168.1.84:8000/view/readFile/" + ((CosmicComicsTempI + "path.txt").replaceAll("/", "ù").replaceAll("\\", "ù"))).then((response) => {
+                                        fetch("http://" + domain + ":" + port +"/view/readFile/" + ((CosmicComicsTempI + "path.txt").replaceAll("/", "ù").replaceAll("\\", "ù"))).then((response) => {
                                             response.json().then((readCCTIP) => {
                                                 console.log("read : " + readCCTIP)
                                                 console.log("path : " + CosmicComicsTempI + "path.txt")
@@ -744,7 +751,7 @@ function Viewer() {
                                                     readCCTIP != decodeURIComponent(path).replaceAll("%C3%B9","/") ||
                                                     path.includes(".pdf")
                                                 ) {
-                                                    fetch("http://192.168.1.84:8000/Unzip/" + window.location.search.replace("?", "")).then((response) => {
+                                                    fetch("http://" + domain + ":" + port +"/Unzip/" + window.location.search.replace("?", "")+"/"+connected).then((response) => {
                                                         console.log(response);
                                                         console.log("here 2");
 
@@ -778,7 +785,7 @@ function Viewer() {
                                             })
                                         })
                                     } else {
-                                        fetch("http://192.168.1.84:8000/Unzip/" + window.location.search.replace("?", "")).then((response) => {
+                                        fetch("http://" + domain + ":" + port +"/Unzip/" + window.location.search.replace("?", "")+"/"+connected).then((response) => {
                                             return response.text();
                                         }).then((data) => {
                                             console.log(data)
@@ -866,16 +873,16 @@ function Reader(listOfImg, page) {
         document.getElementById("imgViewer_1").style.display = "";
         if (mangaMode == true) {
             document.getElementById("imgViewer_0").src =
-                "CosmicComics_local/current_book/" + listOfImg[page + 1];
+                "CosmicComics_local/profiles/"+currentUser +"/current_book/" + listOfImg[page + 1];
             document.getElementById("imgViewer_1").src =
-                "CosmicComics_local/current_book/" + listOfImg[page];
+                "CosmicComics_local/profiles/"+currentUser +"/current_book/" + listOfImg[page];
             document.getElementById("currentpage").innerHTML =
                 page + 2 + " / " + listOfImg.length;
         } else {
             document.getElementById("imgViewer_0").src =
-                "CosmicComics_local/current_book/" + listOfImg[page];
+                "CosmicComics_local/profiles/"+currentUser +"/current_book/" + listOfImg[page];
             document.getElementById("imgViewer_1").src =
-                "CosmicComics_local/current_book/" + listOfImg[page + 1];
+                "CosmicComics_local/profiles/"+currentUser +"/current_book/" + listOfImg[page + 1];
             document.getElementById("currentpage").innerHTML =
                 page + 2 + " / " + listOfImg.length;
         }
@@ -888,14 +895,14 @@ function Reader(listOfImg, page) {
             document.getElementById("imgViewer_1").style.display = "none";
             if (page == 2) {
                 document.getElementById("imgViewer_0").src =
-                    "CosmicComics_local/current_book/" + listOfImg[page + 1];
+                    "CosmicComics_local/profiles/"+currentUser +"/current_book/" + listOfImg[page + 1];
 
                 document.getElementById("currentpage").innerHTML =
                     page + 1 + " / " + listOfImg.length;
 
             } else {
                 document.getElementById("imgViewer_0").src =
-                    "CosmicComics_local/current_book/" + listOfImg[page];
+                    "CosmicComics_local/profiles/"+currentUser +"/current_book/" + listOfImg[page];
                 document.getElementById("currentpage").innerHTML =
                     page + 1 + " / " + listOfImg.length;
 
@@ -908,16 +915,16 @@ function Reader(listOfImg, page) {
             document.getElementById("imgViewer_1").style.display = "";
             if (mangaMode == true) {
                 document.getElementById("imgViewer_0").src =
-                    "CosmicComics_local/current_book/" + listOfImg[page + 1];
+                    "CosmicComics_local/profiles/"+currentUser +"/current_book/" + listOfImg[page + 1];
                 document.getElementById("imgViewer_1").src =
-                    "CosmicComics_local/current_book/" + listOfImg[page];
+                    "CosmicComics_local/profiles/"+currentUser +"/current_book/" + listOfImg[page];
                 document.getElementById("currentpage").innerHTML =
                     page + 2 + " / " + listOfImg.length;
             } else {
                 document.getElementById("imgViewer_0").src =
-                    "CosmicComics_local/current_book/" + listOfImg[page];
+                    "CosmicComics_local/profiles/"+currentUser +"/current_book/" + listOfImg[page];
                 document.getElementById("imgViewer_1").src =
-                    "CosmicComics_local/current_book/" + listOfImg[page + 1];
+                    "CosmicComics_local/profiles/"+currentUser +"/current_book/" + listOfImg[page + 1];
                 document.getElementById("currentpage").innerHTML =
                     page + 2 + " / " + listOfImg.length;
             }
@@ -930,7 +937,7 @@ function Reader(listOfImg, page) {
         document.getElementById("imgViewer_1").style.display = "none";
 
         document.getElementById("imgViewer_0").src =
-            "CosmicComics_local/current_book/" + listOfImg[page];
+            "CosmicComics_local/profiles/"+currentUser +"/current_book/" + listOfImg[page];
         document.getElementById("currentpage").innerHTML =
             page + 1 + " / " + listOfImg.length;
 
@@ -942,7 +949,7 @@ function Reader(listOfImg, page) {
     }
     setTimeout(() => {
         if (toogleBGC == true) {
-            var pathBG = "CosmicComics_local/current_book/" + listOfImg[page];
+            var pathBG = "CosmicComics_local/profiles/"+currentUser +"/current_book/" + listOfImg[page];
             console.log("ColorThief : Enable")
             GettheBGColor(listOfImg[page]).then((BGColor) => {
                 BGColor = BGColor.replaceAll("[", "").replaceAll("]", "")
@@ -1277,7 +1284,7 @@ function End() {
 
 //get the object by JSON
 async function GetInfoFromJSON(json, name) {
-    return fetch("http://192.168.1.84:8000/DB/read/" + json).then(function (response) {
+    return fetch("http://" + domain + ":" + port +"/DB/read/" + json).then(function (response) {
         return response.text();
     }).then(function (data) {
 
@@ -1548,7 +1555,7 @@ window.addEventListener("keydown", (e) => {
 function modifyConfigJson(json, tomod, mod) {
     //check si obj exist pour remplacer valeur
 
-    fetch("http://192.168.1.84:8000/config/getConfig/"+connected).then(function (response) {
+    fetch("http://" + domain + ":" + port +"/config/getConfig/"+connected).then(function (response) {
         return response.text();
     }).then(function (data) {
         var configFile = data;
@@ -1676,7 +1683,7 @@ function AutoBGC() {
 
 //Getting the Background Color by the dominant color of image
 async function GettheBGColor(page) {
-    return fetch("http://192.168.1.84:8000/img/getColor/" + page).then(function (response) {
+    return fetch("http://" + domain + ":" + port +"/img/getColor/" + page+"/"+connected).then(function (response) {
         return response.text();
     }).then(function (data) {
         console.log("ColorThief : ", data)
@@ -1981,7 +1988,7 @@ var preloadedImages = [];
 function preloadImage(listImages) {
     for (var i = 0; i < listImages.length; i++) {
         preloadedImages[i] = new Image();
-        preloadedImages[i].src = "http://192.168.1.84:8000/CosmicComics_local/current_book/" + listImages[i];
+        preloadedImages[i].src = "http://" + domain + ":" + port +"/CosmicComics_local/profiles/"+currentUser +"/current_book/" + listImages[i];
     }
 }
 
@@ -2191,7 +2198,7 @@ function ConstructSideBar() {
             const acontainer = document.createElement("a");
             const pel = document.createElement("p");
             const img = document.createElement("img");
-            img.src = "CosmicComics_local/current_book/" + image;
+            img.src = "CosmicComics_local/profiles/"+currentUser +"/current_book/" + image;
             img.height = "120";
             pel.innerHTML = index + 1;
             acontainer.appendChild(img);
@@ -2286,7 +2293,7 @@ function CreateAllVIV() {
         const imgel = document.createElement("img");
         const div = document.createElement("div");
         imgel.id = "imgViewer_" + i;
-        imgel.src = "CosmicComics_local/current_book/" + listofImg[i];
+        imgel.src = "CosmicComics_local/profiles/"+currentUser +"/current_book/" + listofImg[i];
         div.appendChild(imgel);
         div.id = "div_imgViewer_" + i;
         el.appendChild(div);
@@ -2459,7 +2466,7 @@ function setScrollbar() {
 //Load the parameters
 //Send BE
 function loadParameters() {
-    fetch("http://192.168.1.84:8000/config/getConfig/"+connected).then(function (response) {
+    fetch("http://" + domain + ":" + port +"/config/getConfig/"+connected).then(function (response) {
         return response.text();
     }).then(function (data) {
         var configFile = data

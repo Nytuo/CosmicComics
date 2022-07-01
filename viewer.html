@@ -28,6 +28,7 @@ along with Cosmic-Comics.  If not, see <https://www.gnu.org/licenses/>.-->
     />
     <link href="css/materialize.css" rel="stylesheet" />
     <link rel="icon" type="image/x-icon" href="/Images/Logo.ico">
+    <link rel="stylesheet" href="themes/default.css">
     <script type="text/javascript" src="js/html-magnifier.js"></script>
 
     <title>CosmicComics Viewer</title>
@@ -516,21 +517,17 @@ along with Cosmic-Comics.  If not, see <https://www.gnu.org/licenses/>.-->
         </div>
       </div>
       </div>
-    <div id="overlay">
+    <div id="overlay" style="left:8vw">
       <div style="text-align: center; margin-top: 25%">
 
-        
-        <div
-          class="spinner-border"
-          style="width: 70px; height: 70px"
-          role="status"
-        >
-          <span class="visually-hidden">Loading...</span>
-        </div>
+
+        <svg viewBox="0 0 50 50" class="spinner">
+          <circle class="ring" cx="25" cy="25" r="22.5"/>
+          <circle class="line" cx="25" cy="25" r="22.5"/>
+        </svg>
         <p id="overlaymsg"style="margin-top: 10px">We take care of your comics</p>
       </div>
     </div>
-  </div>   
    <div id="SideBar" style="display:none;position: fixed; width: 200px;height: 95%;background-color: #171717;overflow-y: scroll;text-align: center;">
     <!--Contient dynamiquement des images-->
   </div>

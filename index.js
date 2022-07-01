@@ -4999,6 +4999,7 @@ async function logout() {
 
 function AccountMenu() {
 
+
     const ul = document.createElement("ul");
     const li2 = document.createElement("li");
     const li3 = document.createElement("li");
@@ -5007,9 +5008,18 @@ function AccountMenu() {
     li2.setAttribute("data-bs-toggle", "modal");
     li2.setAttribute("data-bs-target", "#modifAccount");
     li3.innerHTML = "Create a new user";
-    li4.innerHTML = "Logout";
+    li3.setAttribute("data-bs-toggle", "modal");
+    li3.setAttribute("data-bs-target", "#modifAccount");
     li3.addEventListener("click", function () {
-    });
+        document.getElementById("id_modifAccount").innerHTML = "Create a new user";
+        document.getElementById("delaccount").style.display = "none";
+        document.getElementById("sendbdd").style.display = "none";
+        document.getElementById("sendaccount").onclick = async function () {
+            console.log("sendaccount")
+            createAccount()
+        }
+    })
+    li4.innerHTML = "Logout";
     li4.addEventListener("click", function () {
         logout();
     });
@@ -5025,11 +5035,8 @@ function AccountMenu() {
 
     ul.style.top = 70 + "px";
     ul.style.display = "flex";
-    ul.addEventListener("click", function () {
-        ul.style.display = "none";
-    });
     document.addEventListener("click", function (e) {
-        if (e.target != menu && e.target != ul && e.target != li && e.target != li2 && e.target != li3 && e.target != li4 && e.target != btn && e.target != menu.children[0]) {
+        if (e.target != ul && e.target != li2 && e.target != li3 && e.target != li4 && e.target != document.getElementById("id_accountSystem") && e.target != document.getElementById("icon_id_accountSystem")) {
             ul.style.display = "none";
         }
 
@@ -5058,16 +5065,49 @@ fetch("/profile/custo/getNumber").then((res) => {
         document.getElementById("AMImages").appendChild(newone)
     }
 })
-function DownloadBDD(){
-    window.open('http://' + domain + ":" + port +"/profile/DLBDD/"+connected)
+
+function DownloadBDD() {
+    window.open('http://' + domain + ":" + port + "/profile/DLBDD/" + connected)
 }
-async function DeleteAccount(){
+
+async function DeleteAccount() {
     const option = {
         method: 'POST', headers: {'Content-Type': 'application/json'}, body: JSON.stringify({
             "token": connected
         }, null, 2)
     };
-    fetch('http://' + domain + ":" + port +"/profile/deleteAccount",option).then(()=>{
-        console.log("account delete !")
+    fetch('http://' + domain + ":" + port + "/profile/deleteAccount", option).then(() => {
+        console.log("account deleted !")
     })
+}
+
+let accountsNames = []
+fetch("http://" + domain + ":" + port + "/profile/discover").then(function (response) {
+    return response.text();
+}).then(async function (data) {
+    data = JSON.parse(data);
+    data.forEach(function (item) {
+        accountsNames.push(item.name.toLowerCase())
+    });
+})
+
+async function createAccount() {
+    if (!accountsNames.includes(document.getElementById("usernameManager").value.toLowerCase())) {
+        const option = {
+            method: 'POST', headers: {'Content-Type': 'application/json'}, body: JSON.stringify({
+                "token": connected,
+                "name": document.getElementById("usernameManager").value,
+                "password": document.getElementById("passwordManager").value,
+                "pp": document.getElementById("newImage").src
+            }, null, 2)
+        };
+        fetch('http://' + domain + ":" + port + "/createUser", option).then(() => {
+            console.log("account created !")
+        })
+        Toastifycation("The user is created", "#00C33C")
+        document.getElementById("close_mna").click()
+    }else{
+        Toastifycation("This username is already used", "#ff0000")
+    }
+
 }

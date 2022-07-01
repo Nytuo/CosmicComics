@@ -10,7 +10,6 @@ const {getColorFromURL} = require('color-thief-node');
 const Path27Zip = SevenBin.path7za;
 app.use(express.static('public'))
 var CosmicComicsTemp = __dirname + "/public/CosmicComics_local";
-var CosmicComicsTempI = CosmicComicsTemp + "/current_book/";
 var sqlite3 = require("sqlite3");
 const anilist = require("anilist-node");
 const AniList = new anilist();
@@ -181,9 +180,9 @@ app.post("/downloadBook", function (req, res) {
     });
 });
 let DLBOOKPATH = "";
-app.post("/createUser/:name/:passcode", function (req, res) {
-    const name = req.params.name;
-    const passcode = req.params.passcode;
+app.post("/createUser", function (req, res) {
+    const name = req.body.name;
+    const passcode = req.body.password;
     fs.mkdirSync(CosmicComicsTemp + "/profiles/" + name, {recursive: true});
     console.log("Creating dir " + name);
     fs.writeFileSync(CosmicComicsTemp + "/profiles/" + name + "/passcode.txt", passcode, {encoding: "utf8"});
@@ -228,8 +227,16 @@ app.post("/createUser/:name/:passcode", function (req, res) {
 
 
     }
+    if (req.body.pp =={}){
+
     let random = Math.floor(Math.random() * (fs.readdirSync(__dirname + "/public/Images/account_default/").length - 1) + 1)
     fs.copyFileSync(__dirname + "/public/Images/account_default/" + random + ".jpg", __dirname + "/public/CosmicComics_local/profiles/" + name + "/pp.png");
+    }else{
+        let nppPath = req.body.pp.toString().replace(/http:\/\/(([0-9]{1,3}\.){3}[0-9]{1,3}){0,1}(localhost){0,1}:[0-9]{4}/g, __dirname + "/public");
+
+        fs.copyFileSync(nppPath, __dirname + "/public/CosmicComics_local/profiles/" + name + "/pp.png");
+
+    }
     makeDB(name);
     console.log("User created");
     res.sendStatus(200);
@@ -258,8 +265,9 @@ app.get("/modules/bootstrapJS", (req, res) => {
         }
     });
 })
-app.get("/img/getColor/:img", async (req, res) => {
-    var img = __dirname + "/public/CosmicComics_local/current_book/" + req.params.img;
+app.get("/img/getColor/:img/:token", async (req, res) => {
+    const token = resolveToken(req.params.token);
+    var img = CosmicComicsTemp+"/profiles/"+token+"/current_book/" + req.params.img;
     const dominantColor = await getColorFromURL(img);
     res.send(dominantColor);
 })
@@ -308,7 +316,7 @@ app.get("/Unzip/:path/:token", (req, res) => {
     var named = path.basename(patho);
     named = named.split(".");
     var ext = named.pop();
-    UnZip(currentPath, CosmicComicsTempI, "00000", ext, token)
+    UnZip(currentPath, CosmicComicsTemp+"/profiles/"+resolveToken(token)+"/current_book", "00000", ext, token)
     inter = setInterval(() => {
         if (SendToUnZip != "") {
             res.send(SendToUnZip)
@@ -318,16 +326,16 @@ app.get("/Unzip/:path/:token", (req, res) => {
     }, 1000);
 
 })
-app.get("/viewer/view/current", (req, res) => {
-    res.send(GetListOfImg(CosmicComicsTempI))
+app.get("/viewer/view/current/:token", (req, res) => {
+    res.send(GetListOfImg(CosmicComicsTemp+"/profiles/"+resolveToken(req.params.token)+"/current_book/"));
 })
 app.get("/dirname", (req, res) => {
     res.send(__dirname)
 })
-app.get("/viewer/view/current/:page", (req, res) => {
+app.get("/viewer/view/current/:page/:token", (req, res) => {
     var page = req.params.page;
-    var listOfImg = GetListOfImg(CosmicComicsTempI);
-    res.send(CosmicComicsTempI + listOfImg[page])
+    var listOfImg = GetListOfImg(CosmicComicsTemp+"/profiles/"+resolveToken(req.params.token)+"/current_book/");
+    res.send(CosmicComicsTemp+"/profiles/"+resolveToken(req.params.token)+"/current_book/" + listOfImg[page])
 })
 app.get("/config/getConfig/:token", (req, res) => {
     const token = resolveToken(req.params.token);
@@ -662,15 +670,15 @@ function UnZip(zipPath, ExtractDir, name, ext, token) {
     var listofImg;
     try {
         var n = 0;
-        if (fs.existsSync(CosmicComicsTempI)) {
-            fs.rmSync(CosmicComicsTempI, {
+        if (fs.existsSync(CosmicComicsTemp+"/profiles/" +resolveToken(token)+"/current_book")) {
+            fs.rmSync(CosmicComicsTemp+"/profiles/"+resolveToken(token)+"/current_book", {
                 recursive: true,
             });
-            fs.mkdirSync(CosmicComicsTempI);
+            fs.mkdirSync(CosmicComicsTemp+"/profiles/"+resolveToken(token)+"/current_book");
         } else {
-            fs.mkdirSync(CosmicComicsTempI);
+            fs.mkdirSync(CosmicComicsTemp+"/profiles/"+resolveToken(token)+"/current_book");
         }
-        fs.writeFileSync(CosmicComicsTempI + "/path.txt", zipPath);
+        fs.writeFileSync(CosmicComicsTemp+"/profiles/"+resolveToken(token)+"/current_book/path.txt", zipPath);
 
         if (ext === "pdf") {
             alert(language[0]["pdf"]);
@@ -694,7 +702,7 @@ function UnZip(zipPath, ExtractDir, name, ext, token) {
             var resEnd;
             Stream.on("end", () => {
 
-                listofImg = GetListOfImg(CosmicComicsTempI);
+                listofImg = GetListOfImg(CosmicComicsTemp+"/profiles/"+resolveToken(token)+"/current_book");
                 console.log("finish")
 
                 var name1 = path.basename(zipPath);
@@ -768,8 +776,8 @@ function UnZip(zipPath, ExtractDir, name, ext, token) {
                             var stream = archive.stream(currentName);
                             stream.on("error", console.error);
 
-                            if (!fs.existsSync(CosmicComicsTempI)) {
-                                fs.mkdirSync(CosmicComicsTempI);
+                            if (!fs.existsSync(CosmicComicsTemp+"/profiles/"+resolveToken(token)+"/current_book")) {
+                                fs.mkdirSync(CosmicComicsTemp+"/profiles/"+resolveToken(token)+"/current_book");
                             }
                             if (
                                 currentName.includes("png") ||
@@ -783,7 +791,7 @@ function UnZip(zipPath, ExtractDir, name, ext, token) {
                                 currentName.includes("webp")
                             ) {
                                 stream.pipe(
-                                    fs.createWriteStream(CosmicComicsTempI + name + ".jpg")
+                                    fs.createWriteStream(CosmicComicsTemp+"/profiles/"+resolveToken(token)+"/current_book/" + name + ".jpg")
                                 );
                                 n = parseInt(name) + 1;
                                 name = Array(5 - String(n).length + 1).join("0") + n;

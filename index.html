@@ -57,8 +57,6 @@ along with Cosmic-Comics.  If not, see <https://www.gnu.org/licenses/>.--->
                 <i class="material-icons" id="icon_id_viewmode" style="line-height: 1; height: 40px">view_list</i>
             </button>
             <button class="btn" style="margin: 0px 5px -1px;" onclick="AccountMenu()" id="id_accountSystem">
-
-
                 <img id="icon_id_accountSystem" alt="#">
             </button>
         </div>
@@ -496,20 +494,21 @@ along with Cosmic-Comics.  If not, see <https://www.gnu.org/licenses/>.--->
                         onclick="DownloadBDD()">
                     Download a copy of your database
                 </button>
-                <button id="sendlib" class="btn btns btn-primary"
+                <button id="sendaccount" class="btn btns btn-primary"
                         onclick="modifyAccount({'form':[document.getElementById('usernameManager').value,document.getElementById('passwordManager').value,document.getElementById('newImage')]});">
                     Apply changes (You will need to reconnect)
                 </button>
 
             </div>
             <div class="modal-footer">
-                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal" id="close_lib">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal" id="close_mna">
                     Close
                 </button>
             </div>
         </div>
     </div>
 </div>
+
 <div id="snackbar">Some text some message..</div>
 <p id="LibTitle"></p>
 <div id="home">
