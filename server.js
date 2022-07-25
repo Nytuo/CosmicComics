@@ -6,7 +6,7 @@ const SevenBin = require("7zip-bin");
 const unrarBin = require("unrar-binaries");
 var Unrar = require("unrar");
 const Seven = require("node-7z");
-const {getColorFromURL} = require('color-thief-node');
+const {getColorFromURL, getPaletteFromURL} = require('color-thief-node');
 const Path27Zip = SevenBin.path7za;
 app.use(express.static('public'))
 var CosmicComicsTemp = __dirname + "/public/CosmicComics_local";
@@ -123,7 +123,7 @@ function makeDB(forwho) {
         console.log("Conected to the DB")
     })
 
-    db.run('CREATE TABLE IF NOT EXISTS Books (ID_DB INT AUTO_INCREMENT, ID_book VARCHAR(255) PRIMARY KEY NOT NULL, NOM VARCHAR(255) NOT NULL,read boolean NOT NULL,reading boolean NOT NULL,unread boolean NOT NULL,favorite boolean NOT NULL,last_page INTEGER NOT NULL,folder boolean NOT NULL,PATH VARCHAR(255) NOT NULL,URLCover VARCHAR(255), issueNumber INTEGER,description VARCHAR(255),format VARCHAR(255),pageCount INTEGER,URLs VARCHAR(255),series VARCHAR(255),creators VARCHAR(255),characters VARCHAR(255),prices VARCHAR(255),dates VARCHAR(255),collectedIssues VARCHAR(255),collections VARCHAR(255),variants VARCHAR(255))')
+    db.run('CREATE TABLE IF NOT EXISTS Books (ID_DB INTEGER AUTO_INCREMENT, ID_book VARCHAR(255) PRIMARY KEY NOT NULL, NOM VARCHAR(255) NOT NULL,note INTEGER,read boolean NOT NULL,reading boolean NOT NULL,unread boolean NOT NULL,favorite boolean NOT NULL,last_page INTEGER NOT NULL,folder boolean NOT NULL,PATH VARCHAR(255) NOT NULL,URLCover VARCHAR(255), issueNumber INTEGER,description VARCHAR(255),format VARCHAR(255),pageCount INTEGER,URLs VARCHAR(255),series VARCHAR(255),creators VARCHAR(255),characters VARCHAR(255),prices VARCHAR(255),dates VARCHAR(255),collectedIssues VARCHAR(255),collections VARCHAR(255),variants VARCHAR(255))')
     db.run("CREATE TABLE IF NOT EXISTS Bookmarks (ID_BOOKMARK INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL,BOOK_ID VARCHAR(255) NOT NULL,PATH VARCHAR(4096) NOT NULL,page INTEGER NOT NULL,FOREIGN KEY (BOOK_ID) REFERENCES Book (ID_book));")
     db.run("CREATE TABLE IF NOT EXISTS API (ID_API INTEGER PRIMARY KEY NOT NULL, NOM VARCHAR(255) NOT NULL);", () => {
 
@@ -155,7 +155,7 @@ let openedDB = new Map();
 
 function getDB(forwho) {
     if (!openedDB.has(forwho)) {
-        openedDB.set(forwho,new sqlite3.Database(__dirname + '/public/CosmicComics_local/profiles/' + forwho + '/CosmicComics.db', (err) => {
+        openedDB.set(forwho, new sqlite3.Database(__dirname + '/public/CosmicComics_local/profiles/' + forwho + '/CosmicComics.db', (err) => {
             if (err) {
                 return console.error(err.message);
             }
@@ -247,13 +247,34 @@ app.post("/createUser", function (req, res) {
     console.log("User created");
     res.sendStatus(200);
 })
+app.get("/null", function (req, res) {
+  res.sendFile(__dirname + "/public/Images/fileDefault.png");
+})
 app.post("/DL", function (req, res) {
     console.log(req.body);
     DLBOOKPATH = req.body.path;
     res.sendStatus(200);
 })
 app.get("/getDLBook", function (req, res) {
+    if (DLBOOKPATH == "") {
+        res.sendStatus(404);
+    } else if (fs.existsSync(DLBOOKPATH) && !fs.statSync(DLBOOKPATH).isDirectory()) {
     res.download(DLBOOKPATH);
+    } else if (fs.statSync(DLBOOKPATH).isDirectory()) {
+        const compress = Seven.add(__dirname+"/public/TODL/"+ path.basename(DLBOOKPATH)+".zip",DLBOOKPATH,{
+            recursive: true,
+            $bin: Path27Zip,
+        });
+        compress.on("error", (err) => {
+            console.log(err);
+        })
+        compress.on("end", () => {
+            console.log("Compressed");
+            res.download(__dirname+"/public/TODL/"+ path.basename(DLBOOKPATH)+".zip");
+        })
+    }else {
+        res.sendStatus(404);
+    }
 })
 app.get("/", function (req, res) {
     res.sendFile(__dirname + "/index.html");
@@ -276,6 +297,14 @@ app.get("/img/getColor/:img/:token", async (req, res) => {
     var img = CosmicComicsTemp + "/profiles/" + token + "/current_book/" + req.params.img;
     const dominantColor = await getColorFromURL(img);
     res.send(dominantColor);
+})
+app.get("/img/getPalette/:token", async (req, res) => {
+    const token = resolveToken(req.params.token);
+    await getPaletteFromURL(req.headers.img).then(function (palette) {
+        res.send(palette);
+    })
+
+
 })
 app.get("/css/materialize.css", (req, res) => {
     res.sendFile(__dirname + "/css/materialize.css");
@@ -392,6 +421,14 @@ app.get("/DB/update/:token/:dbName/:colName/:value/:id", (req, res) => {
     }
     res.sendStatus(200)
 
+})
+app.post("/DB/update/", (req, res) => {
+    try {
+        getDB(resolveToken(req.body.token)).run("UPDATE " + req.body.table + " SET " + req.body.column + " = " + req.body.value + " WHERE " + req.body.where + "='" + req.body.whereEl + "';")
+        getDB(resolveToken(req.body.token)).run("UPDATE " + req.body.table + " SET " + req.body.column + " = " + req.body.value + " WHERE " + req.body.where + "='" + req.body.whereEl + "';")
+    } catch (e) {
+        console.log(e);
+    }
 })
 app.post("/DB/lib/update/:token/:id", (req, res) => {
     console.log(req.body)
@@ -513,6 +550,13 @@ setInterval(() => {
         config["Token"] = {};
     }
     fs.writeFileSync(__dirname + "/public/CosmicComics_local/serverconfig.json", JSON.stringify(config));
+}, 2 * 60 * 60 * 1000);
+setInterval(() => {
+    console.log("Removing ZIPs to DL")
+    if (fs.existsSync(__dirname + "/public/TODL")) {
+        fs.rmSync(__dirname + "/public/TODL", {recursive: true, force: true});
+    }
+
 }, 2 * 60 * 60 * 1000);
 app.get("/profile/login/:name/:passcode", (req, res) => {
     if (fs.existsSync(__dirname + "/public/CosmicComics_local/profiles/" + req.params.name + "/passcode.txt")) {
@@ -841,6 +885,10 @@ function GetListOfImg(dirPath) {
 const server = app.listen(8000)
 process.on('SIGINT', () => {
     console.log('SIGINT signal received: closing server')
+    console.log("Removing ZIPs to DL")
+    if (fs.existsSync(__dirname + "/public/TODL")) {
+        fs.rmSync(__dirname + "/public/TODL", {recursive: true, force: true});
+    }
     server.close(() => {
         console.log('Server closed')
         process.exit(0);

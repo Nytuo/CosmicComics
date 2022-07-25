@@ -53,5 +53,7 @@ along with Cosmic-Comics.  If not, see <https://www.gnu.org/licenses/>.*/
     --ratingColor: rgb(255, 191, 0);
     --saveActivedColor :rgb(255, 0, 0);
     --DisabledColor :rgba(255, 255, 255, 0.6);
-    --cardImageColor : rgba(0,0,0,0.753)
+    --cardImageColor : rgba(0,0,0,0.753);
+    --BGDetails : #1a1e21
+
 }

@@ -58,6 +58,8 @@ html {
     background-size: var(--HTMLBGSize);
     background-attachment: fixed;
     --speed: 0.65s;
+
+    scroll-behavior: smooth;
 }
 
 a {
@@ -86,9 +88,112 @@ a {
     z-index: 0;
     display: flex;
     flex-wrap: nowrap;
-    overflow-y: auto;
-
+overflow-y: scroll;
+transition: transform 0.65s ease-in-out;
 }
+.item-list::-webkit-scrollbar {
+    display: none;
+}
+
+.feedback {
+    max-width: 230px;
+    background-color: transparent;
+    width: 100%;
+    border-radius: 8px;
+    display: flex;
+    flex-direction: column;
+    flex-wrap: wrap;
+    align-items: center;
+    box-shadow: 0 4px 30px rgba(0,0,0,.05);
+}
+.rating {
+    display: flex;
+    justify-content: center;
+    overflow: hidden;
+    flex-direction: row-reverse;
+    height: 150px;
+    position: relative;
+}
+
+.rating-0 {
+    filter: grayscale(100%);
+}
+
+.rating > input {
+    display: none;
+}
+
+.rating > label {
+    cursor: pointer;
+    width: 40px;
+    height: 40px;
+    margin-top: auto;
+    background-image: url("data:image/svg+xml;charset=UTF-8,%3csvg xmlns='http://www.w3.org/2000/svg' width='126.729' height='126.73'%3e%3cpath fill='%23e3e3e3' d='M121.215 44.212l-34.899-3.3c-2.2-.2-4.101-1.6-5-3.7l-12.5-30.3c-2-5-9.101-5-11.101 0l-12.4 30.3c-.8 2.1-2.8 3.5-5 3.7l-34.9 3.3c-5.2.5-7.3 7-3.4 10.5l26.3 23.1c1.7 1.5 2.4 3.7 1.9 5.9l-7.9 32.399c-1.2 5.101 4.3 9.3 8.9 6.601l29.1-17.101c1.9-1.1 4.2-1.1 6.1 0l29.101 17.101c4.6 2.699 10.1-1.4 8.899-6.601l-7.8-32.399c-.5-2.2.2-4.4 1.9-5.9l26.3-23.1c3.8-3.5 1.6-10-3.6-10.5z'/%3e%3c/svg%3e");
+    background-repeat: no-repeat;
+    background-position: center;
+    background-size: 76%;
+    transition: .3s;
+}
+
+.rating > input:checked ~ label,
+.rating > input:checked ~ label ~ label {
+    background-image: url("data:image/svg+xml;charset=UTF-8,%3csvg xmlns='http://www.w3.org/2000/svg' width='126.729' height='126.73'%3e%3cpath fill='%23fcd93a' d='M121.215 44.212l-34.899-3.3c-2.2-.2-4.101-1.6-5-3.7l-12.5-30.3c-2-5-9.101-5-11.101 0l-12.4 30.3c-.8 2.1-2.8 3.5-5 3.7l-34.9 3.3c-5.2.5-7.3 7-3.4 10.5l26.3 23.1c1.7 1.5 2.4 3.7 1.9 5.9l-7.9 32.399c-1.2 5.101 4.3 9.3 8.9 6.601l29.1-17.101c1.9-1.1 4.2-1.1 6.1 0l29.101 17.101c4.6 2.699 10.1-1.4 8.899-6.601l-7.8-32.399c-.5-2.2.2-4.4 1.9-5.9l26.3-23.1c3.8-3.5 1.6-10-3.6-10.5z'/%3e%3c/svg%3e");
+}
+
+
+.rating > input:not(:checked) ~ label:hover,
+.rating > input:not(:checked) ~ label:hover ~ label {
+    background-image: url("data:image/svg+xml;charset=UTF-8,%3csvg xmlns='http://www.w3.org/2000/svg' width='126.729' height='126.73'%3e%3cpath fill='%23d8b11e' d='M121.215 44.212l-34.899-3.3c-2.2-.2-4.101-1.6-5-3.7l-12.5-30.3c-2-5-9.101-5-11.101 0l-12.4 30.3c-.8 2.1-2.8 3.5-5 3.7l-34.9 3.3c-5.2.5-7.3 7-3.4 10.5l26.3 23.1c1.7 1.5 2.4 3.7 1.9 5.9l-7.9 32.399c-1.2 5.101 4.3 9.3 8.9 6.601l29.1-17.101c1.9-1.1 4.2-1.1 6.1 0l29.101 17.101c4.6 2.699 10.1-1.4 8.899-6.601l-7.8-32.399c-.5-2.2.2-4.4 1.9-5.9l26.3-23.1c3.8-3.5 1.6-10-3.6-10.5z'/%3e%3c/svg%3e");
+}
+
+.emoji-wrapper {
+    width: 100%;
+    text-align: center;
+    height: 100px;
+    overflow: hidden;
+    position: absolute;
+    top: 0;
+    left: 0;
+}
+
+.emoji-wrapper:before,
+.emoji-wrapper:after{
+    content: "";
+    height: 15px;
+    width: 100%;
+    position: absolute;
+    left: 0;
+    z-index: 1;
+}
+
+.emoji-wrapper:before {
+    top: 0;
+}
+
+.emoji-wrapper:after{
+    bottom: 0;
+}
+
+.emoji {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    transition: .3s;
+}
+
+.emoji > svg {
+    margin: 15px 0;
+    width: 70px;
+    height: 70px;
+    flex-shrink: 0;
+}
+
+#rating-1:checked ~ .emoji-wrapper > .emoji { transform: translateY(-100px); }
+#rating-2:checked ~ .emoji-wrapper > .emoji { transform: translateY(-200px); }
+#rating-3:checked ~ .emoji-wrapper > .emoji { transform: translateY(-300px); }
+#rating-4:checked ~ .emoji-wrapper > .emoji { transform: translateY(-400px); }
+#rating-5:checked ~ .emoji-wrapper > .emoji { transform: translateY(-500px); }
+
 
 /* Cosmic Comics logo */
 .logo {
@@ -794,16 +899,24 @@ body {
     cursor: initial;
     /* Add a pointer on hover */
     overflow-y: scroll;
-    background-blend-mode: darken;
-    background-size: 100%;
-    background-repeat: no-repeat;
+    background: var(--BGDetails);
+
+}
+#imageBGOV2{
+    position: fixed;
+    opacity: 1;
+
+    filter: blur(400px) brightness(0.5);
+    -webkit-filter: blur(400px) brightness(0.5);
+    -moz-filter: blur(400px) brightness(0.5);
 }
 
 .onContentViewer {
     position: absolute;
     width: 100%;
     height: auto;
-    backdrop-filter: blur(50px) brightness(0.5);
+
+
 
 }
 
@@ -811,32 +924,38 @@ body {
     color: var(--text);
     background-color: transparent;
     font-family: 'Roboto-condensed', sans-serif;
-    margin-top: 10vh;
     font-size: 2rem;
-    margin-right: 3vw;
-    text-align: right;
+    text-align: left;
+    margin-left: 45vw;
+    margin-right: 2vw;
+    margin-top: 14vh;
 }
 
 #ColCover > img {
     width: 20vw;
     height: auto;
     margin-left: 20vw;
-    box-shadow: 20px 20px 15px var(--cardCustoShadowHover);
 }
 
 #ColCover {
     position: absolute;
     top: 15vh;
 }
-
-#id, #averageProgress, #OriginCountry, #startDate, #description, #endDate, #Trending, #genres, #chapters {
+#endDate, #startDate {
+    font-weight: bold;
+}
+#id, #averageProgress, #OriginCountry, #startDate, #description, #endDate, #Trending, #genres, #chapters,#btnsActions,.Ratecontainer, #price{
     color: var(--text);
     margin-left: 45vw;
     margin-right: 2vw;
     margin-top: 2vh;
 }
+#btnsActions>a>i{
+    color: var(--text);
+    margin-right: 10px;
+}
 
-#SiteURL, #Staff, #OtherTitles, #Volumes, #characters, #price {
+#SiteURL, #Staff, #OtherTitles, #Volumes, #characters {
     color: var(--text);
     margin-left: 20vw;
     margin-right: 2vw;
@@ -848,9 +967,9 @@ body {
 }
 
 .releasing {
-    position: absolute;
-    top: 15vh;
-    right: 3vw;
+    position: relative;
+    left: 45vw;
+    max-width: fit-content;
     color: var(--text);
     background-color: var(--color-orange);
 
@@ -859,17 +978,20 @@ body {
 .released {
     color: var(--text);
     background-color: var(--color-green);
-    position: absolute;
-    top: 15vh;
-    right: 3vw;
+    position: relative;
+    left: 45vw;
+    max-width: fit-content;
+}
+a[href^="http://marvel.com"] {
+    color: var(--text);
 }
 
 .NotYet {
     color: white;
     background-color: var(--color-red);
-    position: absolute;
-    top: 15vh;
-    right: 3vw;
+    position: relative;
+    left: 45vw;
+    max-width: fit-content;
 }
 
 /* scrollbar custom*/
@@ -995,6 +1117,7 @@ body {
     height: var(--squarePP);
     border-radius: 50%;
     margin-top: 15px;
+    margin-bottom: 10px;
 
 }
 
@@ -1250,3 +1373,18 @@ body {
     border: solid #157347 5px;
     transition: border .3s;
 }
+.scrollBtnL{
+    background-color: transparent;
+    color: whitesmoke;
+    position: absolute;
+    right: 80px;
+
+}
+.scrollBtnR{
+
+    background-color: transparent;
+    color: whitesmoke;
+    position: absolute;
+    right: 40px;
+
+ }

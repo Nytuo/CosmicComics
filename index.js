@@ -15,6 +15,8 @@ along with Cosmic-Comics.  If not, see <https://www.gnu.org/licenses/>.*/
 //Variables declaration
 //All required nodes modules
 //All other variables and constants
+
+
 const ValidatedExtension = ["cbr", "cbz", "pdf", "zip", "7z", "cb7", "tar", "cbt", "rar",];
 var imagelink = "null";
 var nabc = 0;
@@ -91,7 +93,6 @@ var cardMode = true;
 
 function GetElFromInforPath(search, info) {
     for (var i in info) {
-        console.log(i)
         if (i == search) {
             return info[i];
         }
@@ -99,27 +100,11 @@ function GetElFromInforPath(search, info) {
     return null;
 }
 
-var theme_BG = "#181818";
 var theme_FG = "white";
 var theme_BG_CI = "rgba(0,0,0,0.753)";
 var currenttheme;
-
-
-var theme_O2 = "black";
-var theme_notifBG = "rgb(143, 143, 143)";
 var theme_button_card = "";
-var theme_progress = "";
 var theme_hover_listview = "#242424";
-var theme_nohover_listview = "transparent";
-var theme_hover_close;
-var theme_btn_FG = "white";
-var theme_btn_BG = "#0d6efd";
-var theme_btn_FG_s = "white";
-var theme_btn_BG_s = "#6c757d";
-var theme_btn_border = theme_btn_BG;
-var theme_btn_hover = "#0b5ed7";
-var theme_btn_border_s = theme_btn_BG;
-var theme_btn_hover_s = "#5c636a";
 var linkBG = "";
 document.getElementsByTagName("html")[0].className = "black";
 document.getElementById("btn_close_icon_about").className = "btn-close btn-close-white";
@@ -267,13 +252,9 @@ function modifyLib(elElement) {
     document.getElementById("opt" + elElement["API_ID"]).setAttribute("selected", "true");
     document.getElementById("opt" + elElement["API_ID"]).selected = true;
     document.getElementById("sendlib").innerHTML = "Modify library";
-    document.getElementById("sendlib").onclick =
-        function () {
-
-            return updateLibrary({'form': [document.getElementById('namelocation'), document.getElementById('locationa'), document.getElementById('providerID')]}, elElement["ID_LIBRARY"]);
-        };
-
-
+    document.getElementById("sendlib").onclick = function () {
+        return updateLibrary({'form': [document.getElementById('namelocation'), document.getElementById('locationa'), document.getElementById('providerID')]}, elElement["ID_LIBRARY"]);
+    };
 }
 
 function resetLibModal() {
@@ -282,8 +263,6 @@ function resetLibModal() {
     document.getElementById("locationa").removeAttribute("value");
     document.getElementById("namelocation").value = "";
     document.getElementById("locationa").value = "";
-
-
     document.getElementById("opt1").removeAttribute("selected");
     document.getElementById("opt2").removeAttribute("selected");
     document.getElementById("opt3").removeAttribute("selected");
@@ -292,12 +271,9 @@ function resetLibModal() {
     document.getElementById("opt2").selected = false;
     document.getElementById("opt3").selected = false;
     document.getElementById("opt0").selected = true;
-    document.getElementById("sendlib").onclick =
-        function () {
-            return addLibrary({'form': [document.getElementById('namelocation'), document.getElementById('locationa'), document.getElementById('providerID')]});
-        };
-
-
+    document.getElementById("sendlib").onclick = function () {
+        return addLibrary({'form': [document.getElementById('namelocation'), document.getElementById('locationa'), document.getElementById('providerID')]});
+    };
 }
 
 function refreshMetadata(elElement) {
@@ -329,21 +305,16 @@ function discoverFolders() {
                 document.getElementById("LibTitle").innerHTML = el["NAME"]
                 openFolder_logic(el["PATH"], el["API_ID"]);
             });
+            const marvelogo = document.createElement("img");
             if (el["API_ID"] === 1) {
-                const marvelogo = document.createElement("img");
                 marvelogo.src = "./Images/marvel-logo-png-10.png";
-                marvelogo.style.width = "25px";
-                marvelogo.style.float = "left";
-                marvelogo.style.lineHeight = "1"
-                btn.appendChild(marvelogo);
             } else if (el["API_ID"] === 2) {
-                const marvelogo = document.createElement("img");
                 marvelogo.src = "./Images/android-chrome-512x512.png";
-                marvelogo.style.width = "25px";
-                marvelogo.style.float = "left";
-                marvelogo.style.lineHeight = "1"
-                btn.appendChild(marvelogo);
             }
+            marvelogo.style.width = "25px";
+            marvelogo.style.float = "left";
+            marvelogo.style.lineHeight = "1"
+            btn.appendChild(marvelogo);
             btn.appendChild(document.createTextNode(el["NAME"]));
             btn.className = "btn btns libbtn";
             div.style.display = "flex";
@@ -408,34 +379,6 @@ function discoverFolders() {
 }
 
 discoverFolders();
-
-//Open the folder
-function openFolder() {
-    let result = remote.dialog.showOpenDialogSync({
-        properties: ["openDirectory"],
-    });
-    if (result) {
-        document.getElementById("overlaymsg").innerHTML = language["overlaymsg_opening"];
-        setTimeout(() => {
-            document.getElementById("overlaymsg").innerHTML = language["overlaymsg_takecare"];
-        }, 5000);
-        folderRootPath.push(result[0]);
-        Modify_JSON_For_Config(CosmicComicsData + "/config.json", "path", result[0]);
-        openFolder_logic(result);
-    }
-}
-
-//Forget the current folder
-function obliviate() {
-    Modify_JSON_For_Config(CosmicComicsData + "/config.json", "path", "");
-    window.location.reload();
-}
-
-//Changing the Update provider
-function changeUpdateProvider() {
-    Modify_JSON_For_Config(CosmicComicsData + "/config.json", "update_provider", "");
-    Toastifycation(language["next_time"], "#00C33C");
-}
 
 function modifyConfigJson(json, tomod, mod) {
     //check si obj exist pour remplacer valeur
@@ -716,11 +659,9 @@ function Get_element_from_data(search, data) {
 
 //On RightClick
 function RightClick(object = HTMLAnchorElement, lepath, name) {
-
     var realname = name
     var shortname = get_the_ID_by_name(realname);
     name_of_the_current_book = shortname;
-
     path_of_the_current_book = lepath;
 }
 
@@ -990,6 +931,7 @@ shortname
                 //Setting Card Div
                 const carddiv = document.createElement("div");
                 carddiv.style.cursor = "pointer";
+                // TODO faire plus simple / séparer / template
                 if (cardMode === true) {
                     const rib = document.createElement("div");
                     if (TheBook["unread"] == 1) {
@@ -1132,143 +1074,7 @@ shortname
 
                         });
                         carddiv.addEventListener("click", async function () {
-                            if (provider == 1) {
-                                console.log(TheBook)
-                                document.getElementById("DLBOOK").addEventListener("click", function (e) {
-
-                                    let path = TheBook.PATH;
-                                    console.log(path);
-                                    downloadBook(path);
-
-                                })
-
-                                //TODO FD
-
-                                document.getElementById("relations").innerHTML = "";
-
-                                document.getElementById("id").innerHTML = "This is a : " + TheBook.format + " and it have : " + TheBook.pageCount + " pages. <br/> This is part of the series : " + JSON.parse(TheBook.series).name;
-                                document.getElementById("averageProgress").style.display = "none";
-                                document.getElementById("ContentView").innerHTML = "";
-                                document.getElementById("ColTitle").innerHTML = TheBook.NOM
-                                document.getElementById("ImgColCover").src = TheBook.URLCover
-                                document.getElementById("Status").innerHTML = "";
-                                if (TheBook.description != null && TheBook.description != "null") {
-                                    document.getElementById("description").innerHTML = TheBook.description;
-                                } else {
-                                    document.getElementById("description").innerHTML = "";
-                                }
-                                // TODO : add the character list
-
-                                var NameToFetchList = [];
-                                JSON.parse(TheBook.characters)["items"].forEach((el) => {
-                                    NameToFetchList.push("'" + el.name + "'");
-                                });
-                                var NameToFetch = NameToFetchList.join(",");
-                                var container = document.createElement("div");
-                                await getFromDB("Characters", "* FROM Characters WHERE name IN (" + NameToFetch + ")").then((clres) => {
-                                    clres = JSON.parse(clres)
-                                    console.log(clres)
-                                    container.className = "item-list";
-                                    clres.forEach((el) => {
-                                        const divs = document.createElement("div");
-                                        divs.innerHTML = "<a target='_blank' href=" + JSON.parse(el.url)[0].url + ">" + "<img src='" + JSON.parse(el.image).path + "/detail." + JSON.parse(el.image).extension + "' class='img-charac'/>" + el.name + "</a>";
-
-                                        divs.style.marginLeft = "10px";
-                                        container.appendChild(divs);
-                                    })
-                                })
-
-                                /* tmpchara += "<a href=" + el.resourceURI + ">" + el.name + "</a>" + "<br/>";*/
-                                document.getElementById("characters").innerHTML = "<h1>" + "characters" + ":</h1> " + "Number of characters : " + JSON.parse(TheBook.characters)["available"] + "<br/>";
-                                document.getElementById("characters").appendChild(container);
-                                //Genres
-
-                                document.getElementById("SiteURL").innerHTML = "URL : <a target='_blank' href=" + JSON.parse(TheBook.URLs)[0].url + ">" + JSON.parse(TheBook.URLs)[0].url + "</a>";
-                                // TODO : add the relations
-                                document.getElementById("OtherTitles").innerHTML = "Variants of this comic (for a complete view check the Marvel's website)" + " : ";
-
-                                await getFromDB("variants", "* FROM variants WHERE series = '" + TheBook.ID_Series + "'").then((clres) => {
-                                    clres = JSON.parse(clres)
-                                    console.log(clres)
-                                    const divlist = document.createElement("div");
-                                    divlist.className = "cards-list2"
-                                    clres.forEach((el) => {
-                                        const reltxt = document.createElement("div");
-                                        reltxt.innerHTML = el.name;
-                                        reltxt.onclick = function () {
-                                            window.open(JSON.parse(el.url)[0].url);
-                                        }
-                                        reltxt.className = "cardcusto";
-                                        const imgcard = document.createElement("img");
-                                        imgcard.src = JSON.parse(el.image).path + "/detail." + JSON.parse(el.image).extension;
-                                        imgcard.style.width = "100%";
-                                        reltxt.appendChild(imgcard);
-                                        divlist.appendChild(reltxt);
-                                    })
-                                    document.getElementById("OtherTitles").appendChild(divlist);
-                                })
-
-
-                                // TODO : add the staff list
-                                var tmpstaff = "Number of people : " + JSON.parse(TheBook["creators"])["available"] + "<br/>";
-                                var StaffToFetchList = [];
-                                JSON.parse(TheBook.creators)["items"].forEach((el) => {
-                                    StaffToFetchList.push("'" + el.name.replaceAll("'", "''") + "'");
-                                });
-                                var StaffToFetch = StaffToFetchList.join(",");
-                                var container2 = document.createElement("div");
-
-                                await getFromDB("Creators", "* FROM Creators WHERE name IN (" + StaffToFetch + ")").then((clres) => {
-                                    clres = JSON.parse(clres)
-                                    container2.className = "item-list";
-
-                                    for (var i = 0; i < clres.length; i++) {
-                                        var el = clres[i];
-                                        const divs = document.createElement("div");
-                                        for (var j = 0; j < clres.length; j++) {
-                                            if (el.name == JSON.parse(TheBook["creators"])["items"][j].name) {
-                                                divs.innerHTML = "<a target='_blank' href=" + JSON.parse(el.url)[0].url + ">" + "<img src='" + JSON.parse(el.image).path + "/detail." + JSON.parse(el.image).extension + "' class='img-charac'/>" + el.name + "<br/>" + JSON.parse(TheBook["creators"])["items"][j]["role"] + "</a>";
-                                                divs.style.marginLeft = "10px";
-                                                container2.appendChild(divs);
-                                            }
-
-                                        }
-                                    }
-
-                                })
-
-                                for (var a = 0; a < JSON.parse(TheBook.collectedIssues).length; a++) {
-
-                                    document.getElementById("colissue").innerHTML += JSON.parse(TheBook.collectedIssues)[a].name + "<br/>";
-                                }
-                                for (var a = 0; a < JSON.parse(TheBook.collections).length; a++) {
-
-                                    document.getElementById("col").innerHTML += JSON.parse(TheBook.collections)[a].name + "<br/>";
-                                }
-
-
-                                document.getElementById("Staff").innerHTML = "<h1>" + "Staff" + ":</h1> " + "<br/>" + tmpstaff;
-                                document.getElementById("Staff").appendChild(container2);
-                                document.getElementById("chapters").innerHTML = "Number of this comic within the series : " + TheBook.issueNumber;
-                                document.getElementById("price").innerHTML += "Prices : <br/>";
-                                for (var a = 0; a < JSON.parse(TheBook.prices).length; a++) {
-                                    console.log(JSON.parse(TheBook.prices)[a])
-                                    document.getElementById("price").innerHTML += JSON.parse(TheBook.prices)[a].type.replace(/([A-Z])/g, ' $1').trim() + " : " + JSON.parse(TheBook.prices)[a].price + "<br/>";
-                                }
-                                document.getElementById("startDate").innerHTML = "Dates : <br/>"
-                                for (var b = 0; b < JSON.parse(TheBook.dates).length; b++) {
-                                    document.getElementById("startDate").innerHTML += JSON.parse(TheBook.dates)[b].type.replace(/([A-Z])/g, ' $1').trim() + " : " + convertDate(JSON.parse(TheBook.dates)[b].date) + "<br/>";
-                                }
-
-
-                                animateCSS(document.getElementById("contentViewer"), "fadeOut").then((message) => {
-                                    animateCSS(document.getElementById("contentViewer"), "fadeIn").then((message) => {
-                                        document.getElementById("contentViewer").style.display = "block";
-                                    });
-                                });
-
-
-                            }
+                            await createDetails(TheBook, provider)
                         });
 
                         carddiv.addEventListener("mouseover", function (e) {
@@ -1278,8 +1084,6 @@ shortname
                     }
                     n++;
                     const element = document.getElementById("ContentView");
-                    const divrating = document.createElement("div");
-                    carddiv.appendChild(divrating);
                     carddiv.appendChild(rib)
 
                     element.appendChild(carddiv);
@@ -1524,13 +1328,12 @@ function convertDate(inputFormat) {
         return (s < 10) ? '0' + s : s;
     }
 
-    var d = new Date(inputFormat)
+    let d = new Date(inputFormat)
     return [pad(d.getDate()), pad(d.getMonth() + 1), d.getFullYear()].join('/')
 }
 
 async function GETMARVELAPI_variants(id) {
     var url = "https://gateway.marvel.com:443/v1/public/series/" + id + "/comics?orderBy=issueNumber&apikey=1ad92a16245cfdb9fecffa6745b3bfdc";
-
     var response = await fetch(url);
     var data = await response.json();
     console.log(data);
@@ -1539,7 +1342,6 @@ async function GETMARVELAPI_variants(id) {
 
 async function GETMARVELAPI_Characters(id, type) {
     var url = "https://gateway.marvel.com:443/v1/public/characters?" + type + "=" + id + "&apikey=1ad92a16245cfdb9fecffa6745b3bfdc";
-
     var response = await fetch(url);
     var data = await response.json();
     console.log(data);
@@ -1548,7 +1350,6 @@ async function GETMARVELAPI_Characters(id, type) {
 
 async function GETMARVELAPI_Creators(id, type) {
     var url = "https://gateway.marvel.com:443/v1/public/creators?" + type + "=" + id + "&apikey=1ad92a16245cfdb9fecffa6745b3bfdc";
-
     var response = await fetch(url);
     var data = await response.json();
     console.log(data);
@@ -1700,51 +1501,6 @@ async function loadContent(provider, FolderRes, libraryPath) {
     var n = 0;
     listOfImages = [];
     document.getElementById("overlay2").style.display = "block";
-    /*FolderResults.forEach((file) => {
-        var stat = fs.statSync(file);
-        var name = patha.basename(file);
-        var realname = name.split(".");
-        realname = realname[0];
-        var shortname = get_the_ID_by_name(realname);
-        var Info = Get_From_JSON(
-            CosmicComicsData + "/ListOfComics.json",
-            shortname
-        );
-        if (
-            Get_element_from_data("read", Info) === "undefined" ||
-            Get_element_from_data("read", Info) == null
-        ) {
-            if (stat.isDirectory()) {
-                var obj = {
-                    fullname: realname,
-                    name: shortname,
-                    read: false,
-                    reading: false,
-                    unread: true,
-                    favorite: false,
-                    last_page: 0,
-                    folder: true,
-                    note: -1,
-                };
-
-                Add_To_JSON(obj, CosmicComicsData + "/ListOfComics.json");
-            } else {
-                var obj = {
-                    fullname: realname,
-                    name: shortname,
-                    read: false,
-                    reading: false,
-                    unread: true,
-                    favorite: false,
-                    last_page: 0,
-                    folder: false,
-                    note: -1,
-                };
-
-                Add_To_JSON(obj, CosmicComicsData + "/ListOfComics.json");
-            }
-        }
-    });*/
     FolderRes = JSON.parse(FolderRes);
     const divlist = document.createElement("div");
     divlist.className = "list-group";
@@ -1793,57 +1549,100 @@ async function loadContent(provider, FolderRes, libraryPath) {
                     if (provider == 2) {
                         console.log("provider 2")
                         await getAPIANILIST(name).then(async (data) => {
-                            await InsertIntoDB("Series", "(ID_Series,title,statut,start_date,end_date,description,Score,genres,cover,BG,CHARACTERS,TRENDING,STAFF,SOURCE,volumes,chapters)", "('" + data["id"] + "_2" + "','" + JSON.stringify(data["title"]).replaceAll("'", "''") + "','" + data["status"].replaceAll("'", "''") + "','" + JSON.stringify(data["startDate"]).replaceAll("'", "''") + "','" + JSON.stringify(data["endDate"]).replaceAll("'", "''") + "','" + data["description"].replaceAll("'", "''") + "','" + data["meanScore"] + "','" + JSON.stringify(data["genres"]).replaceAll("'", "''") + "','" + data["coverImage"]["large"] + "','" + data["bannerImage"] + "','" + JSON.stringify(data["characters"]).replaceAll("'", "''") + "','" + data["trending"] + "','" + JSON.stringify(data["staff"]).replaceAll("'", "''") + "','" + data["siteUrl"].replaceAll("'", "''") + "','" + data["volumes"] + "','" + data["chapters"] + "')");
-                            await GETANILISTAPI_CREATOR(data["staff"]).then(async (ccdata) => {
-                                for (let i = 0; i < ccdata.length; i++) {
-                                    if (ccdata[i]["description"] == null) {
-                                        await InsertIntoDB("Creators", "", `('${ccdata[i]["id"] + "_2"}','${ccdata[i]["name"]["english"].replaceAll("'", "''")}','${JSON.stringify(ccdata[i]["image"]["medium"])}','${null}','${JSON.stringify(ccdata[i]["siteUrl"])}')`).then(() => {
+                                await InsertIntoDB("Series", "(ID_Series,title,statut,start_date,end_date,description,Score,genres,cover,BG,CHARACTERS,TRENDING,STAFF,SOURCE,volumes,chapters)", "('" + data["id"] + "_2" + "','" + JSON.stringify(data["title"]).replaceAll("'", "''") + "','" + data["status"].replaceAll("'", "''") + "','" + JSON.stringify(data["startDate"]).replaceAll("'", "''") + "','" + JSON.stringify(data["endDate"]).replaceAll("'", "''") + "','" + data["description"].replaceAll("'", "''") + "','" + data["meanScore"] + "','" + JSON.stringify(data["genres"]).replaceAll("'", "''") + "','" + data["coverImage"]["large"] + "','" + data["bannerImage"] + "','" + JSON.stringify(data["characters"]).replaceAll("'", "''") + "','" + data["trending"] + "','" + JSON.stringify(data["staff"]).replaceAll("'", "''") + "','" + data["siteUrl"].replaceAll("'", "''") + "','" + data["volumes"] + "','" + data["chapters"] + "')");
+                                await GETANILISTAPI_CREATOR(data["staff"]).then(async (ccdata) => {
+                                    for (let i = 0; i < ccdata.length; i++) {
+                                        try {
+                                            if (ccdata[i]["description"] == null) {
+
+                                                await InsertIntoDB("Creators", "", `('${ccdata[i]["id"] + "_2"}','${ccdata[i]["name"]["english"].replaceAll("'", "''")}','${JSON.stringify(ccdata[i]["image"]["medium"])}','${null}','${JSON.stringify(ccdata[i]["siteUrl"])}')`).then(() => {
+                                                    console.log("inserted");
+                                                });
+                                            } else {
+                                                await InsertIntoDB("Creators", "", `('${ccdata[i]["id"] + "_2"}','${ccdata[i]["name"]["english"].replaceAll("'", "''")}','${JSON.stringify(ccdata[i]["image"]["medium"])}','${JSON.stringify(ccdata[i]["description"].replaceAll("'", "''"))}','${JSON.stringify(ccdata[i]["siteUrl"])}')`).then(() => {
+                                                    console.log("inserted");
+                                                });
+                                            }
+
+                                        } catch (e) {
+                                            try {
+                                                if (ccdata[i]["description"] == null) {
+
+                                                    await InsertIntoDB("Creators", "", `('${ccdata[i]["id"] + "_2"}','${ccdata[i]["name"]["romaji"].replaceAll("'", "''")}','${JSON.stringify(ccdata[i]["image"]["medium"])}','${null}','${JSON.stringify(ccdata[i]["siteUrl"])}')`).then(() => {
+                                                        console.log("inserted");
+                                                    });
+                                                } else {
+                                                    await InsertIntoDB("Creators", "", `('${ccdata[i]["id"] + "_2"}','${ccdata[i]["name"]["romaji"].replaceAll("'", "''")}','${JSON.stringify(ccdata[i]["image"]["medium"])}','${JSON.stringify(ccdata[i]["description"].replaceAll("'", "''"))}','${JSON.stringify(ccdata[i]["siteUrl"])}')`).then(() => {
+                                                        console.log("inserted");
+                                                    });
+                                                }
+                                            } catch (e) {
+                                                try {
+                                                    if (ccdata[i]["description"] == null) {
+
+                                                        await InsertIntoDB("Creators", "", `('${ccdata[i]["id"] + "_2"}','${ccdata[i]["name"]["native"].replaceAll("'", "''")}','${JSON.stringify(ccdata[i]["image"]["medium"])}','${null}','${JSON.stringify(ccdata[i]["siteUrl"])}')`).then(() => {
+                                                            console.log("inserted");
+                                                        });
+                                                    } else {
+                                                        await InsertIntoDB("Creators", "", `('${ccdata[i]["id"] + "_2"}','${ccdata[i]["name"]["native"].replaceAll("'", "''")}','${JSON.stringify(ccdata[i]["image"]["medium"])}','${JSON.stringify(ccdata[i]["description"].replaceAll("'", "''"))}','${JSON.stringify(ccdata[i]["siteUrl"])}')`).then(() => {
+                                                            console.log("inserted");
+                                                        });
+                                                    }
+                                                } catch (e) {
+                                                    if (ccdata[i]["description"] == null) {
+
+                                                        await InsertIntoDB("Creators", "", `('${ccdata[i]["id"] + "_2"}','Unknown','${JSON.stringify(ccdata[i]["image"]["medium"])}','${null}','${JSON.stringify(ccdata[i]["siteUrl"])}')`).then(() => {
+                                                            console.log("inserted");
+                                                        });
+                                                    } else {
+                                                        await InsertIntoDB("Creators", "", `('${ccdata[i]["id"] + "_2"}','Unknown','${JSON.stringify(ccdata[i]["image"]["medium"])}','${JSON.stringify(ccdata[i]["description"].replaceAll("'", "''"))}','${JSON.stringify(ccdata[i]["siteUrl"])}')`).then(() => {
+                                                            console.log("inserted");
+                                                        });
+                                                    }
+                                                }
+
+                                            }
+                                        }
+
+
+                                    }
+                                })
+                                await GETANILISTAPI_CHARACTER(data["characters"]).then(async (ccdata) => {
+                                    for (let i = 0; i < ccdata.length; i++) {
+                                        if (ccdata[i]["description"] == null) {
+                                            await InsertIntoDB("Characters", "", `('${ccdata[i]["id"] + "_2"}','${ccdata[i]["name"]["english"].replaceAll("'", "''")}','${JSON.stringify(ccdata[i]["image"]["medium"])}','${null}','${JSON.stringify(ccdata[i]["siteUrl"])}')`).then(() => {
+                                                console.log("inserted");
+                                            });
+                                        } else {
+                                            await InsertIntoDB("Characters", "", `('${ccdata[i]["id"] + "_2"}','${ccdata[i]["name"]["english"].replaceAll("'", "''")}','${JSON.stringify(ccdata[i]["image"]["medium"])}','${JSON.stringify(ccdata[i]["description"].replaceAll("'", "''"))}','${JSON.stringify(ccdata[i]["siteUrl"])}')`).then(() => {
+                                                console.log("inserted");
+                                            });
+
+                                        }
+                                    }
+                                })
+
+
+                                await GETANILISTAPI_RELATION(data["title"]["english"]).then(async (ccdata) => {
+                                    for (let i = 0; i < ccdata.length; i++) {
+
+                                        var dataR = ccdata[i]["node"];
+                                        if (dataR.title.english == null) {
+                                            await InsertIntoDB("variants", "", `('${dataR["id"] + "_2"}','${dataR["title"]["romaji"].replaceAll("'", "''")}','${dataR["coverImage"]["large"]}','${dataR["type"] + " / " + dataR["relationType"] + " / " + dataR["format"]}',${null},'${data["id"] + "_2"}')`);
                                             console.log("inserted");
-                                        });
-                                    } else {
-                                        await InsertIntoDB("Creators", "", `('${ccdata[i]["id"] + "_2"}','${ccdata[i]["name"]["english"].replaceAll("'", "''")}','${JSON.stringify(ccdata[i]["image"]["medium"])}','${JSON.stringify(ccdata[i]["description"].replaceAll("'", "''"))}','${JSON.stringify(ccdata[i]["siteUrl"])}')`).then(() => {
+                                        } else {
+                                            await InsertIntoDB("variants", "", `('${dataR["id"] + "_2"}','${dataR["title"]["english"].replaceAll("'", "''")}','${dataR["coverImage"]["large"]}','${dataR["type"] + " / " + dataR["relationType"] + " / " + dataR["format"]}',${null},'${data["id"] + "_2"}')`);
                                             console.log("inserted");
-                                        });
+                                        }
+
+
                                     }
 
-
-                                }
-                            })
-                            await GETANILISTAPI_CHARACTER(data["characters"]).then(async (ccdata) => {
-                                for (let i = 0; i < ccdata.length; i++) {
-                                    if (ccdata[i]["description"] == null) {
-                                        await InsertIntoDB("Characters", "", `('${ccdata[i]["id"] + "_2"}','${ccdata[i]["name"]["english"].replaceAll("'", "''")}','${JSON.stringify(ccdata[i]["image"]["medium"])}','${null}','${JSON.stringify(ccdata[i]["siteUrl"])}')`).then(() => {
-                                            console.log("inserted");
-                                        });
-                                    } else {
-                                        await InsertIntoDB("Characters", "", `('${ccdata[i]["id"] + "_2"}','${ccdata[i]["name"]["english"].replaceAll("'", "''")}','${JSON.stringify(ccdata[i]["image"]["medium"])}','${JSON.stringify(ccdata[i]["description"].replaceAll("'", "''"))}','${JSON.stringify(ccdata[i]["siteUrl"])}')`).then(() => {
-                                            console.log("inserted");
-                                        });
-
-                                    }
-                                }
-                            })
+                                })
 
 
-                            await GETANILISTAPI_RELATION(data["title"]["english"]).then(async (ccdata) => {
-                                for (let i = 0; i < ccdata.length; i++) {
-
-                                    var dataR = ccdata[i]["node"];
-                                    if (dataR.title.english == null) {
-                                        await InsertIntoDB("variants", "", `('${dataR["id"] + "_2"}','${dataR["title"]["romaji"].replaceAll("'", "''")}','${dataR["coverImage"]["large"]}','${dataR["type"] + " / " + dataR["relationType"] + " / " + dataR["format"]}',${null},'${data["id"] + "_2"}')`);
-                                        console.log("inserted");
-                                    } else {
-                                        await InsertIntoDB("variants", "", `('${dataR["id"] + "_2"}','${dataR["title"]["english"].replaceAll("'", "''")}','${dataR["coverImage"]["large"]}','${dataR["type"] + " / " + dataR["relationType"] + " / " + dataR["format"]}',${null},'${data["id"] + "_2"}')`);
-                                        console.log("inserted");
-                                    }
-
-
-                                }
-
-                            })
-
-
-                        })
+                            }
+                        )
                     } else if (provider == 1) {
                         console.log("Provider: Marvel Comics");
                         await GETMARVELAPI(name).then(async (data) => {
@@ -1886,7 +1685,6 @@ async function loadContent(provider, FolderRes, libraryPath) {
                         })
 
                     } else {
-                        console.log("Provider: " + provider);
                     }
 
 
@@ -1973,272 +1771,7 @@ async function loadContent(provider, FolderRes, libraryPath) {
 
                                 /*          if (stat.isDirectory()) {*/
                                 carddiv.addEventListener("click", async function () {
-                                    if (provider == 1) {
-                                        loadView(path, libraryPath, JSON.parse(res[0].start_date), provider);
-                                        document.getElementById("id").innerText = "This series ID from Marvel : " + parseInt(res[0].ID_Series);
-                                        document.getElementById("averageProgress").style.display = "none";
-                                        document.getElementById("contentViewer").style.backgroundImage = "url(" + JSON.parse(res[0].BG).path + "/detail." + JSON.parse(res[0].cover).extension + ")";
-                                        document.getElementById("ColTitle").innerHTML = JSON.parse(res[0].title)
-                                        document.getElementById("ImgColCover").src = JSON.parse(res[0].cover).path + "/detail." + JSON.parse(res[0].cover).extension
-                                        if (res[0].description != null && res[0].description != "null") {
-                                            document.getElementById("description").innerHTML = res[0].description;
-                                        } else {
-                                            document.getElementById("description").innerHTML = "";
-                                        }
-                                        if (JSON.parse(res[0].start_date) == null) {
-                                            document.getElementById("startDate").innerHTML = "?";
-                                        } else {
-                                            document.getElementById("startDate").innerHTML = JSON.parse(res[0].start_date)
-                                        }
-                                        if (
-
-                                            JSON.parse(res[0].end_date) == null || JSON.parse(res[0].end_date) > new Date().getFullYear()) {
-                                            document.getElementById("startDate").innerHTML += " - ?";
-                                        } else {
-                                            document.getElementById("startDate").innerHTML += " - " + JSON.parse(res[0].end_date);
-                                        }
-
-
-                                        // TODO : add the character list
-
-                                        var NameToFetchList = [];
-                                        JSON.parse(res[0].CHARACTERS)["items"].forEach((el) => {
-                                            NameToFetchList.push("'" + el.name + "'");
-                                        });
-                                        var NameToFetch = NameToFetchList.join(",");
-                                        var container = document.createElement("div");
-                                        await getFromDB("Characters", "* FROM Characters WHERE name IN (" + NameToFetch + ")").then((clres) => {
-                                            clres = JSON.parse(clres)
-                                            console.log(clres)
-                                            container.className = "item-list";
-                                            clres.forEach((el) => {
-                                                const divs = document.createElement("div");
-                                                divs.innerHTML = "<a target='_blank' href=" + JSON.parse(el.url)[0].url + ">" + "<img src='" + JSON.parse(el.image).path + "/detail." + JSON.parse(el.image).extension + "' class='img-charac'/>" + el.name + "</a>";
-                                                divs.style.marginLeft = "10px";
-                                                container.appendChild(divs);
-                                            })
-                                        })
-
-                                        /* tmpchara += "<a href=" + el.resourceURI + ">" + el.name + "</a>" + "<br/>";*/
-                                        document.getElementById("characters").innerHTML = "<h1>" + "characters" + ":</h1> " + "Number of characters : " + JSON.parse(res[0].CHARACTERS)["available"] + "<br/>";
-                                        document.getElementById("characters").appendChild(container);
-                                        //Genres
-
-                                        document.getElementById("SiteURL").innerHTML = "URL : <a target='_blank' href=" + JSON.parse(res[0].SOURCE).url + ">Voir plus</a>";
-                                        // TODO : add the relations
-                                        document.getElementById("OtherTitles").innerHTML = "A few comics in this series (for a complete view check the Marvel's website)" + " : ";
-
-                                        await getFromDB("variants", "* FROM variants WHERE series = '" + res[0].ID_Series + "'").then((clres) => {
-                                            clres = JSON.parse(clres)
-                                            console.log(clres)
-                                            const divlist = document.createElement("div");
-                                            divlist.className = "cards-list2"
-                                            clres.forEach((el) => {
-                                                const reltxt = document.createElement("div");
-                                                reltxt.innerHTML = el.name;
-                                                reltxt.onclick = function () {
-                                                    window.open(JSON.parse(el.url)[0].url);
-                                                }
-                                                reltxt.className = "cardcusto";
-                                                const imgcard = document.createElement("img");
-                                                imgcard.src = JSON.parse(el.image).path + "/detail." + JSON.parse(el.image).extension;
-                                                imgcard.style.width = "100%";
-                                                reltxt.appendChild(imgcard);
-                                                divlist.appendChild(reltxt);
-                                            })
-                                            document.getElementById("OtherTitles").appendChild(divlist);
-                                        })
-
-
-                                        // TODO : add the staff list
-                                        var tmpstaff = "Number of people : " + JSON.parse(res[0]["STAFF"])["available"] + "<br/>";
-                                        var StaffToFetchList = [];
-                                        JSON.parse(res[0].STAFF)["items"].forEach((el) => {
-                                            StaffToFetchList.push("'" + el.name.replaceAll("'", "''") + "'");
-                                        });
-                                        var StaffToFetch = StaffToFetchList.join(",");
-                                        var container2 = document.createElement("div");
-
-                                        await getFromDB("Creators", "* FROM Creators WHERE name IN (" + StaffToFetch + ")").then((clres) => {
-                                            clres = JSON.parse(clres)
-                                            container2.className = "item-list";
-
-                                            for (var i = 0; i < clres.length; i++) {
-                                                var el = clres[i];
-                                                const divs = document.createElement("div");
-                                                for (var j = 0; j < clres.length; j++) {
-                                                    if (el.name == JSON.parse(res[0]["STAFF"])["items"][j].name) {
-                                                        divs.innerHTML = "<a target='_blank' href=" + JSON.parse(el.url)[0].url + ">" + "<img src='" + JSON.parse(el.image).path + "/detail." + JSON.parse(el.image).extension + "' class='img-charac'/>" + el.name + "<br/>" + JSON.parse(res[0]["STAFF"])["items"][j]["role"] + "</a>";
-                                                        divs.style.marginLeft = "10px";
-                                                        container2.appendChild(divs);
-                                                    }
-
-                                                }
-                                            }
-
-                                        })
-                                        document.getElementById("Staff").innerHTML = "<h1>" + "Staff" + ":</h1> " + "<br/>" + tmpstaff;
-                                        document.getElementById("Staff").appendChild(container2);
-                                        document.getElementById("chapters").innerHTML = "Number of Comics in this series : " + res[0]["chapters"];
-
-
-                                        if (JSON.parse(res[0].end_date) > new Date().getFullYear()) {
-                                            document.getElementById("Status").innerHTML = "RELEASING";
-                                            document.getElementById("Status").className = "releasing";
-                                        } else if (JSON.parse(res[0].end_date) < new Date().getFullYear()) {
-                                            document.getElementById("Status").innerHTML = "FINISHED";
-                                            document.getElementById("Status").className = "released";
-                                        } else if (JSON.parse(res[0].start_date) > new Date().getFullYear()) {
-
-                                            document.getElementById("Status").innerHTML = "NOT YET RELEASED";
-                                            document.getElementById("Status").className = "NotYet";
-
-                                        } else if (JSON.parse(res[0].start_date) == new Date().getFullYear()) {
-                                            document.getElementById("Status").innerHTML = "END SOON";
-                                            document.getElementById("Status").className = "releasing";
-                                        } else {
-                                            document.getElementById("Status").innerHTML = "UNKNOWN";
-                                            document.getElementById("Status").className = "NotYet";
-                                        }
-
-                                        document.getElementById("contentViewer").style.display = "block";
-                                        animateCSS(document.getElementById("contentViewer"), "fadeIn").then((message) => {
-                                        });                                /*launchDetect(path, root);*/
-                                    } else if (provider == 2) {
-                                        loadView(path, libraryPath, "", provider);
-
-                                        document.getElementById("contentViewer").style.background = "rgba(0,0,0,0.7) url(" + res[0].BG + ")";
-                                        document.getElementById("ColTitle").innerHTML = JSON.parse(res[0].title).english + " / " + JSON.parse(res[0].title).romaji + " / " + JSON.parse(res[0].title).native;
-                                        document.getElementById("ImgColCover").src = res[0].cover
-                                        document.getElementById("description").innerHTML = res[0].description;
-                                        if (JSON.parse(res[0].start_date).year == null) {
-                                            document.getElementById("startDate").innerHTML = "?";
-                                        } else {
-                                            document.getElementById("startDate").innerHTML = JSON.parse(res[0].start_date).year
-                                        }
-                                        if (
-
-                                            JSON.parse(res[0].end_date).year == null) {
-                                            document.getElementById("startDate").innerHTML += " - ?";
-                                        } else {
-                                            document.getElementById("startDate").innerHTML += " - " + JSON.parse(res[0].end_date).year;
-                                        }
-
-                                        // TODO : add the character list
-
-                                        var NameToFetchList = [];
-                                        JSON.parse(res[0].CHARACTERS).forEach((el) => {
-                                            NameToFetchList.push("'" + el.name + "'");
-                                        });
-                                        var NameToFetch = NameToFetchList.join(",");
-                                        var container = document.createElement("div");
-                                        await getFromDB("Characters", "* FROM Characters WHERE name IN (" + NameToFetch + ")").then((clres) => {
-                                            clres = JSON.parse(clres)
-                                            console.log(clres)
-                                            container.className = "item-list";
-                                            clres.forEach((el) => {
-                                                const divs = document.createElement("div");
-                                                divs.innerHTML = "<a target='_blank' href=" + el.url + ">" + "<img src='" + el.image.replaceAll('"', '') + "' class='img-charac'/>" + el.name + "</a>";
-                                                divs.style.marginLeft = "10px";
-                                                container.appendChild(divs);
-                                            })
-                                        })
-
-                                        /* tmpchara += "<a href=" + el.resourceURI + ">" + el.name + "</a>" + "<br/>";*/
-                                        document.getElementById("characters").innerHTML = "<h1>" + "characters" + ":</h1><br/>";
-                                        document.getElementById("characters").appendChild(container);
-
-                                        //Genres
-                                        document.getElementById("genres").innerHTML = "Genres " + ":";
-                                        JSON.parse(res[0].genres).forEach((el, index) => {
-                                            if (index != JSON.parse(res[0].genres).length - 1) {
-                                                document.getElementById("genres").innerHTML += " " + el + ", ";
-
-                                            } else {
-                                                document.getElementById("genres").innerHTML += " " + el;
-
-                                            }
-                                        });
-                                        document.getElementById("SiteURL").innerHTML = "<a href='" + res[0].SOURCE + "'>Voir plus</a>";
-                                        document.getElementById("Trending").innerHTML = "Trending : " + res[0]["TRENDING"];
-
-                                        // TODO : add the relations
-                                        document.getElementById("OtherTitles").innerHTML = "Relations" + " : ";
-                                        await getFromDB("variants", "* FROM variants WHERE series = '" + res[0].ID_Series + "'").then((clres) => {
-                                            clres = JSON.parse(clres)
-                                            console.log(clres)
-                                            const divlist = document.createElement("div");
-                                            divlist.className = "cards-list2"
-                                            clres.forEach((el) => {
-                                                const reltxt = document.createElement("div");
-                                                reltxt.innerHTML = el.name;
-                                                reltxt.className = "cardcusto";
-                                                const imgcard = document.createElement("img");
-                                                imgcard.src = el.image;
-                                                imgcard.style.width = "100%";
-                                                reltxt.appendChild(imgcard);
-                                                divlist.appendChild(reltxt);
-                                            })
-                                            document.getElementById("OtherTitles").appendChild(divlist);
-                                        })
-
-
-                                        document.getElementById("Volumes").innerHTML = res[0]["volumes"];
-
-                                        // TODO : add the staff list
-                                        var StaffToFetchList = [];
-                                        JSON.parse(res[0].STAFF).forEach((el) => {
-                                            StaffToFetchList.push("'" + el.name.replaceAll("'", "''") + "'");
-                                        });
-                                        var StaffToFetch = StaffToFetchList.join(",");
-                                        var container2 = document.createElement("div");
-
-                                        await getFromDB("Creators", "* FROM Creators WHERE name IN (" + StaffToFetch + ")").then((clres) => {
-                                            clres = JSON.parse(clres)
-                                            container2.className = "item-list";
-
-                                            for (var i = 0; i < clres.length; i++) {
-                                                var el = clres[i];
-                                                const divs = document.createElement("div");
-                                                for (var j = 0; j < clres.length; j++) {
-                                                    if (el.name == JSON.parse(res[0]["STAFF"])[j].name) {
-                                                        divs.innerHTML = "<a target='_blank' href=" + el.url + ">" + "<img src='" + el.image.replaceAll('"', "") + "' class='img-charac'/>" + el.name + "</a>";
-                                                        divs.style.marginLeft = "10px";
-                                                        container2.appendChild(divs);
-                                                    }
-
-                                                }
-                                            }
-
-                                        })
-                                        document.getElementById("Staff").innerHTML = "<h1>" + "Staff" + ":</h1> " + "<br/>";
-                                        document.getElementById("Staff").appendChild(container2);
-
-
-                                        document.getElementById("chapters").innerHTML = res[0]["chapters"];
-                                        document.getElementById("averageScore").innerHTML = res[0]["Score"];
-                                        document.querySelectorAll(".circle-small .progress.one").forEach((el) => {
-                                            el.style.strokeDashoffset = Math.abs(100 - res[0]["Score"]);
-                                        });
-
-
-                                        document.documentElement.style.setProperty('--averageScore', Math.abs(100 - res[0]["Score"]));
-                                        document.getElementById("Status").innerHTML = res[0]["statut"];
-                                        if (res[0]["statut"] == "RELEASING") {
-                                            document.getElementById("Status").className = "releasing";
-                                        } else if (res[0]["statut"] == "FINISHED") {
-                                            document.getElementById("Status").className = "released";
-
-                                        } else if (res[0]["statut"] == "Not_YET_RELEASED") {
-                                            document.getElementById("Status").className = "NotYet";
-
-                                        }
-
-                                        document.getElementById("contentViewer").style.display = "block";
-                                        animateCSS(document.getElementById("contentViewer"), "fadeIn").then((message) => {
-                                        });                                /*launchDetect(path, root);*/
-                                    }
-
+                                    await createSeries(provider, path, libraryPath, res)
                                 });
                                 playbtn.addEventListener("click", function () {
                                     ModifyJSONFile(CosmicComicsData + "/ListOfComics.json", "reading", true, shortname);
@@ -2820,24 +2353,6 @@ function get_the_ID_by_name(the_name = "") {
     return finalName;
 }
 
-//Create the first image of all folder
-function CreateFIOAFolder() {
-    if (!fs.existsSync(CosmicComicsData + "/FirstImageOfAll")) {
-        fs.mkdirSync(CosmicComicsData + "/FirstImageOfAll");
-    }
-}
-
-//Creating a folder
-function CreateFolder(dirname, dirpath) {
-    if (!fs.existsSync(dirpath + "/" + dirname)) {
-        fs.mkdirSync(dirpath + "/" + dirname);
-    }
-}
-
-/*var configOSProvider = fs.readFileSync(CosmicComicsData + "/config.json");
-var JSON_OSProvider = JSON.parse(configOSProvider);
-var OSprovider = Get_From_Config("update_provider", JSON_OSProvider);*/
-
 //Unarchive the first element of each archive
 async function delete_all_exept_the_first() {
     var dir = fs.readdirSync(CosmicComicsData + "/FirstImageOfAll/");
@@ -2865,102 +2380,6 @@ async function delete_all_exept_the_first() {
         }
     }
     await WConv();
-    //Scan le dossier
-    // Sort
-    // Delete tt sauf le premier
-}
-
-function unarchive_first(zipPath, ExtractDir, name, ext, listofelements, indice, filesInFolder) {
-    var nn = 0;
-    if (ext === "zip" || ext === "cbz" || ext === "7z" || ext === "cb7" || ext === "tar" || ext === "cbt") {
-        var fromfile = [];
-
-        const Streamer = Seven.list(zipPath, {
-            recursive: true, $cherryPick: listofelements, $bin: Path27Zip,
-        });
-        console.log(Streamer);
-        Streamer.on("data", function (data) {
-            fromfile.push(data.file);
-            console.log(fromfile);
-        });
-        Streamer.on("end", function () {
-            const Stream = Seven.extract(zipPath, ExtractDir, {
-                recursive: true, $cherryPick: fromfile[0], $bin: Path27Zip,
-            });
-            Stream.on("data", function (data) {
-                GetTheFirstImageOfComicsByFolder(filesInFolder, indice + 1);
-            });
-            Stream.on("end", function () {
-                if (Stream.info.get("Files") === "0") {
-                    Toastifycation(language["cover_not_compatible"] + " " + name, "#ff0000");
-                    GetTheFirstImageOfComicsByFolder(filesInFolder, indice + 1);
-                }
-            });
-            Stream.on("error", function (err) {
-                console.log("Error: " + err);
-            });
-        });
-    }
-
-    if (ext === "rar" || ext === "cbr") {
-        if (OSprovider === "msstore") {
-            var archive = new Unrar({
-                path: zipPath, bin: CosmicComicsData + "/unrar_bin/UnRAR.exe",
-            });
-        } else {
-            var archive = new Unrar({
-                path: zipPath, bin: unrarBin,
-            });
-        }
-
-        archive.list(function (err, entries) {
-            if (err) {
-                new Notification("Cosmic-Comics", {body: err});
-                GetTheFirstImageOfComicsByFolder(filesInFolder, indice + 1);
-                return;
-            }
-            entries.sort((a, b) => {
-                let fa = a.name.toLowerCase(), fb = b.name.toLowerCase();
-                if (fa < fb) {
-                    return -1;
-                }
-                if (fa > fb) {
-                    return 1;
-                }
-                return 0;
-            });
-            for (var i = 0; i < entries.length; i++) {
-                const file = entries[i]["name"];
-                var currentName = file;
-                currentName = currentName.toString();
-                if (process.platform === "win32") {
-                    currentName = currentName.toLowerCase();
-                }
-                if (currentName.includes(".png") || currentName.includes(".jpg") || currentName.includes(".jpeg") || currentName.includes(".gif") || currentName.includes(".apng") || currentName.includes(".svg") || currentName.includes(".ico") || currentName.includes(".webp") || currentName.includes(".bmp")) {
-                    var stream = archive.stream(currentName);
-                    stream.on("error", function (err) {
-                        new Notification("Cosmic-Comics", {body: err});
-                        GetTheFirstImageOfComicsByFolder(filesInFolder, indice + 1);
-
-                    });
-
-                    if (fs.existsSync(ExtractDir + "/0.jpg") === false || fs.existsSync(ExtractDir + "/cover.webp") === false) {
-                        var x = fs.createWriteStream(ExtractDir + "/0.jpg");
-                        stream.pipe(x);
-                        GetTheFirstImageOfComicsByFolder(filesInFolder, indice + 1);
-                        return;
-                    }
-                }
-            }
-        });
-        if (process.platform === "linux" || process.platform === "darwin") {
-            GetTheFirstImageOfComicsByFolder(filesInFolder, indice + 1);
-            return;
-        }
-    }
-    if (ext === "pdf") {
-        GetTheFirstImageOfComicsByFolder(filesInFolder, indice + 1);
-    }
 }
 
 //mark book as read
@@ -3031,54 +2450,12 @@ function markasreading() {
 
 //Toogle Favorite
 function favorite() {
-    if (name_of_the_current_book !== "") {
-        var Info = Get_From_JSON(CosmicComicsData + "/ListOfComics.json", name_of_the_current_book);
-        var favorite = Get_element_from_data("favorite", Info);
-        if (favorite) {
-            Toastifycation(language["remove_fav"], "#00C33C");
-
-            ModifyJSONFile(CosmicComicsData + "/ListOfComics.json", "favorite", false, name_of_the_current_book);
-            toggleActive(document.getElementById("btn_id_fav_" + name_of_the_current_book));
-        } else {
-            Toastifycation(language["add_fav"], "#00C33C");
-            ModifyJSONFile(CosmicComicsData + "/ListOfComics.json", "favorite", true, name_of_the_current_book);
-            toggleActive(document.getElementById("btn_id_fav_" + name_of_the_current_book));
-        }
-        name_of_the_current_book = "";
-    }
-}
-
-//(Not Working, old idea to make a navigation by filters)
-function showOnlyFavT() {
-    favonly = favonly !== true;
-}
-
-function showOnlyUnread() {
-    unreadonly = true;
-}
-
-function showOnlyRead() {
-    readonly = true;
-}
-
-function showOnlyReading() {
-    readingonly = true;
-}
-
-//Continue the reading of the last opened book
-function continuereading() {
-    var configFile = fs.readFileSync(CosmicComicsData + "/config.json");
-    var parsedJSON = JSON.parse(configFile);
-    var path = Get_From_Config("last_opened", parsedJSON);
-    window.location.href = "viewer.html?" + encodeURIComponent(path.replaceAll("/", "%C3%B9"));
+    // TODO favorite
 }
 
 //Open a single file
 function OpenFileOnce() {
-    let result = remote.dialog.showOpenDialogSync({
-        properties: ["openFile"],
-    });
-    window.location.href = "viewer.html?" + result[0];
+    // TODO Open file from the file explorer
 }
 
 //Open a book in the bookmarks
@@ -3088,7 +2465,7 @@ function openBOOKM(path) {
 
 //List of Bookmarked folder
 function listBM() {
-    return;
+    return; // TODO bookmark
     var data = fs.readFileSync(CosmicComicsData + "/bookmarks.json");
     var info = JSON.parse(data);
     console.log(info);
@@ -3117,97 +2494,6 @@ function listBM() {
 
 //the Bookmarked loading
 listBM();
-
-//Loading ToolTips and languages
-/*new bootstrap.Tooltip(document.getElementById("menuid"), {
-    title: language["menu"],
-    placement: "bottom",
-});
-new bootstrap.Tooltip(document.getElementById("GotoRoot"), {
-    title: language["go_root"],
-    placement: "bottom",
-});
-new bootstrap.Tooltip(document.getElementById("gotoback"), {
-    title: language["go_to_back"],
-    placement: "bottom",
-});
-new bootstrap.Tooltip(document.getElementById("id_continuereading"), {
-    title: language["continue_reading"],
-    placement: "bottom",
-});
-document.getElementById("id_nav").innerHTML = language["menu"];
-new bootstrap.Tooltip(document.getElementById("opnfld"), {
-    title: language["open_folder"],
-    placement: "bottom",
-});
-new bootstrap.Tooltip(document.getElementById("id_bm"), {
-    title: language["show_bookmarks"],
-    placement: "bottom",
-});
-new bootstrap.Tooltip(document.getElementById("id_forgetfolder"), {
-    title: language["forget_folder"],
-    placement: "bottom",
-});
-new bootstrap.Tooltip(document.getElementById("id_settings"), {
-    title: language["settings"],
-    placement: "bottom",
-});
-new bootstrap.Tooltip(document.getElementById("id_refreshFolder"), {
-    title: language["refresh_folder"],
-    placement: "bottom",
-});
-new bootstrap.Tooltip(document.getElementById("id_opnfile"), {
-    title: language["open_file"],
-    placement: "bottom",
-});
-new bootstrap.Tooltip(document.getElementById("id_info"), {
-    title: language["info"],
-    placement: "bottom",
-});
-new bootstrap.Tooltip(document.getElementById("id_tips-btn"), {
-    title: language["Tips"],
-    placement: "bottom",
-});
-new bootstrap.Tooltip(document.getElementById("id_theme"), {
-    title: language["custom_theme"],
-    placement: "bottom",
-});
-new bootstrap.Tooltip(document.getElementById("icon_id_viewmode"), {
-    title: language["viewmode"],
-    placement: "bottom",
-});*/
-/*document.getElementById("id_about").innerHTML = language["about"];
-document.getElementById("createdby").innerHTML = language["createdby"];
-document.getElementById("usewhat").innerHTML = language["technology_used"];
-document.getElementById("seewhere").innerHTML = language["github_promoted"];
-document.getElementById("project").innerHTML = language["license"];
-document.getElementById("translated").innerHTML = language["translation"];
-document.getElementById("id_bmm").innerHTML = language["bookmark_modal"];
-document.getElementById("close_nav").innerHTML = language["close"];
-document.getElementById("close_bm").innerHTML = language["close"];
-document.getElementById("close_about").innerHTML = language["close"];
-document.getElementById("close_settings").innerHTML = language["close"];
-document.getElementById("id_settingsmod").innerHTML = language["settings"];
-document.getElementById("id_btn_STB").innerHTML = language["skip_tb"];
-document.getElementById("id_btn_CTN").innerHTML = language["clear_tb"];
-document.getElementById("id_btn_TE").innerHTML =
-    language["activate_theme_date"];
-document.getElementById("languages").innerHTML = language["languages"];
-document.getElementById("beta_test").innerHTML =
-    language["betatest"] + document.getElementById("beta_test").innerHTML;
-document.getElementById("id_tips").innerHTML = language["Tips"];
-document.getElementById("id_did_you_know").innerHTML = language["did_you_know"];
-document.getElementById("id_tip_1").innerHTML = language["tips_1"];
-document.getElementById("id_tip_2").innerHTML = language["tips_2"];
-document.getElementById("id_tip_3").innerHTML = language["tips_3"];
-document.getElementById("extract_thumbnails").innerHTML = language["skip_tb"];
-document.getElementById("id_btn_update_provider").innerHTML =
-    language["btn_update_provider"];
-document.getElementById("id_btn_appdata").innerHTML = language["btn_appdata"];
-document.getElementById("id_btn_ComicsFolder").innerHTML =
-    language["btn_ComicsFolder"];
-document.getElementById("id_btn_Temp").innerHTML = language["btn_Temp"];
-document.getElementById("tutotxt").innerHTML = language["tuto_txt"];*/
 
 
 //Send Notification
@@ -3253,83 +2539,14 @@ document.addEventListener("dragleave", (event) => {
     console.log("File has left the Drop Space");
 });
 
-//Modify the Comics JSON at the note element by the user's note
-function SetForRating1(name_of_book) {
-    var rated = document
-        .getElementsByName("Rating_" + name_of_book)
-        .forEach((rate) => {
-            if (rate.checked) {
-                ModifyJSONFile(CosmicComicsData + "/ListOfComics.json", "note", parseInt(rate.value), name_of_book);
-            }
-        });
-}
-
-function SetForRating2(name_of_book) {
-    var rated = document
-        .getElementsByName("Rating_" + name_of_book)
-        .forEach((rate) => {
-            if (rate.checked) {
-                ModifyJSONFile(CosmicComicsData + "/ListOfComics.json", "note", parseInt(rate.value), name_of_book);
-            }
-        });
-}
-
-function SetForRating3(name_of_book) {
-    document.getElementsByName("Rating_" + name_of_book).forEach((rate) => {
-        if (rate.checked) {
-            ModifyJSONFile(CosmicComicsData + "/ListOfComics.json", "note", parseInt(rate.value), name_of_book);
-        }
-    });
-}
-
-function SetForRating4(name_of_book) {
-    var rated = document
-        .getElementsByName("Rating_" + name_of_book)
-        .forEach((rate) => {
-            if (rate.checked) {
-                ModifyJSONFile(CosmicComicsData + "/ListOfComics.json", "note", parseInt(rate.value), name_of_book);
-            }
-        });
-}
-
-function SetForRating5(name_of_book) {
-    var rated = document
-
-        .getElementsByName("Rating_" + name_of_book)
-        .forEach((rate) => {
-            if (rate.checked) {
-                ModifyJSONFile(CosmicComicsData + "/ListOfComics.json", "note", parseInt(rate.value), name_of_book);
-            }
-        });
-}
-
 // Toggle "active" class
 function toggleActive(object) {
     object.classList.toggle("active");
 }
 
-/*
-document.getElementById("id_btn_FU").innerHTML = language["FU"];
-*/
-
-function skipping() {
-    skip = true;
-}
-
-function toggleSkip() {
-    var configFile = fs.readFileSync(CosmicComicsData + "/config.json");
-    var parsedJSON = JSON.parse(configFile);
-    var old = Get_From_Config("skip", parsedJSON);
-    if (old === true) {
-        Modify_JSON_For_Config(CosmicComicsData + "/config.json", "skip", false);
-    } else {
-        Modify_JSON_For_Config(CosmicComicsData + "/config.json", "skip", true);
-    }
-}
 
 function clearTN() {
-    fs.rmSync(CosmicComicsData + "/FirstImageOfAll", {recursive: true});
-    fs.mkdirSync(CosmicComicsData + "/FirstImageOfAll");
+
 }
 
 function changeVM() {
@@ -3343,12 +2560,6 @@ function changeVM() {
         Modify_JSON_For_Config(CosmicComicsData + "/config.json", "display_style", 0);
     }
 }
-
-/*if (cardMode === true) {
-    document.getElementById("icon_id_viewmode").innerHTML = "view_list";
-} else {
-    document.getElementById("icon_id_viewmode").innerHTML = "grid_view";
-}*/
 
 function selectTheme() {
     document.head.getElementsByTagName("link")[5].href = "/themes/" + document.getElementById("themeselector").value;
@@ -3365,19 +2576,6 @@ function ToggleTBY() {
         document.getElementById("id_btn_TE").innerHTML = language["deactivate_theme_date"];
     }
 }
-
-/*if (
-    Get_From_Config(
-        "theme_date",
-        JSON.parse(fs.readFileSync(CosmicComicsData + "/config.json"))
-    ) === true
-) {
-    document.getElementById("id_btn_TE").innerHTML =
-        language["deactivate_theme_date"];
-} else {
-    document.getElementById("id_btn_TE").innerHTML =
-        language["activate_theme_date"];
-}*/
 
 fetch('http://' + domain + ":" + port + "/getThemes").then((response) => {
     return response.text();
@@ -3435,75 +2633,6 @@ function saveToTheme(el, value, d = "", d2 = "") {
 
     Modify_JSON_For_Config(__dirname + "/themes/[CUSTOM] - Custom.json", value, mod);
 }
-
-function recoverThemeCustom() {
-    var id = ["colorBG", "colorFG", "colorO2", "O2BG_id", "colorNotifBG", "btn_card_id", "progress_color_id", "BTNHC_id", "BTNFG_id", "BTNBG_id", "BTNBC_id", "BTNH_id", "FGSBC_id", "BGSBC_id", "BSC_id", "HSC_id", "HLVC_id", "BGCI_id", "NBGC_id", "SCID", "PGRSBW_id", "LBG_id", "MUSIC_id", "PRGSBC_id",];
-    var name = ["BG", "FG", "O2", "O2", "notifBG", "button_card", "progress", "hover_close", "btn_FG", "btn_BG", "btn_border", "btn_hover", "btn_FG_s", "btn_BG_s", "btn_border_s", "btn_hover_s", "hover_listview", "BG_CI", "nav_BG", "scrollbar", "progressbar_progresswhite_progressblack", "linkBG", "Music", "progress_color",];
-    for (var i = 0; i < id.length; i++) {
-        var config_JSON = fs.readFileSync(__dirname + "/themes/[CUSTOM] - Custom.json");
-        var parsedJSON = JSON.parse(config_JSON);
-        var val = Get_From_Config(name[i], parsedJSON);
-        console.log(val);
-        try {
-            console.log(document.getElementById(id[i]).getAttribute("type"));
-            if (document.getElementById(id[i]).getAttribute("type") === "checkbox") {
-                document.getElementById(id[i]).setAttribute("checked", val);
-            } else {
-                document.getElementById(id[i]).value = val;
-            }
-        } catch (error) {
-            console.log(error);
-        }
-    }
-}
-
-/*
-recoverThemeCustom();
-*/
-
-function openFileImageTheme(id, v) {
-    let result = remote.dialog.showOpenDialogSync({
-        properties: ["openFile"],
-    });
-    document.getElementById(id).value = result[0].replaceAll("\\", "/");
-    saveToTheme(document.getElementById(id), v);
-}
-
-/*document.getElementById("selectTheme_id").innerHTML =
-    language["select_a_theme"];
-document.getElementById("id_thememod").innerHTML = language["theme_customizer"];
-document.getElementById("colorBG_txt").innerHTML = language["colorBG_txt"];
-document.getElementById("colorFG_txt").innerHTML = language["colorFG_txt"];
-document.getElementById("colorO2_txt").innerHTML = language["colorO2_txt"];
-document.getElementById("overlay_background_txt").innerHTML =
-    language["overlay_background_txt"];
-document.getElementById("browseFileTheme_txt").innerHTML =
-    language["browseFileTheme_txt"];
-document.getElementById("colorNotifBG_txt").innerHTML =
-    language["colorNotifBG_txt"];
-document.getElementById("btn_card_txt").innerHTML = language["btn_card_txt"];
-document.getElementById("progress_color_txt").innerHTML =
-    language["progress_color_txt"];
-document.getElementById("BTNHC_txt").innerHTML = language["BTNHC_txt"];
-document.getElementById("BTNFG_txt").innerHTML = language["BTNFG_txt"];
-document.getElementById("BTNBG_txt").innerHTML = language["BTNBG_txt"];
-document.getElementById("BTNBC_txt").innerHTML = language["BTNBC_txt"];
-document.getElementById("BTNH_txt").innerHTML = language["BTNH_txt"];
-document.getElementById("FGSBC_txt").innerHTML = language["FGSBC_txt"];
-document.getElementById("BGSBC_txt").innerHTML = language["BGSBC_txt"];
-document.getElementById("BSC_txt").innerHTML = language["BSC_txt"];
-document.getElementById("HSC_txt").innerHTML = language["HSC_txt"];
-document.getElementById("HLVC_txt").innerHTML = language["HLVC_txt"];
-document.getElementById("BGCI_txt").innerHTML = language["BGCI_txt"];
-document.getElementById("NBGC_txt").innerHTML = language["NBGC_txt"];
-document.getElementById("SCID_txt").innerHTML = language["SCID_txt"];
-document.getElementById("PGRSBW_txt").innerHTML = language["PGRSBW_txt"];
-document.getElementById("MUSIC_txt").innerHTML = language["MUSIC_txt"];
-document.getElementById("LBG_txt").innerHTML = language["LBG_txt"];
-document.getElementById("browse_fileImageTheme_txt").innerHTML =
-    language["browse_fileImageTheme_txt"];
-document.getElementById("PRGSBC_txt").innerHTML = language["PRGSBC_txt"];*/
-
 
 const download = (url, destination) => new Promise((resolve, reject) => {
     const file = fs.createWriteStream(destination);
@@ -3582,7 +2711,6 @@ async function modifyAccount(forma) {
 }
 
 async function updateLibrary(forma, id) {
-    var form = forma.form;
     const option = {
         method: 'POST', headers: {'Content-Type': 'application/json'}, body: JSON.stringify({
             "name": forma.form[0].value, "path": forma.form[1].value, "api_id": forma.form[2].value
@@ -3592,7 +2720,6 @@ async function updateLibrary(forma, id) {
         window.location.href = window.location.href.split("?")[0];
     });
 }
-
 
 getFromDB("Books", "* FROM Books WHERE reading = 1").then(async (resa) => {
     var TheBookun = JSON.parse(resa);
@@ -3740,134 +2867,11 @@ getFromDB("Books", "* FROM Books WHERE reading = 1").then(async (resa) => {
                     window.location.href = "viewer.html?" + encoded;
 
                 });
-                carddiv.addEventListener("click", async function () {
-                    if (provider == 1) {
+                let brook = TheBook
+                carddiv.addEventListener("click", function () {
+                    let provider = ((brook.series.includes("marvel")) ? (1) : (2))
+                    createDetails(brook, provider)
 
-
-                        //TODO FD
-
-                        document.getElementById("relations").innerHTML = "";
-
-                        document.getElementById("id").innerHTML = "This is a : " + TheBook.format + " and it have : " + TheBook.pageCount + " pages. <br/> This is part of the series : " + JSON.parse(TheBook.series).name;
-                        document.getElementById("averageProgress").style.display = "none";
-                        document.getElementById("ContentView").innerHTML = "";
-                        document.getElementById("ColTitle").innerHTML = TheBook.NOM
-                        document.getElementById("ImgColCover").src = TheBook.URLCover
-                        document.getElementById("Status").innerHTML = "";
-                        if (TheBook.description != null && TheBook.description != "null") {
-                            document.getElementById("description").innerHTML = TheBook.description;
-                        } else {
-                            document.getElementById("description").innerHTML = "";
-                        }
-                        // TODO : add the character list
-
-                        var NameToFetchList = [];
-                        JSON.parse(TheBook.characters)["items"].forEach((el) => {
-                            NameToFetchList.push("'" + el.name + "'");
-                        });
-                        var NameToFetch = NameToFetchList.join(",");
-                        var container = document.createElement("div");
-                        await getFromDB("Characters", "* FROM Characters WHERE name IN (" + NameToFetch + ")").then((clres) => {
-                            clres = JSON.parse(clres)
-                            console.log(clres)
-                            container.className = "item-list";
-                            clres.forEach((el) => {
-                                const divs = document.createElement("div");
-                                divs.innerHTML = "<a target='_blank' href=" + JSON.parse(el.url)[0].url + ">" + "<img src='" + JSON.parse(el.image).path + "/detail." + JSON.parse(el.image).extension + "' class='img-charac'/>" + el.name + "</a>";
-                                divs.style.marginLeft = "10px";
-                                container.appendChild(divs);
-                            })
-                        })
-
-                        /* tmpchara += "<a href=" + el.resourceURI + ">" + el.name + "</a>" + "<br/>";*/
-                        document.getElementById("characters").innerHTML = "<h1>" + "characters" + ":</h1> " + "Number of characters : " + JSON.parse(TheBook.characters)["available"] + "<br/>";
-                        document.getElementById("characters").appendChild(container);
-                        //Genres
-
-                        document.getElementById("SiteURL").innerHTML = "URL : <a target='_blank' href=" + JSON.parse(TheBook.URLs)[0].url + ">" + JSON.parse(TheBook.URLs)[0].url + "</a>";
-                        // TODO : add the relations
-                        document.getElementById("OtherTitles").innerHTML = "Variants of this comic (for a complete view check the Marvel's website)" + " : ";
-
-                        await getFromDB("variants", "* FROM variants WHERE series = '" + TheBook.ID_Series + "'").then((clres) => {
-                            clres = JSON.parse(clres)
-                            console.log(clres)
-                            const divlist = document.createElement("div");
-                            divlist.className = "cards-list2"
-                            clres.forEach((el) => {
-                                const reltxt = document.createElement("div");
-                                reltxt.innerHTML = el.name;
-                                reltxt.onclick = function () {
-                                    window.open(JSON.parse(el.url)[0].url);
-                                }
-                                reltxt.className = "cardcusto";
-                                const imgcard = document.createElement("img");
-                                imgcard.src = JSON.parse(el.image).path + "/detail." + JSON.parse(el.image).extension;
-                                imgcard.style.width = "100%";
-                                reltxt.appendChild(imgcard);
-                                divlist.appendChild(reltxt);
-                            })
-                            document.getElementById("OtherTitles").appendChild(divlist);
-                        })
-
-
-                        // TODO : add the staff list
-                        var tmpstaff = "Number of people : " + JSON.parse(TheBook["creators"])["available"] + "<br/>";
-                        var StaffToFetchList = [];
-                        JSON.parse(TheBook.creators)["items"].forEach((el) => {
-                            StaffToFetchList.push("'" + el.name.replaceAll("'", "''") + "'");
-                        });
-                        var StaffToFetch = StaffToFetchList.join(",");
-                        var container2 = document.createElement("div");
-
-                        await getFromDB("Creators", "* FROM Creators WHERE name IN (" + StaffToFetch + ")").then((clres) => {
-                            clres = JSON.parse(clres)
-                            container2.className = "item-list";
-
-                            for (var i = 0; i < clres.length; i++) {
-                                var el = clres[i];
-                                const divs = document.createElement("div");
-                                for (var j = 0; j < clres.length; j++) {
-                                    if (el.name == JSON.parse(TheBook["creators"])["items"][j].name) {
-                                        divs.innerHTML = "<a target='_blank' href=" + JSON.parse(el.url)[0].url + ">" + "<img src='" + JSON.parse(el.image).path + "/detail." + JSON.parse(el.image).extension + "' class='img-charac'/>" + el.name + "<br/>" + JSON.parse(TheBook["creators"])["items"][j]["role"] + "</a>";
-                                        divs.style.marginLeft = "10px";
-                                        container2.appendChild(divs);
-                                    }
-
-                                }
-                            }
-
-                        })
-
-                        for (var a = 0; a < JSON.parse(TheBook.collectedIssues).length; a++) {
-
-                            document.getElementById("colissue").innerHTML += JSON.parse(TheBook.collectedIssues)[a].name + "<br/>";
-                        }
-                        for (var a = 0; a < JSON.parse(TheBook.collections).length; a++) {
-
-                            document.getElementById("col").innerHTML += JSON.parse(TheBook.collections)[a].name + "<br/>";
-                        }
-
-
-                        document.getElementById("Staff").innerHTML = "<h1>" + "Staff" + ":</h1> " + "<br/>" + tmpstaff;
-                        document.getElementById("Staff").appendChild(container2);
-                        document.getElementById("chapters").innerHTML = "Number of this comic within the series : " + TheBook.issueNumber;
-                        document.getElementById("price").innerHTML += "Prices : <br/>";
-                        for (var a = 0; a < JSON.parse(TheBook.prices).length; a++) {
-                            console.log(JSON.parse(TheBook.prices)[a])
-                            document.getElementById("price").innerHTML += JSON.parse(TheBook.prices)[a].type.replace(/([A-Z])/g, ' $1').trim() + " : " + JSON.parse(TheBook.prices)[a].price + "<br/>";
-                        }
-                        document.getElementById("startDate").innerHTML = "Dates : <br/>"
-                        for (var b = 0; b < JSON.parse(TheBook.dates).length; b++) {
-                            document.getElementById("startDate").innerHTML += JSON.parse(TheBook.dates)[b].type.replace(/([A-Z])/g, ' $1').trim() + " : " + convertDate(JSON.parse(TheBook.dates)[b].date) + "<br/>";
-                        }
-
-                        animateCSS(document.getElementById("contentViewer"), "fadeOut").then((message) => {
-                            animateCSS(document.getElementById("contentViewer"), "fadeIn").then((message) => {
-                                document.getElementById("contentViewer").style.display = "block";
-                            });
-                        });
-
-                    }
                 });
 
             }
@@ -3887,15 +2891,17 @@ getFromDB("Books", "* FROM Books WHERE reading = 1").then(async (resa) => {
     }
 
 })
-getFromDB("Books", "* FROM Books ORDER BY ID_DB DESC LIMIT 10").then(async (resa) => {
+
+getFromDB("Books", "* FROM Books ORDER BY ID_DB DESC LIMIT 10").then((resa) => {
     var TheBookun = JSON.parse(resa);
     console.log(TheBookun);
+    const element = document.getElementById("recentlyAdded");
 
     for (let i = 0; i < TheBookun.length; i++) {
         var TheBook = TheBookun[i];
         var imagelink = TheBook["URLCover"];
         var node = document.createTextNode(TheBook["NOM"]);
-        const carddiv = document.createElement("div");
+        let carddiv = document.createElement("div");
         carddiv.style.cursor = "pointer";
         if (cardMode === true) {
             carddiv.className = "cardcusto";
@@ -4008,166 +3014,39 @@ getFromDB("Books", "* FROM Books ORDER BY ID_DB DESC LIMIT 10").then(async (resa
             carddiv.appendChild(bodycard);
             carddiv.id = "id_vol" + TheBook["ID_book"];
 
-            if (playbtn.addEventListener) {
 
-                playbtn.addEventListener("click", function () {
-                    /*            ModifyJSONFile(
-                                    CosmicComicsData + "/ListOfComics.json",
-                                    "reading",
-                                    true,
-                                    shortname
-                                );
-                                ModifyJSONFile(
-                                    CosmicComicsData + "/ListOfComics.json",
-                                    "unread",
-                                    false,
-                                    shortname
-                                );
-                                Modify_JSON_For_Config(
-                                    CosmicComicsData + "/config.json",
-                                    "last_opened",
-                                    path
-                                );*/
-                    alert("ici4")
-                    let encoded = encodeURIComponent(path.replaceAll("/", "%C3%B9"))
+            playbtn.addEventListener("click", function () {
+                /*            ModifyJSONFile(
+                                CosmicComicsData + "/ListOfComics.json",
+                                "reading",
+                                true,
+                                shortname
+                            );
+                            ModifyJSONFile(
+                                CosmicComicsData + "/ListOfComics.json",
+                                "unread",
+                                false,
+                                shortname
+                            );
+                            Modify_JSON_For_Config(
+                                CosmicComicsData + "/config.json",
+                                "last_opened",
+                                path
+                            );*/
+                alert("ici4")
+                let encoded = encodeURIComponent(path.replaceAll("/", "%C3%B9"))
 
-                    window.location.href = "viewer.html?" + encoded;
+                window.location.href = "viewer.html?" + encoded;
 
-                });
-                carddiv.addEventListener("click", async function () {
-                    if (provider == 1) {
+            });
+            let brook = TheBook
+            carddiv.addEventListener("click", function () {
+                let provider = ((brook.series.includes("marvel")) ? (1) : (2))
+                createDetails(brook, provider)
 
-
-                        //TODO FD
-
-                        document.getElementById("relations").innerHTML = "";
-
-                        document.getElementById("id").innerHTML = "This is a : " + TheBook.format + " and it have : " + TheBook.pageCount + " pages. <br/> This is part of the series : " + JSON.parse(TheBook.series).name;
-                        document.getElementById("averageProgress").style.display = "none";
-                        document.getElementById("ContentView").innerHTML = "";
-                        document.getElementById("ColTitle").innerHTML = TheBook.NOM
-                        document.getElementById("ImgColCover").src = TheBook.URLCover
-                        document.getElementById("Status").innerHTML = "";
-                        if (TheBook.description != null && TheBook.description != "null") {
-                            document.getElementById("description").innerHTML = TheBook.description;
-                        } else {
-                            document.getElementById("description").innerHTML = "";
-                        }
-                        // TODO : add the character list
-
-                        var NameToFetchList = [];
-                        JSON.parse(TheBook.characters)["items"].forEach((el) => {
-                            NameToFetchList.push("'" + el.name + "'");
-                        });
-                        var NameToFetch = NameToFetchList.join(",");
-                        var container = document.createElement("div");
-                        await getFromDB("Characters", "* FROM Characters WHERE name IN (" + NameToFetch + ")").then((clres) => {
-                            clres = JSON.parse(clres)
-                            console.log(clres)
-                            container.className = "item-list";
-                            clres.forEach((el) => {
-                                const divs = document.createElement("div");
-                                divs.innerHTML = "<a target='_blank' href=" + JSON.parse(el.url)[0].url + ">" + "<img src='" + JSON.parse(el.image).path + "/detail." + JSON.parse(el.image).extension + "' class='img-charac'/>" + el.name + "</a>";
-                                divs.style.marginLeft = "10px";
-                                container.appendChild(divs);
-                            })
-                        })
-
-                        /* tmpchara += "<a href=" + el.resourceURI + ">" + el.name + "</a>" + "<br/>";*/
-                        document.getElementById("characters").innerHTML = "<h1>" + "characters" + ":</h1> " + "Number of characters : " + JSON.parse(TheBook.characters)["available"] + "<br/>";
-                        document.getElementById("characters").appendChild(container);
-                        //Genres
-
-                        document.getElementById("SiteURL").innerHTML = "URL : <a target='_blank' href=" + JSON.parse(TheBook.URLs)[0].url + ">" + JSON.parse(TheBook.URLs)[0].url + "</a>";
-                        // TODO : add the relations
-                        document.getElementById("OtherTitles").innerHTML = "Variants of this comic (for a complete view check the Marvel's website)" + " : ";
-
-                        await getFromDB("variants", "* FROM variants WHERE series = '" + TheBook.ID_Series + "'").then((clres) => {
-                            clres = JSON.parse(clres)
-                            console.log(clres)
-                            const divlist = document.createElement("div");
-                            divlist.className = "cards-list2"
-                            clres.forEach((el) => {
-                                const reltxt = document.createElement("div");
-                                reltxt.innerHTML = el.name;
-                                reltxt.onclick = function () {
-                                    window.open(JSON.parse(el.url)[0].url);
-                                }
-                                reltxt.className = "cardcusto";
-                                const imgcard = document.createElement("img");
-                                imgcard.src = JSON.parse(el.image).path + "/detail." + JSON.parse(el.image).extension;
-                                imgcard.style.width = "100%";
-                                reltxt.appendChild(imgcard);
-                                divlist.appendChild(reltxt);
-                            })
-                            document.getElementById("OtherTitles").appendChild(divlist);
-                        })
+            });
 
 
-                        // TODO : add the staff list
-                        var tmpstaff = "Number of people : " + JSON.parse(TheBook["creators"])["available"] + "<br/>";
-                        var StaffToFetchList = [];
-                        JSON.parse(TheBook.creators)["items"].forEach((el) => {
-                            StaffToFetchList.push("'" + el.name.replaceAll("'", "''") + "'");
-                        });
-                        var StaffToFetch = StaffToFetchList.join(",");
-                        var container2 = document.createElement("div");
-
-                        await getFromDB("Creators", "* FROM Creators WHERE name IN (" + StaffToFetch + ")").then((clres) => {
-                            clres = JSON.parse(clres)
-                            container2.className = "item-list";
-
-                            for (var i = 0; i < clres.length; i++) {
-                                var el = clres[i];
-                                const divs = document.createElement("div");
-                                for (var j = 0; j < clres.length; j++) {
-                                    if (el.name == JSON.parse(TheBook["creators"])["items"][j].name) {
-                                        divs.innerHTML = "<a target='_blank' href=" + JSON.parse(el.url)[0].url + ">" + "<img src='" + JSON.parse(el.image).path + "/detail." + JSON.parse(el.image).extension + "' class='img-charac'/>" + el.name + "<br/>" + JSON.parse(TheBook["creators"])["items"][j]["role"] + "</a>";
-                                        divs.style.marginLeft = "10px";
-                                        container2.appendChild(divs);
-                                    }
-
-                                }
-                            }
-
-                        })
-
-                        for (var a = 0; a < JSON.parse(TheBook.collectedIssues).length; a++) {
-
-                            document.getElementById("colissue").innerHTML += JSON.parse(TheBook.collectedIssues)[a].name + "<br/>";
-                        }
-                        for (var a = 0; a < JSON.parse(TheBook.collections).length; a++) {
-
-                            document.getElementById("col").innerHTML += JSON.parse(TheBook.collections)[a].name + "<br/>";
-                        }
-
-
-                        document.getElementById("Staff").innerHTML = "<h1>" + "Staff" + ":</h1> " + "<br/>" + tmpstaff;
-                        document.getElementById("Staff").appendChild(container2);
-                        document.getElementById("chapters").innerHTML = "Number of this comic within the series : " + TheBook.issueNumber;
-                        document.getElementById("price").innerHTML += "Prices : <br/>";
-                        for (var a = 0; a < JSON.parse(TheBook.prices).length; a++) {
-                            console.log(JSON.parse(TheBook.prices)[a])
-                            document.getElementById("price").innerHTML += JSON.parse(TheBook.prices)[a].type.replace(/([A-Z])/g, ' $1').trim() + " : " + JSON.parse(TheBook.prices)[a].price + "<br/>";
-                        }
-                        document.getElementById("startDate").innerHTML = "Dates : <br/>"
-                        for (var b = 0; b < JSON.parse(TheBook.dates).length; b++) {
-                            document.getElementById("startDate").innerHTML += JSON.parse(TheBook.dates)[b].type.replace(/([A-Z])/g, ' $1').trim() + " : " + convertDate(JSON.parse(TheBook.dates)[b].date) + "<br/>";
-                        }
-
-                        animateCSS(document.getElementById("contentViewer"), "fadeOut").then((message) => {
-                            animateCSS(document.getElementById("contentViewer"), "fadeIn").then((message) => {
-                                document.getElementById("contentViewer").style.display = "block";
-                            });
-                        });
-
-                    }
-                });
-
-            }
-            const element = document.getElementById("recentlyAdded");
-            const divrating = document.createElement("div");
-            carddiv.appendChild(divrating);
             element.appendChild(carddiv);
 
 
@@ -4181,6 +3060,7 @@ getFromDB("Books", "* FROM Books ORDER BY ID_DB DESC LIMIT 10").then(async (resa
     }
 
 })
+
 getFromDB("Books", "* FROM Books WHERE unread = 1").then(async (resa) => {
     var TheBookun = JSON.parse(resa);
     console.log(TheBookun);
@@ -4327,134 +3207,11 @@ getFromDB("Books", "* FROM Books WHERE unread = 1").then(async (resa) => {
                     window.location.href = "viewer.html?" + encoded;
 
                 });
-                carddiv.addEventListener("click", async function () {
-                    if (provider == 1) {
+                let brook = TheBook
+                carddiv.addEventListener("click", function () {
+                    let provider = ((brook.series.includes("marvel")) ? (1) : (2))
+                    createDetails(brook, provider)
 
-
-                        //TODO FD
-
-                        document.getElementById("relations").innerHTML = "";
-
-                        document.getElementById("id").innerHTML = "This is a : " + TheBook.format + " and it have : " + TheBook.pageCount + " pages. <br/> This is part of the series : " + JSON.parse(TheBook.series).name;
-                        document.getElementById("averageProgress").style.display = "none";
-                        document.getElementById("ContentView").innerHTML = "";
-                        document.getElementById("ColTitle").innerHTML = TheBook.NOM
-                        document.getElementById("ImgColCover").src = TheBook.URLCover
-                        document.getElementById("Status").innerHTML = "";
-                        if (TheBook.description != null && TheBook.description != "null") {
-                            document.getElementById("description").innerHTML = TheBook.description;
-                        } else {
-                            document.getElementById("description").innerHTML = "";
-                        }
-                        // TODO : add the character list
-
-                        var NameToFetchList = [];
-                        JSON.parse(TheBook.characters)["items"].forEach((el) => {
-                            NameToFetchList.push("'" + el.name + "'");
-                        });
-                        var NameToFetch = NameToFetchList.join(",");
-                        var container = document.createElement("div");
-                        await getFromDB("Characters", "* FROM Characters WHERE name IN (" + NameToFetch + ")").then((clres) => {
-                            clres = JSON.parse(clres)
-                            console.log(clres)
-                            container.className = "item-list";
-                            clres.forEach((el) => {
-                                const divs = document.createElement("div");
-                                divs.innerHTML = "<a target='_blank' href=" + JSON.parse(el.url)[0].url + ">" + "<img src='" + JSON.parse(el.image).path + "/detail." + JSON.parse(el.image).extension + "' class='img-charac'/>" + el.name + "</a>";
-                                divs.style.marginLeft = "10px";
-                                container.appendChild(divs);
-                            })
-                        })
-
-                        /* tmpchara += "<a href=" + el.resourceURI + ">" + el.name + "</a>" + "<br/>";*/
-                        document.getElementById("characters").innerHTML = "<h1>" + "characters" + ":</h1> " + "Number of characters : " + JSON.parse(TheBook.characters)["available"] + "<br/>";
-                        document.getElementById("characters").appendChild(container);
-                        //Genres
-
-                        document.getElementById("SiteURL").innerHTML = "URL : <a target='_blank' href=" + JSON.parse(TheBook.URLs)[0].url + ">" + JSON.parse(TheBook.URLs)[0].url + "</a>";
-                        // TODO : add the relations
-                        document.getElementById("OtherTitles").innerHTML = "Variants of this comic (for a complete view check the Marvel's website)" + " : ";
-
-                        await getFromDB("variants", "* FROM variants WHERE series = '" + TheBook.ID_Series + "'").then((clres) => {
-                            clres = JSON.parse(clres)
-                            console.log(clres)
-                            const divlist = document.createElement("div");
-                            divlist.className = "cards-list2"
-                            clres.forEach((el) => {
-                                const reltxt = document.createElement("div");
-                                reltxt.innerHTML = el.name;
-                                reltxt.onclick = function () {
-                                    window.open(JSON.parse(el.url)[0].url);
-                                }
-                                reltxt.className = "cardcusto";
-                                const imgcard = document.createElement("img");
-                                imgcard.src = JSON.parse(el.image).path + "/detail." + JSON.parse(el.image).extension;
-                                imgcard.style.width = "100%";
-                                reltxt.appendChild(imgcard);
-                                divlist.appendChild(reltxt);
-                            })
-                            document.getElementById("OtherTitles").appendChild(divlist);
-                        })
-
-
-                        // TODO : add the staff list
-                        var tmpstaff = "Number of people : " + JSON.parse(TheBook["creators"])["available"] + "<br/>";
-                        var StaffToFetchList = [];
-                        JSON.parse(TheBook.creators)["items"].forEach((el) => {
-                            StaffToFetchList.push("'" + el.name.replaceAll("'", "''") + "'");
-                        });
-                        var StaffToFetch = StaffToFetchList.join(",");
-                        var container2 = document.createElement("div");
-
-                        await getFromDB("Creators", "* FROM Creators WHERE name IN (" + StaffToFetch + ")").then((clres) => {
-                            clres = JSON.parse(clres)
-                            container2.className = "item-list";
-
-                            for (var i = 0; i < clres.length; i++) {
-                                var el = clres[i];
-                                const divs = document.createElement("div");
-                                for (var j = 0; j < clres.length; j++) {
-                                    if (el.name == JSON.parse(TheBook["creators"])["items"][j].name) {
-                                        divs.innerHTML = "<a target='_blank' href=" + JSON.parse(el.url)[0].url + ">" + "<img src='" + JSON.parse(el.image).path + "/detail." + JSON.parse(el.image).extension + "' class='img-charac'/>" + el.name + "<br/>" + JSON.parse(TheBook["creators"])["items"][j]["role"] + "</a>";
-                                        divs.style.marginLeft = "10px";
-                                        container2.appendChild(divs);
-                                    }
-
-                                }
-                            }
-
-                        })
-
-                        for (var a = 0; a < JSON.parse(TheBook.collectedIssues).length; a++) {
-
-                            document.getElementById("colissue").innerHTML += JSON.parse(TheBook.collectedIssues)[a].name + "<br/>";
-                        }
-                        for (var a = 0; a < JSON.parse(TheBook.collections).length; a++) {
-
-                            document.getElementById("col").innerHTML += JSON.parse(TheBook.collections)[a].name + "<br/>";
-                        }
-
-
-                        document.getElementById("Staff").innerHTML = "<h1>" + "Staff" + ":</h1> " + "<br/>" + tmpstaff;
-                        document.getElementById("Staff").appendChild(container2);
-                        document.getElementById("chapters").innerHTML = "Number of this comic within the series : " + TheBook.issueNumber;
-                        document.getElementById("price").innerHTML += "Prices : <br/>";
-                        for (var a = 0; a < JSON.parse(TheBook.prices).length; a++) {
-                            console.log(JSON.parse(TheBook.prices)[a])
-                            document.getElementById("price").innerHTML += JSON.parse(TheBook.prices)[a].type.replace(/([A-Z])/g, ' $1').trim() + " : " + JSON.parse(TheBook.prices)[a].price + "<br/>";
-                        }
-                        document.getElementById("startDate").innerHTML = "Dates : <br/>"
-                        for (var b = 0; b < JSON.parse(TheBook.dates).length; b++) {
-                            document.getElementById("startDate").innerHTML += JSON.parse(TheBook.dates)[b].type.replace(/([A-Z])/g, ' $1').trim() + " : " + convertDate(JSON.parse(TheBook.dates)[b].date) + "<br/>";
-                        }
-
-                        animateCSS(document.getElementById("contentViewer"), "fadeOut").then((message) => {
-                            animateCSS(document.getElementById("contentViewer"), "fadeIn").then((message) => {
-                                document.getElementById("contentViewer").style.display = "block";
-                            });
-                        });
-
-                    }
                 });
 
             }
@@ -4474,6 +3231,7 @@ getFromDB("Books", "* FROM Books WHERE unread = 1").then(async (resa) => {
     }
 
 })
+
 getFromDB("Books", "* FROM Books WHERE favorite = 1").then(async (resa) => {
     var TheBookun = JSON.parse(resa);
     console.log(TheBookun);
@@ -4620,136 +3378,12 @@ getFromDB("Books", "* FROM Books WHERE favorite = 1").then(async (resa) => {
                     window.location.href = "viewer.html?" + encoded;
 
                 });
-                carddiv.addEventListener("click", async function () {
-                    if (provider == 1) {
+                let brook = TheBook
+                carddiv.addEventListener("click", function () {
+                    let provider = ((brook.series.includes("marvel")) ? (1) : (2))
+                    createDetails(brook, provider)
 
-
-                        //TODO FD
-
-                        document.getElementById("relations").innerHTML = "";
-
-                        document.getElementById("id").innerHTML = "This is a : " + TheBook.format + " and it have : " + TheBook.pageCount + " pages. <br/> This is part of the series : " + JSON.parse(TheBook.series).name;
-                        document.getElementById("averageProgress").style.display = "none";
-                        document.getElementById("ContentView").innerHTML = "";
-                        document.getElementById("ColTitle").innerHTML = TheBook.NOM
-                        document.getElementById("ImgColCover").src = TheBook.URLCover
-                        document.getElementById("Status").innerHTML = "";
-                        if (TheBook.description != null && TheBook.description != "null") {
-                            document.getElementById("description").innerHTML = TheBook.description;
-                        } else {
-                            document.getElementById("description").innerHTML = "";
-                        }
-                        // TODO : add the character list
-
-                        var NameToFetchList = [];
-                        JSON.parse(TheBook.characters)["items"].forEach((el) => {
-                            NameToFetchList.push("'" + el.name + "'");
-                        });
-                        var NameToFetch = NameToFetchList.join(",");
-                        var container = document.createElement("div");
-                        await getFromDB("Characters", "* FROM Characters WHERE name IN (" + NameToFetch + ")").then((clres) => {
-                            clres = JSON.parse(clres)
-                            console.log(clres)
-                            container.className = "item-list";
-                            clres.forEach((el) => {
-                                const divs = document.createElement("div");
-                                divs.innerHTML = "<a target='_blank' href=" + JSON.parse(el.url)[0].url + ">" + "<img src='" + JSON.parse(el.image).path + "/detail." + JSON.parse(el.image).extension + "' class='img-charac'/>" + el.name + "</a>";
-                                divs.style.marginLeft = "10px";
-                                container.appendChild(divs);
-                            })
-                        })
-
-                        /* tmpchara += "<a href=" + el.resourceURI + ">" + el.name + "</a>" + "<br/>";*/
-                        document.getElementById("characters").innerHTML = "<h1>" + "characters" + ":</h1> " + "Number of characters : " + JSON.parse(TheBook.characters)["available"] + "<br/>";
-                        document.getElementById("characters").appendChild(container);
-                        //Genres
-
-                        document.getElementById("SiteURL").innerHTML = "URL : <a target='_blank' href=" + JSON.parse(TheBook.URLs)[0].url + ">" + JSON.parse(TheBook.URLs)[0].url + "</a>";
-                        // TODO : add the relations
-                        document.getElementById("OtherTitles").innerHTML = "Variants of this comic (for a complete view check the Marvel's website)" + " : ";
-
-                        await getFromDB("variants", "* FROM variants WHERE series = '" + TheBook.ID_Series + "'").then((clres) => {
-                            clres = JSON.parse(clres)
-                            console.log(clres)
-                            const divlist = document.createElement("div");
-                            divlist.className = "cards-list2"
-                            clres.forEach((el) => {
-                                const reltxt = document.createElement("div");
-                                reltxt.innerHTML = el.name;
-                                reltxt.onclick = function () {
-                                    window.open(JSON.parse(el.url)[0].url);
-                                }
-                                reltxt.className = "cardcusto";
-                                const imgcard = document.createElement("img");
-                                imgcard.src = JSON.parse(el.image).path + "/detail." + JSON.parse(el.image).extension;
-                                imgcard.style.width = "100%";
-                                reltxt.appendChild(imgcard);
-                                divlist.appendChild(reltxt);
-                            })
-                            document.getElementById("OtherTitles").appendChild(divlist);
-                        })
-
-
-                        // TODO : add the staff list
-                        var tmpstaff = "Number of people : " + JSON.parse(TheBook["creators"])["available"] + "<br/>";
-                        var StaffToFetchList = [];
-                        JSON.parse(TheBook.creators)["items"].forEach((el) => {
-                            StaffToFetchList.push("'" + el.name.replaceAll("'", "''") + "'");
-                        });
-                        var StaffToFetch = StaffToFetchList.join(",");
-                        var container2 = document.createElement("div");
-
-                        await getFromDB("Creators", "* FROM Creators WHERE name IN (" + StaffToFetch + ")").then((clres) => {
-                            clres = JSON.parse(clres)
-                            container2.className = "item-list";
-
-                            for (var i = 0; i < clres.length; i++) {
-                                var el = clres[i];
-                                const divs = document.createElement("div");
-                                for (var j = 0; j < clres.length; j++) {
-                                    if (el.name == JSON.parse(TheBook["creators"])["items"][j].name) {
-                                        divs.innerHTML = "<a target='_blank' href=" + JSON.parse(el.url)[0].url + ">" + "<img src='" + JSON.parse(el.image).path + "/detail." + JSON.parse(el.image).extension + "' class='img-charac'/>" + el.name + "<br/>" + JSON.parse(TheBook["creators"])["items"][j]["role"] + "</a>";
-                                        divs.style.marginLeft = "10px";
-                                        container2.appendChild(divs);
-                                    }
-
-                                }
-                            }
-
-                        })
-
-                        for (var a = 0; a < JSON.parse(TheBook.collectedIssues).length; a++) {
-
-                            document.getElementById("colissue").innerHTML += JSON.parse(TheBook.collectedIssues)[a].name + "<br/>";
-                        }
-                        for (var a = 0; a < JSON.parse(TheBook.collections).length; a++) {
-
-                            document.getElementById("col").innerHTML += JSON.parse(TheBook.collections)[a].name + "<br/>";
-                        }
-
-
-                        document.getElementById("Staff").innerHTML = "<h1>" + "Staff" + ":</h1> " + "<br/>" + tmpstaff;
-                        document.getElementById("Staff").appendChild(container2);
-                        document.getElementById("chapters").innerHTML = "Number of this comic within the series : " + TheBook.issueNumber;
-                        document.getElementById("price").innerHTML += "Prices : <br/>";
-                        for (var a = 0; a < JSON.parse(TheBook.prices).length; a++) {
-                            console.log(JSON.parse(TheBook.prices)[a])
-                            document.getElementById("price").innerHTML += JSON.parse(TheBook.prices)[a].type.replace(/([A-Z])/g, ' $1').trim() + " : " + JSON.parse(TheBook.prices)[a].price + "<br/>";
-                        }
-                        document.getElementById("startDate").innerHTML = "Dates : <br/>"
-                        for (var b = 0; b < JSON.parse(TheBook.dates).length; b++) {
-                            document.getElementById("startDate").innerHTML += JSON.parse(TheBook.dates)[b].type.replace(/([A-Z])/g, ' $1').trim() + " : " + convertDate(JSON.parse(TheBook.dates)[b].date) + "<br/>";
-                        }
-
-                        animateCSS(document.getElementById("contentViewer"), "fadeOut").then((message) => {
-                            animateCSS(document.getElementById("contentViewer"), "fadeIn").then((message) => {
-                                document.getElementById("contentViewer").style.display = "block";
-                            });
-                        });
-
-                    }
                 });
-
             }
             const element = document.getElementById("myfavoriteHome");
             const divrating = document.createElement("div");
@@ -4805,129 +3439,10 @@ async function setSearch(res) {
             await getFromDB("Books", "* FROM Books WHERE PATH = '" + res[key].PATH + "'").then(async (resa) => {
                 let bookList = JSON.parse(resa);
                 let TheBook = bookList[0];
+                let provider = ((TheBook.series.includes("marvel")) ? (1) : (2))
 
+                await createDetails(TheBook, provider);
 
-                //TODO FD
-
-                document.getElementById("relations").innerHTML = "";
-
-                document.getElementById("id").innerHTML = "This is a : " + TheBook.format + " and it have : " + TheBook.pageCount + " pages. <br/> This is part of the series : " + JSON.parse(TheBook.series).name;
-                document.getElementById("averageProgress").style.display = "none";
-                document.getElementById("ContentView").innerHTML = "";
-                document.getElementById("ColTitle").innerHTML = TheBook.NOM
-                document.getElementById("ImgColCover").src = TheBook.URLCover
-                document.getElementById("Status").innerHTML = "";
-                if (TheBook.description != null && TheBook.description != "null") {
-                    document.getElementById("description").innerHTML = TheBook.description;
-                } else {
-                    document.getElementById("description").innerHTML = "";
-                }
-                // TODO : add the character list
-
-                var NameToFetchList = [];
-                JSON.parse(TheBook.characters)["items"].forEach((el) => {
-                    NameToFetchList.push("'" + el.name + "'");
-                });
-                var NameToFetch = NameToFetchList.join(",");
-                var container = document.createElement("div");
-                await getFromDB("Characters", "* FROM Characters WHERE name IN (" + NameToFetch + ")").then((clres) => {
-                    clres = JSON.parse(clres)
-                    console.log(clres)
-                    container.className = "item-list";
-                    clres.forEach((el) => {
-                        const divs = document.createElement("div");
-                        divs.innerHTML = "<a target='_blank' href=" + JSON.parse(el.url)[0].url + ">" + "<img src='" + JSON.parse(el.image).path + "/detail." + JSON.parse(el.image).extension + "' class='img-charac'/>" + el.name + "</a>";
-
-                        divs.style.marginLeft = "10px";
-                        container.appendChild(divs);
-                    })
-                })
-
-                /* tmpchara += "<a href=" + el.resourceURI + ">" + el.name + "</a>" + "<br/>";*/
-                document.getElementById("characters").innerHTML = "<h1>" + "characters" + ":</h1> " + "Number of characters : " + JSON.parse(TheBook.characters)["available"] + "<br/>";
-                document.getElementById("characters").appendChild(container);
-                //Genres
-
-                document.getElementById("SiteURL").innerHTML = "URL : <a target='_blank' href=" + JSON.parse(TheBook.URLs)[0].url + ">" + JSON.parse(TheBook.URLs)[0].url + "</a>";
-                // TODO : add the relations
-                document.getElementById("OtherTitles").innerHTML = "Variants of this comic (for a complete view check the Marvel's website)" + " : ";
-
-                await getFromDB("variants", "* FROM variants WHERE series = '" + TheBook.ID_Series + "'").then((clres) => {
-                    clres = JSON.parse(clres)
-                    console.log(clres)
-                    const divlist = document.createElement("div");
-                    divlist.className = "cards-list2"
-                    clres.forEach((el) => {
-                        const reltxt = document.createElement("div");
-                        reltxt.innerHTML = el.name;
-                        reltxt.onclick = function () {
-                            window.open(JSON.parse(el.url)[0].url);
-                        }
-                        reltxt.className = "cardcusto";
-                        const imgcard = document.createElement("img");
-                        imgcard.src = JSON.parse(el.image).path + "/detail." + JSON.parse(el.image).extension;
-                        imgcard.style.width = "100%";
-                        reltxt.appendChild(imgcard);
-                        divlist.appendChild(reltxt);
-                    })
-                    document.getElementById("OtherTitles").appendChild(divlist);
-                })
-
-
-                // TODO : add the staff list
-                var tmpstaff = "Number of people : " + JSON.parse(TheBook["creators"])["available"] + "<br/>";
-                var StaffToFetchList = [];
-                JSON.parse(TheBook.creators)["items"].forEach((el) => {
-                    StaffToFetchList.push("'" + el.name.replaceAll("'", "''") + "'");
-                });
-                var StaffToFetch = StaffToFetchList.join(",");
-                var container2 = document.createElement("div");
-
-                await getFromDB("Creators", "* FROM Creators WHERE name IN (" + StaffToFetch + ")").then((clres) => {
-                    clres = JSON.parse(clres)
-                    container2.className = "item-list";
-
-                    for (var i = 0; i < clres.length; i++) {
-                        var el = clres[i];
-                        const divs = document.createElement("div");
-                        for (var j = 0; j < clres.length; j++) {
-                            if (el.name == JSON.parse(TheBook["creators"])["items"][j].name) {
-                                divs.innerHTML = "<a target='_blank' href=" + JSON.parse(el.url)[0].url + ">" + "<img src='" + JSON.parse(el.image).path + "/detail." + JSON.parse(el.image).extension + "' class='img-charac'/>" + el.name + "<br/>" + JSON.parse(TheBook["creators"])["items"][j]["role"] + "</a>";
-                                divs.style.marginLeft = "10px";
-                                container2.appendChild(divs);
-                            }
-
-                        }
-                    }
-
-                })
-
-                for (var a = 0; a < JSON.parse(TheBook.collectedIssues).length; a++) {
-
-                    document.getElementById("colissue").innerHTML += JSON.parse(TheBook.collectedIssues)[a].name + "<br/>";
-                }
-                for (var a = 0; a < JSON.parse(TheBook.collections).length; a++) {
-
-                    document.getElementById("col").innerHTML += JSON.parse(TheBook.collections)[a].name + "<br/>";
-                }
-
-                document.getElementById("contentViewer").style.backgroundImage = "url(" + TheBook.URLCover + ")";
-
-                document.getElementById("Staff").innerHTML = "<h1>" + "Staff" + ":</h1> " + "<br/>" + tmpstaff;
-                document.getElementById("Staff").appendChild(container2);
-                document.getElementById("chapters").innerHTML = "Number of this comic within the series : " + TheBook.issueNumber;
-                document.getElementById("price").innerHTML += "Prices : <br/>";
-                for (var a = 0; a < JSON.parse(TheBook.prices).length; a++) {
-                    console.log(JSON.parse(TheBook.prices)[a])
-                    document.getElementById("price").innerHTML += JSON.parse(TheBook.prices)[a].type.replace(/([A-Z])/g, ' $1').trim() + " : " + JSON.parse(TheBook.prices)[a].price + "<br/>";
-                }
-                document.getElementById("startDate").innerHTML = "Dates : <br/>"
-                for (var b = 0; b < JSON.parse(TheBook.dates).length; b++) {
-                    document.getElementById("startDate").innerHTML += JSON.parse(TheBook.dates)[b].type.replace(/([A-Z])/g, ' $1').trim() + " : " + convertDate(JSON.parse(TheBook.dates)[b].date) + "<br/>";
-                }
-
-
-                document.getElementById("contentViewer").style.display = "block";
 
             });
         })
@@ -4942,6 +3457,511 @@ async function setSearch(res) {
         resItem.appendChild(text)
         document.getElementById("searchResults").appendChild(resItem)
     }
+}
+
+async function createSeries(provider, path, libraryPath, res) {
+    console.log(provider)
+    for (let i = 1; i <= 5; i++) {
+        document.getElementById("rating-" + i).onclick = function () {
+            changeRating("Series", res[0].ID_Series, i)
+        };
+        try {
+            document.getElementById("rating-" + i).removeAttribute("checked")
+
+        } catch (e) {
+            console.log(e);
+        }
+    }
+    if (res[0].note != null) {
+        document.getElementById("rating-" + res[0].note).setAttribute("checked", "true");
+    }
+    document.getElementById("DLBOOK").addEventListener("click", function (e) {
+        downloadBook(path)
+    })
+    document.getElementById("readingbtndetails").style.display = "none";
+    const options = {
+        method: "GET",
+        headers: {
+            "Content-Type": "application/json",
+            "img": ((provider == 1) ? (JSON.parse(res[0].BG).path + "/detail." + JSON.parse(res[0].BG).extension) : (res[0].BG))
+        },
+    }
+    await fetch("http://" + domain + ":" + port + "/img/getPalette/" + connected, options).then(function (response) {
+        return response.json();
+    }).then(function (data) {
+        let Blurcolors = data
+        console.log(Blurcolors);
+        console.log("linear-gradient(to top left,rgb(" + Blurcolors[0].toString() + "),rgb(" + Blurcolors[1].toString() + ")) no-repeat fixed")
+        document.documentElement.style.setProperty("--BGDetails", "linear-gradient(to bottom left,rgb(" + Blurcolors[0].toString() + "),rgb(" + Blurcolors[1].toString() + ")) no-repeat fixed")
+    })
+    document.getElementById("ColTitle").innerHTML = "<a target='_blank' href='" + ((provider == 1) ? (JSON.parse(res[0].SOURCE).url) : (res[0].SOURCE)) + "' style='color:white'>" + ((provider == 1) ? (JSON.parse(res[0].title)) : (JSON.parse(res[0].title).english + " / " + JSON.parse(res[0].title).romaji + " / " + JSON.parse(res[0].title).native)) + "<i style='font-size: 18px;top: -10px;position: relative' class='material-icons'>open_in_new</i></a>";
+    document.getElementById("ImgColCover").src = ((provider == 1) ? (JSON.parse(res[0].cover).path + "/detail." + JSON.parse(res[0].cover).extension) : (res[0].cover))
+
+    if (((provider == 1) ? (JSON.parse(res[0].start_date)) : (JSON.parse(res[0].start_date).year)) == null) {
+        document.getElementById("startDate").innerHTML = "?";
+    } else {
+        document.getElementById("startDate").innerHTML = ((provider == 1) ? (JSON.parse(res[0].start_date)) : (JSON.parse(res[0].start_date).year))
+    }
+
+    if (((provider == 1) ? (JSON.parse(res[0].end_date)) : (JSON.parse(res[0].end_date).year)) == null || JSON.parse(res[0].end_date) > new Date().getFullYear()) {
+        document.getElementById("startDate").innerHTML += " - ?";
+    } else {
+        document.getElementById("startDate").innerHTML += " - " + ((provider == 1) ? (JSON.parse(res[0].end_date)) : (JSON.parse(res[0].end_date).year))
+    }
+    var NameToFetchList = [];
+    if (provider == 1) {
+        JSON.parse(res[0].CHARACTERS)["items"].forEach((el) => {
+            NameToFetchList.push("'" + el.name + "'");
+        });
+    } else if (provider == 2) {
+        JSON.parse(res[0].CHARACTERS).forEach((el) => {
+            NameToFetchList.push("'" + el.name + "'");
+        });
+    }
+    var NameToFetch = NameToFetchList.join(",");
+    var container = document.createElement("div");
+    await getFromDB("Characters", "* FROM Characters WHERE name IN (" + NameToFetch + ")").then((clres) => {
+        clres = JSON.parse(clres)
+        console.log(clres)
+        container.className = "item-list";
+        clres.forEach((el) => {
+            const divs = document.createElement("div");
+            const divs2 = document.createElement("div");
+            if (provider == 1) {
+
+                divs2.innerHTML = "<a target='_blank' href=" + JSON.parse(el.url)[0].url + ">" + "<img src='" + JSON.parse(el.image).path + "/detail." + JSON.parse(el.image).extension + "' class='img-charac'/><br><span>" + el.name + "</span></a>";
+            } else if (provider == 2) {
+                divs2.innerHTML = "<a target='_blank' href=" + el.url + ">" + "<img src='" + el.image.replaceAll('"', '') + "' class='img-charac'/><br><span>" + el.name + "</span></a>";
+            }
+            divs.appendChild(divs2);
+            divs2.style.marginTop = "10px";
+            divs2.style.textAlign = "center";
+            divs.style.marginLeft = "10px";
+            container.appendChild(divs);
+        })
+    })
+    document.getElementById("characters").innerHTML = "<h1>" + "Characters" + ":</h1> " + "Number of characters : " + ((provider == 1) ? (JSON.parse(res[0].CHARACTERS)["available"]) : (JSON.parse(res[0].CHARACTERS).length)) + "<br/>";
+    let scrollCharactersAmount = 0;
+    let moveRight = document.createElement("button")
+
+
+    moveRight.className = "scrollBtnR";
+
+    moveRight.onclick = function () {
+        container.scrollTo({
+            left: Math.max(scrollCharactersAmount += 140, container.clientWidth),
+            behavior: "smooth"
+        })
+    }
+    moveRight.innerHTML = "<i class='material-icons'>keyboard_arrow_right</i>";
+    let moveLeft = document.createElement("button")
+    moveLeft.className = "scrollBtnL";
+    moveLeft.onclick = function () {
+        container.scrollTo({
+            left: Math.min(scrollCharactersAmount -= 140, 0),
+            behavior: "smooth"
+        })
+    }
+    moveLeft.innerHTML = "<i class='material-icons'>keyboard_arrow_left</i>";
+    document.getElementById("characters").appendChild(moveLeft);
+    document.getElementById("characters").appendChild(moveRight);
+    document.getElementById("characters").appendChild(container);
+    document.getElementById("OtherTitles").innerHTML = ((provider == 1) ? ("A few comics in this series (for a complete view check the Marvel's website)") : ("Relations")) + " : ";
+    await getFromDB("variants", "* FROM variants WHERE series = '" + res[0].ID_Series + "'").then((clres) => {
+        clres = JSON.parse(clres)
+        console.log(clres)
+        const divlist = document.createElement("div");
+        divlist.className = "cards-list2"
+        clres.forEach((el) => {
+            const reltxt = document.createElement("div");
+            const relbody = document.createElement("div");
+            const relbio = document.createElement("p");
+            relbio.innerHTML = el.name;
+            relbio.className = "card__bio";
+            relbio.style.textAlign = "center";
+            relbio.style.color = "white";
+            relbody.appendChild(relbio);
+            relbody.className = "card__body";
+
+            reltxt.onclick = function () {
+                window.open(JSON.parse(el.url)[0].url);
+            }
+            reltxt.className = "cardcusto";
+            reltxt.style.cursor = "pointer";
+            const relimg = document.createElement("div");
+            const imgcard = document.createElement("img");
+            imgcard.src = ((provider == 1) ? (JSON.parse(el.image).path + "/detail." + JSON.parse(el.image).extension) : (el.image));
+            imgcard.style.width = "100%";
+            relimg.className = "card__image";
+            relimg.style.backgroundColor = "rgba(0,0,0,0.753)";
+            relimg.appendChild(imgcard);
+            reltxt.appendChild(relimg);
+            reltxt.appendChild(relbody);
+            divlist.appendChild(reltxt);
+        })
+        document.getElementById("OtherTitles").appendChild(divlist);
+    })
+    var tmpstaff = "Number of people : " + ((provider == 1) ? (JSON.parse(res[0].STAFF)["available"]) : (JSON.parse(res[0].STAFF).length)) + "<br/>";
+    var StaffToFetchList = [];
+    if (provider == 1) {
+
+        JSON.parse(res[0].STAFF)["items"].forEach((el) => {
+            StaffToFetchList.push("'" + el.name.replaceAll("'", "''") + "'");
+        });
+    } else if (provider == 2) {
+        JSON.parse(res[0].STAFF).forEach((el) => {
+            StaffToFetchList.push("'" + el.name.replaceAll("'", "''") + "'");
+        });
+    }
+    var StaffToFetch = StaffToFetchList.join(",");
+    var container2 = document.createElement("div");
+
+    await getFromDB("Creators", "* FROM Creators WHERE name IN (" + StaffToFetch + ")").then((clres) => {
+        clres = JSON.parse(clres)
+        container2.className = "item-list";
+
+        for (var i = 0; i < clres.length; i++) {
+            var el = clres[i];
+            const divs = document.createElement("div");
+            const divs2 = document.createElement("div");
+            for (var j = 0; j < clres.length; j++) {
+
+                if (provider == 1) {
+                    if (el.name == JSON.parse(res[0]["STAFF"])["items"][j].name) {
+                        divs2.innerHTML = "<a target='_blank' href=" + JSON.parse(el.url)[0].url + ">" + "<img src='" + JSON.parse(el.image).path + "/detail." + JSON.parse(el.image).extension + "' class='img-charac'/><br><span>" + el.name + "</span><br/><span style='font-size: 14px;color: #a8a8a8a8'>" + JSON.parse(res[0]["STAFF"])["items"][j]["role"] + "</span></a>";
+                    }
+                } else if (provider == 2) {
+                    if (el.name == JSON.parse(res[0]["STAFF"])[j].name) {
+                        divs2.innerHTML = "<a target='_blank' href=" + el.url + ">" + "<img src='" + el.image.replaceAll('"', "") + "' class='img-charac'/><br><span>" + el.name + "</span></a>";
+                    }
+                }
+                divs.appendChild(divs2);
+                divs2.style.marginTop = "10px";
+                divs2.style.textAlign = "center";
+                divs.style.marginLeft = "10px";
+                container2.appendChild(divs);
+            }
+        }
+
+    })
+    document.getElementById("Staff").innerHTML = "<h1>" + "Staff" + ":</h1> " + "<br/>" + tmpstaff;
+    let scrollStaffAmount = 0;
+    let moveRight2 = document.createElement("button")
+    moveRight2.className = "scrollBtnR";
+    moveRight2.onclick = function () {
+        container2.scrollTo({
+            left: Math.max(scrollStaffAmount += 140, container2.clientWidth),
+            behavior: "smooth"
+        })
+    }
+    moveRight2.innerHTML = "<i class='material-icons'>keyboard_arrow_right</i>";
+    let moveLeft2 = document.createElement("button")
+    moveLeft2.className = "scrollBtnL";
+    moveLeft2.onclick = function () {
+        container2.scrollTo({
+            left: Math.min(scrollStaffAmount += 140, 0),
+            behavior: "smooth"
+        })
+    }
+    moveLeft2.innerHTML = "<i class='material-icons'>keyboard_arrow_left</i>";
+    document.getElementById("Staff").appendChild(moveLeft2);
+    document.getElementById("Staff").appendChild(moveRight2);
+    document.getElementById("Staff").appendChild(container2);
+    document.getElementById("chapters").innerHTML = ((provider == 1) ? ("Number of Comics in this series : ") : ("Number of chapter in this series : ")) + res[0]["chapters"];
+    document.getElementById("contentViewer").style.display = "block";
+    animateCSS(document.getElementById("contentViewer"), "fadeIn").then((message) => {
+    });
+    /*launchDetect(path, root);*/
+    document.getElementById("detailSeparator").style.marginTop = "5vh";
+
+    if (provider == 1) {
+        loadView(path, libraryPath, JSON.parse(res[0].start_date), provider);
+        document.getElementById("id").innerText = "This series ID from Marvel : " + parseInt(res[0].ID_Series);
+        if (res[0].description != null && res[0].description != "null") {
+            document.getElementById("description").innerHTML = res[0].description;
+        } else {
+            document.getElementById("description").innerHTML = "";
+        }
+        document.getElementById("averageProgress").style.display = "none";
+        if (JSON.parse(res[0].end_date) > new Date().getFullYear()) {
+            document.getElementById("Status").innerHTML = "RELEASING";
+            document.getElementById("Status").className = "releasing";
+        } else if (JSON.parse(res[0].end_date) < new Date().getFullYear()) {
+            document.getElementById("Status").innerHTML = "FINISHED";
+            document.getElementById("Status").className = "released";
+        } else if (JSON.parse(res[0].start_date) > new Date().getFullYear()) {
+
+            document.getElementById("Status").innerHTML = "NOT YET RELEASED";
+            document.getElementById("Status").className = "NotYet";
+
+        } else if (JSON.parse(res[0].start_date) == new Date().getFullYear()) {
+            document.getElementById("Status").innerHTML = "END SOON";
+            document.getElementById("Status").className = "releasing";
+        } else {
+            document.getElementById("Status").innerHTML = "UNKNOWN";
+            document.getElementById("Status").className = "NotYet";
+        }
+    } else if (provider == 2) {
+        loadView(path, libraryPath, "", provider);
+        document.getElementById("description").innerHTML = res[0].description;
+        document.getElementById("genres").innerHTML = "Genres " + ":";
+        JSON.parse(res[0].genres).forEach((el, index) => {
+            if (index != JSON.parse(res[0].genres).length - 1) {
+                document.getElementById("genres").innerHTML += " " + el + ", ";
+
+            } else {
+                document.getElementById("genres").innerHTML += " " + el;
+
+            }
+        });
+        document.getElementById("Trending").innerHTML = "Trending : " + res[0]["TRENDING"];
+        document.getElementById("Volumes").innerHTML = res[0]["volumes"];
+        document.getElementById("averageScore").innerHTML = res[0]["Score"];
+        document.querySelectorAll(".circle-small .progress.one").forEach((el) => {
+            el.style.strokeDashoffset = Math.abs(100 - res[0]["Score"]);
+        });
+        document.documentElement.style.setProperty('--averageScore', Math.abs(100 - res[0]["Score"]));
+        document.getElementById("Status").innerHTML = res[0]["statut"];
+        if (res[0]["statut"] == "RELEASING") {
+            document.getElementById("Status").className = "releasing";
+        } else if (res[0]["statut"] == "FINISHED") {
+            document.getElementById("Status").className = "released";
+
+        } else if (res[0]["statut"] == "Not_YET_RELEASED") {
+            document.getElementById("Status").className = "NotYet";
+
+        }
+    }
+}
+
+async function createDetails(TheBook, provider) {
+    console.log(TheBook)
+    document.getElementById("contentViewer").style.display = "block";
+    animateCSS(document.getElementById("contentViewer"), "fadeOut").then(async (message) => {
+        document.getElementById("DLBOOK").addEventListener("click", function (e) {
+
+            let path = TheBook.PATH;
+            console.log(path);
+            downloadBook(path);
+
+        })
+        for (let i = 1; i <= 5; i++) {
+
+            document.getElementById("rating-" + i).onclick = function () {
+                changeRating("Books", TheBook.ID_book, i)
+            };
+            try {
+                document.getElementById("rating-" + i).removeAttribute("checked");
+
+            } catch (e) {
+                console.log(e)
+            }
+        }
+        if (TheBook.note != null) {
+            document.getElementById("rating-" + TheBook.note).setAttribute("checked", "true");
+        }
+        document.getElementById("readingbtndetails").style.display = "inline";
+
+        document.getElementById("OtherTitles").innerHTML = ""
+        document.getElementById("relations").innerHTML = "";
+        if (TheBook.characters != "null") {
+
+            document.getElementById("id").innerHTML = "This is a " + TheBook.format + " of " + TheBook.pageCount + " pages. <br/> This is part of the '" + JSON.parse(TheBook.series).name + "' series.";
+        }
+
+        document.getElementById("averageProgress").style.display = "none";
+        document.getElementById("ContentView").innerHTML = "";
+        if (provider == 1) {
+            document.getElementById("ColTitle").innerHTML = "<a target='_blank' href='" + ((TheBook.URLs == null) ? ("#") : (JSON.parse(TheBook.URLs)[0].url)) + "' style='color:white'>" + TheBook.NOM + "<i style='font-size: 18px;top: -10px;position: relative' class='material-icons'>open_in_new</i></a>";
+
+        } else if (provider == 2) {
+
+            document.getElementById("ColTitle").innerHTML = "<a target='_blank' style='color:white'>" + TheBook.NOM + "</a>";
+        }
+        document.getElementById("ImgColCover").src = TheBook.URLCover
+        document.getElementById("Status").innerHTML = "";
+        if (TheBook.description != null && TheBook.description != "null") {
+            document.getElementById("description").innerHTML = TheBook.description;
+        } else {
+            document.getElementById("description").innerHTML = "";
+        }
+
+        if (TheBook.characters != "null") {
+
+            var NameToFetchList = [];
+            if (provider == 1) {
+                JSON.parse(TheBook.characters)["items"].forEach((el) => {
+                    NameToFetchList.push("'" + el.name + "'");
+                });
+            } else if (provider == 2) {
+
+                JSON.parse(TheBook.characters).forEach((el) => {
+                    NameToFetchList.push("'" + el.name + "'");
+                });
+
+            }
+            var NameToFetch = NameToFetchList.join(",");
+            var container = document.createElement("div");
+            await getFromDB("Characters", "* FROM Characters WHERE name IN (" + NameToFetch + ")").then((clres) => {
+                clres = JSON.parse(clres)
+                console.log(clres)
+                container.className = "item-list";
+                clres.forEach((el) => {
+                    const divs = document.createElement("div");
+                    const divs2 = document.createElement("div");
+                    if (provider == 1) {
+
+                        divs2.innerHTML = "<a target='_blank' href=" + JSON.parse(el.url)[0].url + ">" + "<img src='" + JSON.parse(el.image).path + "/detail." + JSON.parse(el.image).extension + "' class='img-charac'/><br><span>" + el.name + "</span></a>";
+                    } else if (provider == 2) {
+                        divs2.innerHTML = "<a target='_blank' href=" + el.url + ">" + "<img src='" + el.image.replaceAll('"', '') + "' class='img-charac'/><br><span>" + el.name + "</span></a>";
+                    }
+                    divs.appendChild(divs2);
+                    divs2.style.marginTop = "10px";
+                    divs2.style.textAlign = "center";
+                    divs.style.marginLeft = "10px";
+                    container.appendChild(divs);
+                })
+            })
+            document.getElementById("characters").innerHTML = "<h1>" + "Characters" + ":</h1> " + "Number of characters : " + ((provider == 1) ? (JSON.parse(TheBook.characters)["available"]) : ((TheBook.characters != "null") ? (JSON.parse(TheBook.characters).length) : (0))) + "<br/>";
+            document.getElementById("detailSeparator").style.marginTop = "2vh";
+            let scrollCharactersAmount = 0;
+            let moveRight = document.createElement("button")
+
+
+            moveRight.className = "scrollBtnR";
+
+            moveRight.onclick = function () {
+                container.scrollTo({
+                    left: Math.max(scrollCharactersAmount += 140, container.clientWidth),
+                    behavior: "smooth"
+                })
+            }
+            moveRight.innerHTML = "<i class='material-icons'>keyboard_arrow_right</i>";
+            let moveLeft = document.createElement("button")
+            moveLeft.className = "scrollBtnL";
+            moveLeft.onclick = function () {
+                container.scrollTo({
+                    left: Math.min(scrollCharactersAmount -= 140, 0),
+                    behavior: "smooth"
+                })
+            }
+            moveLeft.innerHTML = "<i class='material-icons'>keyboard_arrow_left</i>";
+            document.getElementById("characters").appendChild(moveLeft);
+            document.getElementById("characters").appendChild(moveRight);
+            document.getElementById("characters").appendChild(container);
+
+        }
+        //Genres
+        if (TheBook.creators != "null") {
+            var tmpstaff = "Number of people : " + ((provider == 1) ? (JSON.parse(TheBook["creators"])["available"]) : ((TheBook["creators"] != "null") ? (JSON.parse(TheBook["creators"]).length) : ("0"))) + "<br/>";
+            var StaffToFetchList = [];
+            if (provider == 1) {
+
+                JSON.parse(TheBook.creators)["items"].forEach((el) => {
+                    StaffToFetchList.push("'" + el.name.replaceAll("'", "''") + "'");
+                });
+            } else if (provider == 2) {
+
+
+                JSON.parse(TheBook.creators).forEach((el) => {
+                    StaffToFetchList.push("'" + el.name.replaceAll("'", "''") + "'");
+                });
+
+            }
+            var StaffToFetch = StaffToFetchList.join(",");
+            var container2 = document.createElement("div");
+
+            await getFromDB("Creators", "* FROM Creators WHERE name IN (" + StaffToFetch + ")").then((clres) => {
+                clres = JSON.parse(clres)
+                container2.className = "item-list";
+
+                for (var i = 0; i < clres.length; i++) {
+                    var el = clres[i];
+                    const divs = document.createElement("div");
+                    const divs2 = document.createElement("div");
+                    for (var j = 0; j < clres.length; j++) {
+
+                        if (provider == 1) {
+                            if (el.name == JSON.parse(TheBook.creators)["items"][j].name) {
+                                divs2.innerHTML = "<a target='_blank' href=" + JSON.parse(el.url)[0].url + ">" + "<img src='" + JSON.parse(el.image).path + "/detail." + JSON.parse(el.image).extension + "' class='img-charac'/><br><span>" + el.name + "</span><br/><span style='font-size: 14px;color: #a8a8a8a8'>" + JSON.parse(TheBook.creators)["items"][j]["role"] + "</span></a>";
+                            }
+                        } else if (provider == 2) {
+                            if (el.name == JSON.parse(TheBook.creators)[j].name) {
+                                divs2.innerHTML = "<a target='_blank' href=" + el.url + ">" + "<img src='" + el.image.replaceAll('"', "") + "' class='img-charac'/><br><span>" + el.name + "</span></a>";
+                            }
+                        }
+                        divs.appendChild(divs2);
+                        divs2.style.marginTop = "10px";
+                        divs2.style.textAlign = "center";
+                        divs.style.marginLeft = "10px";
+                        container2.appendChild(divs);
+                    }
+                }
+
+            })
+            document.getElementById("Staff").innerHTML = "<h1>" + "Staff" + ":</h1> " + "<br/>" + tmpstaff;
+            let scrollStaffAmount = 0;
+            let moveRight2 = document.createElement("button")
+            moveRight2.className = "scrollBtnR";
+            moveRight2.onclick = function () {
+                container2.scrollTo({
+                    left: Math.max(scrollStaffAmount += 140, container2.clientWidth),
+                    behavior: "smooth"
+                })
+            }
+            moveRight2.innerHTML = "<i class='material-icons'>keyboard_arrow_right</i>";
+            let moveLeft2 = document.createElement("button")
+            moveLeft2.className = "scrollBtnL";
+            moveLeft2.onclick = function () {
+                container2.scrollTo({
+                    left: Math.min(scrollStaffAmount += 140, 0),
+                    behavior: "smooth"
+                })
+            }
+            moveLeft2.innerHTML = "<i class='material-icons'>keyboard_arrow_left</i>";
+            document.getElementById("Staff").appendChild(moveLeft2);
+            document.getElementById("Staff").appendChild(moveRight2);
+            document.getElementById("Staff").appendChild(container2);
+        }
+        if (TheBook.collectedIssues != "null") {
+
+            for (var a = 0; a < JSON.parse(TheBook.collectedIssues).length; a++) {
+
+                document.getElementById("colissue").innerHTML += JSON.parse(TheBook.collectedIssues)[a].name + "<br/>";
+            }
+        }
+        if (TheBook.collections != "null") {
+
+            for (var a = 0; a < JSON.parse(TheBook.collections).length; a++) {
+
+                document.getElementById("col").innerHTML += JSON.parse(TheBook.collections)[a].name + "<br/>";
+            }
+        }
+
+
+        document.getElementById("chapters").innerHTML = "Number of volumes within the series : " + TheBook.issueNumber;
+        if (provider == 1) {
+
+            document.getElementById("price").innerHTML += "Prices : <br/>";
+            for (var a = 0; a < JSON.parse(TheBook.prices).length; a++) {
+                console.log(JSON.parse(TheBook.prices)[a])
+                document.getElementById("price").innerHTML += JSON.parse(TheBook.prices)[a].type.replace(/([A-Z])/g, ' $1').trim() + " : " + JSON.parse(TheBook.prices)[a].price + "<br/>";
+            }
+        }
+        if (TheBook.dates != "null") {
+
+            document.getElementById("startDate").innerHTML = "Dates : <br/>"
+            for (var b = 0; b < JSON.parse(TheBook.dates).length; b++) {
+                document.getElementById("startDate").innerHTML += JSON.parse(TheBook.dates)[b].type.replace(/([A-Z])/g, ' $1').trim() + " : " + convertDate(JSON.parse(TheBook.dates)[b].date) + "<br/>";
+            }
+        }
+
+        animateCSS(document.getElementById("contentViewer"), "fadeIn").then((message) => {
+            document.getElementById("contentViewer").style.display = "block";
+        });
+    });
+
+
 }
 
 function clearList() {
@@ -4966,13 +3986,13 @@ document.getElementById('searchField').addEventListener('input', function (e) {
         document.getElementById("searchResults").style.display = "none";
         clearList()
     }
+    document.addEventListener('click', function (e) {
+        document.getElementById("searchResults").style.display = "none";
+        clearList();
+        // TODO remove listener
+    })
 })
-document.addEventListener('click', function (e) {
-    document.getElementById("searchResults").style.display = "none";
 
-    clearList();
-
-})
 
 async function downloadBook(path) {
     const option = {
@@ -4984,7 +4004,6 @@ async function downloadBook(path) {
     await fetch('http://' + domain + ":" + port + '/DL', option).then(() => {
         window.open("http://" + domain + ":" + port + "/getDLBook", "_blank");
     });
-
 }
 
 async function logout() {
@@ -4996,8 +4015,12 @@ async function logout() {
     });
 }
 
-function AccountMenu() {
+function createContextMenu(elements = []) {
 
+}
+
+function AccountMenu() {
+// TODO generaliser de la creation de menu
 
     const ul = document.createElement("ul");
     const li2 = document.createElement("li");
@@ -5076,7 +4099,11 @@ async function DeleteAccount() {
         }, null, 2)
     };
     fetch('http://' + domain + ":" + port + "/profile/deleteAccount", option).then(() => {
+        Toastifycation("Account deleted", "#00C33C")
         console.log("account deleted !")
+    }).catch((err) => {
+        Toastifycation("Account not deleted", "#ff0000")
+
     })
 }
 
@@ -5105,8 +4132,51 @@ async function createAccount() {
         })
         Toastifycation("The user is created", "#00C33C")
         document.getElementById("close_mna").click()
-    }else{
-        Toastifycation("This username is already used", "#ff0000")
+    } else {
+        Toastifycation("This username is already used. User creation aborted", "#ff0000")
     }
+}
 
+function changeRating(table, where, value) {
+    if (table == "Books") {
+        console.log(table, value + " from Book")
+        const options = {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/json",
+
+            },
+            body: JSON.stringify({
+                "token": connected,
+                "table": table,
+                "column": "note",
+                "whereEl": where,
+                "value": value,
+                "where": "ID_book"
+            }, null, 2)
+        }
+
+        fetch("http://" + domain + ":" + port + "/DB/update", options)
+
+
+    } else if (table == "Series") {
+        console.log(table, value)
+        const options = {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/json",
+
+            },
+            body: JSON.stringify({
+                "token": connected,
+                "table": table,
+                "column": "note",
+                "where": "ID_Series",
+                "whereEl": where,
+                "value": value,
+            }, null, 2)
+        }
+
+        fetch("http://" + domain + ":" + port + "/DB/update", options)
+    }
 }
