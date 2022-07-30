@@ -75,5 +75,5 @@ typings/
 # FuseBox cache
 .fusebox/
 
-public/CosmicComics_local
+CosmicData/
 .idea/
