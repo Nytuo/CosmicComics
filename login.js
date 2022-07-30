@@ -37,16 +37,20 @@ async function discover(){
                     myModal.show(modalToggle)
     
                     document.getElementById("loginInBtn").addEventListener("click", async function () {
-                        await fetch("http://" + domain + ":" + port + "/profile/login/" + profile.name + "/" + document.getElementById("ThePassToWord").value).then(function (response) {
+                        if (document.getElementById("ThePassToWord").value.trim() == "") alert("This account needs a password to login. Please enter a password below.");
+                        await fetch("http://" + domain + ":" + port + "/profile/login/" + profile.name + "/" + document.getElementById("ThePassToWord").value.trim()).then(function (response) {
                             return response.text();
                         }).then(function (data) {
                             if (data == "false") {
-                                alert("Wrong passcode");
-    
-                            } else {
+                                alert("Wrong password");
+                            } else if(data){
                                 setCookie('selectedProfile', data, 2);
-                                window.location.href = "/";
+                                window.location.href = "index";
+                            }else{
+                                alert("Please insert a password");
                             }
+                        }).catch(function (error) {
+                            console.log(error);
                         });
                     });
                 });
@@ -54,7 +58,7 @@ async function discover(){
             } else {
                 profileDiv.addEventListener("click", function () {
                     setCookie('selectedProfile', profile.name, 2);
-                    window.location.href = "/";
+                    window.location.href = "index";
                 })
             }
             profilesDiv.appendChild(profileDiv);

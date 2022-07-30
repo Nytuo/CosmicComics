@@ -6,7 +6,6 @@ import requests
 import shutil
 import os
 import sys
-from alive_progress import alive_bar
 
 
 def save_file(data, destination):
@@ -39,7 +38,7 @@ def determine_extension(ext):
     return ext
 
 
-def extract(data, type):
+def extract(data, type,path):
     """this function extract from a website all the images"""
 
     if type == True:
@@ -54,34 +53,6 @@ def extract(data, type):
             soup = bs4.BeautifulSoup(URLdata.text, "html.parser")
             ImgTags = soup.find_all('img')
             i = 0
-            with alive_bar(len(ImgTags)) as bar:
-
-                for link in ImgTags:
-                    try:
-                        images = link.get('src')
-                        ext = images[images.rindex('.'):]
-                        determine_extension(ext)
-                        data = requests.get(images, stream=True)
-                        filename = deterimating_filename(i, ext)
-                        save_file(data, os.getcwd() +
-                                  "/out"+str(iop)+"/"+filename)
-                        i += 1
-                    except:
-                        pass
-                    bar()
-                print('[!] Downloaded Successfully...')
-                iop += 1
-    else:
-        if os.path.exists(os.getcwd()+"/out/") == False:
-            os.mkdir("out")
-        URL_input = data
-        print('[i] Fetching from ', URL_input)
-        URLdata = requests.get(URL_input)
-        soup = bs4.BeautifulSoup(URLdata.text, "html.parser")
-        ImgTags = soup.find_all('img')
-        i = 0
-
-        with alive_bar(len(ImgTags)) as bar:
             for link in ImgTags:
                 try:
                     images = link.get('src')
@@ -89,15 +60,36 @@ def extract(data, type):
                     determine_extension(ext)
                     data = requests.get(images, stream=True)
                     filename = deterimating_filename(i, ext)
-                    save_file(data, os.getcwd()+"/out/"+filename)
+                    save_file(data, os.getcwd() +
+                    "/out"+str(iop)+"/"+filename)
                     i += 1
                 except:
                     pass
-                bar()
+            print('[!] Downloaded Successfully...')
+            iop += 1
+    else:
+        if os.path.exists(path) == False:
+            os.mkdir(path)
+        URL_input = data
+        print('[i] Fetching from ', URL_input)
+        URLdata = requests.get(URL_input)
+        soup = bs4.BeautifulSoup(URLdata.text, "html.parser")
+        ImgTags = soup.find_all('img')
+        i = 0
+        for link in ImgTags:
+            try:
+                images = link.get('src')
+                ext = images[images.rindex('.'):]
+                determine_extension(ext)
+                data = requests.get(images, stream=True)
+                filename = deterimating_filename(i, ext)
+                save_file(data, path+"/"+filename)
+                i += 1
+            except:
+                pass
         print('[!] Downloaded Successfully...')
     print("[!] All Done!")
-print(str(sys.argv))
-if len(sys.argv) == 2 and sys.argv[1] != 'undefined':
-    extract(sys.argv[1], False)
+if len(sys.argv) == 3 and sys.argv[1] != 'undefined':
+    extract(sys.argv[1], False,sys.argv[2])
 else:
     print("[!] No URL specified!")

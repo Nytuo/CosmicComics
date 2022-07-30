@@ -17,6 +17,7 @@ along with Cosmic-Comics.  If not, see <https://www.gnu.org/licenses/>.--->
 
 <head>
     <meta charset="UTF-8"/>
+
     <!--Declaring the stylesheets-->
     <link rel="stylesheet" href="css/animate"/>
     <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet"/>
@@ -24,6 +25,8 @@ along with Cosmic-Comics.  If not, see <https://www.gnu.org/licenses/>.--->
     <link rel="stylesheet" href="css/bootstrap.css"/>
     <link rel="stylesheet" href="css/base.css"/>
     <link rel="stylesheet" href="themes/default.css">
+    <link rel="icon" type="image/x-icon" href="Images/Logo.ico">
+
     <!--The name of the page-->
     <title>Cosmic-Comics Collectionner</title>
 </head>
@@ -119,6 +122,33 @@ along with Cosmic-Comics.  If not, see <https://www.gnu.org/licenses/>.--->
         </div>
     </div>
 </div>
+
+<!-- Modal moreinfo-->
+<div class="modal animate__animated animate__zoomIn animate__faster" id="moreinfo" tabindex="-1"
+     aria-labelledby="id_moreinfo"
+     aria-hidden="true" data-bs-backdrop="static" data-bs-keyboard="false" style="overflow: hidden">
+    <div class="modal-dialog modal-dialog-scrollable modal-dialog-centered">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="id_moreinfo">More information : </h5>
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"
+                        onclick="resetLibModal()"></button>
+            </div>
+            <div class="modal-body" style="text-align: center">
+                <img id="moreinfo_img" class="img-charac" src="#" alt="" />
+                <p id="moreinfo_txt"></p>
+                <a class="btn btn-primary" style="cursor: pointer" id="moreinfo_btn"></a>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal" id="close_moreinfo"
+                        onclick="resetLibModal()">
+                    Close
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+
 <!-- Modal navigation -->
 <div class="modal animate__animated animate__zoomIn animate__faster" id="buttonp" tabindex="-1"
      aria-labelledby="id_nav" aria-hidden="true">
@@ -231,7 +261,11 @@ along with Cosmic-Comics.  If not, see <https://www.gnu.org/licenses/>.--->
                     or
                     no-direct image link.</p>
                 <div class="mb-3">
-                    <label for="id_URLDL"></label><input class="form-control" type="text" placeholder=""
+                    <label for="id_NAME_DL"></label><input class="form-control" type="text" placeholder="Name of the series"
+                                                         id="id_NAME_DL">
+                    <label for="id_VOL_DL"></label><input class="form-control" type="text" placeholder="Chapter / Volume"
+                                                         id="id_VOL_DL">
+                    <label for="id_URLDL"></label><input class="form-control" type="text" placeholder="URL"
                                                          id="id_URLDL">
                 </div>
                 <button class="btn btn-primary" onclick="downloader();" id="id_btnDLStart">Start Download</button>
@@ -509,7 +543,14 @@ along with Cosmic-Comics.  If not, see <https://www.gnu.org/licenses/>.--->
     </div>
 </div>
 
-<div id="snackbar">Some text some message..</div>
+<div class="snack_container">
+    <div class="snack_rectangle">
+        <div class="snack_notification">
+            <i class="material-icons">info</i>
+            <span id="snack_msg">&nbsp;&nbsp;This is a test notification.</span>
+        </div>
+    </div>
+</div>
 <p id="LibTitle"></p>
 <div id="home">
     <p>Continue reading : </p>
@@ -551,33 +592,34 @@ along with Cosmic-Comics.  If not, see <https://www.gnu.org/licenses/>.--->
 <div class="contentViewer" id="contentViewer">
     <img id="imageBGOV2" src="#" alt="#" style="width: 100vw;height: auto">
     <div class="onContentViewer">
-        <div id="ColTitle">Demon Slayer</div>
+        <div id="ColTitle"></div>
         <div id="ColContent">
             <div id="startDate"></div>
-                <p id="Status"></p>
+            <p id="Status"></p>
             <div id="price"></div>
 
             <div id="btnsActions">
-                <a href="#"> <i class="material-icons"  style="">play_arrow</i></a>
-                <a href="#"> <i class="material-icons"  style="">check</i></a>
-                <a href="#" id="readingbtndetails"> <i class="material-icons"  style="">auto_stories</i></a>
-                <a href="#"> <i class="material-icons"  style="">close</i></a>
+                <a href="#"> <i class="material-icons" style="">play_arrow</i></a>
+                <a href="#"> <i class="material-icons" style="">check</i></a>
+                <a href="#" id="readingbtndetails"> <i class="material-icons" style="">auto_stories</i></a>
+                <a href="#"> <i class="material-icons" style="">close</i></a>
+                <a href="#"> <i class="material-icons" style="">favorite</i></a>
                 <a href="#"> <i class="material-icons" style="">edit</i></a>
-                <a href="#" id="DLBOOK"> <i class="material-icons"   style="">download</i></a>
-                <a href="#"> <i class="material-icons"  style="">refresh</i></a>
-                <a href="#"> <i class="material-icons"  style="">youtube_searched_for</i></a>
-                <a href="#"> <i class="material-icons"  style="">search_off</i></a>
+                <a href="#" id="DLBOOK"> <i class="material-icons" style="">download</i></a>
+                <a href="#"> <i class="material-icons" style="">refresh</i></a>
+                <a href="#"> <i class="material-icons" style="">youtube_searched_for</i></a>
+                <a href="#"> <i class="material-icons" style="">search_off</i></a>
             </div>
             <div class="Ratecontainer">
                 <div class="feedback">
                     <div class="rating">
                         <input type="radio" name="rating" id="rating-5" onClick="changeRating('Series', 5)"/>
                         <label For="rating-5"></label>
-                        <input type="radio" name="rating" id="rating-4"onClick={props.cr4}/>
+                        <input type="radio" name="rating" id="rating-4" onClick={props.cr4}/>
                         <label For="rating-4"></label>
-                        <input type="radio" name="rating" id="rating-3"onClick={props.cr3}/>
+                        <input type="radio" name="rating" id="rating-3" onClick={props.cr3}/>
                         <label For="rating-3"></label>
-                        <input type="radio" name="rating" id="rating-2"onClick={props.cr2}/>
+                        <input type="radio" name="rating" id="rating-2" onClick={props.cr2}/>
                         <label For="rating-2"></label>
                         <input type="radio" name="rating" id="rating-1" onClick={props.cr1}/>
                         <label For="rating-1"></label>
@@ -782,20 +824,23 @@ along with Cosmic-Comics.  If not, see <https://www.gnu.org/licenses/>.--->
             <div id="genres"></div>
             <div id="chapters"></div>
             <div id="id"></div>
+            <div id="colissue"></div>
+            <div id="col"></div>
+            <div id="Volumes"></div>
+            <div id="Trending"></div>
             <div id="detailSeparator" style="margin-top:30vh;"></div>
 
             <div id="ContentView">
                 <h2>Volumes : </h2>
             </div>
             <div id="characters"></div>
-            <div id="colissue"></div>
-            <div id="col"></div>
-            <div id="Volumes"></div>
-            <div id="Trending"></div>
             <div id="Staff"></div>
             <div id="SiteURL"></div>
             <div id="OtherTitles"></div>
-            <div id="relations" class="relationsDiv cards-list"></div>
+            <div id="relations" class="relationsDiv"></div>
+            <div style="text-align: center;"><p id="provider_text"></p></div>
+
+
         </div>
         <div id="ColCover">
             <img src="" id="ImgColCover" alt="#">

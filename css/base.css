@@ -88,9 +88,10 @@ a {
     z-index: 0;
     display: flex;
     flex-wrap: nowrap;
-overflow-y: scroll;
-transition: transform 0.65s ease-in-out;
+    overflow-y: scroll;
+    transition: transform 0.65s ease-in-out;
 }
+
 .item-list::-webkit-scrollbar {
     display: none;
 }
@@ -104,8 +105,9 @@ transition: transform 0.65s ease-in-out;
     flex-direction: column;
     flex-wrap: wrap;
     align-items: center;
-    box-shadow: 0 4px 30px rgba(0,0,0,.05);
+    box-shadow: 0 4px 30px rgba(0, 0, 0, .05);
 }
+
 .rating {
     display: flex;
     justify-content: center;
@@ -157,7 +159,7 @@ transition: transform 0.65s ease-in-out;
 }
 
 .emoji-wrapper:before,
-.emoji-wrapper:after{
+.emoji-wrapper:after {
     content: "";
     height: 15px;
     width: 100%;
@@ -170,7 +172,7 @@ transition: transform 0.65s ease-in-out;
     top: 0;
 }
 
-.emoji-wrapper:after{
+.emoji-wrapper:after {
     bottom: 0;
 }
 
@@ -188,11 +190,25 @@ transition: transform 0.65s ease-in-out;
     flex-shrink: 0;
 }
 
-#rating-1:checked ~ .emoji-wrapper > .emoji { transform: translateY(-100px); }
-#rating-2:checked ~ .emoji-wrapper > .emoji { transform: translateY(-200px); }
-#rating-3:checked ~ .emoji-wrapper > .emoji { transform: translateY(-300px); }
-#rating-4:checked ~ .emoji-wrapper > .emoji { transform: translateY(-400px); }
-#rating-5:checked ~ .emoji-wrapper > .emoji { transform: translateY(-500px); }
+#rating-1:checked ~ .emoji-wrapper > .emoji {
+    transform: translateY(-100px);
+}
+
+#rating-2:checked ~ .emoji-wrapper > .emoji {
+    transform: translateY(-200px);
+}
+
+#rating-3:checked ~ .emoji-wrapper > .emoji {
+    transform: translateY(-300px);
+}
+
+#rating-4:checked ~ .emoji-wrapper > .emoji {
+    transform: translateY(-400px);
+}
+
+#rating-5:checked ~ .emoji-wrapper > .emoji {
+    transform: translateY(-500px);
+}
 
 
 /* Cosmic Comics logo */
@@ -391,14 +407,87 @@ a {
     bottom: 30px; /* 30px from the bottom */
 }
 
-/* Show the snackbar when clicking on a button (class added with JavaScript) */
+/*!* Show the snackbar when clicking on a button (class added with JavaScript) *!
 #snackbar.show {
-    visibility: visible; /* Show the snackbar */
-    /* Add animation: Take 0.5 seconds to fade in and out the snackbar.
-    However, delay the fade out process for 2.5 seconds */
-    /*-webkit-animation: fadein 0.5s, fadeout 0.5s 2.5s;*/
+    visibility: visible; !* Show the snackbar *!
+    !* Add animation: Take 0.5 seconds to fade in and out the snackbar.
+    However, delay the fade out process for 2.5 seconds *!
+    !*-webkit-animation: fadein 0.5s, fadeout 0.5s 2.5s;*!
     animation: bounceInUp 1s, bounceOutDown 1s 2.5s;
-    /*animation: fadein 0.5s, fadeout 0.5s 2.5s;*/
+    !*animation: fadein 0.5s, fadeout 0.5s 2.5s;*!
+}*/
+
+
+.snack_container {
+    display: none;
+    height: 100%;
+    justify-content: center;
+    align-items: center;
+}
+
+.snack_rectangle {
+    display: flex;
+    align-items: center;
+    justify-content: flex-start;
+    positon: relative;
+    width: 50px;
+    height: 50px;
+    background: #380848;
+    transform: scale(0);
+    border-radius: 50%;
+    color: white;
+    opacity: 0;
+    overflow: hidden;
+    -webkit-animation: scale-in 0.3s ease-out forwards, expand 0.3s 0.6s ease-out forwards;
+    animation: scale-in 0.3s ease-out forwards, expand 0.3s 0.6s ease-out forwards;
+}
+
+.snack_notification {
+    display: flex;
+    align-items: center;
+    padding: 0 16px;
+    font-family: "Roboto", sans-serif;
+    font-size: 14px;
+    -webkit-animation: fade-in 0.65s ease-in forwards;
+    animation: fade-in 0.65s ease-in forwards;
+}
+
+@-webkit-keyframes scale-in {
+    100% {
+        transform: scale(1);
+        opacity: 1;
+    }
+}
+
+@keyframes scale-in {
+    100% {
+        transform: scale(1);
+        opacity: 1;
+    }
+}
+
+@-webkit-keyframes expand {
+    50% {
+        width: 45vw;
+        border-radius: 6px;
+    }
+    100% {
+        width: 40vw;
+        border-radius: 4px;
+        box-shadow: 0px 1px 3px 0px rgba(0, 0, 0, 0.2), 0px 1px 1px 0px rgba(0, 0, 0, 0.14), 0px 3px 3px -1px rgba(0, 0, 0, 0.12);
+    }
+}
+
+@keyframes expand {
+    50% {
+        width: 45vw;
+        border-radius: 6px;
+    }
+    100% {
+        width: 40vw;
+        border-radius: 4px;
+        box-shadow: 0px 1px 3px 0px rgba(0, 0, 0, 0.2), 0px 1px 1px 0px rgba(0, 0, 0, 0.14), 0px 3px 3px -1px rgba(0, 0, 0, 0.12);
+    }
 }
 
 /* Animations to fade the snackbar in and out */
@@ -902,7 +991,8 @@ body {
     background: var(--BGDetails);
 
 }
-#imageBGOV2{
+
+#imageBGOV2 {
     position: fixed;
     opacity: 1;
 
@@ -915,7 +1005,6 @@ body {
     position: absolute;
     width: 100%;
     height: auto;
-
 
 
 }
@@ -941,21 +1030,24 @@ body {
     position: absolute;
     top: 15vh;
 }
+
 #endDate, #startDate {
     font-weight: bold;
 }
-#id, #averageProgress, #OriginCountry, #startDate, #description, #endDate, #Trending, #genres, #chapters,#btnsActions,.Ratecontainer, #price{
+
+#id, #averageProgress, #OriginCountry, #startDate, #description, #endDate, #Trending, #genres, #chapters, #btnsActions, .Ratecontainer, #price,#Volumes {
     color: var(--text);
     margin-left: 45vw;
     margin-right: 2vw;
     margin-top: 2vh;
 }
-#btnsActions>a>i{
+
+#btnsActions > a > i {
     color: var(--text);
     margin-right: 10px;
 }
 
-#SiteURL, #Staff, #OtherTitles, #Volumes, #characters {
+#SiteURL, #Staff, #OtherTitles, #characters,#relations {
     color: var(--text);
     margin-left: 20vw;
     margin-right: 2vw;
@@ -982,6 +1074,7 @@ body {
     left: 45vw;
     max-width: fit-content;
 }
+
 a[href^="http://marvel.com"] {
     color: var(--text);
 }
@@ -1373,18 +1466,34 @@ a[href^="http://marvel.com"] {
     border: solid #157347 5px;
     transition: border .3s;
 }
-.scrollBtnL{
+
+.scrollBtnL {
     background-color: transparent;
     color: whitesmoke;
     position: absolute;
     right: 80px;
 
 }
-.scrollBtnR{
+
+.scrollBtnR {
 
     background-color: transparent;
     color: whitesmoke;
     position: absolute;
     right: 40px;
 
- }
+}
+.desc_CC{
+    display: block;
+    background-color: rgba(0,0,0,0.7);
+    width: 75vw;
+    height: 30vh;
+    top: 200px;
+    animation: fadeIn 0.5s ease-in-out;
+    transition: all 0.3s ;
+    border-radius: 5px;
+}
+.img-relation{
+    width:50%;
+    height:50%;
+}
