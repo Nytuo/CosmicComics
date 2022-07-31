@@ -10,19 +10,10 @@
   "repository": "https://github.com/Nytuo/CosmicComics.git",
   "license": "GPL-3.0-only",
   "private": false,
-  "pkg": {
-    "assets": [
-      "node_modules/canvas/**/*.*",
-      "*"
-    ],
-    "targets": [
-      "node16-win-x64"
-    ],
-    "outputPath": "dist"
-  },
-  "bin": "server.js",
+  "main": "main.js",
   "scripts": {
-    "serv": "nodemon server.js"
+    "serv": "nodemon server.js",
+    "gui": "electron ."
   },
   "dependencies": {
     "7zip-bin": "^5.1.1",
@@ -30,6 +21,7 @@
     "anilist-node": "^1.11.2",
     "anilist.js": "^1.2.1",
     "bootstrap": "^5.0.2",
+    "electron": "^19.0.10",
     "color-thief-node": "^1.0.4",
     "cors": "^2.8.5",
     "download": "^8.0.0",
