@@ -6,7 +6,7 @@ const SevenBin = require("7zip-bin");
 const unrarBin = require("unrar-binaries");
 var Unrar = require("unrar");
 const Seven = require("node-7z");
-const {getColorFromURL, getPaletteFromURL} = require('color-thief-node');
+const {getColorFromURL, getPaletteFromURL} = require(__dirname+'/customPackages/color-thief-node');
 const Path27Zip = SevenBin.path7za;
 app.use(express.static('public'));
 var CosmicComicsTemp = __dirname + "/CosmicData";
