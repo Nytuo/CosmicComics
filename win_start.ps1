@@ -5,7 +5,7 @@ function CheckUpdate {
     param ()
     Write-Host "Checking for updates..." -ForegroundColor White    
     Write-Host "Downloading information..." -ForegroundColor White
-    curl.exe -s https://raw.githubusercontent.com/Nytuo/CosmicComics/main/package.json --output "$installoc/lastPackage.json"
+    curl.exe -s https://raw.githubusercontent.com/Nytuo/CosmicComics/master/package.json --output "$installoc/lastPackage.json"
     $jsonFile = Get-Content "$installoc/CosmicComics/package.json"
     $jsonObj = $jsonFile | ConvertFrom-Json
     $versionPrefix = $jsonObj.version
@@ -29,28 +29,24 @@ function CheckUpdate {
 function Update {
     param ()
     Write-Host "Downloading update..." -ForegroundColor White
-    <# Move-Item -Path $installoc/CosmicComics/public -Destination $installoc/CCPublic.old #>
-    <# Remove-Item -Path $installoc/CosmicComics/ -Recurse -Force #>
-    cd $installoc/CosmicComics
-    git pull
-    <# Move-Item -Path $installoc/CCPublic.old -Destination $installoc/CosmicComics/public -Force #>
+    Move-Item -Path $installoc/CosmicComics/CosmicData -Destination $installoc/CCData.old
+    Remove-Item -Path $installoc/CosmicComics/ -Recurse -Force
+    DLCC
+    Move-Item -Path $installoc/CCData.old -Destination $installoc/CosmicComics/CosmicData -Force
     Write-Host "Update complete." -ForegroundColor White
-    Write-Host "Installing dependencies..." -ForegroundColor White
-    if (((Get-CimInstance Win32_operatingsystem).OSArchitecture) -eq "64-bit" -or ((Get-CimInstance Win32_operatingsystem).OSArchitecture) -eq "64 bits") {
-
-        $nodeins = Join-Path -Path $installoc -ChildPath "/node/node-v16.14.2-win-x64/npm install"
-    }
-    else {
-
-        $nodeins = Join-Path -Path $installoc -ChildPath "/node/node-v16.14.2-win-x86/npm install"
-    }
-    <# Start process cmd #>
-    cmd.exe /c $nodeins
+    CleanUp
 }
 function FirstInstall {
     param ()
     Write-Host -ForegroundColor Blue "INFO : Performing first installation..."
-    git clone https://github.com/Nytuo/CosmicComics
+    if (Test-Path -Path $installoc/7z.exe) {
+        Write-Host "INFO : 7z already downloaded." -ForegroundColor Blue
+    }
+    else {
+        Write-Host "INFO : Downloading 7z..." -ForegroundColor Blue
+DL7za
+    }
+
     if (Test-Path -Path $installoc/node) {
         Write-Host "INFO : Node already installed." -ForegroundColor Blue
     }
@@ -58,18 +54,9 @@ function FirstInstall {
         Write-Host "INFO : Downloading Node..." -ForegroundColor Blue
         DLNode
     }
+        Write-Host "INFO : Downloading CosmicComics..." -ForegroundColor Blue
+    DLCC
     CleanUp
-    cd $installoc\CosmicComics
-    Write-Host "INFO : Installing dependencies..." -ForegroundColor Blue
-    if (((Get-CimInstance Win32_operatingsystem).OSArchitecture) -eq "64-bit" -or ((Get-CimInstance Win32_operatingsystem).OSArchitecture) -eq "64 bits") {
-
-        $nodeins = Join-Path -Path $installoc -ChildPath "/node/node-v16.14.2-win-x64/npm install"
-    }
-    else {
-
-        $nodeins = Join-Path -Path $installoc -ChildPath "/node/node-v16.14.2-win-x86/npm install"
-    }
-    cmd.exe /c $nodeins
 }
 function DLNode {
     param ()
@@ -88,6 +75,14 @@ function DLNode {
         Write-Host "ERROR : Could not determine architecture." -ForegroundColor Red
     }
 }
+function DLCC{
+        curl.exe -L https://github.com/Nytuo/CosmicComics/releases/latest/download/CosmicComics-win64.7z --output CosmicComics.7z
+        <#curl.exe -L https://github.com/Nytuo/CosmicComics/releases/download/v2.0.0/CosmicComics-win64.7z --output CosmicComics.7z#>
+        cmd.exe /C ""$installoc/7z.exe"" x CosmicComics.7z -o* -y
+}
+function DL7za{
+        curl.exe https://www.7-zip.org/a/7zr.exe --output 7z.exe
+}
 function CleanUp {
     param ()
     Write-Host -ForegroundColor Blue "INFO : Cleaning up..."
@@ -97,6 +92,9 @@ function CleanUp {
     }
     if (Test-Path -Path $installoc/lastPackage.json) {
         Remove-Item -Path $installoc/lastPackage.json -Recurse -Force
+    }
+      if (Test-Path -Path $installoc/CosmicComics.7z) {
+        Remove-Item -Path $installoc/CosmicComics.7z -Recurse -Force
     }
 }
 
@@ -114,24 +112,17 @@ function LaunchServer {
     param ()
     cd $installoc/CosmicComics
     Write-Host "INFO : Launching server..." -ForegroundColor Blue
+    start http://localhost:4696
     if (((Get-CimInstance Win32_operatingsystem).OSArchitecture) -eq "64-bit" -or ((Get-CimInstance Win32_operatingsystem).OSArchitecture) -eq "64 bits") {
 
-        $nodepm = Join-Path -Path $installoc -ChildPath "/node/node-v16.14.2-win-x64/npm run serv"
+    cmd.exe /c ""$installoc/node/node-v16.14.2-win-x64/npm"" run serv
     }
     elseif (((Get-CimInstance Win32_operatingsystem).OSArchitecture) -eq "32-bit" -or ((Get-CimInstance Win32_operatingsystem).OSArchitecture) -eq "32 bits") {
-        $nodepm = Join-Path -Path $installoc -ChildPath "/node/node-v16.14.2-win-x86/npm run serv"
+    cmd.exe /c ""$installoc/node/node-v16.14.2-win-x86/npm"" run serv
 
     }
-    start http://localhost:8000
-    cmd.exe /c $nodepm
     
 }
-function GetGit {
-    param()
-    curl.exe https://github.com/git-for-windows/git/releases/download/v2.36.1.windows.1/PortableGit-2.36.1-64-bit.7z.exe --output git.7z.exe
-    
-}
-GetGit
 if ($($args[0]) -eq "ForceUpdate") {
     Update
 }
