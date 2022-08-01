@@ -8,6 +8,7 @@
     "email": "nytuo.yt@gmail.com"
   },
   "build": {
+    "npmRebuild": true,
     "artifactName": "Cosmic-Comics_${version}_${os}_${arch}.${ext}",
     "files": [
       "**/*",
@@ -136,23 +137,31 @@
   "main": "main.js",
   "scripts": {
     "serv": "nodemon server.js",
-    "start": "electron .",
-    "dist": "electron-builder"
+    "start": "electron-forge start",
+    "dist": "electron-builder",
+    "package": "electron-forge package",
+    "make": "electron-forge make"
   },
   "devDependencies": {
+    "@electron-forge/cli": "^6.0.0-beta.65",
+    "@electron-forge/maker-deb": "^6.0.0-beta.65",
+    "@electron-forge/maker-rpm": "^6.0.0-beta.65",
+    "@electron-forge/maker-squirrel": "^6.0.0-beta.65",
+    "@electron-forge/maker-zip": "^6.0.0-beta.65",
     "electron": "^19.0.10",
-    "electron-builder": "^23.3.3"
+    "electron-rebuild": "^3.2.8"
   },
   "dependencies": {
     "7zip-bin": "^5.1.1",
     "@popperjs/core": "^2.9.2",
     "anilist-node": "^1.11.2",
-    "electron-updater": "^5.2.1",
     "anilist.js": "^1.2.1",
     "bootstrap": "^5.0.2",
-    "color-thief-node": "^1.0.4",
+    "color-extr-thief": "^2.3.4",
     "cors": "^2.8.5",
     "download": "^8.0.0",
+    "electron-squirrel-startup": "^1.0.0",
+    "electron-updater": "^5.2.1",
     "express": "^4.17.2",
     "github-content": "^1.0.1",
     "html-magnifier": "^2.0.2",
@@ -162,5 +171,32 @@
     "unrar": "^0.2.0",
     "unrar-binaries": "^1.1.0",
     "webp-converter": "^2.3.3"
+  },
+  "config": {
+    "forge": {
+      "packagerConfig": {},
+      "makers": [
+        {
+          "name": "@electron-forge/maker-squirrel",
+          "config": {
+            "name": "cosmiccomics"
+          }
+        },
+        {
+          "name": "@electron-forge/maker-zip",
+          "platforms": [
+            "darwin"
+          ]
+        },
+        {
+          "name": "@electron-forge/maker-deb",
+          "config": {}
+        },
+        {
+          "name": "@electron-forge/maker-rpm",
+          "config": {}
+        }
+      ]
+    }
   }
 }

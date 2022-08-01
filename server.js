@@ -6,7 +6,7 @@ const SevenBin = require("7zip-bin");
 const unrarBin = require("unrar-binaries");
 var Unrar = require("unrar");
 const Seven = require("node-7z");
-const {getColorFromURL, getPaletteFromURL} = require('color-thief-node');
+const {getColor, getPalette} = require('color-extr-thief');
 const Path27Zip = SevenBin.path7za;
 app.use(express.static('public'));
 var CosmicComicsTemp = __dirname + "/CosmicData";
@@ -279,12 +279,12 @@ app.get("/modules/bootstrapJS", (req, res) => {
 app.get("/img/getColor/:img/:token", async (req, res) => {
 	const token = resolveToken(req.params.token);
 	var img = CosmicComicsTemp + "/profiles/" + token + "/current_book/" + req.params.img;
-	const dominantColor = await getColorFromURL(img);
+	const dominantColor = await getColor(img);
 	res.send(dominantColor);
 });
 app.get("/img/getPalette/:token", async (req, res) => {
 	const token = resolveToken(req.params.token);
-	await getPaletteFromURL(req.headers.img).then(function (palette) {
+	await getPalette(req.headers.img).then(function (palette) {
 		res.send(palette);
 	});
 });

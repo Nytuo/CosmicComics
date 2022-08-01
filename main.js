@@ -2,6 +2,7 @@ const {app, BrowserWindow} = require('electron');
 const {autoUpdater} = require('electron-updater');
 const path = require('path');
 const {spawn} = require('child_process');
+const server = require('./server.js')
 
 function createWindow() {
 	const win = new BrowserWindow({
@@ -14,7 +15,6 @@ function createWindow() {
 }
 
 function createServer() {
-	var child = spawn('node', ['server.js']);
 }
 autoUpdater.checkForUpdates()
 autoUpdater.on('update-downloaded', (info) => {
