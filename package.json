@@ -7,21 +7,149 @@
     "name": "Nytuo",
     "email": "nytuo.yt@gmail.com"
   },
+  "build": {
+    "artifactName": "Cosmic-Comics_${version}_${os}_${arch}.${ext}",
+    "files": [
+      "**/*",
+      "!FirstImageOfAll${/*}",
+      "!tmp${/*}",
+      "!languages/dev.json",
+      "!CosmicData${/*}"
+    ],
+    "asar": false,
+    "appId": "com.Nytuo.CosmicComics",
+    "nsis": {
+      "oneClick": true,
+      "runAfterFinish": false,
+      "createDesktopShortcut": "always",
+      "perMachine": true
+    },
+    "snap": {
+      "confinement": "strict"
+    },
+    "publish": [
+      {
+        "provider": "github",
+        "repo": "CosmicComics",
+        "owner": "Nytuo",
+        "vPrefixedTagName": true,
+        "host": "github.com",
+        "protocol": "https"
+      }
+    ],
+    "win": {
+      "publish": [
+        "github"
+      ],
+      "target": [
+        {
+          "target": "nsis",
+          "arch": [
+            "x64",
+            "ia32"
+          ]
+        },
+        {
+          "target": "zip",
+          "arch": [
+            "x64",
+            "ia32"
+          ]
+        }
+      ],
+      "icon": "public/Images/Logo.ico"
+    },
+    "linux": {
+      "publish": [
+        "github"
+      ],
+      "target": [
+        {
+          "target": "AppImage",
+          "arch": [
+            "x64",
+            "ia32",
+            "arm64"
+          ]
+        },
+        {
+          "target": "zip",
+          "arch": [
+            "x64",
+            "ia32",
+            "arm64"
+          ]
+        },
+        {
+          "target": "deb",
+          "arch": [
+            "x64",
+            "ia32",
+            "arm64"
+          ]
+        },
+        {
+          "target": "rpm",
+          "arch": [
+            "x64",
+            "ia32",
+            "arm64"
+          ]
+        },
+        {
+          "target": "snap"
+        }
+      ],
+      "icon": "public/Images/Logo.png",
+      "category": "Utility"
+    },
+    "mac": {
+      "target": [
+        {
+          "target": "dmg",
+          "arch": [
+            "x64"
+          ]
+        },
+        {
+          "target": "zip",
+          "arch": [
+            "x64"
+          ]
+        }
+      ]
+    }
+  },
   "repository": "https://github.com/Nytuo/CosmicComics.git",
   "license": "GPL-3.0-only",
   "private": false,
+  "pkg": {
+    "assets": [
+      "node_modules/canvas/**/*.*",
+      "*"
+    ],
+    "targets": [
+      "node16-win-x64"
+    ],
+    "outputPath": "dist"
+  },
   "main": "main.js",
   "scripts": {
     "serv": "nodemon server.js",
-    "gui": "electron ."
+    "start": "electron .",
+    "dist": "electron-builder"
+  },
+  "devDependencies": {
+    "electron": "^19.0.10",
+    "electron-builder": "^23.3.3"
   },
   "dependencies": {
     "7zip-bin": "^5.1.1",
     "@popperjs/core": "^2.9.2",
     "anilist-node": "^1.11.2",
+    "electron-updater": "^5.2.1",
     "anilist.js": "^1.2.1",
     "bootstrap": "^5.0.2",
-    "electron": "^19.0.10",
     "color-thief-node": "^1.0.4",
     "cors": "^2.8.5",
     "download": "^8.0.0",
