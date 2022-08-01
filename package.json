@@ -2,13 +2,12 @@
   "name": "cosmiccomics",
   "productName": "Cosmic-Comics",
   "version": "2.0.0",
-  "description": "PLEX / JELLYFIN for Comics and Manga",
+  "description": "Server based Books (Comics and Manga) Reader",
   "author": {
     "name": "Nytuo",
     "email": "nytuo.yt@gmail.com"
   },
   "build": {
-    "npmRebuild": true,
     "artifactName": "Cosmic-Comics_${version}_${os}_${arch}.${ext}",
     "files": [
       "**/*",
@@ -47,15 +46,13 @@
           "target": "nsis",
           "arch": [
             "x64",
-            "ia32"
-          ]
+            "ia32"          ]
         },
         {
           "target": "zip",
           "arch": [
             "x64",
-            "ia32"
-          ]
+            "ia32"          ]
         }
       ],
       "icon": "public/Images/Logo.ico"
@@ -126,7 +123,6 @@
   "private": false,
   "pkg": {
     "assets": [
-      "node_modules/canvas/**/*.*",
       "*"
     ],
     "targets": [
@@ -137,19 +133,12 @@
   "main": "main.js",
   "scripts": {
     "serv": "nodemon server.js",
-    "start": "electron-forge start",
-    "dist": "electron-builder",
-    "package": "electron-forge package",
-    "make": "electron-forge make"
+    "start": "electron .",
+    "dist": "electron-builder"
   },
   "devDependencies": {
-    "@electron-forge/cli": "^6.0.0-beta.65",
-    "@electron-forge/maker-deb": "^6.0.0-beta.65",
-    "@electron-forge/maker-rpm": "^6.0.0-beta.65",
-    "@electron-forge/maker-squirrel": "^6.0.0-beta.65",
-    "@electron-forge/maker-zip": "^6.0.0-beta.65",
     "electron": "^19.0.10",
-    "electron-rebuild": "^3.2.8"
+    "electron-builder": "^23.3.3"
   },
   "dependencies": {
     "7zip-bin": "^5.1.1",
@@ -160,7 +149,6 @@
     "color-extr-thief": "^2.3.4",
     "cors": "^2.8.5",
     "download": "^8.0.0",
-    "electron-squirrel-startup": "^1.0.0",
     "electron-updater": "^5.2.1",
     "express": "^4.17.2",
     "github-content": "^1.0.1",
@@ -171,32 +159,5 @@
     "unrar": "^0.2.0",
     "unrar-binaries": "^1.1.0",
     "webp-converter": "^2.3.3"
-  },
-  "config": {
-    "forge": {
-      "packagerConfig": {},
-      "makers": [
-        {
-          "name": "@electron-forge/maker-squirrel",
-          "config": {
-            "name": "cosmiccomics"
-          }
-        },
-        {
-          "name": "@electron-forge/maker-zip",
-          "platforms": [
-            "darwin"
-          ]
-        },
-        {
-          "name": "@electron-forge/maker-deb",
-          "config": {}
-        },
-        {
-          "name": "@electron-forge/maker-rpm",
-          "config": {}
-        }
-      ]
-    }
   }
 }

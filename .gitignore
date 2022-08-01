@@ -78,3 +78,4 @@ typings/
 CosmicData/
 .idea/
 dist/
+yarn.lock
