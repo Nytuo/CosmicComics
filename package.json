@@ -22,7 +22,7 @@
       "oneClick": true,
       "runAfterFinish": false,
       "createDesktopShortcut": "always",
-      "perMachine": true
+      "perMachine": false
     },
     "snap": {
       "confinement": "strict"
@@ -46,13 +46,15 @@
           "target": "nsis",
           "arch": [
             "x64",
-            "ia32"          ]
+            "ia32"
+          ]
         },
         {
           "target": "zip",
           "arch": [
             "x64",
-            "ia32"          ]
+            "ia32"
+          ]
         }
       ],
       "icon": "public/Images/Logo.ico"
@@ -121,15 +123,6 @@
   "repository": "https://github.com/Nytuo/CosmicComics.git",
   "license": "GPL-3.0-only",
   "private": false,
-  "pkg": {
-    "assets": [
-      "*"
-    ],
-    "targets": [
-      "node16-win-x64"
-    ],
-    "outputPath": "dist"
-  },
   "main": "main.js",
   "scripts": {
     "serv": "nodemon server.js",
@@ -155,7 +148,7 @@
     "html-magnifier": "^2.0.2",
     "node-7z": "^3.0.0",
     "nodemon": "^2.0.15",
-    "sqlite3": "^4.2.0",
+    "sqlite3": "^5.0.11",
     "unrar": "^0.2.0",
     "unrar-binaries": "^1.1.0",
     "webp-converter": "^2.3.3"

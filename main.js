@@ -1,8 +1,6 @@
 const {app, BrowserWindow} = require('electron');
 const {autoUpdater} = require('electron-updater');
 const path = require('path');
-const {spawn} = require('child_process');
-const server = require('./server.js')
 
 function createWindow() {
 	const win = new BrowserWindow({
@@ -15,26 +13,10 @@ function createWindow() {
 }
 
 function createServer() {
-}
-autoUpdater.checkForUpdates()
-autoUpdater.on('update-downloaded', (info) => {
-// Wait 5 seconds, then quit and install
-	// In your application, you don't need to wait for it.
-	// You can call autoUpdater.quitAndInstall();
-	setTimeout(function() {
-		autoUpdater.quitAndInstall();
-	}, 5000);
+	app.server = require(__dirname + '/server.js');
 
-});
-autoUpdater.on('update-available', (info) => {
-	autoUpdater.downloadUpdate();
-});
-autoUpdater.on('update-not-available', (info) => {
-	alert('No Update available.');
-});
-autoUpdater.on('error', (err) => {
-	alert("Hum, the updater encountered an error. Please try again later.");
-});
+}
+autoUpdater.checkForUpdatesAndNotify()
 app.whenReady().then(() => {
 	createServer();
 	createWindow();

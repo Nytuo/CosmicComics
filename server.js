@@ -8,7 +8,7 @@ var Unrar = require("unrar");
 const Seven = require("node-7z");
 const {getColor, getPalette} = require('color-extr-thief');
 const Path27Zip = SevenBin.path7za;
-app.use(express.static('public'));
+app.use(express.static(path.join(__dirname,'/public')));
 var CosmicComicsTemp = __dirname + "/CosmicData";
 var sqlite3 = require("sqlite3");
 const anilist = require("anilist-node");

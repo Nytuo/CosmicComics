@@ -79,3 +79,4 @@ CosmicData/
 .idea/
 dist/
 yarn.lock
+*.lock
