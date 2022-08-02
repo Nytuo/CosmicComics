@@ -29,59 +29,92 @@ function CheckUpdate {
 function Update {
     param ()
     Write-Host "Downloading update..." -ForegroundColor White
-    Move-Item -Path $installoc/CosmicComics/CosmicData -Destination $installoc/CCData.old
-    Remove-Item -Path $installoc/CosmicComics/ -Recurse -Force
-    DLCC
-    Move-Item -Path $installoc/CCData.old -Destination $installoc/CosmicComics/CosmicData -Force
+    <# Move-Item -Path $installoc/CosmicComics/public -Destination $installoc/CCPublic.old #>
+    <# Remove-Item -Path $installoc/CosmicComics/ -Recurse -Force #>
+    cd $installoc/CosmicComics
+    cmd.exe /c ""$installoc/Git/bin/git.exe"" pull
+    <# Move-Item -Path $installoc/CCPublic.old -Destination $installoc/CosmicComics/public -Force #>
     Write-Host "Update complete." -ForegroundColor White
-    CleanUp
+    Write-Host "Installing dependencies..." -ForegroundColor White
+    if (((Get-CimInstance Win32_operatingsystem).OSArchitecture) -eq "64-bit" -or ((Get-CimInstance Win32_operatingsystem).OSArchitecture) -eq "64 bits") {
+
+        $nodeins = Join-Path -Path $installoc -ChildPath "/node/node-v16.14.2-win-x64/npm install"
+    }
+    else {
+
+        $nodeins = Join-Path -Path $installoc -ChildPath "/node/node-v16.14.2-win-x86/npm install"
+    }
+    <# Start process cmd #>
+    cmd.exe /c $nodeins
 }
 function FirstInstall {
     param ()
     Write-Host -ForegroundColor Blue "INFO : Performing first installation..."
-    if (Test-Path -Path $installoc/7z.exe) {
-        Write-Host "INFO : 7z already downloaded." -ForegroundColor Blue
-    }
-    else {
-        Write-Host "INFO : Downloading 7z..." -ForegroundColor Blue
-DL7za
+    $beta = Read-Host -Prompt "INPUT : Would you join the Beta ? (Stuff may break) [y/n]"
+    $branch = "main"
+    if ($beta -eq "y"){
+    $branch = "develop"
     }
 
+    cmd.exe /c ""$installoc/Git/bin/git.exe"" clone https://github.com/Nytuo/CosmicComics
+    cd CosmicComics
+    cmd.exe /c ""$installoc/Git/bin/git.exe"" checkout $branch
+    cd ..
     if (Test-Path -Path $installoc/node) {
         Write-Host "INFO : Node already installed." -ForegroundColor Blue
     }
     else {
-        Write-Host "INFO : Downloading Node..." -ForegroundColor Blue
+    if (Command-Test node){
+        Write-Host "INFO : Node already installed." -ForegroundColor Blue
+
+     }else{
+     Write-Host "INFO : Downloading Node..." -ForegroundColor Blue
         DLNode
+     }
+
     }
-        Write-Host "INFO : Downloading CosmicComics..." -ForegroundColor Blue
-    DLCC
     CleanUp
+    $env:Path += ";$installoc/node/node-v16.14.2-win-x64"
+
+    cd $installoc\CosmicComics
+    Write-Host "INFO : Installing dependencies..." -ForegroundColor Blue
+    if (((Get-CimInstance Win32_operatingsystem).OSArchitecture) -eq "64-bit" -or ((Get-CimInstance Win32_operatingsystem).OSArchitecture) -eq "64 bits") {
+
+        $nodeins = Join-Path -Path $installoc -ChildPath "/node/node-v16.14.2-win-x64/npm install --production"
+    }
+    else {
+
+        $nodeins = Join-Path -Path $installoc -ChildPath "/node/node-v16.14.2-win-x86/npm install --production"
+    }
+    cmd.exe /c $nodeins
 }
 function DLNode {
     param ()
     Write-Host "INFO : Downloading Node..." -ForegroundColor Blue
     if (((Get-CimInstance Win32_operatingsystem).OSArchitecture) -eq "64-bit" -or ((Get-CimInstance Win32_operatingsystem).OSArchitecture) -eq "64 bits") {
-        
+
         curl.exe https://nodejs.org/dist/v16.14.2/node-v16.14.2-win-x64.zip --output node.zip
-        Expand-Archive -Path node.zip -DestinationPath node -Verbose
+        Expand-Archive -Path node.zip -DestinationPath node
+
     }
     elseif (((Get-CimInstance Win32_operatingsystem).OSArchitecture) -eq "32-bit" -or ((Get-CimInstance Win32_operatingsystem).OSArchitecture) -eq "32 bits") {
-        
+
         curl.exe https://nodejs.org/dist/v16.14.2/node-v16.14.2-win-x86.zip --output node.zip
-        Expand-Archive -Path node.zip -DestinationPath node -Verbose
+        Expand-Archive -Path node.zip -DestinationPath node
+
     }
     else {
         Write-Host "ERROR : Could not determine architecture." -ForegroundColor Red
     }
 }
-function DLCC{
-        curl.exe -L https://github.com/Nytuo/CosmicComics/releases/latest/download/CosmicComics-win64.7z --output CosmicComics.7z
-        <#curl.exe -L https://github.com/Nytuo/CosmicComics/releases/download/v2.0.0/CosmicComics-win64.7z --output CosmicComics.7z#>
-        cmd.exe /C ""$installoc/7z.exe"" x CosmicComics.7z -o* -y
-}
-function DL7za{
-        curl.exe https://www.7-zip.org/a/7zr.exe --output 7z.exe
+function Command-Test{
+Param($command)
+$oldErr = $ErrorActionPreference
+$ErrorActionPreference = 'SilentlyContinue'
+try{
+if (Get-Command $command){RETURN $true}
+}Catch{RETURN $false}
+Finally{$ErrorActionPreference=$oldErr}
 }
 function CleanUp {
     param ()
@@ -93,8 +126,8 @@ function CleanUp {
     if (Test-Path -Path $installoc/lastPackage.json) {
         Remove-Item -Path $installoc/lastPackage.json -Recurse -Force
     }
-      if (Test-Path -Path $installoc/CosmicComics.7z) {
-        Remove-Item -Path $installoc/CosmicComics.7z -Recurse -Force
+    if (Test-Path -Path $installoc/git.7z.exe) {
+        Remove-Item -Path $installoc/git.7z.exe -Recurse -Force
     }
 }
 
@@ -104,25 +137,53 @@ function Uninstall {
     Write-Host -ForegroundColor Blue "INFO : Uninstalling..."
     Remove-Item -Path $installoc/CosmicComics -Recurse -Force
     Remove-Item -Path $installoc/node -Recurse -Force
+    Remove-Item -Path $installoc/Git -Recurse -Force
+
     Write-Host -ForegroundColor Blue "INFO : Uninstallation complete."
     <#     rm $PSCommandPath
- #>    
+ #>
 }
 function LaunchServer {
     param ()
     cd $installoc/CosmicComics
     Write-Host "INFO : Launching server..." -ForegroundColor Blue
-    start http://localhost:4696
     if (((Get-CimInstance Win32_operatingsystem).OSArchitecture) -eq "64-bit" -or ((Get-CimInstance Win32_operatingsystem).OSArchitecture) -eq "64 bits") {
 
-    cmd.exe /c ""$installoc/node/node-v16.14.2-win-x64/npm"" run serv
+        $nodepm = Join-Path -Path $installoc -ChildPath "/node/node-v16.14.2-win-x64/npm run serv"
     }
     elseif (((Get-CimInstance Win32_operatingsystem).OSArchitecture) -eq "32-bit" -or ((Get-CimInstance Win32_operatingsystem).OSArchitecture) -eq "32 bits") {
-    cmd.exe /c ""$installoc/node/node-v16.14.2-win-x86/npm"" run serv
+        $nodepm = Join-Path -Path $installoc -ChildPath "/node/node-v16.14.2-win-x86/npm run serv"
 
     }
-    
+    start http://localhost:4696
+    cmd.exe /c $nodepm
+
 }
+function GetGit {
+    param()
+    Write-Host -ForegroundColor Blue "INFO : A progress dialog will pop, DO NOT CLOSE IT."
+
+    curl.exe -L https://github.com/git-for-windows/git/releases/download/v2.36.1.windows.1/PortableGit-2.36.1-64-bit.7z.exe --output git.7z.exe
+
+
+    cmd.exe /c start /wait git.7z.exe -o $installoc/Git -y
+
+}
+if (Test-Path -Path $installoc/Git){
+    Write-Host -ForegroundColor Blue "INFO : Git already downloaded."
+
+}else{
+if (Command-Test git){
+    Write-Host -ForegroundColor Blue "INFO : Git already installed."
+
+}else{
+    Write-Host -ForegroundColor Blue "INFO : Git not found. Will be downloaded and installed"
+
+GetGit
+}
+
+}
+
 if ($($args[0]) -eq "ForceUpdate") {
     Update
 }
