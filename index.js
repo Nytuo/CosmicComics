@@ -111,7 +111,7 @@ fetch("http://" + domain + ":" + port + "/dirname").then(function (response) {
 }).then(function (data) {
 	dirnameFE = data;
 	CosmicComicsData = dirnameFE + "/CosmicComics_data";
-	CosmicComicsTemp = dirnameFE + "/CosmicData";
+	CosmicComicsTemp = dirnameFE;
 	CosmicComicsTempI = CosmicComicsTemp + "/current_book/";
 	console.log(CosmicComicsTempI);
 }).catch(function (error) {

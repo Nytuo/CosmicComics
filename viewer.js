@@ -98,7 +98,7 @@ fetch("http://" + domain + ":" + port + "/dirname").then(function (response) {
 }).then(function (data) {
 	dirnameFE = data;
 	CosmicComicsData = dirnameFE + "/CosmicComics_data";
-	CosmicComicsTemp = dirnameFE + "/CosmicData";
+	CosmicComicsTemp = dirnameFE;
 	CosmicComicsTempI = CosmicComicsTemp + "/profiles/" + currentUser + "/current_book/";
 	console.log(CosmicComicsTempI);
 }).catch(function (error) {
@@ -1952,7 +1952,19 @@ var preloadedImages = [];
 function preloadImage(listImages) {
 	for (var i = 0; i < listImages.length; i++) {
 		preloadedImages[i] = new Image();
-		preloadedImages[i].src = "http://" + domain + ":" + port + "/CosmicData/profiles/" + currentUser + "/current_book/" + listImages[i];
+		let options = {
+			"method": "GET",
+			"headers": {
+				"Content-Type": "application/json",
+				"path": DirectoryPath,
+				"token": connected,
+				"met": isADirectory ? "DL" : "CLASSIC",
+				"page": listImages[i]
+			}
+		};
+		fetch("http://" + domain + ":" + port + "/view/readImage", options).then(async (response) => {
+			preloadedImages[i].src = URL.createObjectURL(await response.blob());
+		});
 	}
 }
 
@@ -2173,7 +2185,19 @@ function ConstructSideBar() {
 			const acontainer = document.createElement("a");
 			const pel = document.createElement("p");
 			const img = document.createElement("img");
-			img.src = "CosmicData/profiles/" + currentUser + "/current_book/" + image;
+			let options = {
+				"method": "GET",
+				"headers": {
+					"Content-Type": "application/json",
+					"path": DirectoryPath,
+					"token": connected,
+					"met": isADirectory ? "DL" : "CLASSIC",
+					"page": image
+				}
+			};
+			fetch("http://" + domain + ":" + port + "/view/readImage", options).then(async (response) => {
+				img.src = URL.createObjectURL(await response.blob());
+			});
 			img.height = "120";
 			pel.innerHTML = index + 1;
 			acontainer.appendChild(img);
@@ -2266,7 +2290,19 @@ function CreateAllVIV() {
 		const imgel = document.createElement("img");
 		const div = document.createElement("div");
 		imgel.id = "imgViewer_" + i;
-		imgel.src = "CosmicData/profiles/" + currentUser + "/current_book/" + listofImg[i];
+		let options = {
+			"method": "GET",
+			"headers": {
+				"Content-Type": "application/json",
+				"path": DirectoryPath,
+				"token": connected,
+				"met": isADirectory ? "DL" : "CLASSIC",
+				"page": listofImg[i]
+			}
+		};
+		fetch("http://" + domain + ":" + port + "/view/readImage", options).then(async (response) => {
+			imgel.src = URL.createObjectURL(await response.blob());
+		});
 		div.appendChild(imgel);
 		div.id = "div_imgViewer_" + i;
 		el.appendChild(div);
