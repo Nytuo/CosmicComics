@@ -10,7 +10,7 @@ const {getColor, getPalette} = require('color-extr-thief');
 const Path27Zip = SevenBin.path7za;
 app.use(express.static(path.join(__dirname, '/public')));
 const isPortable = fs.existsSync(path.join(__dirname, "portable.txt"));
-const isElectron = fs.readFileSync(path.join(__dirname, "portable.txt"), "utf8") === "electron";
+const isElectron = fs.existsSync(path.join(__dirname,'portable.txt')) && fs.readFileSync(path.join(__dirname, "portable.txt"), "utf8") === "electron";
 let path2Data;
 if (isPortable) {
 	if (isElectron) {

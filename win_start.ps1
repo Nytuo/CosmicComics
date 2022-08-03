@@ -43,13 +43,11 @@ function Update
     Write-Host "Installing dependencies..." -ForegroundColor White
     if (((Get-CimInstance Win32_operatingsystem).OSArchitecture) -eq "64-bit" -or ((Get-CimInstance Win32_operatingsystem).OSArchitecture) -eq "64 bits")
     {
-
-        $nodeins = Join-Path -Path $installoc -ChildPath "/node/node-v16.14.2-win-x64/npm install"
+        $nodeins = Join-Path -Path $installoc -ChildPath "/node/node-v16.14.2-win-x64/npm install --production"
     }
     else
     {
-
-        $nodeins = Join-Path -Path $installoc -ChildPath "/node/node-v16.14.2-win-x86/npm install"
+        $nodeins = Join-Path -Path $installoc -ChildPath "/node/node-v16.14.2-win-x86/npm install --production"
     }
     <# Start process cmd #>
     cmd.exe /c $nodeins
@@ -57,6 +55,7 @@ function Update
 function FirstInstall
 {
     param ()
+    setNodePath
     Write-Host -ForegroundColor Blue "INFO : Performing first installation..."
     $beta = Read-Host -Prompt "INPUT : Would you join the Beta ? (Stuff may break) [y/n]"
     $branch = "main"
@@ -92,18 +91,15 @@ function FirstInstall
 
     }
     CleanUp
-    $env:Path += ";$installoc/node/node-v16.14.2-win-x64"
 
     cd $installoc\CosmicComics
     Write-Host "INFO : Installing dependencies..." -ForegroundColor Blue
     if (((Get-CimInstance Win32_operatingsystem).OSArchitecture) -eq "64-bit" -or ((Get-CimInstance Win32_operatingsystem).OSArchitecture) -eq "64 bits")
     {
-
         $nodeins = Join-Path -Path $installoc -ChildPath "/node/node-v16.14.2-win-x64/npm install --production"
     }
     else
     {
-
         $nodeins = Join-Path -Path $installoc -ChildPath "/node/node-v16.14.2-win-x86/npm install --production"
     }
     cmd.exe /c $nodeins
@@ -183,10 +179,23 @@ function Uninstall
     Write-Host -ForegroundColor Blue "INFO : Uninstallation complete."
     <#     rm $PSCommandPath #>
 }
+function setNodePath
+{
+    param ()
+    if (((Get-CimInstance Win32_operatingsystem).OSArchitecture) -eq "64-bit" -or ((Get-CimInstance Win32_operatingsystem).OSArchitecture) -eq "64 bits")
+    {
+        $env:Path += ";$installoc/node/node-v16.14.2-win-x64"
+    }
+    else
+    {
+        $env:Path += ";$installoc/node/node-v16.14.2-win-x86"
+    }
+}
 function LaunchServer
 {
     param ()
     $port = 4696
+
     cd $installoc/CosmicComics
     if ((Test-Path -Path '$installoc/CosmicComics/portable.txt') -and (Test-Path -Path '$installoc/CosmicData/serverconfig.json'))
     {
@@ -255,10 +264,12 @@ else
 
 if ($( $args[0] ) -eq "ForceUpdate")
 {
+    setNodePath
     Update
 }
 elseif ($( $args[0] ) -eq "IgnoreUpdate")
 {
+    setNodePath
     LaunchServer
 }
 elseif ($( $args[0] ) -eq "FirstInstall")
@@ -272,9 +283,9 @@ elseif ($( $args[0] ) -eq "Uninstall")
 else
 {
     Write-Host -ForegroundColor Blue "INFO : No arguments given."
-    Write-Host -ForegroundColor Blue "INFO : Normal Script Startup"
     if ((Test-Path -Path "$installoc/CosmicComics") -eq "True" -and (Test-Path -Path $installoc/node) -eq "True")
     {
+        setNodePath
         CheckUpdate
         cd $installoc\CosmicComics
     }
