@@ -69,7 +69,7 @@ function FirstInstall
     cmd.exe /c ""$installoc/Git/bin/git.exe"" checkout $branch
     if ($portable -eq "y")
     {
-        Out-File -Path $installoc/CosmicComics/portable.txt -Force -Encoding UTF8 -Contents "portable"
+        Set-Content -Path $installoc/CosmicComics/portable.txt -Value "portable"
     }
     cd ..
     if (Test-Path -Path $installoc/node)
@@ -197,11 +197,18 @@ function LaunchServer
     $port = 4696
 
     cd $installoc/CosmicComics
-    if ((Test-Path -Path '$installoc/CosmicComics/portable.txt') -and (Test-Path -Path '$installoc/CosmicData/serverconfig.json'))
+    $portablePath = Join-Path -Path $installoc -ChildPath "/CosmicComics/portable.txt"
+    $configPath = Join-Path -Path $installoc -ChildPath "/CosmicData/serverconfig.json"
+
+    if (Test-Path -Path $portablePath)
     {
-        $jsonFile = Get-Content "$installoc/CosmicData/serverconfig.json"
-        $jsonObj = $jsonFile | ConvertFrom-Json
-        $port = $jsonObj.port
+        if (Test-Path -Path $configPath){
+
+            $jsonFile = Get-Content $configPath
+            $jsonObj = $jsonFile | ConvertFrom-Json
+            $port = $jsonObj.port
+
+        }
     }
     else
     {
@@ -228,6 +235,7 @@ function LaunchServer
     }
     start http://localhost:$port
     cmd.exe /c $nodepm
+    cd ..
 
 }
 function GetGit
