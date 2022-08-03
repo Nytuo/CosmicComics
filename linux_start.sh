@@ -1,5 +1,6 @@
 #!/bin/bash
 installoc=$PWD
+port=4696
 declare -A osInfo;
 osInfo[/etc/redhat-release]=yum
 osInfo[/etc/arch-release]=pacman
@@ -15,6 +16,8 @@ packagesManager=${osInfo[$f]}
     fi
 done
 
+echo "WARNING : If you don't have the following installed (CURL, GIT, NODEJS, NPM), this script will try to install them for you. However you need to be updated. If this script cannot get one of those package, you will need to do it yourself..."
+sleep 2
 
 vercomp () {
     if [[ $1 == $2 ]]
@@ -49,18 +52,31 @@ vercomp () {
 function LaunchServer (){
     cd $installoc/CosmicComics
     echo "INFO : Launching the server..."
+    if [ -f ~/.config/CosmicComics/CosmicData/serverconfig.json ]
+    then
+    port=$(grep -oP '"port":\s*\K[^\s,]*(?=\s*[,}])' ~/.config/CosmicComics/CosmicData/serverconfig.json) 2> /dev/null
+
+    fi
+    xdg-open http://localhost:$port </dev/null &>/dev/null &
     npm run serv
-
-
 }
 
 function FirstInstall (){
     git clone https://github.com/Nytuo/CosmicComics
      cd $installoc/CosmicComics
-    git checkout develop
-      npm install
+     branch="master"
+    read -p "Do you want to be part of the beta program ? [y/n]" res
+    if [ "$res" = "y" ]
+    then
+    branch="develop"
+    fi
 
-
+    git checkout $branch
+      npm install --production
+      if [ -f $installoc/CosmicComics/node_modules/anilist.js/dist/client/utilities.js ]
+then
+mv $installoc/CosmicComics/node_modules/anilist.js/dist/client/utilities.js $installoc/CosmicComics/node_modules/anilist.js/dist/client/Utilities.js
+fi
 }
 function CleanUp(){
     echo "Cleaning Up ..."
@@ -74,7 +90,7 @@ function Uninstall(){
     rm -Rf $installoc/CosmicComics
 }
 function CheckUpdate(){
-    curl https://raw.githubusercontent.com/Nytuo/CosmicComics/main/package.json --output "$installoc/lastPackage.json"
+    curl https://raw.githubusercontent.com/Nytuo/CosmicComics/master/package.json --output "$installoc/lastPackage.json"
     versionlocal=`sed 's/.*"version": "\(.*\)".*/\1/;t;d' $installoc/CosmicComics/package.json`
     versioninternet=`sed 's/.*"version": "\(.*\)".*/\1/;t;d' $installoc/lastPackage.json`
     vercomp $versionlocal $versioninternet
@@ -89,25 +105,28 @@ function CheckUpdate(){
 function Update(){
     cd $installoc/CosmicComics
     git pull
-npm install
+npm install --production
 
 }
 
 
 function PMInstall(){
+echo "Installing $1"
 if [ $packagesManager = "pacman" ]
 then
 sudo pacman -S $1
 elif [ $packagesManager = "yum" ]
 then
 sudo yum install $1
-elif [ $packagesManager = "apt" ]
-then 
-sudo apt-get install $1
+elif [ $packagesManager = "apt-get" ]
+then
+sudo apt install $1
 fi
 }
-echo -e "Nytuo's CosmicComics\nLinux AIO script : Install / Uninstall / Update / Launch\n"
-echo "Checking if you have Git and Node installed..."
+
+
+echo -e "\n\nNytuo's CosmicComics\nLinux AIO script : Install / Uninstall / Update / Launch\n"
+echo "Checking if you have Git, NodeJS, NPM and CURL installed..."
 if [ $(which git) ]
 then
 echo "Git is already installed"
@@ -119,12 +138,23 @@ if [ $(which node) ]
 then
 echo "Node is already installed"
 else
-echo "Installing Node..."
-PMInstall node
+PMInstall nodejs
+fi
+if [ $(which npm) ]
+then
+echo "NPM is already installed"
+else
+PMInstall npm
 fi
 
+if [ $(which curl) ]
+then
+echo "Curl is already installed"
+else
+PMInstall curl
+fi
 if [ $# -eq 0 ]
-then 
+then
 if [ -d $installoc/CosmicComics ]
 then
 CheckUpdate
@@ -171,5 +201,4 @@ do
       ;;
   esac
 done
-
 

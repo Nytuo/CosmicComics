@@ -4,6 +4,8 @@ const path = require("path");
 const app = express();
 const SevenBin = require("7zip-bin");
 const unrarBin = require("unrar-binaries");
+const os = require("os");
+
 var Unrar = require("unrar");
 const Seven = require("node-7z");
 const {getColor, getPalette} = require('color-extr-thief');
@@ -19,7 +21,15 @@ if (isPortable) {
 		path2Data = path.join(path.dirname(__dirname), 'CosmicData');
 	}
 } else {
+	if (os.platform() === "win32") {
+
 	path2Data = process.env.APPDATA + "/CosmicComics/CosmicData/";
+	}else if (os.platform() === "darwin") {
+		path2Data = process.env.HOME + "/Library/Application Support/CosmicComics/CosmicData/";
+	}else if (os.platform() === "linux") {
+		path2Data = process.env.HOME + "/.config/CosmicComics/CosmicData/";
+
+	}
 }
 var CosmicComicsTemp = path2Data;
 var sqlite3 = require("sqlite3");
