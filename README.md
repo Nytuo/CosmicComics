@@ -28,32 +28,116 @@ The old versions of ComsicComics are not retro compatible with this version.
 This is all you can do with this software and more:
 - Read `CBR`, `CBZ`, `CB7`, `CBT`, `ZIP`, `RAR`, `7z`, `TAR`, `Folder` which contains `PNG`, `JPG`, `JPEG`, `BMP`.
 - Display your books and navigate your folders with custom covers (automaticatly by extraction or manually set)
-- Discord Rich Presence (RPC)
-- Multi-lang Support (English(US) and French(FR) are officially supported but you can wrote your own, see more under the [Languages](https://github.com/Nytuo/CosmicComics/tree/master#languages) section)
-- Keyboard and mouse shortcuts (see more on the [Keyboard and Mouse shortcuts](https://github.com/Nytuo/CosmicComics/tree/master#keyboard-and-mouse-shortcuts) section)
-- Keep info of your books and app settings in a `JSON` under the `AppData` folder.
 - Set your books as `Read`, `Unread`, `Reading` or `favorite` and `note` them.
 - Many Customizable parameters
 - Zoom, Auto Background Color, Double page Mode, Blank first page, No double page for Horizontal, Manga Mode, Webtoon Mode, fullscreen, rotations, Bookmarks, Slideshow, SideBar, Hide Menu Bar.
-- Display informations about Comics/ Manga
-- Open a single or a whole folder (recommanded)
+- Display information about Comics/ Manga
+- Open a single or a whole folder (recommended)
 - Open a file by drag&Drop, or open it via the file explorer (only if you have set Cosmic-Comics as default app for this extension)
 - Continue reading where you stopped and more...
 
 ## Installation
-To determinate...
+When the 2.0.0 version will release you will also be able to install threw the [snapcraft store](https://snapcraft.io) and the [microsoft store](https://apps.microsoft.com/store/apps).
 
-As from now, you can only install the app by the scripts by they not work at 100% and need nodeJS installed on your computer or begin development.
+### Electron
+*I’m just a simple man, trying to make my way in the universe.*
+
+Installation difficulty : 😴
+
+The Electron version is recommended for the most people.<br>
+It is the same, but you got a dedicated view instead of your browser.
+The server is attached to the program, so the server close when you close the window.
+#### Steps to install the electron version :
+1. Download the installer for your operating system and architecture under the 'Release' section of the GitHub.<br>
+2. Install the application by opening the installer.<br>
+3. Open the application like any other.<br>
+
+### Script
+*This is where the fun begins.*
+
+Installing difficulty : 🙂
+
+This is the better way of installing the app, but could afraid some people.
+This will install only the server (and needed dependencies), you will need a browser.
+
+#### Steps to install the script version (Windows):
+1. Download the script from the GitHub repository. (script_win.ps1)<br>
+2. Create a directory where you want to install the application.<br>
+3. Put the script in the directory.<br>
+Right-click on the script and select 'Run with PowerShell'. If you get a warning type 'y'<br>
+Or, Open a PowerShell Terminal in this directory. (Right-click or SHIFT+Right-click > open PowerShell window here)<br>
+Run the script.
+`./script_win.ps1`
+4. When prompted for the beta version, say 'yes' until the release of the 2.0.0.<br>
+5. If you say 'yes' when asked for the portable version, the data of the application will be in the same directory as the script.<br>If not the server will create a directory under the user's appdata folder.<br>
+6. The server launch automatically when all it's done<br>
+
+Creating a shortcut is very recommended.
+
+#### Steps to install the script version (Linux):
+1. Update your package manager (apt-get update / pacman -Suy / equivalent).<br>
+2. Download the script from the GitHub repository. (script_linux.sh)<br>
+3. Create a directory where you want to install the application.<br>
+4. Put the script in the directory.<br>
+5. Open a Terminal in this directory.<br>
+6. Run the script. You may need to allow the execution with `chmod a+x ./script_linux.sh`<br>
+7. When prompted for the beta version, say 'yes' until the release of the 2.0.0.<br>
+8. The server launch automatically when all it's done<br>
+#### Creating a shortcut (Windows):
+1. Where you want to create the shortcut, right-click and select 'New' > 'Shortcut'.<br>
+2. In the popup, type `powershell.exe -noexit -ExecutionPolicy Bypass -File <location_to_script_win.ps1>` in the box. Where <location_to_script_win.ps1> is the location of the script (absolute path).<br>
+3. Click 'Next', name the shortcut and click 'Finish'.<br>
+4. You can change the icon, color of the terminal under 'Properties'.<br>
+Note that you will need to launch the script each time you want to launch the server.
+If you want to close the server press CTRL+C in the terminal or close the window.
+### Cloning
+*UNLIMITED POWER!!*
+
+Installing difficulty : 😭
+
+Wow, you must be a developer...<br/>
+#### pre-requisite
+- Git
+- Node.js
+- NPM (included in Node.js for Windows)
+- Python (for compiling some Node.js modules)
+- Visual Studio Build Tools (for compiling some Node.js modules) (for windows)
+- make (for linux)
+- Build-essential (for ubuntu)
+- A terminal
+- A browser
+ 
+Assuming you have all the prerequisite installed, clone the repository in a new directory with Git :<br/>
+`git clone https://github.com/Nytuo/Cosmic-Comics.git`
+
+Then install the dependencies with 
+`npm install --production`.<br/>
+Then run the app with `node server.js`.<br/>
+You will have access to all the features of the app, directly in your browser.
+
 
 ### Portable Edition
-CosmicComics is now fully portable !
+#### Electron
+The executable installer cannot be used for a portable version.<br>
+The ".zip" file provides a portable support.<br/>
+Create a directory and another one in it and extract the ".zip" file in the last directory.<br/>
+Go to `CosmicComics/resources/app/` and create a file called `portable.txt` with `electron` written inside.<br/>
+The 'Data' folder will be created in the first directory you created.<br/>
 
-The server is launched in a folder, and you use a browser to render.
-Note that you may need some dependencies like nodeJS installed.
-
+### Script
+The script asks you if you want to install in a portable way on Windows.<br/>
+Linux's users cannot because the script requires to install apps in the system.
+### Cloning
+You cannot use this installation method for a portable version.
 ## Update
-To determinate, for the moment this version do not have a working out-of-the-box updater and will depend on how I will handle the installation.
-
+### Electron
+The electron version have a built-in update system.
+If an update is available, the application will download it and install it when you quit.
+### Script
+The script have a built-in update system.
+The update proceed when the script is started.
+### Cloning
+Well, you just to ``git pull`` in the directory.
 ## Languages
 Since CosmicComics use your own web browser to render, and the most modern browsers have a translation plugin, you will be able to translate to your language the application.
 
