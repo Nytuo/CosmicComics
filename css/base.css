@@ -53,13 +53,23 @@ along with Cosmic-Comics.  If not, see <https://www.gnu.org/licenses/>.*/
 }
 
 html {
-    background: var(--background);
-    color: var(--text);
+    /*background: linear-gradient(227deg, #1f307c, #251f52, #222f72);
+    background-size: 600% 600%;
+    -webkit-animation: AnimationName 14s ease infinite;
+    -moz-animation: AnimationName 14s ease infinite;
+    -o-animation: AnimationName 14s ease infinite;
+    animation: AnimationName 14s ease infinite;*/
+    background-color: var(--background);
     background-size: var(--HTMLBGSize);
     background-attachment: fixed;
+    color: var(--text);
     --speed: 0.65s;
-
+    transition: background-color 1s;
     scroll-behavior: smooth;
+}
+
+body {
+    transition: background-color 1s;
 }
 
 a {
@@ -97,24 +107,19 @@ a {
 }
 
 .feedback {
-    max-width: 230px;
     background-color: transparent;
-    width: 100%;
     border-radius: 8px;
-    display: flex;
-    flex-direction: column;
-    flex-wrap: wrap;
     align-items: center;
-    box-shadow: 0 4px 30px rgba(0, 0, 0, .05);
 }
 
 .rating {
     display: flex;
-    justify-content: center;
+    justify-content: flex-end;
     overflow: hidden;
     flex-direction: row-reverse;
-    height: 150px;
     position: relative;
+    flex-wrap: wrap;
+    align-content: flex-start;
 }
 
 .rating-0 {
@@ -127,8 +132,8 @@ a {
 
 .rating > label {
     cursor: pointer;
-    width: 40px;
-    height: 40px;
+    width: 25px;
+    height: 75px;
     margin-top: auto;
     background-image: url("data:image/svg+xml;charset=UTF-8,%3csvg xmlns='http://www.w3.org/2000/svg' width='126.729' height='126.73'%3e%3cpath fill='%23e3e3e3' d='M121.215 44.212l-34.899-3.3c-2.2-.2-4.101-1.6-5-3.7l-12.5-30.3c-2-5-9.101-5-11.101 0l-12.4 30.3c-.8 2.1-2.8 3.5-5 3.7l-34.9 3.3c-5.2.5-7.3 7-3.4 10.5l26.3 23.1c1.7 1.5 2.4 3.7 1.9 5.9l-7.9 32.399c-1.2 5.101 4.3 9.3 8.9 6.601l29.1-17.101c1.9-1.1 4.2-1.1 6.1 0l29.101 17.101c4.6 2.699 10.1-1.4 8.899-6.601l-7.8-32.399c-.5-2.2.2-4.4 1.9-5.9l26.3-23.1c3.8-3.5 1.6-10-3.6-10.5z'/%3e%3c/svg%3e");
     background-repeat: no-repeat;
@@ -142,20 +147,18 @@ a {
     background-image: url("data:image/svg+xml;charset=UTF-8,%3csvg xmlns='http://www.w3.org/2000/svg' width='126.729' height='126.73'%3e%3cpath fill='%23fcd93a' d='M121.215 44.212l-34.899-3.3c-2.2-.2-4.101-1.6-5-3.7l-12.5-30.3c-2-5-9.101-5-11.101 0l-12.4 30.3c-.8 2.1-2.8 3.5-5 3.7l-34.9 3.3c-5.2.5-7.3 7-3.4 10.5l26.3 23.1c1.7 1.5 2.4 3.7 1.9 5.9l-7.9 32.399c-1.2 5.101 4.3 9.3 8.9 6.601l29.1-17.101c1.9-1.1 4.2-1.1 6.1 0l29.101 17.101c4.6 2.699 10.1-1.4 8.899-6.601l-7.8-32.399c-.5-2.2.2-4.4 1.9-5.9l26.3-23.1c3.8-3.5 1.6-10-3.6-10.5z'/%3e%3c/svg%3e");
 }
 
-
 .rating > input:not(:checked) ~ label:hover,
 .rating > input:not(:checked) ~ label:hover ~ label {
     background-image: url("data:image/svg+xml;charset=UTF-8,%3csvg xmlns='http://www.w3.org/2000/svg' width='126.729' height='126.73'%3e%3cpath fill='%23d8b11e' d='M121.215 44.212l-34.899-3.3c-2.2-.2-4.101-1.6-5-3.7l-12.5-30.3c-2-5-9.101-5-11.101 0l-12.4 30.3c-.8 2.1-2.8 3.5-5 3.7l-34.9 3.3c-5.2.5-7.3 7-3.4 10.5l26.3 23.1c1.7 1.5 2.4 3.7 1.9 5.9l-7.9 32.399c-1.2 5.101 4.3 9.3 8.9 6.601l29.1-17.101c1.9-1.1 4.2-1.1 6.1 0l29.101 17.101c4.6 2.699 10.1-1.4 8.899-6.601l-7.8-32.399c-.5-2.2.2-4.4 1.9-5.9l26.3-23.1c3.8-3.5 1.6-10-3.6-10.5z'/%3e%3c/svg%3e");
 }
 
 .emoji-wrapper {
-    width: 100%;
     text-align: center;
     height: 100px;
     overflow: hidden;
     position: absolute;
-    top: 0;
-    left: 0;
+    top: -25px;
+    left: 140px;
 }
 
 .emoji-wrapper:before,
@@ -185,31 +188,30 @@ a {
 
 .emoji > svg {
     margin: 15px 0;
-    width: 70px;
-    height: 70px;
+    width: 50px;
+    height: 105px;
     flex-shrink: 0;
 }
 
 #rating-1:checked ~ .emoji-wrapper > .emoji {
-    transform: translateY(-100px);
+    transform: translateY(-140px);
 }
 
 #rating-2:checked ~ .emoji-wrapper > .emoji {
-    transform: translateY(-200px);
+    transform: translateY(-275px);
 }
 
 #rating-3:checked ~ .emoji-wrapper > .emoji {
-    transform: translateY(-300px);
+    transform: translateY(-410px);
 }
 
 #rating-4:checked ~ .emoji-wrapper > .emoji {
-    transform: translateY(-400px);
+    transform: translateY(-545px);
 }
 
 #rating-5:checked ~ .emoji-wrapper > .emoji {
-    transform: translateY(-500px);
+    transform: translateY(-680px);
 }
-
 
 /* Cosmic Comics logo */
 .logo {
@@ -367,7 +369,6 @@ img {
     }
 }
 
-
 .btnw:hover {
     background-color: var(--topBtnHover);
 }
@@ -381,7 +382,6 @@ ul.staggered-list li {
 }
 
 ul li {
-
     float: left;
     padding: 0 0 0;
     margin: 0 5px 5px;
@@ -391,7 +391,6 @@ ul li {
 a {
     color: var(--line-color);
 }
-
 
 /* The snackbar - position it at the bottom and in the middle of the screen */
 #snackbar {
@@ -416,8 +415,6 @@ a {
     animation: bounceInUp 1s, bounceOutDown 1s 2.5s;
     !*animation: fadein 0.5s, fadeout 0.5s 2.5s;*!
 }*/
-
-
 .snack_container {
     display: none;
     height: 100%;
@@ -627,7 +624,6 @@ body {
     transform: scale(1.1, 1.1);
 }
 
-
 .card__save {
     position: absolute;
     top: 10px;
@@ -656,7 +652,6 @@ body {
 .card__save i {
     font-size: 24px;
     color: var(--DisabledColor);
-
     cursor: pointer;
     -webkit-transition: all var(--speed) ease;
     transition: all var(--speed) ease;
@@ -665,7 +660,6 @@ body {
 .card__save:hover i {
     color: var(--saveActivedColor);
 }
-
 
 .card__save:active i,
 .card__save.active i {
@@ -742,7 +736,6 @@ body {
 .card__reading i {
     font-size: 24px;
     color: var(--DisabledColor);
-
     cursor: pointer;
     -webkit-transition: all var(--speed) ease;
     transition: all var(--speed) ease;
@@ -751,7 +744,6 @@ body {
 .card__reading:hover i {
     color: var(--color-orange)
 }
-
 
 .card__reading:active i,
 .card__reading.active i {
@@ -794,7 +786,6 @@ body {
 .card__read:hover i {
     color: var(--color-green)
 }
-
 
 .card__read:active i,
 .card__read.active i {
@@ -988,14 +979,18 @@ body {
     cursor: initial;
     /* Add a pointer on hover */
     overflow-y: scroll;
-    background: var(--BGDetails);
+    background-color: var(--background);
+    transition: background-color 1.5s linear;
+    transition-delay: 1s;
+}
 
+.contentFade {
+    /*    opacity: 0;*/
 }
 
 #imageBGOV2 {
     position: fixed;
     opacity: 1;
-
     filter: blur(400px) brightness(0.5);
     -webkit-filter: blur(400px) brightness(0.5);
     -moz-filter: blur(400px) brightness(0.5);
@@ -1005,8 +1000,6 @@ body {
     position: absolute;
     width: 100%;
     height: auto;
-
-
 }
 
 #ColTitle {
@@ -1035,7 +1028,7 @@ body {
     font-weight: bold;
 }
 
-#id, #averageProgress, #OriginCountry, #startDate, #description, #endDate, #Trending, #genres, #chapters, #btnsActions, .Ratecontainer, #price,#Volumes {
+#id, #averageProgress, #OriginCountry, #startDate, #description, #endDate, #Trending, #genres, #chapters, #btnsActions, .Ratecontainer, #price, #Volumes {
     color: var(--text);
     margin-left: 45vw;
     margin-right: 2vw;
@@ -1045,9 +1038,16 @@ body {
 #btnsActions > a > i {
     color: var(--text);
     margin-right: 10px;
+    background-color: rgba(0, 0, 0, 0.7);
+    padding : 10px;
+    border-radius: 50%;
+    transition: background-color .5s linear;
+}
+#btnsActions > a > i:hover {
+    background-color: rgba(0, 0, 0, 0.4);
 }
 
-#SiteURL, #Staff, #OtherTitles, #characters,#relations {
+#SiteURL, #Staff, #OtherTitles, #characters, #relations, #readstat {
     color: var(--text);
     margin-left: 20vw;
     margin-right: 2vw;
@@ -1064,7 +1064,9 @@ body {
     max-width: fit-content;
     color: var(--text);
     background-color: var(--color-orange);
-
+    padding: 5px;
+    border-radius: 6px;
+    margin-top: 10px;
 }
 
 .released {
@@ -1073,6 +1075,9 @@ body {
     position: relative;
     left: 45vw;
     max-width: fit-content;
+    padding: 5px;
+    border-radius: 6px;
+    margin-top: 10px;
 }
 
 a[href^="http://marvel.com"] {
@@ -1085,6 +1090,9 @@ a[href^="http://marvel.com"] {
     position: relative;
     left: 45vw;
     max-width: fit-content;
+    padding: 5px;
+    border-radius: 6px;
+    margin-top: 10px;
 }
 
 /* scrollbar custom*/
@@ -1133,7 +1141,6 @@ a[href^="http://marvel.com"] {
     transform: rotate(-90deg);
     transform-origin: 50% 50%;
 }
-
 
 .circle-small .progress.one {
     stroke-dashoffset: var(--averageScore);
@@ -1191,7 +1198,6 @@ a[href^="http://marvel.com"] {
 }
 
 .libmenu {
-
     border-color: transparent;
     background-color: transparent;
 }
@@ -1211,7 +1217,6 @@ a[href^="http://marvel.com"] {
     border-radius: 50%;
     margin-top: 15px;
     margin-bottom: 10px;
-
 }
 
 .spinner {
@@ -1257,7 +1262,6 @@ a[href^="http://marvel.com"] {
     }
 }
 
-
 /* The libraries side bar style */
 .librariesSideBar {
     position: fixed;
@@ -1274,7 +1278,6 @@ a[href^="http://marvel.com"] {
     z-index: 7;
     overflow-y: auto;
     background-color: var(--libraryBG);
-
 }
 
 /* context menu style */
@@ -1302,12 +1305,10 @@ a[href^="http://marvel.com"] {
     align-items: center;
     position: relative;
     background-color: var(--color-bg-secondary);
-
 }
 
 .contextMenu > li:hover {
     background-color: var(--color-black);
-
 }
 
 /* The home page style*/
@@ -1315,7 +1316,6 @@ a[href^="http://marvel.com"] {
     margin-top: 14vh;
     margin-left: 18vw;
 }
-
 
 /* disposition for recently added abd continue reading */
 #recentlyAdded, #continueReadingHome, #toRead, #myfavoriteHome {
@@ -1351,7 +1351,6 @@ a[href^="http://marvel.com"] {
     outline: none;
     box-shadow: none;
     transition: all 0.3s ease;
-
 }
 
 #menuid {
@@ -1472,28 +1471,75 @@ a[href^="http://marvel.com"] {
     color: whitesmoke;
     position: absolute;
     right: 80px;
-
 }
 
 .scrollBtnR {
-
     background-color: transparent;
     color: whitesmoke;
     position: absolute;
     right: 40px;
-
 }
-.desc_CC{
+
+.desc_CC {
     display: block;
-    background-color: rgba(0,0,0,0.7);
+    background-color: rgba(0, 0, 0, 0.7);
     width: 75vw;
     height: 30vh;
     top: 200px;
     animation: fadeIn 0.5s ease-in-out;
-    transition: all 0.3s ;
+    transition: all 0.3s;
     border-radius: 5px;
 }
-.img-relation{
-    width:50%;
-    height:50%;
+
+.img-relation {
+    width: 50%;
+    height: 50%;
+}
+
+@-webkit-keyframes AnimationName {
+    0% {
+        background-position: 0% 99%
+    }
+    50% {
+        background-position: 100% 2%
+    }
+    100% {
+        background-position: 0% 99%
+    }
+}
+
+@-moz-keyframes AnimationName {
+    0% {
+        background-position: 0% 99%
+    }
+    50% {
+        background-position: 100% 2%
+    }
+    100% {
+        background-position: 0% 99%
+    }
+}
+
+@-o-keyframes AnimationName {
+    0% {
+        background-position: 0% 99%
+    }
+    50% {
+        background-position: 100% 2%
+    }
+    100% {
+        background-position: 0% 99%
+    }
+}
+
+@keyframes AnimationName {
+    0% {
+        background-position: 0% 99%
+    }
+    50% {
+        background-position: 100% 2%
+    }
+    100% {
+        background-position: 0% 99%
+    }
 }

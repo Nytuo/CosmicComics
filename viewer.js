@@ -141,6 +141,8 @@ async function getResponse() {
 				response.json().then((datoo) => {
 					console.log(datoo);
 					language = datoo;
+					loadParameters();
+
 					//Languages for ToolTips and other things
 					new bootstrap.Tooltip(document.getElementById("goback_id"), {
 						title: language[0]["go_back"],
@@ -696,7 +698,6 @@ async function prepareReader() {
 //Main Fonction, executed onload
 async function Viewer() {
 	document.getElementById("overlay").style.display = "block";
-	loadParameters();
 	//If the folder doesn't exist then create it and unzip in it
 	//Else we check for the path.txt and if it doesn't exist we unzip
 	//Else we check if the path.txt is equal to the path if he is not then we unzip
@@ -1962,8 +1963,9 @@ function preloadImage(listImages) {
 				"page": listImages[i]
 			}
 		};
+		let a = i
 		fetch("http://" + domain + ":" + port + "/view/readImage", options).then(async (response) => {
-			preloadedImages[i].src = URL.createObjectURL(await response.blob());
+			preloadedImages[a].src = URL.createObjectURL(await response.blob());
 		});
 	}
 }
@@ -2476,6 +2478,7 @@ function loadParameters() {
 	fetch("http://" + domain + ":" + port + "/config/getConfig/" + connected).then(function (response) {
 		return response.text();
 	}).then(function (data) {
+		console.log(data);
 		var configFile = data;
 		var parsedJSON = JSON.parse(configFile);
 		var configZoomLVL = GetElFromInforPath("ZoomLVL", parsedJSON);

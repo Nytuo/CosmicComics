@@ -265,7 +265,7 @@ ajv@^6.10.0, ajv@^6.12.0, ajv@^6.12.3:
     json-schema-traverse "^0.4.1"
     uri-js "^4.2.2"
 
-anilist-node@^1.11.2:
+anilist-node@^1.12.1:
   version "1.12.1"
   resolved "https://registry.yarnpkg.com/anilist-node/-/anilist-node-1.12.1.tgz#02299721360b0770571178c71c92c6306b712017"
   integrity sha512-z5bKzkw9EirSdZcqNTT705+MIU8wt1HsaOgqNIlk8J7UDzhK1Ect0eIXzD7pHKo4u/Hl5ENUU3ZVOMxh5bOnMQ==
@@ -3653,6 +3653,11 @@ timed-out@^4.0.1:
   version "4.0.1"
   resolved "https://registry.yarnpkg.com/timed-out/-/timed-out-4.0.1.tgz#f32eacac5a175bea25d7fab565ab3ed8741ef56f"
   integrity sha512-G7r3AhovYtr5YKOWQkta8RKAPb+J9IsO4uVmzjl8AZwfhs8UcUwTiD6gcJYSgOtzyjvQKrKYn41syHbUWMkafA==
+
+tinycolor2@^1.4.2:
+  version "1.4.2"
+  resolved "https://registry.yarnpkg.com/tinycolor2/-/tinycolor2-1.4.2.tgz#3f6a4d1071ad07676d7fa472e1fac40a719d8803"
+  integrity sha512-vJhccZPs965sV/L2sU4oRQVAos0pQXwsvTLkWYdqJ+a8Q5kPFzJTuOFwy7UniPli44NKQGAglksjvOcpo95aZA==
 
 tmp-promise@^3.0.2:
   version "3.0.3"

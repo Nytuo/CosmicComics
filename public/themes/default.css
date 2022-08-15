@@ -21,7 +21,7 @@ along with Cosmic-Comics.  If not, see <https://www.gnu.org/licenses/>.*/
     --color-text-primary: #3a3c42;
     --color-text-primary-offset: #898c94;
     --color-orange: #dc9960;
-    --color-green: #007919;
+    --color-green: #236431;
     --color-purple: #657cc4;
     --color-black: var(--color-text-primary);
     --color-red: #d92027;
@@ -44,7 +44,7 @@ along with Cosmic-Comics.  If not, see <https://www.gnu.org/licenses/>.*/
     --snackBarThumbHover: #212121;
     --ProgressBG: #343035;
     --ProgressFG: #2e52eb;
-    --background: linear-gradient(to top left, #4a5865, #1b232a) no-repeat fixed;
+    --background: #1a1e21;
     --overlayBG: rgba(0, 0, 0, 0);
     --overlay2BG: transparent;
     --libraryBG: rgba(0, 0, 0, .4);
