@@ -269,6 +269,7 @@ nav {
   height: 56px;
   margin: 5px;
   line-height: 56px;
+  backdrop-filter: blur(var(--blurpx));
 }
 
 nav.nav-extended {
@@ -304,6 +305,7 @@ nav .nav-wrapper {
   display: flex;
   flex-direction: row;
   height: 100%;
+
 }
 
 @media only screen and (min-width: 993px) {
@@ -367,7 +369,7 @@ nav .brand-logo [class^="mdi-"],
 nav .brand-logo [class*="mdi-"],
 nav .brand-logo i.material-icons {
   float: left;
-  margin-right: 15px;
+  margin-right: 80px;
 }
 
 nav .nav-title {

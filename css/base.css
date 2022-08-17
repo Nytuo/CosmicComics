@@ -30,7 +30,7 @@ along with Cosmic-Comics.  If not, see <https://www.gnu.org/licenses/>.*/
 .ribbon-1 {
     width: 20px;
     height: 40px;
-    background: #ee583a;
+    background: #c42929;
     top: -270px;
     left: 220px;
 }
@@ -38,12 +38,37 @@ along with Cosmic-Comics.  If not, see <https://www.gnu.org/licenses/>.*/
 .ribbon-1:before {
     height: 0;
     width: 0;
-    border-bottom: 6px solid #ca3011;
+    border-bottom: 6px solid #c42929;
     border-right: 6px solid transparent;
     right: -6px;
 }
 
 .ribbon-1:after {
+    height: 0;
+    width: 0;
+    border-left: 10px solid #c42929;
+    border-right: 10px solid #c42929;
+    border-bottom: 10px solid transparent;
+    bottom: -10px;
+}
+
+.ribbon-2 {
+    width: 20px;
+    height: 40px;
+    background: #ee583a;
+    top: -270px;
+    left: 220px;
+}
+
+.ribbon-2:before {
+    height: 0;
+    width: 0;
+    border-bottom: 6px solid #ca3011;
+    border-right: 6px solid transparent;
+    right: -6px;
+}
+
+.ribbon-2:after {
     height: 0;
     width: 0;
     border-left: 10px solid #ee583a;
@@ -80,10 +105,12 @@ a {
 .cards-list {
     z-index: 0;
     margin-left: 15vw;
+    margin-top: 125px;
     width: 80%;
     display: flex;
     justify-content: space-evenly;
     flex-wrap: wrap;
+    transition: margin-left .5s ease;
 }
 
 .cards-list2 {
@@ -298,6 +325,7 @@ img {
     bottom: 0;
     z-index: 9;
     background-color: var(--overlayBG);
+    transition: left .5s ease;
 }
 
 #overlay2 {
@@ -1011,12 +1039,14 @@ body {
     margin-left: 45vw;
     margin-right: 2vw;
     margin-top: 14vh;
+    transition: margin-left .5s ease;
 }
 
 #ColCover > img {
     width: 20vw;
     height: auto;
     margin-left: 20vw;
+    transition: margin-left .5s ease;
 }
 
 #ColCover {
@@ -1028,34 +1058,44 @@ body {
     font-weight: bold;
 }
 
-#id, #averageProgress, #OriginCountry, #startDate, #description, #endDate, #Trending, #genres, #chapters, #btnsActions, .Ratecontainer, #price, #Volumes {
+#id, #averageProgress, #OriginCountry, #startDate, #description, #endDate, #Trending, #genres, #chapters, #btnsActions, .Ratecontainer, #price, #Volumes, #readstat, #readAdd {
     color: var(--text);
     margin-left: 45vw;
     margin-right: 2vw;
     margin-top: 2vh;
+    transition: margin-left .5s ease;
 }
 
 #btnsActions > a > i {
     color: var(--text);
     margin-right: 10px;
     background-color: rgba(0, 0, 0, 0.7);
-    padding : 10px;
+    padding: 10px;
     border-radius: 50%;
-    transition: background-color .5s linear;
+    transition: background-color .2s linear;
 }
+
 #btnsActions > a > i:hover {
     background-color: rgba(0, 0, 0, 0.4);
 }
 
-#SiteURL, #Staff, #OtherTitles, #characters, #relations, #readstat {
+#readAddInput {
+    background-color: transparent;
+    color: white;
+    text-align: right;
+}
+
+#SiteURL, #Staff, #OtherTitles, #characters, #relations {
     color: var(--text);
     margin-left: 20vw;
     margin-right: 2vw;
     margin-top: 2vh;
+    transition: margin-left .5s ease;
 }
 
 #ContentView {
     margin-left: 20vw;
+    transition: margin-left .5s ease;
 }
 
 .releasing {
@@ -1067,6 +1107,7 @@ body {
     padding: 5px;
     border-radius: 6px;
     margin-top: 10px;
+    transition: left .5s ease;
 }
 
 .released {
@@ -1078,6 +1119,39 @@ body {
     padding: 5px;
     border-radius: 6px;
     margin-top: 10px;
+    transition: left .5s ease;
+}
+
+.pointR {
+    position: relative;
+    left: 229px;
+    max-width: fit-content;
+    color: var(--text);
+    background-color: var(--color-red);
+    padding: 19px;
+    border-radius: 20px;
+    margin-top: 10px;
+    top: -280px;
+}
+
+.pointY {
+    position: relative;
+    left: 229px;
+    max-width: fit-content;
+    color: var(--text);
+    background-color: var(--color-orange);
+    padding: 19px;
+    border-radius: 20px;
+    margin-top: 10px;
+    top: -280px;
+}
+
+.released.favorite {
+    background: linear-gradient(to right, var(--color-green) 33%, var(--color-red));
+}
+
+.releasing.favorite {
+    background: linear-gradient(to right, var(--color-orange) 60%, var(--color-red));
 }
 
 a[href^="http://marvel.com"] {
@@ -1093,6 +1167,7 @@ a[href^="http://marvel.com"] {
     padding: 5px;
     border-radius: 6px;
     margin-top: 10px;
+    transition: left .5s ease;
 }
 
 /* scrollbar custom*/
@@ -1272,12 +1347,13 @@ a[href^="http://marvel.com"] {
     border-radius: 4px;
     top: 65px;
     height: 90vh;
-    min-width: 240px;
     width: 15vw;
     text-align: center;
     z-index: 7;
     overflow-y: auto;
     background-color: var(--libraryBG);
+    backdrop-filter: blur(var(--blurpx));
+    transition: width .5s ease;
 }
 
 /* context menu style */
@@ -1313,15 +1389,17 @@ a[href^="http://marvel.com"] {
 
 /* The home page style*/
 #home {
-    margin-top: 14vh;
+    margin-top: 8vh;
     margin-left: 18vw;
+    transition: margin-left .5s ease;
 }
 
 /* disposition for recently added abd continue reading */
 #recentlyAdded, #continueReadingHome, #toRead, #myfavoriteHome {
     display: flex;
     flex-direction: row;
-    flex-wrap: nowrap;
+    flex-wrap: wrap;
+    overflow-y: auto;
 }
 
 .selectLib {
@@ -1329,19 +1407,24 @@ a[href^="http://marvel.com"] {
     color: var(--line-color)
 }
 
-#LibTitle {
+.breadcrumb {
     font-family: 'Roboto-condensed', sans-serif;
-    font-size: 22px;
-    position: absolute;
-    top: 8vh;
-    left: 18vw;
+    font-size: 18px;
+    margin-left: 260px;
+    cursor: pointer;
+    z-index: 10;
+    position: fixed;
 }
 
 #searchField {
-    background-color: var(--cardCustoShadow);
-    margin-left: 20vw;
+    backdrop-filter: blur(20px);
+    background-color: rgba(0, 0, 0, 0.78);
+    z-index: 10;
+    top: 80px;
+    left: 30%;
+    position: fixed;
     height: 40px;
-    width: 40vw;
+    width: 45vw;
     border-radius: 5px;
     padding-left: 10px;
     color: var(--text);
@@ -1355,17 +1438,10 @@ a[href^="http://marvel.com"] {
 
 #menuid {
     height: 40px;
-    margin: 10px 10px 10px calc(100vw - 1460px);
+    margin: 10px 10px 10px 10px;
 }
 
 @media (max-width: 1250px) {
-    #searchField {
-        margin-left: 10vw;
-    }
-
-    #menuid {
-        margin: 10px 10px 10px calc(100vw - 510px);
-    }
 
     #logo_id_txt {
         display: none;
@@ -1378,34 +1454,39 @@ a[href^="http://marvel.com"] {
 }
 
 #searchResults {
-    position: absolute;
-    top: 50px;
-    left: 20vw;
-    width: 40vw;
-    height: 40vh;
-    background-color: var(--cardCustoShadow);
+    position: fixed;
+    top: 125px;
+    width: 45vw;
+    height: 80vh;
+    left: 29.9vw;
+    backdrop-filter: blur(20px);
+    background-color: rgba(0, 0, 0, 0.78);
+    border-radius: 5px;
     border-radius: 5px;
     box-shadow: 0 10px 20px var(--cardCustoShadow);
     z-index: 10;
     display: none;
+    overflow-x: auto;
+    transition: width .5s ease;
 }
 
 #searchResults > li {
     left: 0;
     font-family: 'Roboto-condensed', sans-serif;
-    font-size: 18px;
+    font-size: 16px;
     width: 100%;
     color: var(--text);
     cursor: pointer;
     display: flex;
-    align-items: center;
+    align-items: flex-start;
     flex-wrap: nowrap;
     flex-direction: column;
     margin: 0;
+    padding-left: 10px;
 }
 
 #searchResults > li:hover {
-    background-color: var(--cardCustoShadowHover);
+    background-color: rgb(66, 79, 86);
 }
 
 #login_discover {

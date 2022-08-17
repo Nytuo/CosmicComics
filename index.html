@@ -34,42 +34,67 @@ along with Cosmic-Comics.  If not, see <https://www.gnu.org/licenses/>.--->
     <!--The navigation system-->
     <nav class="fixed-top">
         <div class="nav-wrapper">
-            <a class="brand-logo">
-                <img src="Images/Logo.png" alt="" width="auto" height="60px" id="logo_id"
-                     class="navbar-brand rotate linear infinite"/>
-                <img src="Images/LogoTxt.png" alt="" id="logo_id_txt" class="navbar-brand" height="60px"/>
-            </a>
-            <!--The Navigation Menu-->
+            <div style="display: flex;flex-direction: row;width: 100%;justify-content: space-between;align-items: center">
+                <div>
 
-            <label>
-                <input type="text" placeholder="Search in your libraries..." id="searchField"/>
-            </label>
-            <ul id="searchResults"></ul>
 
-            <button class="btn" data-bs-toggle="modal" data-bs-target="#buttonp" id="menuid">
-                <i class="material-icons" style="line-height: 1; height: 40px">menu</i>
-            </button>
-            <button class="btn" style="height: 40px; margin: 10px 5px 5px;" id="gotoback">
-                <i class="material-icons" style="line-height: 1; height: 40px">arrow_back</i>
-            </button>
-            <button class="btn" style="margin: 10px 5px 5px; height: 40px;" data-bs-toggle="modal" data-bs-target="#lib"
-                    id="id_createLib">
-                <i class="material-icons" style="line-height: 1; height: 40px">library_add</i>
-            </button>
-            <button class="btn" style="margin: 10px 5px 5px; height: 40px;" onclick="changeVM()" id="id_viewmode">
-                <i class="material-icons" id="icon_id_viewmode" style="line-height: 1; height: 40px">view_list</i>
-            </button>
-            <button class="btn" style="margin: 0px 5px -1px;" onclick="AccountMenu()" id="id_accountSystem">
-                <img id="icon_id_accountSystem" alt="#">
-            </button>
+                <button class="btn" style="z-index: 10;" onclick="toggleSideBar()"
+                        id="sidemenu">
+                    <i class="material-icons" style="line-height: 1;height: 31px">menu</i>
+                </button>
+                <a class="brand-logo">
+                    <img src="Images/Logo.png" alt="" width="auto" height="50px" id="logo_id"
+                         class="navbar-brand rotate linear infinite"/>
+                    <img src="Images/LogoTxt.png" alt="" id="logo_id_txt" class="navbar-brand" height="50px"/>
+                </a>
+                </div>
+
+                <!--The Navigation Menu-->
+                <ol class="breadcrumb">
+                </ol>
+
+                <div>
+                    <button class="btn" onclick="summonSearch()" id="search">
+                        <i class="material-icons" style="line-height: 1; height: 40px">search</i>
+                    </button>
+                    <button class="btn" data-bs-toggle="modal" data-bs-target="#buttonp" id="menuid">
+                        <i class="material-icons" style="line-height: 1; height: 40px">more_horiz</i>
+                    </button>
+                    <button class="btn"  onclick="changeVM()"
+                            id="id_viewmode">
+                        <i class="material-icons" style="line-height: 1; height: 40px" id="icon_id_viewmode"
+                          >view_list</i>
+                    </button>
+                    <button class="btn" style="margin: 0px 5px -1px;" onclick="AccountMenu()" id="id_accountSystem">
+                        <img id="icon_id_accountSystem" alt="#">
+                    </button>
+
+                </div>
+
+
+            </div>
         </div>
     </nav>
+    <label>
+        <input type="search" placeholder="Search in your libraries..." id="searchField"/>
+    </label>
+    <ul id="searchResults"></ul>
 
 
     <div class="folderExplorer librariesSideBar" id="folderExplorer">
+        <div id="groupbtn" class="btn-group" role="group" aria-label="Basic example">
+            <button class="btn btn-primary" style="height: 40px;" data-bs-toggle="modal" data-bs-target="#lib"
+                    id="id_createLib">
+                <li class="material-icons">library_add</li>
+            </button>
+            <button class="btn btn-primary" style="height: 40px;" onclick="OpenFileOnce()" data-bs-dismiss="modal"
+                    id="id_opnfile">
+                <i class="material-icons">note_add</i>
+            </button>
+        </div>
         <div>
-            <button class="btn btns libbtn" onclick="returnToHome(this)"><i class="material-icons"
-                                                                            style="line-height: 1;float: left;">home</i>Home
+            <button class="btn btns libbtn" id="libHome" onclick="returnToHome()"><i class="material-icons"
+                                                                                     style="line-height: 1;float: left;">home</i><span>Home</span>
             </button>
         </div>
     </div>
@@ -173,19 +198,9 @@ along with Cosmic-Comics.  If not, see <https://www.gnu.org/licenses/>.--->
                             data-bs-target="#thememodal">
                         <i class="material-icons">palette</i>
                     </button>
-
-                    <button class="btn" style="margin: 10px" onclick="refreshFolder();" data-bs-dismiss="modal"
-                            id="id_refreshFolder">
-                        <i class="material-icons">refresh</i>
-                    </button>
                     <button class="btn" style="margin: 10px" id="id_openDL" data-bs-toggle="modal"
                             data-bs-target="#dlmodal">
                         <i class="material-icons">download</i>
-                    </button>
-
-                    <button class="btn" style="margin: 10px" onclick="OpenFileOnce()" data-bs-dismiss="modal"
-                            id="id_opnfile">
-                        <i class="material-icons">note_add</i>
                     </button>
                     <button class="btn" data-bs-toggle="modal" data-bs-target="#about"
                             style="margin: 10px; height: 40px" id="id_info">
@@ -545,6 +560,7 @@ along with Cosmic-Comics.  If not, see <https://www.gnu.org/licenses/>.--->
     </div>
 </div>
 
+
 <div class="snack_container">
     <div class="snack_rectangle">
         <div class="snack_notification">
@@ -553,10 +569,11 @@ along with Cosmic-Comics.  If not, see <https://www.gnu.org/licenses/>.--->
         </div>
     </div>
 </div>
-<p id="LibTitle"></p>
 <div id="home">
     <p>Continue reading : </p>
-    <div id="continueReadingHome"></div>
+    <div id="continueReadingHome">
+
+    </div>
     <p>My favorites : </p>
     <div id="myfavoriteHome"></div>
     <p>Recently added : </p>
@@ -598,7 +615,6 @@ along with Cosmic-Comics.  If not, see <https://www.gnu.org/licenses/>.--->
         <div id="ColContent">
             <p id="Status"></p>
             <div id="startDate"></div>
-            <div id="price"></div>
 
             <div id="btnsActions">
                 <a href="#" id="playbutton"> <i class="material-icons" style="">play_arrow</i></a>
@@ -804,6 +820,7 @@ along with Cosmic-Comics.  If not, see <https://www.gnu.org/licenses/>.--->
 
                 </div>
             </div>
+            <div id="price"></div>
 
             <div id="description"></div>
             <div id="averageProgress">
@@ -827,9 +844,8 @@ along with Cosmic-Comics.  If not, see <https://www.gnu.org/licenses/>.--->
             <div id="col"></div>
             <div id="Volumes"></div>
             <div id="Trending"></div>
-            <div id="readstat"></div>
+            <div id="readstat"><input type="number" step="1" min="0" id="readAddInput"></div>
             <div id="detailSeparator" style="margin-top:30vh;"></div>
-
             <div id="ContentView">
                 <h2>Volumes : </h2>
             </div>

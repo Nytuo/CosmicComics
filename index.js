@@ -300,6 +300,28 @@ function refreshLibrary(elElement) {
 	alert(elElement);
 }
 
+function addToBreadCrumb(title, ListenerF) {
+	let breadCrumb = document.querySelector(".breadcrumb");
+	let newElement = document.createElement("li");
+	newElement.addEventListener('click', (e) => {
+		let breadCrumb = document.querySelector(".breadcrumb");
+		/* Delete all childs after this one */
+		while (breadCrumb.lastChild != newElement) {
+			breadCrumb.removeChild(breadCrumb.lastChild);
+		}
+		document.getElementById("ContainerExplorer").innerHTML = "";
+		document.getElementById("overlay").style.display = "none";
+		document.getElementById("overlay2").style.display = "none";
+		document.getElementById("contentViewer").style.display = "none";
+		resetOverlay();
+		ListenerF();
+	});
+	newElement.innerHTML = title;
+	newElement.setAttribute("class", "breadcrumb-item");
+	newElement.setAttribute("aria-current", "page");
+	breadCrumb.appendChild(newElement);
+}
+
 function discoverFolders() {
 	var listofFolder;
 	getFromDB("Libraries", "* FROM Libraries").then((res) => {
@@ -310,6 +332,11 @@ function discoverFolders() {
 			var btn = document.createElement("button");
 			btn.id = el["NAME"];
 			btn.addEventListener("click", function () {
+				let breadCrumb = document.querySelector(".breadcrumb");
+				/* Delete all childs after this one */
+				while (breadCrumb.lastChild != breadCrumb.childNodes[1]) {
+					breadCrumb.removeChild(breadCrumb.lastChild);
+				}
 				document.querySelectorAll(".selectLib").forEach((el) => {
 					el.classList.remove("selectLib");
 				});
@@ -318,7 +345,7 @@ function discoverFolders() {
 				document.getElementById("overlay").style.display = "none";
 				document.getElementById("overlay2").style.display = "none";
 				document.getElementById("contentViewer").style.display = "none";
-				document.getElementById("LibTitle").innerHTML = el["NAME"];
+				addToBreadCrumb(el["NAME"], function () {return openFolder_logic(el["PATH"], el["API_ID"]);});
 				openFolder_logic(el["PATH"], el["API_ID"]);
 			});
 			const marvelogo = document.createElement("img");
@@ -331,7 +358,9 @@ function discoverFolders() {
 			marvelogo.style.float = "left";
 			marvelogo.style.lineHeight = "1";
 			btn.appendChild(marvelogo);
-			btn.appendChild(document.createTextNode(el["NAME"]));
+			let naming = document.createElement("span");
+			naming.innerHTML = el["NAME"];
+			btn.appendChild(naming);
 			btn.className = "btn btns libbtn";
 			div.style.display = "flex";
 			btn.style.float = "left";
@@ -391,6 +420,11 @@ function discoverFolders() {
 	var btn = document.createElement("button");
 	btn.id = "downloads";
 	btn.addEventListener("click", function () {
+		let breadCrumb = document.querySelector(".breadcrumb");
+		/* Delete all childs after this one */
+		while (breadCrumb.lastChild != breadCrumb.childNodes[1]) {
+			breadCrumb.removeChild(breadCrumb.lastChild);
+		}
 		document.querySelectorAll(".selectLib").forEach((el) => {
 			el.classList.remove("selectLib");
 		});
@@ -399,7 +433,7 @@ function discoverFolders() {
 		document.getElementById("overlay").style.display = "none";
 		document.getElementById("overlay2").style.display = "none";
 		document.getElementById("contentViewer").style.display = "none";
-		document.getElementById("LibTitle").innerHTML = "Downloads";
+		addToBreadCrumb("Downloads", () => {return openFolder_logic(CosmicComicsTemp + "/downloads", 2);});
 		openFolder_logic(CosmicComicsTemp + "/downloads", 2);
 	});
 	const marvelogo = document.createElement("i");
@@ -412,7 +446,9 @@ function discoverFolders() {
 	marvelogo.style.float = "left";
 	marvelogo.style.lineHeight = "1";
 	btn.appendChild(marvelogo);
-	btn.appendChild(document.createTextNode("Downloads"));
+	let naming = document.createElement("span");
+	naming.innerHTML = "Downloads";
+	btn.appendChild(naming);
 	btn.className = "btn btns libbtn";
 	div.style.display = "flex";
 	btn.style.float = "left";
@@ -462,6 +498,101 @@ function Get_From_Config(what_you_want, data) {
 		}
 	}
 	return null;
+}
+
+let sidebarMini = false;
+let searchtoggle = true;
+
+function toggleSideBar() {
+	if (sidebarMini) {
+		sidebarMini = false;
+		document.querySelector(".librariesSideBar").style.width = "15vw";
+		document.querySelector(".librariesSideBar").style.overflow = "auto";
+		document.querySelector("#groupbtn").setAttribute("class", "btn-group");
+		document.querySelectorAll(".libmenu").forEach((el) => {
+			el.style.display = "block";
+		});
+		document.querySelectorAll(".libbtn").forEach((el) => {
+			el.children[1].style.display = "block";
+		});
+		document.getElementById("home").style.marginLeft = "18vw";
+		document.querySelector(".cards-list").style.marginLeft = "15vw";
+		document.querySelector("#overlay").style.left = "16vw";
+		document.querySelector("#ColCover > img").style.marginLeft = "20vw";
+		let list = "#id, #averageProgress, #startDate, #description, #Trending, #genres, #chapters, #btnsActions, #price, #Volumes, #readstat".split(',');
+		list.forEach((el) => {
+			document.querySelector(el).style.marginLeft = "45vw";
+		});
+		let list2 = "#SiteURL, #Staff, #OtherTitles, #characters, #relations".split(',');
+		list2.forEach((el) => {
+			document.querySelector(el).style.marginLeft = "20vw";
+		});
+		document.querySelector("#ContentView").style.marginLeft = "20vw";
+		document.querySelector("#ColTitle").style.marginLeft = "45vw";
+		try {
+			document.querySelector(".releasing").style.left = "45vw";
+		} catch (e) {
+			try {
+				document.querySelector(".released").style.left = "45vw";
+			} catch (e) {
+				try {
+					document.querySelector(".NotYet").style.left = "45vw";
+				} catch (e) {
+					console.log(e);
+				}
+			}
+		}
+	} else {
+		sidebarMini = true;
+		document.querySelector(".librariesSideBar").style.width = "50px";
+		document.querySelector(".librariesSideBar").style.overflow = "hidden";
+		document.querySelector("#groupbtn").setAttribute("class", "");
+		document.querySelectorAll(".libmenu").forEach((el) => {
+			el.style.display = "none";
+		});
+		document.querySelectorAll(".libbtn").forEach((el) => {
+			el.children[1].style.display = "none";
+		});
+		document.getElementById("home").style.marginLeft = "100px";
+		document.querySelector("#ColCover > img").style.marginLeft = "100px";
+		let list = "#id, #averageProgress, #startDate, #description, #Trending, #genres, #chapters, #btnsActions, #price, #Volumes, #readstat".split(',');
+		list.forEach((el) => {
+			document.querySelector(el).style.marginLeft = "550px";
+		});
+		let list2 = "#SiteURL, #Staff, #OtherTitles, #characters, #relations".split(',');
+		list2.forEach((el) => {
+			document.querySelector(el).style.marginLeft = "150px";
+		});
+		document.querySelector(".cards-list").style.marginLeft = "100px";
+		document.querySelector("#ContentView").style.marginLeft = "100px";
+		document.querySelector("#ColTitle").style.marginLeft = "550px";
+		document.querySelector("#overlay").style.left = "10%";
+		try {
+			document.querySelector(".releasing").style.left = "550px";
+		} catch (e) {
+			try {
+				document.querySelector(".released").style.left = "550px";
+			} catch (e) {
+				try {
+					document.querySelector(".NotYet").style.left = "550px";
+				} catch (e) {
+					console.log(e);
+				}
+			}
+		}
+	}
+}
+
+document.getElementById("searchField").style.display = "none";
+
+function summonSearch() {
+	if (searchtoggle) {
+		searchtoggle = false;
+		document.getElementById("searchField").style.display = "block";
+	} else {
+		searchtoggle = true;
+		document.getElementById("searchField").style.display = "none";
+	}
 }
 
 //refresh the folder
@@ -702,6 +833,8 @@ async function getAPIANILIST(name) {
 function loadView(FolderRes, libraryPath, date = "", provider = 2) {
 	var n = 0;
 	var listOfImages = [];
+	console.log("folderRes : " + FolderRes);
+	console.log("libraryPath : " + libraryPath);
 	document.getElementById("overlay2").style.display = "none";
 	/*FolderResults.forEach((file) => {
         var stat = fs.statSync(file);
@@ -759,6 +892,9 @@ function loadView(FolderRes, libraryPath, date = "", provider = 2) {
 			var name = path.replaceAll(libraryPath.replaceAll("\\", "/"), "").replace("/", "");
 			var realname = /[^\\\/]+(?=\.[\w]+$)|[^\\\/]+$/.exec(name)[0];
 			console.log(realname);
+			let readBookNB = await getFromDB("Books", "COUNT(*) FROM Books WHERE READ = 1 AND PATH = '" + path + "'");
+			console.log(JSON.parse(readBookNB));
+			document.getElementById("readstat").innerHTML = JSON.parse(readBookNB)[0]["COUNT(*)"] + " / " + data.length + " volumes read";
 			await getFromDB("Books", "* FROM Books WHERE PATH = '" + path + "'").then(async (resa) => {
 				let bookList = JSON.parse(resa);
 				let TheBook = bookList[0];
@@ -959,7 +1095,13 @@ CosmicComicsData + "/ListOfComics.json",
 				if (cardMode === true) {
 					const rib = document.createElement("div");
 					if (TheBook["unread"] == 1) {
-						rib.className = "ribbon-1";
+						rib.className = "pointR";
+					}
+					if (TheBook["reading"] == 1) {
+						rib.className = "pointY";
+					}
+					if (TheBook["favorite"] == 1) {
+						rib.innerHTML = "<i class='material-icons' style='font-size: 16px;position: relative;left: -17px;'>favorite</i>";
 					}
 					carddiv.className = "cardcusto";
 					carddiv.setAttribute("data-effect", "zoom");
@@ -1482,10 +1624,10 @@ async function loadContent(provider, FolderRes, libraryPath) {
 						await getAPIANILIST(name).then(async (data) => {
 								let randID = Math.floor(Math.random() * 1000000);
 								if (data == null) {
-									await InsertIntoDB("Series", "(ID_Series,title,note,statut,start_date,end_date,description,Score,genres,cover,BG,CHARACTERS,TRENDING,STAFF,SOURCE,volumes,chapters,favorite)",
-										"('" + randID + "U_2" + "','" + JSON.stringify(name.replaceAll("'", "''")) + "',null,null,null,null,null,'0',null,null,null,null,null,null,null,null,null,0)");
+									await InsertIntoDB("Series", "(ID_Series,title,note,statut,start_date,end_date,description,Score,genres,cover,BG,CHARACTERS,TRENDING,STAFF,SOURCE,volumes,chapters,favorite,PATH)",
+										"('" + randID + "U_2" + "','" + JSON.stringify(name.replaceAll("'", "''")) + "',null,null,null,null,null,'0',null,null,null,null,null,null,null,null,null,0,'" + path + "')");
 								} else {
-									await InsertIntoDB("Series", "(ID_Series,title,note,statut,start_date,end_date,description,Score,genres,cover,BG,CHARACTERS,TRENDING,STAFF,SOURCE,volumes,chapters,favorite)", "('" + data["id"] + "_2" + "','" + JSON.stringify(data["title"]).replaceAll("'", "''") + "',null,'" + data["status"].replaceAll("'", "''") + "','" + JSON.stringify(data["startDate"]).replaceAll("'", "''") + "','" + JSON.stringify(data["endDate"]).replaceAll("'", "''") + "','" + data["description"].replaceAll("'", "''") + "','" + data["meanScore"] + "','" + JSON.stringify(data["genres"]).replaceAll("'", "''") + "','" + data["coverImage"]["large"] + "','" + data["bannerImage"] + "','" + JSON.stringify(data["characters"]).replaceAll("'", "''") + "','" + data["trending"] + "','" + JSON.stringify(data["staff"]).replaceAll("'", "''") + "','" + data["siteUrl"].replaceAll("'", "''") + "','" + data["volumes"] + "','" + data["chapters"] + "',0)");
+									await InsertIntoDB("Series", "(ID_Series,title,note,statut,start_date,end_date,description,Score,genres,cover,BG,CHARACTERS,TRENDING,STAFF,SOURCE,volumes,chapters,favorite,PATH)", "('" + data["id"] + "_2" + "','" + JSON.stringify(data["title"]).replaceAll("'", "''") + "',null,'" + data["status"].replaceAll("'", "''") + "','" + JSON.stringify(data["startDate"]).replaceAll("'", "''") + "','" + JSON.stringify(data["endDate"]).replaceAll("'", "''") + "','" + data["description"].replaceAll("'", "''") + "','" + data["meanScore"] + "','" + JSON.stringify(data["genres"]).replaceAll("'", "''") + "','" + data["coverImage"]["large"] + "','" + data["bannerImage"] + "','" + JSON.stringify(data["characters"]).replaceAll("'", "''") + "','" + data["trending"] + "','" + JSON.stringify(data["staff"]).replaceAll("'", "''") + "','" + data["siteUrl"].replaceAll("'", "''") + "','" + data["volumes"] + "','" + data["chapters"] + "',0,'" + path + "')");
 									await GETANILISTAPI_CREATOR(data["staff"]).then(async (ccdata) => {
 										for (let i = 0; i < ccdata.length; i++) {
 											try {
@@ -1601,10 +1743,10 @@ async function loadContent(provider, FolderRes, libraryPath) {
 							console.log(data);
 							let randID = Math.floor(Math.random() * 1000000);
 							if (data["data"]["total"] == 0) {
-								await InsertIntoDB("Series", "(ID_Series,title,note,start_date,end_date,description,Score,cover,BG,CHARACTERS,STAFF,SOURCE,volumes,chapters,favorite)",
-									"('" + randID + "U_1" + "','" + JSON.stringify(name.replaceAll("'", "''")) + "',null,null,null,null,'0',null,null,null,null,null,null,null,0)");
+								await InsertIntoDB("Series", "(ID_Series,title,note,start_date,end_date,description,Score,cover,BG,CHARACTERS,STAFF,SOURCE,volumes,chapters,favorite,PATH)",
+									"('" + randID + "U_1" + "','" + JSON.stringify(name.replaceAll("'", "''")) + "',null,null,null,null,'0',null,null,null,null,null,null,null,0,'" + path + "')");
 							} else {
-								await InsertIntoDB("Series", "(ID_Series,title,note,start_date,end_date,description,Score,cover,BG,CHARACTERS,STAFF,SOURCE,volumes,chapters,favorite)", "('" + data["data"]["results"][0]["id"] + "_1" + "','" + JSON.stringify(data["data"]["results"][0]["title"]).replaceAll("'", "''") + "',null,'" + JSON.stringify(data["data"]["results"][0]["startYear"]).replaceAll("'", "''") + "','" + JSON.stringify(data["data"]["results"][0]["endYear"]).replaceAll("'", "''") + "','" + data["data"]["results"][0]["description"] + "','" + data["data"]["results"][0]["rating"] + "','" + JSON.stringify(data["data"]["results"][0]["thumbnail"]) + "','" + JSON.stringify(data["data"]["results"][0]["thumbnail"]) + "','" + JSON.stringify(data["data"]["results"][0]["characters"]).replaceAll("'", "''") + "','" + JSON.stringify(data["data"]["results"][0]["creators"]).replaceAll("'", "''") + "','" + JSON.stringify(data["data"]["results"][0]["urls"][0]) + "','" + JSON.stringify(data["data"]["results"][0]["comics"]["items"]) + "','" + data["data"]["results"][0]["comics"]["available"] + "',0)");
+								await InsertIntoDB("Series", "(ID_Series,title,note,start_date,end_date,description,Score,cover,BG,CHARACTERS,STAFF,SOURCE,volumes,chapters,favorite,PATH)", "('" + data["data"]["results"][0]["id"] + "_1" + "','" + JSON.stringify(data["data"]["results"][0]["title"]).replaceAll("'", "''") + "',null,'" + JSON.stringify(data["data"]["results"][0]["startYear"]).replaceAll("'", "''") + "','" + JSON.stringify(data["data"]["results"][0]["endYear"]).replaceAll("'", "''") + "','" + data["data"]["results"][0]["description"] + "','" + data["data"]["results"][0]["rating"] + "','" + JSON.stringify(data["data"]["results"][0]["thumbnail"]) + "','" + JSON.stringify(data["data"]["results"][0]["thumbnail"]) + "','" + JSON.stringify(data["data"]["results"][0]["characters"]).replaceAll("'", "''") + "','" + JSON.stringify(data["data"]["results"][0]["creators"]).replaceAll("'", "''") + "','" + JSON.stringify(data["data"]["results"][0]["urls"][0]) + "','" + JSON.stringify(data["data"]["results"][0]["comics"]["items"]) + "','" + data["data"]["results"][0]["comics"]["available"] + "',0,'" + path + "')");
 								await GETMARVELAPI_Creators(data["data"]["results"][0]["id"], "series").then(async (ccdata) => {
 									ccdata = ccdata["data"]["results"];
 									for (let i = 0; i < ccdata.length; i++) {
@@ -2038,13 +2180,6 @@ async function loadContent(provider, FolderRes, libraryPath) {
 			}
 		}
 	}
-	document.getElementById("gotoback").addEventListener("click", function () {
-		animateCSS(document.getElementById("contentViewer"), "fadeOut").then((message) => {
-			document.getElementById("contentViewer").style.display = "none";
-		});
-		document.getElementById("relations").innerHTML = "";
-		document.getElementById("ContentView").innerHTML = "";
-	});
 }
 
 //preload the images
@@ -2980,7 +3115,7 @@ function HomeRoutine() {
 				buttonfav.addEventListener("click", function () {
 					favorite();
 				});
-				buttonfav.id = "btn_id_fav_" + TheBook["ID_book"];
+				buttonfav.id = "btn_id_fav_" + Math.random() * 10000;
 				//icon
 				const favicon = document.createElement("i");
 				favicon.className = "material-icons";
@@ -2995,7 +3130,7 @@ function HomeRoutine() {
 				button_unread.addEventListener("click", function () {
 					markasunread();
 				});
-				button_unread.id = "btn_id_unread_" + TheBook["ID_book"];
+				button_unread.id = "btn_id_unread_" + Math.random() * 10000;
 				//icon
 				const unread_icon = document.createElement("i");
 				unread_icon.className = "material-icons";
@@ -3010,7 +3145,7 @@ function HomeRoutine() {
 				button_reading.addEventListener("click", function () {
 					markasreading();
 				});
-				button_reading.id = "btn_id_reading_" + TheBook["ID_book"];
+				button_reading.id = "btn_id_reading_" + Math.random() * 10000;
 				//icon
 				const reading_icon = document.createElement("i");
 				reading_icon.className = "material-icons";
@@ -3025,7 +3160,7 @@ function HomeRoutine() {
 				button_read.addEventListener("click", function () {
 					markasread();
 				});
-				button_read.id = "btn_id_read_" + TheBook["ID_book"];
+				button_read.id = "btn_id_read_" + Math.random() * 10000;
 				//ico
 				const read_ion = document.createElement("i");
 				read_ion.className = "material-icons";
@@ -3039,7 +3174,7 @@ function HomeRoutine() {
 				cardimage.style.backgroundColor = theme_BG_CI;
 				const imgcard = document.createElement("img");
 				imgcard.style.width = "100%";
-				imgcard.id = "card_img_id_" + TheBook["ID_book"];
+				imgcard.id = "card_img_id_" + Math.random() * 10000;
 				imgcard.src = imagelink;
 				cardimage.appendChild(imgcard);
 				carddiv.appendChild(cardimage);
@@ -3063,7 +3198,7 @@ function HomeRoutine() {
 				pcard_bio.innerHTML = node.textContent;
 				bodycard.appendChild(pcard_bio);
 				carddiv.appendChild(bodycard);
-				carddiv.id = "id_vol" + TheBook["ID_book"];
+				carddiv.id = "id_vol" + Math.random() * 10000;
 				if (playbtn.addEventListener) {
 					playbtn.addEventListener("click", function () {
 						/*            ModifyJSONFile(
@@ -3104,17 +3239,16 @@ function HomeRoutine() {
 			element.appendChild(node);
 		}
 	});
-	document.getElementById("LibTitle").innerHTML = "Home";
 }
 
 HomeRoutine();
 
-function returnToHome(e) {
+function returnToHome() {
+	let e = document.getElementById("libHome");
 	document.querySelectorAll(".selectLib").forEach((el) => {
 		el.classList.remove("selectLib");
 	});
 	e.classList.add("selectLib");
-	document.getElementById("LibTitle").innerHTML = "Home";
 	document.getElementById("ContainerExplorer").innerHTML = "";
 	document.getElementById("overlay").style.display = "none";
 	document.getElementById("overlay2").style.display = "none";
@@ -3132,10 +3266,21 @@ function returnToHome(e) {
 	document.getElementById('home').style.display = 'block';
 	document.getElementById('home').style.fontSize = '16px';
 	resetOverlay();
+	let breadCrumb = document.querySelector(".breadcrumb");
+	/* Delete all childs after this one */
+	while (breadCrumb.lastChild != breadCrumb.childNodes[1]) {
+		breadCrumb.removeChild(breadCrumb.lastChild);
+	}
 }
 
 theSearchList = [];
-getFromDB("Books", "NOM,PATH FROM Books").then(async (resa) => {
+getFromDB("Books", "NOM,PATH,URLCover,Series FROM Books").then(async (resa) => {
+	resa = JSON.parse(resa);
+	for (var i = 0; i < resa.length; i++) {
+		theSearchList.push(resa[i]);
+	}
+});
+getFromDB("Series", "title,cover,PATH FROM Series").then(async (resa) => {
 	resa = JSON.parse(resa);
 	for (var i = 0; i < resa.length; i++) {
 		theSearchList.push(resa[i]);
@@ -3146,16 +3291,89 @@ async function setSearch(res) {
 	for (const key in res) {
 		const resItem = document.createElement("li");
 		resItem.classList.add("resItem");
-		const text = document.createTextNode(res[key].NOM);
+		let text=document.createElement("span");
+		let img = document.createElement("img");
+			let series = document.createElement("span");
+		let isBook = res[key].NOM !== undefined;
+		if (isBook) {
+			text.innerHTML = res[key].NOM;
+			try {
+				series.innerHTML = JSON.parse(res[key].series).name;
+			} catch (e) {
+				try {
+					series.innerHTML = res[key].series.split("_")[2].replaceAll("$", " ");
+				} catch (e) {
+					if (res[key].series != null && res[key].series != "null") {
+						series.innerHTML = res[key].series;
+					} else {
+						series.innerHTML = "No series linked";
+					}
+				}
+			}
+			img.src = res[key].URLCover;
+		} else {
+			text.innerHTML = JSON.parse(res[key].title);
+			if (typeof JSON.parse(res[key].title) == "object") {
+				try {
+					text.innerHTML = JSON.parse(res[key].title).english;
+				} catch (e) {
+					try {
+						text.innerHTML = JSON.parse(res[key].title).romaji;
+					} catch (e) {
+						text.innerHTML = JSON.parse(res[key].title).native;
+					}
+				}
+			}
+			try {
+				if (typeof JSON.parse(res[key].cover) == "object") {
+					img.src = JSON.parse(res[key].cover).path + "/detail." + JSON.parse(res[key].cover).extension;
+				} else {
+					img.src = res[key].cover;
+				}
+			} catch (e) {
+				img.src = res[key].cover;
+			}
+		}
+		img.style.width = "50px";
 		resItem.appendChild(text);
+		resItem.appendChild(img);
+			resItem.appendChild(series);
 		resItem.addEventListener("click", async (e) => {
+			document.getElementById("searchResults").style.display = "none";
 			document.getElementById("home").style.display = "none";
-			await getFromDB("Books", "* FROM Books WHERE PATH = '" + res[key].PATH + "'").then(async (resa) => {
-				let bookList = JSON.parse(resa);
-				let TheBook = bookList[0];
-				let provider = ((brook.series.includes("marvel")) ? (1) : ((brook.series.includes("Anilist")) ? (2) : (0)));
-				await createDetails(TheBook, provider);
-			});
+			if (isBook) {
+				await getFromDB("Books", "* FROM Books WHERE PATH = '" + res[key].PATH + "'").then(async (resa) => {
+					let bookList = JSON.parse(resa);
+					let TheBook = bookList[0];
+					let provider = ((TheBook.series.includes("marvel")) ? (1) : ((TheBook.series.includes("Anilist")) ? (2) : (0)));
+					await createDetails(TheBook, provider);
+				});
+			} else {
+				await getFromDB("Series", "* FROM Series WHERE title = '" + res[key].title + "'").then(async (resa) => {
+					console.log("HERE");
+					let bookList = JSON.parse(resa);
+					let TheBook = bookList[0];
+					let provider = ((TheBook.ID_Series.includes("_1")) ? (1) : ((TheBook.ID_Series.includes("_2")) ? (2) : (0)));
+					let result = res[key].PATH;
+					console.log(result);
+					let libPath = result.replaceAll("\\", "/");
+					libPath = libPath.replace(/\/[^\/]+$/, "");
+					libPath = libPath.replaceAll("/", "\\");
+					if (provider == 1) {
+						await createSeries(provider, result, libPath, bookList);
+					} else if (provider == 2) {
+						try {
+							await createSeries(provider, result, libPath, bookList);
+						} catch (e) {
+							try {
+								await createSeries(provider, result, libPath, bookList);
+							} catch (e) {
+								await createSeries(provider, result, libPath, bookList);
+							}
+						}
+					}
+				});
+			}
 		});
 		document.getElementById("searchResults").appendChild(resItem);
 	}
@@ -3168,10 +3386,29 @@ async function setSearch(res) {
 	}
 }
 
+function resolveTitle(title) {
+	try {
+		if (JSON.parse(title).english !== undefined) {
+			return JSON.parse(title).english;
+		} else if (JSON.parse(title).romaji !== undefined) {
+			return JSON.parse(title).romaji;
+		} else if (JSON.parse(title).native !== undefined) {
+			return JSON.parse(title).native;
+		} else if (typeof JSON.parse(title) !== 'object') {
+			return JSON.parse(title);
+		} else {
+			return title;
+		}
+	} catch (e) {
+		return title;
+	}
+}
+
 async function createSeries(provider, path, libraryPath, res) {
 	resetOverlay();
 	console.log(provider);
 	document.documentElement.style.overflow = "hidden";
+	addToBreadCrumb(resolveTitle(res[0].title), () => { return createSeries(provider, path, libraryPath, res);});
 	let APINOTFOUND = /[a-zA-Z]/g.test(res[0].ID_Series);
 	if (!APINOTFOUND) {
 		document.getElementById("provider_text").innerHTML = ((provider == 1) ? ("Data provided by Marvel. © 2014 Marvel") : ((provider == 2) ? ("Data provided by Anilist.") : ("The Data are not provided by an API.")));
@@ -3519,11 +3756,7 @@ async function createSeries(provider, path, libraryPath, res) {
 	animateCSS(document.getElementById("onContentViewer"), "fadeIn").then((message) => {
 	});
 	/*launchDetect(path, root);*/
-	if (!APINOTFOUND) {
-		document.getElementById("detailSeparator").style.marginTop = "7vh";
-	} else {
-		document.getElementById("detailSeparator").style.marginTop = "15vh";
-	}
+	document.getElementById("detailSeparator").style.marginTop = "5vh";
 	await getFromDB("Books", "PATH FROM Books WHERE unread=1 OR reading=1").then(async (resa) => {
 		let continueSeriesReading;
 		let bookList = JSON.parse(resa);
@@ -3659,9 +3892,6 @@ async function createSeries(provider, path, libraryPath, res) {
 			} else if (res[0]["statut"] == "Not_YET_RELEASED") {
 				document.getElementById("Status").className = "NotYet";
 			}
-			if (res[0].favorite == 1) {
-				document.getElementById("Status").innerHTML += "(Favorite)";
-			}
 		}
 	} else {
 		if (provider == 1) {
@@ -3729,10 +3959,11 @@ async function createSeries(provider, path, libraryPath, res) {
 			} else {
 				document.getElementById("Status").className = "NotYet";
 			}
-			if (res[0].favorite == 1) {
-				document.getElementById("Status").innerHTML += "(Favorite)";
-			}
 		}
+	}
+	if (res[0].favorite == 1) {
+		document.getElementById("Status").innerHTML += " (Favorite)";
+		document.getElementById("Status").classList.add("favorite");
 	}
 }
 
@@ -3844,11 +4075,16 @@ async function AllForOne(W1, W2, A, ID) {
 	});
 }
 
+addToBreadCrumb("Home", () => {
+	returnToHome();
+});
+
 async function createDetails(TheBook, provider) {
 	resetOverlay();
 	document.documentElement.style.overflow = "hidden";
 	console.log(provider);
 	console.log(TheBook);
+	addToBreadCrumb(TheBook.NOM, () => {return createDetails(TheBook, provider);});
 	document.getElementById("provider_text").innerHTML = ((provider == 1) ? ("Data provided by Marvel. © 2014 Marvel") : ((provider == 2) ? ("Data provided by Anilist.") : ("The Data are not provided by an API.")));
 	document.getElementById("contentViewer").style.display = "block";
 	document.getElementById("DLBOOK").addEventListener("click", function (e) {
@@ -3891,6 +4127,8 @@ async function createDetails(TheBook, provider) {
 		if (provider == 1) {
 			document.getElementById("ColTitle").innerHTML = "<a target='_blank' href='" + ((TheBook.URLs == null) ? ("#") : (JSON.parse(TheBook.URLs)[0].url)) + "' style='color:white'>" + TheBook.NOM + "<i style='font-size: 18px;top: -10px;position: relative' class='material-icons'>open_in_new</i></a>";
 		} else if (provider == 2) {
+			document.getElementById("ColTitle").innerHTML = "<a target='_blank' style='color:white'>" + TheBook.NOM + "</a>";
+		} else {
 			document.getElementById("ColTitle").innerHTML = "<a target='_blank' style='color:white'>" + TheBook.NOM + "</a>";
 		}
 	} catch (e) {
@@ -4063,9 +4301,30 @@ async function createDetails(TheBook, provider) {
 		if (TheBook.favorite == 1) {
 			document.getElementById("Status").innerHTML += "(Favorite)";
 		}
-		document.getElementById("readstat").innerHTML = TheBook.last_page + " / " + TheBook.pageCount + " pages read";
+		document.getElementById("readstat").innerHTML = "<input type=\"number\" step=\"1\" min=\"0\" id=\"readAddInput\">" + " / " + TheBook.pageCount + " pages read";
+		document.getElementById("readAddInput").value = TheBook.last_page;
+		document.getElementById("readAddInput").max = TheBook.pageCount;
+		document.getElementById("readAddInput").addEventListener("change", async function (e) {
+			let options = {
+				method: "POST",
+				headers: {
+					"Content-Type": "application/json"
+				},
+				body: JSON.stringify({
+					"token": connected,
+					"table": "Books",
+					"column": "last_page",
+					"whereEl": TheBook.ID_book,
+					"value": e.target.value,
+					"where": "ID_book"
+				}, null, 2)
+			};
+			await fetch("http://" + domain + ":" + port + "/DB/update", options).catch((err) => {
+				Toastifycation("Error", "#d92027");
+			});
+		});
 		document.getElementById("characters").innerHTML = "<h1>" + "Characters" + ":</h1> " + "Number of characters : " + ((provider == 1) ? (JSON.parse(TheBook.characters)["available"]) : ((TheBook.characters != "null") ? (JSON.parse(TheBook.characters).length) : (0))) + "<br/>";
-		document.getElementById("detailSeparator").style.marginTop = "2vh";
+		document.getElementById("detailSeparator").style.marginTop = "5vh";
 		let scrollCharactersAmount = 0;
 		let moveRight = document.createElement("button");
 		moveRight.className = "scrollBtnR";
@@ -4195,7 +4454,7 @@ async function createDetails(TheBook, provider) {
 		}
 	}
 	if (TheBook.issueNumber != "null" && TheBook.issueNumber != "" && TheBook.issueNumber != null) {
-		document.getElementById("chapters").innerHTML = "Number of volumes within the series : " + TheBook.issueNumber;
+		document.getElementById("chapters").innerHTML = "Number of this volume within the series : " + TheBook.issueNumber;
 	} else {
 		document.getElementById("chapters").innerHTML = "";
 	}
@@ -4344,26 +4603,37 @@ function clearList() {
 	}
 }
 
-document.getElementById('searchField').addEventListener('input', function (e) {
+document.getElementById('searchField').addEventListener('focus', function (e) {
 	document.getElementById('searchResults').style.display = 'block';
+	setTimeout(function () {
+		document.addEventListener('click', listenerClickSearch);
+	}, 100);
+});
+document.getElementById('searchField').addEventListener('input', function (e) {
+	console.log(theSearchList);
 	clearList();
 	let value = e.target.value;
 	if (value && value.trim().length > 0) {
 		value = value.trim().toLowerCase();
 		setSearch(theSearchList.filter(item => {
-			return item.NOM.toLowerCase().includes(value);
+			if (item.NOM != undefined) {
+				return item.NOM.toLowerCase().includes(value);
+			} else {
+				return item.title.toLowerCase().includes(value);
+			}
 		})).then(r => {
 		});
 	} else {
 		document.getElementById("searchResults").style.display = "none";
 		clearList();
 	}
-	document.addEventListener('click', function (e) {
-		document.getElementById("searchResults").style.display = "none";
-		clearList();
-		// TODO remove listener
-	});
+	document.addEventListener('click', listenerClickSearch);
 });
+
+function listenerClickSearch() {
+	document.getElementById("searchResults").style.display = "none";
+	document.removeEventListener('click', listenerClickSearch);
+}
 
 async function downloadBook(path) {
 	const option = {
