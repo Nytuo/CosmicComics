@@ -38,15 +38,15 @@ along with Cosmic-Comics.  If not, see <https://www.gnu.org/licenses/>.--->
                 <div>
 
 
-                <button class="btn" style="z-index: 10;" onclick="toggleSideBar()"
-                        id="sidemenu">
-                    <i class="material-icons" style="line-height: 1;height: 31px">menu</i>
-                </button>
-                <a class="brand-logo">
-                    <img src="Images/Logo.png" alt="" width="auto" height="50px" id="logo_id"
-                         class="navbar-brand rotate linear infinite"/>
-                    <img src="Images/LogoTxt.png" alt="" id="logo_id_txt" class="navbar-brand" height="50px"/>
-                </a>
+                    <button class="btn" style="z-index: 10;" onclick="toggleSideBar()"
+                            id="sidemenu">
+                        <i class="material-icons" style="line-height: 1;height: 31px">menu</i>
+                    </button>
+                    <a class="brand-logo">
+                        <img src="Images/Logo.png" alt="" width="auto" height="50px" id="logo_id"
+                             class="navbar-brand rotate linear infinite"/>
+                        <img src="Images/LogoTxt.png" alt="" id="logo_id_txt" class="navbar-brand" height="50px"/>
+                    </a>
                 </div>
 
                 <!--The Navigation Menu-->
@@ -60,10 +60,10 @@ along with Cosmic-Comics.  If not, see <https://www.gnu.org/licenses/>.--->
                     <button class="btn" data-bs-toggle="modal" data-bs-target="#buttonp" id="menuid">
                         <i class="material-icons" style="line-height: 1; height: 40px">more_horiz</i>
                     </button>
-                    <button class="btn"  onclick="changeVM()"
+                    <button class="btn" onclick="changeVM()"
                             id="id_viewmode">
                         <i class="material-icons" style="line-height: 1; height: 40px" id="icon_id_viewmode"
-                          >view_list</i>
+                        >view_list</i>
                     </button>
                     <button class="btn" style="margin: 0px 5px -1px;" onclick="AccountMenu()" id="id_accountSystem">
                         <img id="icon_id_accountSystem" alt="#">
@@ -508,6 +508,131 @@ along with Cosmic-Comics.  If not, see <https://www.gnu.org/licenses/>.--->
         </div>
     </div>
 </div>
+<div class="modal animate__animated animate__zoomIn animate__faster" id="editmodal" tabindex="-1"
+     aria-labelledby="id_editmodal" aria-hidden="true" style="overflow: hidden">
+    <div class="modal-dialog modal-dialog-centered modal-dialog-scrollable">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="id_editmodal">Edit</h5>
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"
+                        aria-label="Close"></button>
+            </div>
+            <div class="modal-body" style="text-align: left">
+                <p>Warning : Be careful when you modify those fields, DO NOT change the way they are written. If an item have '"', {} or [] at the beginning and at the end DO NOT remove them change only the
+                    content. The fields marked with a red * <span style="color: red">*</span> have to be in the same</p>
+                <div id="commonEdit">
+                    <label for="lockCheck">Lock this item ? (That prevent the metadata to be overwritten when refresh and disable
+                        rematch)</label>
+                    <input type="checkbox" id="lockCheck">
+                    <label>
+                        Path
+                        <input type="text" id="edit_PATH">
+                    </label>
+                    <label>
+                        Description
+                        <input type="text" id="edit_description">
+                    </label>
+                </div>
+                <div id="seriesEdit">
+                    <label>
+                        Title <span style="color: red">*</span>
+                        <input type="text" id="edit_title">
+                    </label>
+
+                    <label>
+                        Cover <span style="color: red">*</span>
+                        <input type="text" id="edit_cover">
+                    </label>
+                    <label>
+                        Source <span style="color: red">*</span>
+                        <input type="text" id="edit_SOURCE">
+                    </label>
+                    <label>
+                        Link BG <span style="color: red">*</span>
+                        <input type="text" id="edit_BG">
+                    </label>
+                    <label>
+                        Status
+                        <input type="text" id="edit_statut">
+                    </label>
+                    <label>
+                        Start Date
+                        <input type="text" id="edit_start_date">
+                    </label>
+                    <label>
+                        End Date
+                        <input type="text" id="edit_end_date">
+                    </label>
+                    <label>
+                        Score
+                        <input type="text" id="edit_Score">
+                    </label>
+                    <label>
+                        Genres <span style="color: red">*</span>
+                        <input type="text" id="edit_genres">
+                    </label>
+                    <label>
+                        Trending
+                        <input type="text" id="edit_TRENDING">
+                    </label>
+                    <label>
+                        Volumes <span style="color: red">*</span>
+                        <input type="text" id="edit_volumes">
+                    </label>
+                    <label>
+                        Chapters
+                        <input type="text" id="edit_chapters">
+                    </label>
+
+                </div>
+                <div id="bookEdit">
+                    <label>
+                        Title <span style="color: red">*</span>
+                        <input type="text" id="edit_NOM">
+                    </label>
+                    <label>
+                        URLCover <span style="color: red">*</span>
+                        <input type="text" id="edit_URLCover">
+                    </label>
+                    <label>
+                        issue Number
+                        <input type="text" id="edit_issueNumber">
+                    </label>
+                    <label>
+                        format
+                        <input type="text" id="edit_format">
+                    </label>
+                    <label>
+                        page Count
+                        <input type="text" id="edit_pageCount">
+                    </label>
+                    <label>
+                        URLs <span style="color: red">*</span>
+                        <input type="text" id="edit_URLs">
+                    </label>
+                    <label>
+                        series <span style="color: red">*</span>
+                        <input type="text" id="edit_series">
+                    </label>
+                    <label>
+                        prices <span style="color: red">*</span>
+                        <input type="text" id="prices">
+                    </label>
+                    <label>
+                        dates <span style="color: red">*</span>
+                        <input type="text" id="dates">
+                    </label>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button class="btn btn-primary" id="sendEdit">SEND</button>
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal" id="close_edit">
+                    Close
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
 <!-- Modal Tips-->
 <div class="modal animate__animated animate__zoomIn animate__faster" id="modifAccount" tabindex="-1"
      aria-labelledby="id_modifAccount" aria-hidden="true" data-bs-backdrop="static" data-bs-keyboard="false"
@@ -622,11 +747,11 @@ along with Cosmic-Comics.  If not, see <https://www.gnu.org/licenses/>.--->
                 <a href="#" id="readingbtndetails"> <i class="material-icons" style="">auto_stories</i></a>
                 <a href="#" id="decheckbtn"> <i class="material-icons" style="">close</i></a>
                 <a href="#" id="favoritebtn"> <i class="material-icons" style="">favorite</i></a>
-                <a href="#"> <i class="material-icons" style="">edit</i></a>
+                <a href="#" data-bs-target="#editmodal" data-bs-toggle="modal"> <i class="material-icons"
+                                                                                   style="">edit</i></a>
                 <a href="#" id="DLBOOK"> <i class="material-icons" style="">download</i></a>
-                <a href="#"> <i class="material-icons" style="">refresh</i></a>
+                <a href="#"> <i class="material-icons" id="refresh" style="">refresh</i></a>
                 <a href="#"> <i class="material-icons" style="">youtube_searched_for</i></a>
-                <a href="#"> <i class="material-icons" style="">search_off</i></a>
                 <div class="rating">
                     <input type="radio" name="rating" id="rating-5" onClick="changeRating('Series', 5)"/>
                     <label For="rating-5"></label>

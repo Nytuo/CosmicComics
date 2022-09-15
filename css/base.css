@@ -1084,6 +1084,17 @@ body {
     color: white;
     text-align: right;
 }
+input[type=text]{
+    background-color: rgba(0, 0, 0, 0.3);
+    color: white;
+    text-align: left;
+    width: 100%;
+    height: 31px;
+    font-size: 21px;
+}
+label{
+    width: 100%;
+}
 
 #SiteURL, #Staff, #OtherTitles, #characters, #relations {
     color: var(--text);
@@ -1623,4 +1634,9 @@ a[href^="http://marvel.com"] {
     100% {
         background-position: 0% 99%
     }
+}
+
+::selection {
+    background-color: var(--line-color);
+    color: var(--text);
 }

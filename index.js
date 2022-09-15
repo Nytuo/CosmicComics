@@ -293,11 +293,24 @@ function resetLibModal() {
 }
 
 function refreshMetadata(elElement) {
-	alert(elElement);
-}
-
-function refreshLibrary(elElement) {
-	alert(elElement);
+	let path = elElement["PATH"];
+	DetectFolderInLibrary(path).then(async function (data) {
+		data = JSON.parse(data);
+		console.log(data);
+		await getFromDB("Series", "ID_Series,PATH FROM Series").then(async (res) => {
+			res= JSON.parse(res);
+			console.log(res);
+			for (let index = 0; index < res.length; index++) {
+				let el = res[index]["PATH"];
+				for (let i = 0; i < data.length; i++) {
+					if (el === data[i]) {
+						await refreshMeta(res[index]["ID_Series"], elElement["API_ID"], "Series");
+						break;
+					}
+				}
+			}
+		});
+	})
 }
 
 function addToBreadCrumb(title, ListenerF) {
@@ -345,7 +358,9 @@ function discoverFolders() {
 				document.getElementById("overlay").style.display = "none";
 				document.getElementById("overlay2").style.display = "none";
 				document.getElementById("contentViewer").style.display = "none";
-				addToBreadCrumb(el["NAME"], function () {return openFolder_logic(el["PATH"], el["API_ID"]);});
+				addToBreadCrumb(el["NAME"], function () {
+					return openFolder_logic(el["PATH"], el["API_ID"]);
+				});
 				openFolder_logic(el["PATH"], el["API_ID"]);
 			});
 			const marvelogo = document.createElement("img");
@@ -378,7 +393,6 @@ function discoverFolders() {
 			li2.setAttribute("data-bs-toggle", "modal");
 			li2.setAttribute("data-bs-target", "#lib");
 			li3.innerHTML = "Refresh metadata";
-			li4.innerHTML = "Refresh library";
 			li.addEventListener("click", function () {
 				deleteLib(el);
 			});
@@ -388,13 +402,9 @@ function discoverFolders() {
 			li3.addEventListener("click", function () {
 				refreshMetadata(el);
 			});
-			li4.addEventListener("click", function () {
-				refreshLibrary(el);
-			});
 			ul.appendChild(li);
 			ul.appendChild(li2);
 			ul.appendChild(li3);
-			ul.appendChild(li4);
 			ul.className = "contextMenu";
 			ul.style.left = "15vw";
 			ul.style.display = "none";
@@ -406,7 +416,7 @@ function discoverFolders() {
 					ul.style.display = "none";
 				});
 				document.addEventListener("click", function (e) {
-					if (e.target != menu && e.target != ul && e.target != li && e.target != li2 && e.target != li3 && e.target != li4 && e.target != btn && e.target != menu.children[0]) {
+					if (e.target != menu && e.target != ul && e.target != li && e.target != li2 && e.target != li3 && e.target != btn && e.target != menu.children[0]) {
 						ul.style.display = "none";
 					}
 				});
@@ -433,7 +443,9 @@ function discoverFolders() {
 		document.getElementById("overlay").style.display = "none";
 		document.getElementById("overlay2").style.display = "none";
 		document.getElementById("contentViewer").style.display = "none";
-		addToBreadCrumb("Downloads", () => {return openFolder_logic(CosmicComicsTemp + "/downloads", 2);});
+		addToBreadCrumb("Downloads", () => {
+			return openFolder_logic(CosmicComicsTemp + "/downloads", 2);
+		});
 		openFolder_logic(CosmicComicsTemp + "/downloads", 2);
 	});
 	const marvelogo = document.createElement("i");
@@ -817,7 +829,17 @@ function Get_element_from_data(search, data) {
 	}
 	return null;
 }
-
+async function getAPIANILIST_ByID(id) {
+	return fetch("http://" + domain + ":" + port + "/api/anilist/searchByID/" + id).then(function (response) {
+		return response.text();
+	}).then(function (data) {
+		data = JSON.parse(data);
+		console.log(data);
+		return data;
+	}).catch(function (error) {
+		console.log(error);
+	});
+}
 async function getAPIANILIST(name) {
 	return fetch("http://" + domain + ":" + port + "/api/anilist/search/" + name).then(function (response) {
 		return response.text();
@@ -889,7 +911,8 @@ function loadView(FolderRes, libraryPath, date = "", provider = 2) {
 		for (let index = 0; index < data.length; index++) {
 			const path = data[index];
 			console.log(path);
-			var name = path.replaceAll(libraryPath.replaceAll("\\", "/"), "").replace("/", "");
+			var name = path.replaceAll(libraryPath.replaceAll("\\", "/"), "")
+			console.log(name);
 			var realname = /[^\\\/]+(?=\.[\w]+$)|[^\\\/]+$/.exec(name)[0];
 			console.log(realname);
 			let readBookNB = await getFromDB("Books", "COUNT(*) FROM Books WHERE READ = 1 AND PATH = '" + path + "'");
@@ -908,10 +931,11 @@ function loadView(FolderRes, libraryPath, date = "", provider = 2) {
 							}
 							if (cdata["data"]["total"] > 0) {
 								cdata = cdata["data"]["results"][0];
-								await InsertIntoDB("Books", "", `(?,'${realname}',null,${0},${0},${1},${0},${0},${0},'${path}','${cdata["thumbnail"].path + "/detail." + cdata["thumbnail"].extension}','${cdata["issueNumber"]}','${cdata["description"].replaceAll("'", "''")}','${cdata["format"]}',${cdata["pageCount"]},'${JSON.stringify(cdata["urls"])}','${JSON.stringify(cdata["series"])}','${JSON.stringify(cdata["creators"])}','${JSON.stringify(cdata["characters"])}','${JSON.stringify(cdata["prices"])}','${JSON.stringify(cdata["dates"])}','${JSON.stringify(cdata["collectedIssues"])}','${JSON.stringify(cdata["collections"])}','${JSON.stringify(cdata["variants"])}')`).then(() => {
+								await InsertIntoDB("Books", "", `(?,'${cdata["id"]}','${realname}',null,${0},${0},${1},${0},${0},${0},'${path}','${cdata["thumbnail"].path + "/detail." + cdata["thumbnail"].extension}','${cdata["issueNumber"]}','${cdata["description"].replaceAll("'", "''")}','${cdata["format"]}',${cdata["pageCount"]},'${JSON.stringify(cdata["urls"])}','${JSON.stringify(cdata["series"])}','${JSON.stringify(cdata["creators"])}','${JSON.stringify(cdata["characters"])}','${JSON.stringify(cdata["prices"])}','${JSON.stringify(cdata["dates"])}','${JSON.stringify(cdata["collectedIssues"])}','${JSON.stringify(cdata["collections"])}','${JSON.stringify(cdata["variants"])}',false)`).then(() => {
 									console.log("inserted");
 									TheBook = {
 										NOM: realname,
+										id: cdata["id"],
 										note: null,
 										read: 0,
 										reading: 0,
@@ -934,7 +958,8 @@ function loadView(FolderRes, libraryPath, date = "", provider = 2) {
 										dates: cdata["dates"],
 										collectedIssues: cdata["collectedIssues"],
 										collections: cdata["collections"],
-										variants: cdata["variants"]
+										variants: cdata["variants"],
+										lock: false
 									};
 								});
 								await GETMARVELAPI_Creators(cdata["id"], "comics").then(async (ccdata) => {
@@ -954,7 +979,7 @@ function loadView(FolderRes, libraryPath, date = "", provider = 2) {
 									}
 								});
 							} else {
-								await InsertIntoDB("Books", "", `(?,'${realname}',null,${0},${0},${1},${0},${0},${0},'${path}','${null}','${null}','${null}','${null}',${null},'${null}','${null}','${null}','${null}','${null}','${null}','${null}','${null}','${null}')`).then(() => {
+								await InsertIntoDB("Books", "", `(?,'${null}','${realname}',null,${0},${0},${1},${0},${0},${0},'${path}','${null}','${null}','${null}','${null}',${null},'${null}','${null}','${null}','${null}','${null}','${null}','${null}','${null}','${null}',false)`).then(() => {
 									console.log("inserted");
 									TheBook = {
 										NOM: realname,
@@ -979,7 +1004,8 @@ function loadView(FolderRes, libraryPath, date = "", provider = 2) {
 										dates: null,
 										collectedIssues: null,
 										collections: null,
-										variants: null
+										variants: null,
+										lock: null
 									};
 								});
 							}
@@ -1011,7 +1037,7 @@ function loadView(FolderRes, libraryPath, date = "", provider = 2) {
 								}
 							}
 							console.log(SerieName);
-							await InsertIntoDB("Books", "", `(?,'${realname}',${null},${0},${0},${1},${0},${0},${0},'${path}','${null}','${null}','${null}','${null}',${null},'${null}','${"Anilist_" + realname.replaceAll(" ", "$") + "_" + SerieName.replaceAll(" ", "$")}','${null}','${null}','${null}','${null}','${null}','${null}','${null}')`).then(() => {
+							await InsertIntoDB("Books", "", `(?,'${null}','${realname}',${null},${0},${0},${1},${0},${0},${0},'${path}','${null}','${null}','${null}','${null}',${null},'${null}','${"Anilist_" + realname.replaceAll(" ", "$") + "_" + SerieName.replaceAll(" ", "$")}','${null}','${null}','${null}','${null}','${null}','${null}','${null}',false)`).then(() => {
 								console.log("inserted");
 								TheBook = {
 									NOM: realname,
@@ -1036,7 +1062,8 @@ function loadView(FolderRes, libraryPath, date = "", provider = 2) {
 									dates: null,
 									collectedIssues: null,
 									collections: null,
-									variants: null
+									variants: null,
+									lock: false
 								};
 							});
 						});
@@ -1453,6 +1480,14 @@ async function GETMARVELAPI_Creators(id, type) {
 	return data;
 }
 
+async function GETMARVELAPI_Comics_ByID(id) {
+	let url = "https://gateway.marvel.com:443/v1/public/comics?id=" + id + "&noVariants=true&apikey=1ad92a16245cfdb9fecffa6745b3bfdc";
+	var response = await fetch(url);
+	var data = await response.json();
+	console.log(data);
+	return data;
+}
+
 async function GETMARVELAPI_Comics(name = "", seriesStartDate = "") {
 	if (name === "") {
 		console.log("GETMARVELAPI_Comics : name is empty");
@@ -1483,6 +1518,15 @@ async function GETMARVELAPI_Comics(name = "", seriesStartDate = "") {
 	} else {
 		var url = "https://gateway.marvel.com:443/v1/public/comics?titleStartsWith=" + encodeURIComponent(name) + "&noVariants=true&apikey=1ad92a16245cfdb9fecffa6745b3bfdc";
 	}
+	var response = await fetch(url);
+	var data = await response.json();
+	console.log(data);
+	return data;
+}
+
+async function GETMARVELAPI_Series_ByID(id) {
+	var url = "https://gateway.marvel.com:443/v1/public/series?id=" + id + "&apikey=1ad92a16245cfdb9fecffa6745b3bfdc";
+	console.log(url);
 	var response = await fetch(url);
 	var data = await response.json();
 	console.log(data);
@@ -1585,7 +1629,7 @@ async function loadContent(provider, FolderRes, libraryPath) {
 	FolderRes = JSON.parse(FolderRes);
 	const divlist = document.createElement("div");
 	divlist.className = "list-group";
-	await getFromDB("Series", "title FROM Series").then(async (res) => {
+	await getFromDB("Series", "PATH FROM Series").then(async (res) => {
 			for (var index = 0; index < FolderRes.length; index++) {
 				const path = FolderRes[index];
 				var name = path.replaceAll(libraryPath.replaceAll("\\", "/"), "").replace("/", "");
@@ -1594,29 +1638,19 @@ async function loadContent(provider, FolderRes, libraryPath) {
 				console.log(realname);
 				var found = false;
 				var titlesList = [];
-				var returnedTitles = JSON.parse(res);
-				var foundTitle = "";
-				for (var i = 0; i < returnedTitles.length; i++) {
-					titlesList.push(returnedTitles[i].title);
+				var returnedPath = JSON.parse(res);
+				var foundPATH = "";
+				for (var i = 0; i < returnedPath.length; i++) {
+					titlesList.push(returnedPath[i].PATH);
 				}
 				console.log(titlesList);
 				console.log(name);
 				titlesList.forEach((el) => {
 					console.log(el);
-					save = el;
-					el = el.toLowerCase().replaceAll(":", "").replaceAll("'", "")
-						.replaceAll('"', "")
-						.replaceAll("romaji", "").replaceAll("native", "")
-						.replaceAll("english", "").replaceAll("{", "")
-						.replaceAll("}", "");
-					elar = el.split(",");
-					elar.forEach((el2) => {
-						if (name.toLowerCase() === (el2.toLowerCase())) {
-							console.log(el2);
-							found = true;
-							foundTitle = save;
-						}
-					});
+					if (el === path) {
+						found = true;
+						foundPATH = el;
+					}
 				});
 				if (found == false) {
 					if (provider == 2) {
@@ -1624,10 +1658,10 @@ async function loadContent(provider, FolderRes, libraryPath) {
 						await getAPIANILIST(name).then(async (data) => {
 								let randID = Math.floor(Math.random() * 1000000);
 								if (data == null) {
-									await InsertIntoDB("Series", "(ID_Series,title,note,statut,start_date,end_date,description,Score,genres,cover,BG,CHARACTERS,TRENDING,STAFF,SOURCE,volumes,chapters,favorite,PATH)",
-										"('" + randID + "U_2" + "','" + JSON.stringify(name.replaceAll("'", "''")) + "',null,null,null,null,null,'0',null,null,null,null,null,null,null,null,null,0,'" + path + "')");
+									await InsertIntoDB("Series", "(ID_Series,title,note,statut,start_date,end_date,description,Score,genres,cover,BG,CHARACTERS,TRENDING,STAFF,SOURCE,volumes,chapters,favorite,PATH,lock)",
+										"('" + randID + "U_2" + "','" + JSON.stringify(name.replaceAll("'", "''")) + "',null,null,null,null,null,'0',null,null,null,null,null,null,null,null,null,0,'" + path + "',false)");
 								} else {
-									await InsertIntoDB("Series", "(ID_Series,title,note,statut,start_date,end_date,description,Score,genres,cover,BG,CHARACTERS,TRENDING,STAFF,SOURCE,volumes,chapters,favorite,PATH)", "('" + data["id"] + "_2" + "','" + JSON.stringify(data["title"]).replaceAll("'", "''") + "',null,'" + data["status"].replaceAll("'", "''") + "','" + JSON.stringify(data["startDate"]).replaceAll("'", "''") + "','" + JSON.stringify(data["endDate"]).replaceAll("'", "''") + "','" + data["description"].replaceAll("'", "''") + "','" + data["meanScore"] + "','" + JSON.stringify(data["genres"]).replaceAll("'", "''") + "','" + data["coverImage"]["large"] + "','" + data["bannerImage"] + "','" + JSON.stringify(data["characters"]).replaceAll("'", "''") + "','" + data["trending"] + "','" + JSON.stringify(data["staff"]).replaceAll("'", "''") + "','" + data["siteUrl"].replaceAll("'", "''") + "','" + data["volumes"] + "','" + data["chapters"] + "',0,'" + path + "')");
+									await InsertIntoDB("Series", "(ID_Series,title,note,statut,start_date,end_date,description,Score,genres,cover,BG,CHARACTERS,TRENDING,STAFF,SOURCE,volumes,chapters,favorite,PATH,lock)", "('" + data["id"] + "_2" + "','" + JSON.stringify(data["title"]).replaceAll("'", "''") + "',null,'" + data["status"].replaceAll("'", "''") + "','" + JSON.stringify(data["startDate"]).replaceAll("'", "''") + "','" + JSON.stringify(data["endDate"]).replaceAll("'", "''") + "','" + data["description"].replaceAll("'", "''") + "','" + data["meanScore"] + "','" + JSON.stringify(data["genres"]).replaceAll("'", "''") + "','" + data["coverImage"]["large"] + "','" + data["bannerImage"] + "','" + JSON.stringify(data["characters"]).replaceAll("'", "''") + "','" + data["trending"] + "','" + JSON.stringify(data["staff"]).replaceAll("'", "''") + "','" + data["siteUrl"].replaceAll("'", "''") + "','" + data["volumes"] + "','" + data["chapters"] + "',0,'" + path + "',false)");
 									await GETANILISTAPI_CREATOR(data["staff"]).then(async (ccdata) => {
 										for (let i = 0; i < ccdata.length; i++) {
 											try {
@@ -1743,10 +1777,10 @@ async function loadContent(provider, FolderRes, libraryPath) {
 							console.log(data);
 							let randID = Math.floor(Math.random() * 1000000);
 							if (data["data"]["total"] == 0) {
-								await InsertIntoDB("Series", "(ID_Series,title,note,start_date,end_date,description,Score,cover,BG,CHARACTERS,STAFF,SOURCE,volumes,chapters,favorite,PATH)",
-									"('" + randID + "U_1" + "','" + JSON.stringify(name.replaceAll("'", "''")) + "',null,null,null,null,'0',null,null,null,null,null,null,null,0,'" + path + "')");
+								await InsertIntoDB("Series", "(ID_Series,title,note,start_date,end_date,description,Score,cover,BG,CHARACTERS,STAFF,SOURCE,volumes,chapters,favorite,PATH,lock)",
+									"('" + randID + "U_1" + "','" + JSON.stringify(name.replaceAll("'", "''")) + "',null,null,null,null,'0',null,null,null,null,null,null,null,0,'" + path + "',false)");
 							} else {
-								await InsertIntoDB("Series", "(ID_Series,title,note,start_date,end_date,description,Score,cover,BG,CHARACTERS,STAFF,SOURCE,volumes,chapters,favorite,PATH)", "('" + data["data"]["results"][0]["id"] + "_1" + "','" + JSON.stringify(data["data"]["results"][0]["title"]).replaceAll("'", "''") + "',null,'" + JSON.stringify(data["data"]["results"][0]["startYear"]).replaceAll("'", "''") + "','" + JSON.stringify(data["data"]["results"][0]["endYear"]).replaceAll("'", "''") + "','" + data["data"]["results"][0]["description"] + "','" + data["data"]["results"][0]["rating"] + "','" + JSON.stringify(data["data"]["results"][0]["thumbnail"]) + "','" + JSON.stringify(data["data"]["results"][0]["thumbnail"]) + "','" + JSON.stringify(data["data"]["results"][0]["characters"]).replaceAll("'", "''") + "','" + JSON.stringify(data["data"]["results"][0]["creators"]).replaceAll("'", "''") + "','" + JSON.stringify(data["data"]["results"][0]["urls"][0]) + "','" + JSON.stringify(data["data"]["results"][0]["comics"]["items"]) + "','" + data["data"]["results"][0]["comics"]["available"] + "',0,'" + path + "')");
+								await InsertIntoDB("Series", "(ID_Series,title,note,start_date,end_date,description,Score,cover,BG,CHARACTERS,STAFF,SOURCE,volumes,chapters,favorite,PATH,lock)", "('" + data["data"]["results"][0]["id"] + "_1" + "','" + JSON.stringify(data["data"]["results"][0]["title"]).replaceAll("'", "''") + "',null,'" + JSON.stringify(data["data"]["results"][0]["startYear"]).replaceAll("'", "''") + "','" + JSON.stringify(data["data"]["results"][0]["endYear"]).replaceAll("'", "''") + "','" + data["data"]["results"][0]["description"] + "','" + data["data"]["results"][0]["rating"] + "','" + JSON.stringify(data["data"]["results"][0]["thumbnail"]) + "','" + JSON.stringify(data["data"]["results"][0]["thumbnail"]) + "','" + JSON.stringify(data["data"]["results"][0]["characters"]).replaceAll("'", "''") + "','" + JSON.stringify(data["data"]["results"][0]["creators"]).replaceAll("'", "''") + "','" + JSON.stringify(data["data"]["results"][0]["urls"][0]) + "','" + JSON.stringify(data["data"]["results"][0]["comics"]["items"]) + "','" + data["data"]["results"][0]["comics"]["available"] + "',0,'" + path + "',false)");
 								await GETMARVELAPI_Creators(data["data"]["results"][0]["id"], "series").then(async (ccdata) => {
 									ccdata = ccdata["data"]["results"];
 									for (let i = 0; i < ccdata.length; i++) {
@@ -1790,8 +1824,8 @@ async function loadContent(provider, FolderRes, libraryPath) {
 					} else {
 					}
 				} else {
-					await getFromDB("Series", "* FROM Series where title = '" + foundTitle + "'").then((res) => {
-						console.log(foundTitle);
+					await getFromDB("Series", "* FROM Series where PATH = '" + foundPATH + "'").then((res) => {
+						console.log(foundPATH);
 						res = JSON.parse(res);
 						console.log(res);
 						let node;
@@ -3291,9 +3325,9 @@ async function setSearch(res) {
 	for (const key in res) {
 		const resItem = document.createElement("li");
 		resItem.classList.add("resItem");
-		let text=document.createElement("span");
+		let text = document.createElement("span");
 		let img = document.createElement("img");
-			let series = document.createElement("span");
+		let series = document.createElement("span");
 		let isBook = res[key].NOM !== undefined;
 		if (isBook) {
 			text.innerHTML = res[key].NOM;
@@ -3337,7 +3371,7 @@ async function setSearch(res) {
 		img.style.width = "50px";
 		resItem.appendChild(text);
 		resItem.appendChild(img);
-			resItem.appendChild(series);
+		resItem.appendChild(series);
 		resItem.addEventListener("click", async (e) => {
 			document.getElementById("searchResults").style.display = "none";
 			document.getElementById("home").style.display = "none";
@@ -3408,8 +3442,58 @@ async function createSeries(provider, path, libraryPath, res) {
 	resetOverlay();
 	console.log(provider);
 	document.documentElement.style.overflow = "hidden";
-	addToBreadCrumb(resolveTitle(res[0].title), () => { return createSeries(provider, path, libraryPath, res);});
+	addToBreadCrumb(resolveTitle(res[0].title), () => {
+		return createSeries(provider, path, libraryPath, res);
+	});
 	let APINOTFOUND = /[a-zA-Z]/g.test(res[0].ID_Series);
+	document.getElementById('bookEdit').style.display = "none";
+	document.getElementById('seriesEdit').style.display = "block";
+	document.querySelectorAll("#seriesEdit>label>input").forEach((e) => {
+		e.value = res[0][e.id.replaceAll("edit_", "")];
+	})
+	document.querySelectorAll("#commonEdit>label>input").forEach((e) => {
+		e.value = res[0][e.id.replaceAll("edit_", "")];
+	})
+	document.getElementById("sendEdit").onclick = async () => {
+		let values = [];
+		let columns = [];
+		document.querySelectorAll("#commonEdit>label>input").forEach((e) => {
+			values.push(e.value)
+			columns.push(e.id.replaceAll("edit_", ""))
+		})
+		document.querySelectorAll("#seriesEdit>label>input").forEach((e) => {
+			values.push(e.value)
+			columns.push(e.id.replaceAll("edit_", ""))
+		})
+		values.push(document.getElementById("lockCheck").checked);
+		columns.push("lock");
+		await fetch("http://" + domain + ":" + port + "/DB/update", {
+			method: "POST",
+			headers: {
+				"Content-Type": "application/json"
+			},
+			body: JSON.stringify({
+				"token": connected,
+				"table": "Series",
+				"type": "edit",
+				"column": columns,
+				"whereEl": res[0].PATH,
+				"value": values,
+				"where": "PATH"
+			}, null, 2)
+		})
+	}
+	let isLocked = () => {
+		return res[0].lock == 1 || res[0].lock == true;
+	}
+	document.getElementById("lockCheck").checked = res[0].lock;
+	document.getElementById('refresh').onclick = async () => {
+		if (!isLocked()) {
+			await refreshMeta(res[0].ID_Series, provider, "series");
+		} else {
+			Toastifycation("This series is locked", "#ff0000");
+		}
+	}
 	if (!APINOTFOUND) {
 		document.getElementById("provider_text").innerHTML = ((provider == 1) ? ("Data provided by Marvel. © 2014 Marvel") : ((provider == 2) ? ("Data provided by Anilist.") : ("The Data are not provided by an API.")));
 	} else {
@@ -4079,12 +4163,245 @@ addToBreadCrumb("Home", () => {
 	returnToHome();
 });
 
+async function refreshMeta(id, provider, type) {
+	Toastifycation("Refreshing metadata...");
+	if (provider == 1) {
+		if (type == "book") {
+			await getFromDB("Books", "* FROM Books WHERE ID_book=" + id).then(async (res) => {
+				let book = JSON.parse(res)[0];
+				console.log(book);
+				await GETMARVELAPI_Comics_ByID(book.API_ID).then(async (res2) => {
+					res2 = res2.data.results[0];
+					let blacklisted = ["note", "read", "reading", "unread", "favorite", "last_page", "folder", "PATH", "lock", "ID_book"]
+					let asso = {}
+					for (var i = 0; i < book.length; i++) {
+						for (var key in book[i]) {
+							if (!blacklisted.includes(key)) {
+								asso[key] = book[i][key];
+							}
+						}
+					}
+					asso["NOM"] = res2.title;
+					asso["URLCover"] = res2.thumbnail.path + "/detail." + res2.thumbnail.extension;
+					asso["issueNumber"] = res2.issueNumber;
+					asso["description"] = res2.description.replaceAll("'", "''");
+					asso["format"] = res2.format;
+					asso["pageCount"] = res2.pageCount;
+					asso["URLs"] = JSON.stringify(res2.urls);
+					asso["dates"] = JSON.stringify(res2.dates);
+					asso["prices"] = JSON.stringify(res2.prices);
+					asso["creators"] = JSON.stringify(res2.creators);
+					asso["characters"] = JSON.stringify(res2.characters);
+					asso["series"] = JSON.stringify(res2.series);
+					asso["collectedIssues"] = JSON.stringify(res2.collectedIssues);
+					asso["variants"] = JSON.stringify(res2.variants);
+					asso["collections"] = JSON.stringify(res2.collections);
+					let columns = [];
+					let values = [];
+					for (var key in asso) {
+						columns.push(key);
+						values.push(asso[key]);
+					}
+					let options = {
+						method: "POST",
+						headers: {
+							"Content-Type": "application/json"
+						},
+						body: JSON.stringify({
+							"token": connected,
+							"table": "Books",
+							"type": "edit",
+							"column": columns,
+							"whereEl": book.PATH,
+							"value": values,
+							"where": "PATH"
+						}, null, 2)
+					};
+					await fetch("http://" + domain + ":" + port + "/DB/update", options);
+				});
+			})
+		} else {
+			await getFromDB("Series", "* FROM Series WHERE ID_Series='" + id + "'").then(async (res) => {
+				let book = JSON.parse(res)[0];
+				await GETMARVELAPI_Series_ByID(parseInt(id)).then(async (res2) => {
+					if (!res2.hasOwnProperty("data")) {
+						return;
+					}
+					res2 = res2.data.results[0];
+					let blacklisted = ["note", "favorite", "PATH", "lock", "ID_Series"]
+					let asso = {}
+					for (var i = 0; i < book.length; i++) {
+						for (var key in book[i]) {
+							if (!blacklisted.includes(key)) {
+								asso[key] = book[i][key];
+							}
+						}
+					}
+					asso["title"] = JSON.stringify(res2.title).replaceAll("'", "''");
+					asso["cover"] = JSON.stringify(res2.thumbnail);
+					if (res2.description != null) {
+						asso["description"] = res2.description.replaceAll("'", "''");
+					} else {
+						asso["description"] = "";
+					}
+					asso["start_date"] = res2.startYear
+					asso["end_date"] = res2.endYear
+					asso["CHARACTERS"] = JSON.stringify(res2.characters).replaceAll("'", "''");
+					asso["STAFF"] = JSON.stringify(res2.creators).replaceAll("'", "''");
+					asso["SOURCE"] = JSON.stringify(res2.urls[0]);
+					asso["BG"] = JSON.stringify(res2.thumbnail);
+					asso["volumes"] = JSON.stringify(res2.comics.items).replaceAll("'", "''");
+					asso["chapters"] = JSON.stringify(res2.comics.available).replaceAll("'", "''");
+					let columns = [];
+					let values = [];
+					for (var key in asso) {
+						columns.push(key);
+						values.push(asso[key]);
+					}
+					let options = {
+						method: "POST",
+						headers: {
+							"Content-Type": "application/json"
+						},
+						body: JSON.stringify({
+							"token": connected,
+							"table": "Series",
+							"type": "edit",
+							"column": columns,
+							"whereEl": book.PATH,
+							"value": values,
+							"where": "PATH"
+						}, null, 2)
+					};
+					await fetch("http://" + domain + ":" + port + "/DB/update", options);
+				});
+			})
+		}
+	} else if (provider == 2) {
+		if (type !== "book") {
+			//TODO Anilist
+			await getFromDB("Series", "* FROM Series WHERE ID_Series='" + id + "'").then(async (res) => {
+				let book = JSON.parse(res)[0];
+				await getAPIANILIST_ByID(parseInt(id)).then(async (res2) => {
+					let blacklisted = ["note", "favorite", "PATH", "lock", "ID_Series"]
+					let asso = {}
+					for (var i = 0; i < book.length; i++) {
+						for (var key in book[i]) {
+							if (!blacklisted.includes(key)) {
+								asso[key] = book[i][key];
+							}
+						}
+					}
+					asso["title"] = JSON.stringify(res2.title).replaceAll("'", "''");
+					asso["cover"] = res2.coverImage.large;
+
+					if (res2.description != null) {
+						asso["description"] = res2.description.replaceAll("'", "''");
+					} else {
+						asso["description"] = "";
+					}
+					asso["start_date"] = JSON.stringify(res2.startDate).replaceAll("'", "''");
+					asso["end_date"] = JSON.stringify(res2.endDate).replaceAll("'", "''");
+					asso["CHARACTERS"] = JSON.stringify(res2.characters).replaceAll("'", "''");
+					asso["STAFF"] = JSON.stringify(res2.staff).replaceAll("'", "''");
+					asso["SOURCE"] = JSON.stringify(res2.siteUrl).replaceAll("'", "''");
+					asso["BG"] = res2.bannerImage;
+					asso["volumes"] = JSON.stringify(res2.volumes).replaceAll("'", "''");
+					asso["chapters"] = JSON.stringify(res2.chapters).replaceAll("'", "''");
+					asso["statut"] = res2["status"].replaceAll("'", "''");
+					asso["Score"] = res2["meanScore"]
+					asso["genres"] = JSON.stringify(res2["genres"]).replaceAll("'", "''");
+					asso["TRENDING"] = JSON.stringify(res2["trending"]).replaceAll("'", "''");
+
+					let columns = [];
+					let values = [];
+					for (var key in asso) {
+						columns.push(key);
+						values.push(asso[key]);
+					}
+					let options = {
+						method: "POST",
+						headers: {
+							"Content-Type": "application/json"
+						},
+						body: JSON.stringify({
+							"token": connected,
+							"table": "Series",
+							"type": "edit",
+							"column": columns,
+							"whereEl": book.PATH,
+							"value": values,
+							"where": "PATH"
+						}, null, 2)
+					};
+					await fetch("http://" + domain + ":" + port + "/DB/update", options);
+				});
+			})
+		}
+	}
+	Toastifycation("Metadata updated");
+}
+
 async function createDetails(TheBook, provider) {
 	resetOverlay();
 	document.documentElement.style.overflow = "hidden";
 	console.log(provider);
 	console.log(TheBook);
-	addToBreadCrumb(TheBook.NOM, () => {return createDetails(TheBook, provider);});
+	document.getElementById('bookEdit').style.display = "block";
+	document.getElementById('seriesEdit').style.display = "none";
+	document.querySelectorAll("#commonEdit>label>input").forEach((e) => {
+		e.value = TheBook[e.id.replaceAll("edit_", "")];
+	})
+	document.querySelectorAll("#bookEdit>label>input").forEach((e) => {
+		e.value = TheBook[e.id.replaceAll("edit_", "")];
+	})
+	let isLocked = () => {
+		return TheBook.lock == 1 || TheBook.lock == true;
+	}
+	document.getElementById("lockCheck").checked = isLocked();
+	document.getElementById('refresh').onclick = async () => {
+		if (provider == 2) {
+			Toastifycation("Anilist is not compatible for this feature", "#ff0000")
+		} else {
+			if (!isLocked()) {
+				await refreshMeta(TheBook.ID_book, provider, "book");
+			} else {
+				Toastifycation("This book is locked", "#ff0000");
+			}
+		}
+	}
+	document.getElementById("sendEdit").onclick = async () => {
+		let values = [];
+		let columns = [];
+		document.querySelectorAll("#commonEdit>label>input").forEach((e) => {
+			values.push(e.value)
+			columns.push(e.id.replaceAll("edit_", ""))
+		})
+		document.querySelectorAll("#bookEdit>label>input").forEach((e) => {
+			values.push(e.value)
+			columns.push(e.id.replaceAll("edit_", ""))
+		})
+		values.push(document.getElementById("lockCheck").checked);
+		columns.push("lock");
+		await fetch("http://" + domain + ":" + port + "/DB/update", {
+			method: "POST",
+			headers: {
+				"Content-Type": "application/json"
+			},
+			body: JSON.stringify({
+				"token": connected,
+				"table": "Books",
+				"type": "edit",
+				"column": columns,
+				"whereEl": TheBook.PATH,
+				"value": values,
+				"where": "PATH"
+			}, null, 2)
+		})
+	}
+	addToBreadCrumb(TheBook.NOM, () => {
+		return createDetails(TheBook, provider);
+	});
 	document.getElementById("provider_text").innerHTML = ((provider == 1) ? ("Data provided by Marvel. © 2014 Marvel") : ((provider == 2) ? ("Data provided by Anilist.") : ("The Data are not provided by an API.")));
 	document.getElementById("contentViewer").style.display = "block";
 	document.getElementById("DLBOOK").addEventListener("click", function (e) {
