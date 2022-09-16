@@ -148,6 +148,7 @@
     "html-magnifier": "^2.0.2",
     "node-7z": "^3.0.0",
     "nodemon": "^2.0.15",
+    "pdf-extractor": "^2.1.2",
     "sqlite3": "^5.0.11",
     "tinycolor2": "^1.4.2",
     "unrar": "^0.2.0",
