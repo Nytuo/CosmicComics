@@ -1488,14 +1488,11 @@ a[href^="http://marvel.com"] {
     width: 100%;
     color: var(--text);
     cursor: pointer;
-    display: flex;
-    align-items: flex-start;
-    flex-wrap: nowrap;
-    flex-direction: column;
-    margin: 0;
     padding-left: 10px;
 }
-
+.resItem{
+    margin :0 0 15px 0 ;
+}
 #searchResults > li:hover {
     background-color: rgb(66, 79, 86);
 }
