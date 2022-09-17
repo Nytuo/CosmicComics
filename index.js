@@ -170,7 +170,7 @@ async function rematch(id, provider, type, old_id, isSeries = false) {
                 "type": "noedit",
                 "column": "ID_Series",
                 "whereEl": old_id,
-                "value": id,
+                "value": `'${id}'`,
                 "where": "ID_Series"
             }, null, 2)
         })
@@ -184,7 +184,7 @@ async function rematch(id, provider, type, old_id, isSeries = false) {
                 "type": "noedit",
                 "column": "ID_book",
                 "whereEl": old_id,
-                "value": id,
+                "value": `'${id}'`,
                 "where": "ID_book"
             }, null, 2)
         })

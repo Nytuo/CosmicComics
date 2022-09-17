@@ -173,10 +173,10 @@ along with Cosmic-Comics.  If not, see <https://www.gnu.org/licenses/>.--->
         </div>
     </div>
 </div>
-<div class="modal animate__animated animate__zoomIn animate__faster" id="rematchModal" tabindex="-1"
+<div class="modal  animate__animated animate__zoomIn animate__faster" id="rematchModal" tabindex="-1"
      aria-labelledby="rematchModal"
      aria-hidden="true" data-bs-backdrop="static" data-bs-keyboard="false" style="overflow: hidden">
-    <div class="modal-dialog modal-dialog-scrollable modal-dialog-centered">
+    <div class="modal-dialog modal-xl modal-dialog-scrollable modal-dialog-centered">
         <div class="modal-content">
             <div class="modal-header">
                 <h5 class="modal-title">Rematch : </h5>
@@ -184,8 +184,8 @@ along with Cosmic-Comics.  If not, see <https://www.gnu.org/licenses/>.--->
             </div>
             <div class="modal-body" style="text-align: center">
                 <input type="text" id="rematchSearch" placeholder="Search title in the library's API">
-                <input type="date" id="rematchYearSearch">
-                <button id="rematchSearchSender">Search</button>
+                <input type="text" id="rematchYearSearch" placeholder="Year (optional)">
+                <button class="btn btn-primary" id="rematchSearchSender">Search</button>
                 <div id="resultRematch">
 
                 </div>
