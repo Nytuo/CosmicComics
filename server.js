@@ -57,9 +57,12 @@ const ValidatedExtensionV = [
 	"webp",
 	"gif"
 ];
-fs.mkdirSync(CosmicComicsTemp, {recursive: true});
 var mangaMode = false;
 var devMode = true;
+if (devMode) {
+	CosmicComicsTemp = path.join(__dirname, "CosmicData");
+}
+fs.mkdirSync(CosmicComicsTemp, {recursive: true});
 //Creating the database
 if (!fs.existsSync(CosmicComicsTemp + "/serverconfig.json")) {
 	const obj = {
@@ -75,9 +78,7 @@ if (!fs.existsSync(CosmicComicsTemp + "/serverconfig.json")) {
 		fs.writeFileSync(CosmicComicsTemp + "/serverconfig.json", JSON.stringify(config), {encoding: 'utf8'});
 	}
 }
-if (devMode) {
-	CosmicComicsTemp = path.join(__dirname, "CosmicData");
-}
+
 
 /**
  * Check if the passed param has number in it
@@ -694,6 +695,21 @@ app.get("/api/anilist/searchByID/:id", (req, res) => {
 	} catch (e) {
 		res.sendStatus(500);
 	}
+});
+app.get("/api/anilist/searchOnly/:id", (req, res) => {
+	var name = req.params.name;
+	let isSend = false;
+	AniList.searchEntry.manga(
+		name,
+		null, 1,
+		25
+	).then(async function (data) {
+		if (data == null || data.pageInfo.total == 0) {
+			res.send(null);
+		} else {
+			res.send(data.media)
+		}
+	});
 });
 app.get("/api/anilist/creator/:id", (req, res) => {
 	try {

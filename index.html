@@ -173,7 +173,31 @@ along with Cosmic-Comics.  If not, see <https://www.gnu.org/licenses/>.--->
         </div>
     </div>
 </div>
+<div class="modal animate__animated animate__zoomIn animate__faster" id="rematchModal" tabindex="-1"
+     aria-labelledby="rematchModal"
+     aria-hidden="true" data-bs-backdrop="static" data-bs-keyboard="false" style="overflow: hidden">
+    <div class="modal-dialog modal-dialog-scrollable modal-dialog-centered">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Rematch : </h5>
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body" style="text-align: center">
+                <input type="text" id="rematchSearch" placeholder="Search title in the library's API">
+                <input type="date" id="rematchYearSearch">
+                <button id="rematchSearchSender">Search</button>
+                <div id="resultRematch">
 
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal" id="close_rematchModal">
+                    Close
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
 <!-- Modal navigation -->
 <div class="modal animate__animated animate__zoomIn animate__faster" id="buttonp" tabindex="-1"
      aria-labelledby="id_nav" aria-hidden="true">
@@ -751,7 +775,7 @@ along with Cosmic-Comics.  If not, see <https://www.gnu.org/licenses/>.--->
                                                                                    style="">edit</i></a>
                 <a href="#" id="DLBOOK"> <i class="material-icons" style="">download</i></a>
                 <a href="#"> <i class="material-icons" id="refresh" style="">refresh</i></a>
-                <a href="#"> <i class="material-icons" style="">youtube_searched_for</i></a>
+                <a href="#"> <i class="material-icons" id="rematch" style="">youtube_searched_for</i></a>
                 <div class="rating">
                     <input type="radio" name="rating" id="rating-5" onClick="changeRating('Series', 5)"/>
                     <label For="rating-5"></label>
