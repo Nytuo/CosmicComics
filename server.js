@@ -156,6 +156,7 @@ function makeDB(forwho) {
     db.run("CREATE TABLE IF NOT EXISTS variants (ID_variant VARCHAR(255) PRIMARY KEY NOT NULL UNIQUE,name VARCHAR(255),image varchar(255),url VARCHAR(255),series VARCHAR(255), FOREIGN KEY (series) REFERENCES Series (ID_Series))");
     db.run("CREATE TABLE IF NOT EXISTS relations (ID_variant VARCHAR(255) PRIMARY KEY NOT NULL UNIQUE,name VARCHAR(255),image varchar(255),description VARCHAR(255),url VARCHAR(255),series VARCHAR(255), FOREIGN KEY (series) REFERENCES Series (ID_Series))");
     db.run("CREATE TABLE IF NOT EXISTS Libraries (ID_LIBRARY INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, NAME VARCHAR(255) NOT NULL,PATH VARCHAR(4096) NOT NULL,API_ID INTEGER NOT NULL,FOREIGN KEY (API_ID) REFERENCES API(ID_API));");
+    db.run("PRAGMA user_version = "+process.env.npm_package_version.split(".").join("")+";");
     db.close();
 }
 
@@ -175,17 +176,20 @@ let openedDB = new Map();
 
 async function checkForDBUpdate(forwho) {
         let DBVersion;
-        getDB(forwho).get("PRAGMA user_version").then((row) => {
-            DBVersion = row;
-        })
+        await getDB(forwho).get("PRAGMA user_version",(err,row)=>{
+          DBVersion = row["user_version"];
         console.log(DBVersion);
-        if (DBVersion < 1) {
-        } else if (DBVersion < 2) {
-            //All previous updates + new
-            getDB(forwho).run("PRAGMA user_version = 2");
-        } else {
-            console.log("DB is up to date");
-        }
+        if (DBVersion < 20000) {
+                console.log("Impossible to update the DB (you are using an old version of CosmicComics)");
+            }
+            if (DBVersion <= 20001) {
+                
+
+            }
+            getDB(forwho).run("PRAGMA user_version = "+process.env.npm_package_version.split(".").join("")+";");
+        })
+
+
 }
 
 
