@@ -87,7 +87,7 @@ along with Cosmic-Comics.  If not, see <https://www.gnu.org/licenses/>.--->
                     id="id_createLib">
                 <li class="material-icons">library_add</li>
             </button>
-            <button class="btn btn-primary" style="height: 40px;" onclick="OpenFileOnce()" data-bs-dismiss="modal"
+            <button class="btn btn-primary" style="height: 40px;" data-bs-toggle="modal" data-bs-target="#libUpload"
                     id="id_opnfile">
                 <i class="material-icons">note_add</i>
             </button>
@@ -104,6 +104,32 @@ along with Cosmic-Comics.  If not, see <https://www.gnu.org/licenses/>.--->
 <body>
 <iframe width="854" height="480" style="display: none" id="iframe_yt_music" src="" allowfullscreen></iframe>
 
+<div class="modal animate__animated animate__zoomIn animate__faster" id="libUpload" tabindex="-1" aria-labelledby="libUpload"
+     aria-hidden="true" data-bs-backdrop="static" data-bs-keyboard="false" style="overflow: hidden">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Upload:</h5>
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body" style="text-align: center">
+        <iframe name="dummyUpload" id="dummyUpload" style="display: none"></iframe>
+                <form action="/uploadComic" target="dummyUpload" onsubmit="openInViewer();" method="post" enctype="multipart/form-data">
+
+                <input type="file" name="ComicTemp" id="fileUp">
+                <button class="btn btn-primary" style="margin-top: 10px;" type="submit">Upload</button>
+                <button class="btn btn-secondary" style="margin-top: 10px;"  type="reset">Reset</button>
+                </form>
+
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal" id="close_libUpload">
+                    Close
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
 <!-- Modal Tips-->
 <div class="modal animate__animated animate__zoomIn animate__faster" id="lib" tabindex="-1" aria-labelledby="id_lib"
      aria-hidden="true" data-bs-backdrop="static" data-bs-keyboard="false" style="overflow: hidden">

@@ -146,6 +146,7 @@
     "express": "^4.17.2",
     "github-content": "^1.0.1",
     "html-magnifier": "^2.0.2",
+    "multer": "^1.4.5-lts.1",
     "node-7z": "^3.0.0",
     "nodemon": "^2.0.15",
     "pdf-extractor": "^2.1.2",

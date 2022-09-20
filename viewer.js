@@ -99,12 +99,22 @@ fetch("http://" + domain + ":" + port + "/dirname").then(function (response) {
 	dirnameFE = data;
 	CosmicComicsData = dirnameFE + "/CosmicComics_data";
 	CosmicComicsTemp = dirnameFE;
-	CosmicComicsTempI = CosmicComicsTemp + "/profiles/" + currentUser + "/current_book/";
+	CosmicComicsTempI = CosmicComicsTemp + "profiles/" + currentUser + "/current_book/";
 	console.log(CosmicComicsTempI);
 }).catch(function (error) {
 	console.log(error);
 });
+fetch("http://" + domain + ":" + port + "/CosmicDataLoc").then(function (response) {
+	return response.text();
+}).then(function (data) {
+	dirnameFE = data;
+
+	CosmicComicsTemp = dirnameFE;
+}).catch(function (error) {
+	console.log(error);
+});
 var name1 = GetFilePath().split("/").pop();
+let path = GetFilePath();
 console.log(name1);
 var realname1 = name1.split(".")[0];
 console.log(realname1);
@@ -590,7 +600,7 @@ function postunrar() {
 	} else {
 		var lastpage = 0;
 		try {
-			getFromDB("Books", "last_page FROM Books WHERE ID_book='" + shortname + "'").then((res) => {
+			getFromDB("Books", "last_page FROM Books WHERE PATH='" + path + "'").then((res) => {
 				lastpage = JSON.parse(res)[0]["last_page"];
 				document.getElementById("overlay").style.display = "none";
 				setTimeout(() => {
@@ -676,7 +686,8 @@ async function prepareReader() {
 					} else {
 						var lastpage = 0;
 						try {
-							await getFromDB("Books", "last_page FROM Books WHERE ID_book='" + shortname + "'").then(async (res) => {
+							await getFromDB("Books", "last_page FROM Books WHERE PATH='" + path + "'").then(async (res) => {
+								console.log(res);
 								lastpage = JSON.parse(res)[0]["last_page"];
 								console.log(lastpage);
 								Reader(listofImgLoc, lastpage);
@@ -758,13 +769,15 @@ async function Viewer() {
 											} else {
 												var lastpage = 0;
 												try {
-													await getFromDB("Books", "last_page FROM Books WHERE ID_book='" + shortname + "'").then(async (res) => {
+													await getFromDB("Books", "last_page FROM Books WHERE PATH='" + window.decodeURI(window.location.search.replace("?", "").split("&")[0]).replace("%3A", ":") + "'").then(async (res) => {
 														lastpage = JSON.parse(res)[0]["last_page"];
 														console.log(lastpage);
 														Reader(listofImgLoc, lastpage);
 													});
 												} catch (error) {
 													console.log(error);
+													Reader(listofImgLoc, lastpage);
+
 												}
 											}
 											Toastifycation(language[0]["loaded_local"], "#00C33C");
@@ -1326,7 +1339,7 @@ async function getFromDB(dbname, request) {
 			"request": request
 		}, null, 2)
 	};
-	return fetch('http://192.168.1.84:8000/DB/get/' + connected + "/" + dbname, option).then(function (response) {
+	return fetch("http://" + domain + ":" + port +'/DB/get/' + connected + "/" + dbname, option).then(function (response) {
 		return response.text();
 	}).then(function (data) {
 		return data;
@@ -1409,11 +1422,11 @@ function getCookie(cName) {
 }
 
 async function ModifyDB(dbName, ColName, value, id) {
-	return fetch('http://192.168.1.84:8000/DB/update/' + connected + "/" + dbName + "/" + ColName + "/" + value + "/" + id);
+	return fetch("http://" + domain + ":" + port +'/DB/update/' + connected + "/" + dbName + "/" + ColName + "/" + value + "/" + id);
 }
 
 async function DeleteFromDB(dbName, id, option) {
-	return fetch('http://192.168.1.84:8000/DB/delete/' + connected + "/" + dbName + "/" + id + "/" + option);
+	return fetch("http://" + domain + ":" + port +'/DB/delete/' + connected + "/" + dbName + "/" + id + "/" + option);
 }
 
 async function InsertIntoDB(dbname, dbinfo, values) {
@@ -1425,7 +1438,7 @@ async function InsertIntoDB(dbname, dbinfo, values) {
 			"val": values
 		}, null, 2)
 	};
-	return fetch('http://192.168.1.84:8000/DB/insert/' + connected + "/" + dbname, option);
+	return fetch("http://" + domain + ":" + port +'/DB/insert/' + connected + "/" + dbname, option);
 }
 
 //Send BE
@@ -1458,7 +1471,7 @@ function markasreading() {
 //Send BE
 //Toggle the favorite status
 function ToogleFav() {
-	getFromDB("Books", "favorite FROM Books WHERE ID_book='" + shortname + "'").then((res) => {
+	getFromDB("Books", "favorite FROM Books WHERE PATH='" + path + "'").then((res) => {
 		console.log(info);
 		var res = JSON.parse(res)[0]["favorite"];
 		console.log(res);
