@@ -1090,8 +1090,6 @@ CosmicComicsData + "/ListOfComics.json",
                                 imagelink = path_without_file + "/folder.cosmic";
                                 console.log(imagelink);
                             } else {*/
-				imagelink = TheBook["URLCover"];
-				var node = document.createTextNode(TheBook["NOM"]);
 				/*}
             } else {
             }
@@ -1109,115 +1107,8 @@ CosmicComicsData + "/ListOfComics.json",
                 }
             }*/
 				//Setting Card Div
-				const carddiv = document.createElement("div");
-				carddiv.style.cursor = "pointer";
-				// TODO faire plus simple / séparer / template
-				if (cardMode === true) {
-					const rib = document.createElement("div");
-					if (TheBook["unread"] == 1) {
-						rib.className = "pointR";
-					}
-					if (TheBook["reading"] == 1) {
-						rib.className = "pointY";
-					}
-					if (TheBook["favorite"] == 1) {
-						rib.innerHTML = "<i class='material-icons' style='font-size: 16px;position: relative;left: -17px;'>favorite</i>";
-					}
-					carddiv.className = "cardcusto";
-					carddiv.setAttribute("data-effect", "zoom");
-					//button card_save
-					const buttonfav = document.createElement("button");
-					buttonfav.className = "card__save js-fav";
-					buttonfav.type = "button";
-					buttonfav.addEventListener("click", function () {
-						favorite();
-					});
-					buttonfav.id = "btn_id_fav_" + TheBook["ID_book"];
-					//icon
-					const favicon = document.createElement("i");
-					favicon.className = "material-icons";
-					favicon.innerHTML = "favorite";
-					if (currenttheme > 1) buttonfav.className = "js-fav card__save" + theme_button_card;
-					buttonfav.appendChild(favicon);
-					carddiv.appendChild(buttonfav);
-					//button card__close
-					const button_unread = document.createElement("button");
-					button_unread.className = "card__close js-unread";
-					button_unread.type = "button";
-					button_unread.addEventListener("click", function () {
-						markasunread();
-					});
-					button_unread.id = "btn_id_unread_" + TheBook["ID_book"];
-					//icon
-					const unread_icon = document.createElement("i");
-					unread_icon.className = "material-icons";
-					unread_icon.innerHTML = "close";
-					if (currenttheme > 1) button_unread.className = "js-unread card__close" + theme_button_card;
-					button_unread.appendChild(unread_icon);
-					carddiv.appendChild(button_unread);
-					//button card__reading
-					const button_reading = document.createElement("button");
-					button_reading.className = "card__reading js-reading";
-					button_reading.type = "button";
-					button_reading.addEventListener("click", function () {
-						markasreading();
-					});
-					button_reading.id = "btn_id_reading_" + TheBook["ID_book"];
-					//icon
-					const reading_icon = document.createElement("i");
-					reading_icon.className = "material-icons";
-					reading_icon.innerHTML = "auto_stories";
-					if (currenttheme > 1) button_reading.className = "js-reading card__reading" + theme_button_card;
-					button_reading.appendChild(reading_icon);
-					carddiv.appendChild(button_reading);
-					//button card__read
-					const button_read = document.createElement("button");
-					button_read.className = "card__read js-read";
-					button_read.type = "button";
-					button_read.addEventListener("click", function () {
-						markasread();
-					});
-					button_read.id = "btn_id_read_" + TheBook["ID_book"];
-					//ico
-					const read_ion = document.createElement("i");
-					read_ion.className = "material-icons";
-					read_ion.innerHTML = "done";
-					if (currenttheme > 1) button_read.className = "js-read card__read" + theme_button_card;
-					button_read.appendChild(read_ion);
-					carddiv.appendChild(button_read);
-					//figure card__image
-					const cardimage = document.createElement("div");
-					cardimage.className = "card__image";
-					cardimage.style.backgroundColor = theme_BG_CI;
-					const imgcard = document.createElement("img");
-					imgcard.style.width = "100%";
-					imgcard.id = "card_img_id_" + index;
-					imgcard.src = imagelink;
-					cardimage.appendChild(imgcard);
-					carddiv.appendChild(cardimage);
-					//card__body
-					const bodycard = document.createElement("div");
-					bodycard.className = "card__body";
-					//button play
-					const playbtn = document.createElement("button");
-					playbtn.className = "card__play js-play";
-					playbtn.type = "button";
-					const playarr = document.createElement("i");
-					playarr.className = "material-icons";
-					playarr.innerHTML = "play_arrow";
-					playarr.style.color = theme_button_card;
-					playbtn.appendChild(playarr);
-					bodycard.appendChild(playbtn);
-					const pcard_bio = document.createElement("p");
-					pcard_bio.className = "card__bio";
-					pcard_bio.style = "text-align: center;";
-					pcard_bio.style.color = theme_FG;
-					pcard_bio.innerHTML = node.textContent;
-					bodycard.appendChild(pcard_bio);
-					carddiv.appendChild(bodycard);
-					carddiv.id = "id_vol" + n;
-					if (playbtn.addEventListener) {
-						playbtn.addEventListener("click", function () {
+				let carddiv = createCard(TheBook["unread"],TheBook["read"],TheBook["reading"],TheBook["ID_book"]+"_"+n,TheBook["URLCover"],TheBook["NOM"],TheBook["favorite"])
+				carddiv.querySelector(".card__play").addEventListener("click", function () {
 							/*            ModifyJSONFile(
                                             CosmicComicsData + "/ListOfComics.json",
                                             "reading",
@@ -1241,10 +1132,9 @@ CosmicComicsData + "/ListOfComics.json",
 						carddiv.addEventListener("click", async function () {
 							await createDetails(TheBook, provider);
 						});
-					}
+
 					n++;
 					const element = document.getElementById("ContentView");
-					carddiv.appendChild(rib);
 					divlist.appendChild(carddiv);
 					element.appendChild(divlist);
 					/* if (stat.isDirectory()) {
@@ -1268,129 +1158,7 @@ CosmicComicsData + "/ListOfComics.json",
                      } else {
                          //pas fav
                      }*/
-				} else {
-					//POINTER TO LISTGROUP
-					const alist = document.createElement("a");
-					alist.className = "list-group-item list-group-item-action";
-					alist.style.backgroundColor = "transparent";
-					alist.style.color = theme_FG;
-					alist.style.cursor = "pointer";
-					alist.id = "id_vol" + index;
-					alist.addEventListener("mouseover", function () {
-						alist.style.backgroundColor = theme_hover_listview;
-					});
-					alist.addEventListener("mouseleave", function () {
-						alist.style.backgroundColor = "transparent";
-					});
-					alist.innerHTML = node.textContent;
-					divlist.appendChild(alist);
-					const playbtn = document.createElement("button");
-					playbtn.className = "card__play js-play";
-					playbtn.type = "button";
-					playbtn.style.opacity = 1;
-					playbtn.style.top = "10px";
-					const playarr = document.createElement("i");
-					playarr.className = "material-icons";
-					playarr.style.color = theme_button_card;
-					playarr.innerHTML = "play_arrow";
-					playbtn.appendChild(playarr);
-					alist.appendChild(playbtn);
-					//button card_save
-					const buttonfav = document.createElement("button");
-					buttonfav.className = "card__save js-fav";
-					buttonfav.style.opacity = 1;
-					buttonfav.style.top = "10px";
-					buttonfav.style.right = "190px";
-					buttonfav.type = "button";
-					buttonfav.addEventListener("click", function () {
-						favorite();
-					});
-					buttonfav.id = "btn_id_fav_" + TheBook["ID_book"];
-					if (currenttheme > 1) buttonfav.className = "js-fav card__save" + theme_button_card;
-					//icon
-					const favicon = document.createElement("i");
-					favicon.className = "material-icons";
-					favicon.innerHTML = "favorite";
-					buttonfav.appendChild(favicon);
-					alist.appendChild(buttonfav);
-					//button card__close
-					const button_unread = document.createElement("button");
-					button_unread.className = "card__close js-unread";
-					button_unread.type = "button";
-					button_unread.style.opacity = 1;
-					button_unread.style.top = "10px";
-					button_unread.style.right = "70px";
-					button_unread.addEventListener("click", function () {
-						markasunread();
-					});
-					button_unread.id = "btn_id_unread_" + TheBook["ID_book"];
-					if (currenttheme > 1) button_unread.className = "js-unread card__close" + theme_button_card;
-					//icon
-					const unread_icon = document.createElement("i");
-					unread_icon.className = "material-icons";
-					unread_icon.innerHTML = "close";
-					button_unread.appendChild(unread_icon);
-					alist.appendChild(button_unread);
-					//button card__reading
-					const button_reading = document.createElement("button");
-					button_reading.className = "card__reading js-reading";
-					button_reading.type = "button";
-					button_reading.style.opacity = 1;
-					button_reading.style.top = "10px";
-					button_reading.style.right = "110px";
-					button_reading.addEventListener("click", function () {
-						markasreading();
-					});
-					button_reading.id = "btn_id_reading_" + TheBook["ID_book"];
-					if (currenttheme > 1) button_reading.className = "js-reading card__reading" + theme_button_card;
-					//icon
-					const reading_icon = document.createElement("i");
-					reading_icon.className = "material-icons";
-					reading_icon.innerHTML = "auto_stories";
-					button_reading.appendChild(reading_icon);
-					alist.appendChild(button_reading);
-					//button card__read
-					const button_read = document.createElement("button");
-					button_read.className = "card__read js-read";
-					button_read.type = "button";
-					button_read.style.opacity = 1;
-					button_read.style.top = "10px";
-					button_read.style.right = "150px";
-					button_read.addEventListener("click", function () {
-						markasread();
-					});
-					button_read.id = "btn_id_read_" + TheBook["ID_book"];
-					if (currenttheme > 1) button_read.className = "js-read card__read" + theme_button_card;
-					//ico
-					const read_ion = document.createElement("i");
-					read_ion.className = "material-icons";
-					read_ion.innerHTML = "done";
-					button_read.appendChild(read_ion);
-					alist.appendChild(button_read);
-					var manualDirOverride = false;
-					if (playbtn.addEventListener) {
-						if (manualDirOverride) {
-							alist.addEventListener("dblclick", function () {
-								launchDetect(path, root);
-							});
-							playbtn.addEventListener("click", function () {
-								Modify_JSON_For_Config(CosmicComicsData + "/config.json", "last_opened", path);
-								alert("ici5");
-								window.location.href = "viewer.html?" + encodeURIComponent(path.replaceAll("/", "%C3%B9"));
-							});
-						} else {
-							playbtn.addEventListener("click", function () {
-								window.location.href = "viewer.html?" + encodeURIComponent(path.replaceAll("/", "%C3%B9"));
-							});
-						}
-					}
-					n++;
-					const element = document.getElementById("ContentView");
-					const divrating = document.createElement("div");
-					divrating.appendChild(alist);
-					divlist.appendChild(divrating);
-					element.appendChild(divlist);
-				}
+
 				/*if (readed) {
                     //readed
                 } else if (reading) {
@@ -4823,14 +4591,21 @@ function createVariants(TheBook) {
 	});
 }
 
-function createCard(unread, read, reading, ID, URLCover, NOM) {
+function createCard(unread, read, reading, ID, URLCover, NOM,favorite = 0) {
 	/*document.getElementById("relations").appendChild(createCard(TheBook.unread,TheBook.read,TheBook.reading,TheBook.ID,TheBook.URLCover,TheBook.NOM));*/
 	const carddiv = document.createElement("div");
+	carddiv.style.cursor = "pointer";
 	const rib = document.createElement("div");
 	imagelink = URLCover;
 	let node = document.createTextNode(NOM);
 	if (unread == 1) {
-		rib.className = "ribbon-1";
+		rib.className = "pointR";
+	}
+	if (reading == 1) {
+		rib.className = "pointY";
+	}
+	if (favorite == 1) {
+		rib.innerHTML = "<i class='material-icons' style='font-size: 16px;position: relative;left: -17px;'>favorite</i>";
 	}
 	carddiv.className = "cardcusto";
 	carddiv.setAttribute("data-effect", "zoom");
