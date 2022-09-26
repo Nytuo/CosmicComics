@@ -453,21 +453,18 @@ function discoverLibraries() {
 				document.getElementById("overlay2").style.display = "none";
 				document.getElementById("contentViewer").style.display = "none";
 				addToBreadCrumb(el["NAME"], function () {
-					return openFolder_logic(el["PATH"], el["API_ID"]);
+					return openLibrary(el["PATH"], el["API_ID"]);
 				});
-				openFolder_logic(el["PATH"], el["API_ID"]);
+				openLibrary(el["PATH"], el["API_ID"]);
 			});
-			/* TODO CODE VERIFICATION */
-			const marvelogo = document.createElement("img");
+			const logo = document.createElement("img");
 			if (el["API_ID"] === 1) {
-				marvelogo.src = "./Images/marvel-logo-png-10.png";
+				logo.src = "./Images/marvel-logo-png-10.png";
 			} else if (el["API_ID"] === 2) {
-				marvelogo.src = "./Images/android-chrome-512x512.png";
+				logo.src = "./Images/android-chrome-512x512.png";
 			}
-			marvelogo.style.width = "25px";
-			marvelogo.style.float = "left";
-			marvelogo.style.lineHeight = "1";
-			btn.appendChild(marvelogo);
+			logo.className = "libLogo";
+			btn.appendChild(logo);
 			let naming = document.createElement("span");
 			naming.innerHTML = el["NAME"];
 			btn.appendChild(naming);
@@ -477,12 +474,10 @@ function discoverLibraries() {
 			const menu = document.createElement("button");
 			menu.innerHTML = "<span class='material-icons'>more_vert</span>";
 			menu.className = "btn libmenu";
-			menu.style.float = "right";
 			const ul = document.createElement("ul");
 			const li = document.createElement("li");
 			const li2 = document.createElement("li");
 			const li3 = document.createElement("li");
-			const li4 = document.createElement("li");
 			li.innerHTML = "Delete";
 			li2.innerHTML = "Modify";
 			li2.setAttribute("data-bs-toggle", "modal");
@@ -511,7 +506,7 @@ function discoverLibraries() {
 					ul.style.display = "none";
 				});
 				document.addEventListener("click", function (e) {
-					if (e.target != menu && e.target != ul && e.target != li && e.target != li2 && e.target != li3 && e.target != btn && e.target != menu.children[0]) {
+					if (e.target !== menu && e.target !== ul && e.target !== li && e.target !== li2 && e.target !== li3 && e.target !== btn && e.target !== menu.children[0]) {
 						ul.style.display = "none";
 					}
 				});
@@ -522,14 +517,11 @@ function discoverLibraries() {
 		});
 	});
 	const div = document.createElement("div");
-	var btn = document.createElement("button");
+	let btn = document.createElement("button");
 	btn.id = "downloads";
 	btn.addEventListener("click", function () {
 		let breadCrumb = document.querySelector(".breadcrumb");
-		/* Delete all childs after this one */
-		while (breadCrumb.lastChild != breadCrumb.childNodes[1]) {
-			breadCrumb.removeChild(breadCrumb.lastChild);
-		}
+		removeBreadCrumb(breadCrumb, breadCrumb.childNodes[1]);
 		document.querySelectorAll(".selectLib").forEach((el) => {
 			el.classList.remove("selectLib");
 		});
@@ -539,20 +531,20 @@ function discoverLibraries() {
 		document.getElementById("overlay2").style.display = "none";
 		document.getElementById("contentViewer").style.display = "none";
 		addToBreadCrumb("Downloads", () => {
-			return openFolder_logic(CosmicComicsTemp + "/downloads", 2);
+			return openLibrary(CosmicComicsTemp + "/downloads", 2);
 		});
-		openFolder_logic(CosmicComicsTemp + "/downloads", 2);
+		openLibrary(CosmicComicsTemp + "/downloads", 2);
 	});
-	const marvelogo = document.createElement("i");
-	marvelogo.className = "material-icons";
-	marvelogo.innerHTML = "download_file";
-	marvelogo.style.color = "white";
-	marvelogo.style.lineHeight = "1";
-	marvelogo.style.float = "left";
-	marvelogo.style.width = "25px";
-	marvelogo.style.float = "left";
-	marvelogo.style.lineHeight = "1";
-	btn.appendChild(marvelogo);
+	const logo = document.createElement("i");
+	logo.className = "material-icons";
+	logo.innerHTML = "download_file";
+	logo.style.color = "white";
+	logo.style.lineHeight = "1";
+	logo.style.float = "left";
+	logo.style.width = "25px";
+	logo.style.float = "left";
+	logo.style.lineHeight = "1";
+	btn.appendChild(logo);
 	let naming = document.createElement("span");
 	naming.innerHTML = "Downloads";
 	btn.appendChild(naming);
@@ -565,14 +557,18 @@ function discoverLibraries() {
 
 discoverLibraries();
 
-function modifyConfigJson(json, tomod, mod) {
+/**
+ * Modify user's profile configuration JSON file
+ * @param {string|number} tomod The key to modify
+ * @param {*} mod the new value
+ */
+function modifyConfigJson(tomod, mod) {
 	//check si obj exist pour remplacer valeur
 	fetch("http://" + domain + ":" + port + "/config/getConfig/" + userToken).then(function (response) {
 		return response.text();
 	}).then(function (data) {
-		var configFile = data;
-		var config = JSON.parse(configFile);
-		for (var i in config) {
+		let config = JSON.parse(data);
+		for (let i in config) {
 			config[tomod] = mod;
 		}
 		const option = {
@@ -584,20 +580,13 @@ function modifyConfigJson(json, tomod, mod) {
 	});
 }
 
-//Modify the JSON for config.json
-function Modify_JSON_For_Config(json, tomodify, modification) {
-	var config_JSON = fs.readFileSync(json);
-	var config = JSON.parse(config_JSON);
-	for (var i in config) {
-		config[i][tomodify] = modification;
-	}
-	var config_JSON_Final = JSON.stringify(config, null, 2);
-	fs.writeFileSync(json, config_JSON_Final);
-}
-
-//Get element from config.json
+/**
+ * Search a value in a JSON file by the key
+ * @param {string} what_you_want The key to search
+ * @param {*} data The JSON file
+ */
 function Get_From_Config(what_you_want, data) {
-	for (var i in data[0]) {
+	for (let i in data[0]) {
 		if (i === what_you_want) {
 			return data[0][i];
 		}
@@ -608,6 +597,9 @@ function Get_From_Config(what_you_want, data) {
 let sidebarMini = false;
 let searchtoggle = true;
 
+/**
+ * Toggle the sidebar
+ */
 function toggleSideBar() {
 	if (sidebarMini) {
 		sidebarMini = false;
@@ -690,6 +682,9 @@ function toggleSideBar() {
 
 document.getElementById("searchField").style.display = "none";
 
+/**
+ * Show the search bar
+ */
 function summonSearch() {
 	if (searchtoggle) {
 		searchtoggle = false;
@@ -700,31 +695,18 @@ function summonSearch() {
 	}
 }
 
-//refresh the folder
-function refreshFolder() {
+/**
+ * Reload the page
+ */
+function refreshPage() {
 	window.location.href = window.location.href;
 }
 
-//get the folder's path from config.json
-function get_folder_path_from_JSON(json) {
-	var configFile = fs.readFileSync(json);
-	var parsedJSON = JSON.parse(configFile);
-	return Get_From_Config("path", parsedJSON);
-}
-
-//Continue after extracting the image
-function Continue_After_Extracting_Image(FolderResults, result, favonly, readonly, unreadonly, readingonly) {
-	if (GetAllIMG === true) {
-		loadContent(FolderResults, result[0], favonly, readonly, unreadonly, readingonly);
-	} else if (GetAllIMG == null) {
-		alert(language["err_img"]);
-	} else {
-		setTimeout(() => {
-			Continue_After_Extracting_Image(FolderResults, result, favonly, readonly, unreadonly, readingonly);
-		}, 500);
-	}
-}
-
+/**
+ * Scan for folders in the library
+ * @param {string} result The path to the library
+ * @returns {Promise<string[]>} The list of folders
+ */
 async function DetectFolderInLibrary(result) {
 	result = result.replaceAll("\\", "/");
 	result = result.replaceAll("//", "/");
@@ -738,24 +720,24 @@ async function DetectFolderInLibrary(result) {
 	});
 }
 
-//Open folder logic
-function openFolder_logic(folder, provider = 3) {
+/**
+ * Open the library
+ * @param {string} folder The path to the library
+ * @param {*} provider The provider of the library (default to MANUAL)
+ */
+function openLibrary(folder, provider = 0) {
 	document.getElementById("home").style.display = "none";
 	document.getElementById("overlay").style.display = "block";
 	setTimeout(() => {
-		var result = folder.toString();
+		let result = folder.toString();
 		if (result) {
 			console.log(result);
-			/*
-                        var FolderRes = DetectFilesAndFolders(result[0]);
-            */
 			DetectFolderInLibrary(result).then((data) => {
 				console.log(data);
 				if (data.length <= 0) throw new Error("Folder empty or not found");
 				//Ajouter a la DB les dossiers trouvés en tant que Collection
 				loadContent(provider, data, result);
 			});
-
 		} else {
 			document
 				.getElementById("opnfld")
@@ -769,88 +751,12 @@ function openFolder_logic(folder, provider = 3) {
 	}, 500);
 }
 
-//Checking if the file have a correct extension (validated)
-function Check_File_For_Validated_extension(folderRes, validedextension) {
-	FolderResults = [];
-	folderRes.forEach((file) => {
-		var stat = fs.statSync(file);
-		var ext = "";
-		if (!stat.isDirectory()) {
-			ext = file.split(".").pop();
-			ext = ext.toLowerCase();
-		}
-		if (validedextension.includes(ext)) {
-			FolderResults.push(file);
-		} else {
-			if (stat.isDirectory()) {
-				FolderResults.push(file);
-			} else {
-			}
-		}
-	});
-	return FolderResults;
-}
-
-//Modify a JSON file
-function ModifyJSONFile(json, tomod, mod, name) {
-	//check si obj exist pour remplacer valeur
-	var configFile = fs.readFileSync(json);
-	var config = JSON.parse(configFile);
-	for (var i in config) {
-		for (var j in config[i]) {
-			if (config[i][j] === name) {
-				console.log(config);
-				config[i][tomod] = mod;
-				console.log(config);
-			}
-		}
-	}
-	var configJSON = JSON.stringify(config, null, 2);
-	fs.writeFileSync(json, configJSON);
-}
-
-//Add information to JSON
-function Add_To_JSON(obj, json) {
-	var configFile = fs.readFileSync(json);
-	var config = JSON.parse(configFile);
-	config.push(obj);
-	var configJSON = JSON.stringify(config, null, 2);
-	fs.writeFileSync(json, configJSON);
-}
-
-//Get element from JSON
-function Get_From_JSON(json, name) {
-	var data = fs.readFileSync(json);
-	var info = JSON.parse(data);
-	var Info = GetInfo("name", info, name);
-	return Info;
-}
-
-//Get information
-function GetInfo(search, data, name) {
-	for (var i in data) {
-		for (var j in data[i]) {
-			if (j === search) {
-				if (name === data[i][j]) {
-					return data[i];
-				}
-			}
-		}
-	}
-	return null;
-}
-
-//Get element from data
-function Get_element_from_data(search, data) {
-	for (var i in data) {
-		if (i === search) {
-			return data[i];
-		}
-	}
-	return null;
-}
-
-async function getAPIANILIST_ByID(id) {
+/**
+ * Get from ANILIST API the data of the manga by ID
+ * @param {number|string} id The ID of the manga
+ * @return {Promise<*>} The data of the manga
+ */
+async function API_ANILIST_GET_ID(id) {
 	return fetch("http://" + domain + ":" + port + "/api/anilist/searchByID/" + id).then(function (response) {
 		return response.text();
 	}).then(function (data) {
@@ -862,7 +768,12 @@ async function getAPIANILIST_ByID(id) {
 	});
 }
 
-async function getAPIANILIST_SEARCH(name) {
+/**
+ * Search on ANILIST API by the manga name
+ * @param {string} name The name of the manga
+ * @return {Promise<*>} The list of mangas
+ */
+async function API_ANILIST_GET_SEARCH(name) {
 	return fetch("http://" + domain + ":" + port + "/api/anilist/searchOnly/" + name).then(function (response) {
 		return response.text();
 	}).then(function (data) {
@@ -874,6 +785,11 @@ async function getAPIANILIST_SEARCH(name) {
 	});
 }
 
+/**
+ * Search and get data from the ANILIST API
+ * @param {string} name The name of the manga
+ * @return {Promise<*>} The list of mangas and the data of the manga
+ */
 async function getAPIANILIST(name) {
 	return fetch("http://" + domain + ":" + port + "/api/anilist/search/" + name).then(function (response) {
 		return response.text();
@@ -886,11 +802,17 @@ async function getAPIANILIST(name) {
 	});
 }
 
-function loadView(FolderRes, libraryPath, date = "", provider = 2) {
-	var n = 0;
-	var listOfImages = [];
-	console.log("folderRes : " + FolderRes);
-	console.log("libraryPath : " + libraryPath);
+/* TODO CODE VERIFICATION */
+/**
+ * Load the content of the element
+ * @param {string} FolderRes The folder path
+ * @param {string} libraryPath The library path
+ * @param {*} date The date of the element
+ * @param {*} provider The provider of the element
+ */
+function loadView(FolderRes, libraryPath, date = "", provider = 0) {
+	let n = 0;
+	let listOfImages = [];
 	document.getElementById("overlay2").style.display = "none";
 	const divlist = document.createElement("div");
 	divlist.className = "cards-list2";
@@ -903,23 +825,17 @@ function loadView(FolderRes, libraryPath, date = "", provider = 2) {
 		data = JSON.parse(data);
 		for (let index = 0; index < data.length; index++) {
 			const path = data[index];
-			console.log(path);
-			var name = path.replaceAll(libraryPath.replaceAll("\\", "/"), "")
-			console.log(name);
-			var realname = /[^\\\/]+(?=\.[\w]+$)|[^\\\/]+$/.exec(name)[0];
-			console.log(realname);
+			let name = path.replaceAll(libraryPath.replaceAll("\\", "/"), "")
+			let realname = /[^\\\/]+(?=\.[\w]+$)|[^\\\/]+$/.exec(name)[0];
 			let readBookNB = await getFromDB("Books", "COUNT(*) FROM Books WHERE READ = 1 AND PATH = '" + path + "'");
-			console.log(JSON.parse(readBookNB));
 			document.getElementById("readstat").innerHTML = JSON.parse(readBookNB)[0]["COUNT(*)"] + " / " + data.length + " volumes read";
 			await getFromDB("Books", "* FROM Books WHERE PATH = '" + path + "'").then(async (resa) => {
 				let bookList = JSON.parse(resa);
 				let TheBook = bookList[0];
-				console.log(TheBook);
 				if (bookList.length === 0) {
 					if (provider == 1) {
 						await GETMARVELAPI_Comics(realname, date).then(async (cdata) => {
-							//set the default book  values
-							if (cdata == undefined) {
+							if (cdata === undefined) {
 								throw new Error("no data");
 							}
 							if (cdata["data"]["total"] > 0) {
@@ -1200,6 +1116,11 @@ CosmicComicsData + "/ListOfComics.json",
 	});
 }
 
+/**
+ * Convert a date to a string
+ * @param {number|string|Date|VarDate} inputFormat
+ * @return {string} date in string format (dd/mm/yyyy)
+ */
 function convertDate(inputFormat) {
 	function pad(s) {
 		return (s < 10) ? '0' + s : s;
@@ -1209,10 +1130,16 @@ function convertDate(inputFormat) {
 	return [pad(d.getDate()), pad(d.getMonth() + 1), d.getFullYear()].join('/');
 }
 
+/* TODO CODE VERIFICATION */
+/**
+ * Get from the Marvel API the list of comics
+ * @param {string} id - The id of the comic
+ * @return {string} The list of comics
+ */
 async function GETMARVELAPI_variants(id) {
-	var url = "https://gateway.marvel.com:443/v1/public/series/" + id + "/comics?noVariants=false&orderBy=issueNumber&apikey=1ad92a16245cfdb9fecffa6745b3bfdc";
-	var response = await fetch(url);
-	var data = await response.json();
+	let url = "https://gateway.marvel.com:443/v1/public/series/" + id + "/comics?noVariants=false&orderBy=issueNumber&apikey=1ad92a16245cfdb9fecffa6745b3bfdc";
+	let response = await fetch(url);
+	let data = await response.json();
 	console.log(data);
 	return data;
 }
@@ -1868,26 +1795,6 @@ async function loadContent(provider, FolderRes, libraryPath) {
 								alert("ici3");
 								window.location.href = "viewer.html?" + encodeURIComponent(path.replaceAll("/", "%C3%B9"));
 							});
-							/*} else {
-                                playbtn.addEventListener("click", function () {
-                                    ModifyJSONFile(
-                                        CosmicComicsData + "/ListOfComics.json",
-                                        "reading",
-                                        true,
-                                    );
-                                    ModifyJSONFile(
-                                        CosmicComicsData + "/ListOfComics.json",
-                                        "unread",
-                                        false,
-                                    );
-                                    Modify_JSON_For_Config(
-                                        CosmicComicsData + "/config.json",
-                                        "last_opened",
-                                        path
-                                    );
-                                    window.location.href = "viewer.html?" + path;
-                                });
-                            }*/
 						}
 						n++;
 						const element = document.getElementById("ContainerExplorer");
@@ -1899,71 +1806,7 @@ async function loadContent(provider, FolderRes, libraryPath) {
 				});
 			}
 		}
-		/*        var Info = Get_From_JSON(
-               CosmicComicsData + "/ListOfComics.json",
-           );*/
-		/* var readed = Get_element_from_data("read", Info);
-         var reading = Get_element_from_data("reading", Info);
-         var favorite_v = Get_element_from_data("favorite", Info);*/
-		/*if (fs.existsSync(invertedPath + "/folder.cosmic")) {
-            imagelink = invertedPath + "/folder.cosmic";
-            console.log(imagelink);
-        } else if (fs.existsSync(invertedPath + "/folder.cosmic.svg")) {
-            imagelink = invertedPath + "/folder.cosmic.svg";
-            console.log(imagelink);
-        } else {*/
-		/*}*/
-		/*} else if (
-        ) {
-            var node = document.createTextNode(realname);
-            var FIOA = fs.readdirSync(
-            );
-            var CCDN = CosmicComicsData.replaceAll("\\", "/");
-            invertedPath = path.replaceAll("\\", "/");
-            if (fs.existsSync(path_without_file + "/coverAll.cosmic")) {
-                imagelink = path_without_file + "/coverAll.cosmic";
-                console.log(imagelink);
-            } else if (fs.existsSync(invertedPath + ".cosmic")) {
-                imagelink = invertedPath + ".cosmic";
-                console.log(imagelink);
-            } else if (fs.existsSync(invertedPath + ".cosmic.svg")) {
-                imagelink = invertedPath + ".cosmic.svg";
-                console.log(imagelink);
-            } else {
-                if (FIOA.length === 0) {
-                    if (fs.existsSync(path_without_file + "/folder.cosmic")) {
-                        imagelink = path_without_file + "/folder.cosmic";
-                        console.log(imagelink);
-                    } else {
-                        imagelink = "Images/fileDefault.png";
-                    }
-                } else {
-                }
-            }
-        } else {
-            var node = document.createTextNode(realname);
-            if (fs.existsSync(path_without_file + "/folder.cosmic")) {
-                imagelink = path_without_file + "/folder.cosmic";
-                console.log(imagelink);
-            } else {
-                imagelink = "Images/fileDefault.png";
-            }
-        }*/
-		/*        if (readed) {
-                    //readed
-                } else if (reading) {
-                    //reazading
-                } else {
-                    //rien
-                }*/
-		/*if (favorite_v) {
 
-            //favorite
-        } else if (stat.isDirectory()) {
-            //fav folder
-        } else {
-            //pas fav
-        }*/
 	});
 	if (cardMode === true) {
 		preloadImage(listOfImages, n);
@@ -2036,186 +1879,15 @@ function LoadImages(numberOf) {
 	}
 }
 
-//Navigate or launch the viewer
-function launchDetect(dir, root) {
-	throw new Error("Method not implemented.");
-	window.scrollTo(0, 0);
-	var parento = document.getElementById("controller");
-	var child = parent.lastElementChild;
-	while (child) {
-		parent.removeChild(child);
-		child = parent.lastElementChild;
-	}
-	if (dir !== root) {
-		const btn = document.getElementById("GotoRoot");
-		if (btn.addEventListener) {
-			btn.addEventListener("click", function () {
-				/*btn.removeEventListener("click")*/
-				launchDetect(root, root);
-			});
-		}
-	}
-	var contents = DetectFilesAndFolders(dir);
-	FolderResults = Check_File_For_Validated_extension(contents, ValidatedExtension);
-	loadContent(FolderResults, root, favonly, readonly, unreadonly, readingonly);
-}
-
-//Detect files and folders in the current directory (not recursive)
-function DetectFilesAndFolders(dir) {
-	var result = [];
-	fs.readdirSync(dir).forEach(function (file) {
-		file = dir + "/" + file;
-		var stat = fs.statSync(file);
-		if (stat && stat.isDirectory()) {
-			result = result.concat(file);
-		} else {
-			result.push(file);
-		}
-	});
-	try {
-		result.sort(SortingNumInStr);
-	} catch (error) {
-		console.log(error);
-	}
-	return result;
-}
-
 //Sorting number in a string
 var SortingNumInStr = function (a, b) {
 	return Number(a.match(/(\d+)/g)[0]) - Number(b.match(/(\d+)/g)[0]);
 };
 
-//Detect all folders and files in a directory (recursive)
-function DetectAllFilesAndFolders(dir) {
-	var result = [];
-	fs.readdirSync(dir).forEach(function (file) {
-		file = dir + "/" + file;
-		var stat = fs.statSync(file);
-		if (stat.isDirectory()) {
-			var Deeper = DetectAllFilesAndFolders(file);
-			result = result.concat(Deeper);
-		} else {
-			result.push(file);
-		}
-	});
-	return result;
-}
-
-//Get the first image of book by folder to get the cover in the app
-async function GetTheFirstImageOfComicsByFolder(filesInFolder = [], i = 0) {
-	document.getElementById("prgs").className = "determinate";
-	document.getElementById("prgs").style.width = (i * 100) / filesInFolder.length + "%";
-	remote.getCurrentWindow().setProgressBar(i / filesInFolder.length);
-	try {
-		document.getElementById("decompressfilename").innerHTML = language["extracting"] + patha.basename(filesInFolder[i + 1]);
-	} catch (error) {
-		console.log(error);
-	}
-	document.getElementById("overlaymsg").innerHTML = language["extracting_thumb"] + " " + i + " " + language["out_of"] + " " + filesInFolder.length;
-}
-
 //Check if the passed element contains numbers
 function hasNumbers(t) {
 	var regex = /\d/g;
 	return regex.test(t);
-}
-
-//get the ID of the book by name
-function get_the_ID_by_name(the_name = "") {
-	return finalName;
-}
-
-//Unarchive the first element of each archive
-async function delete_all_exept_the_first() {
-	var dir = fs.readdirSync(CosmicComicsData + "/FirstImageOfAll/");
-	console.log(dir);
-	for (var i = 0; i < dir.length; i++) {
-		try {
-			var files = fs.readdirSync(CosmicComicsData + "/FirstImageOfAll/" + dir[i]);
-			if (files.length > 1) {
-				files.sort((a, b) => {
-					let fa = a.toLowerCase(), fb = b.toLowerCase();
-					if (fa < fb) {
-						return -1;
-					}
-					if (fa > fb) {
-						return 1;
-					}
-					return 0;
-				});
-				for (var j = 1; j < files.length; j++) {
-					fs.unlinkSync(CosmicComicsData + "/FirstImageOfAll/" + dir[i] + "/" + files[j]);
-				}
-			}
-		} catch (error) {
-			console.log("Error when reading the folder to delete");
-		}
-	}
-	await WConv();
-}
-
-//mark book as read
-function markasread() {
-	if (name_of_the_current_book !== "") {
-		Toastifycation(language["marked_as_read"], "#00C33C");
-		ModifyJSONFile(CosmicComicsData + "/ListOfComics.json", "reading", false, name_of_the_current_book);
-		ModifyJSONFile(CosmicComicsData + "/ListOfComics.json", "unread", false, name_of_the_current_book);
-		ModifyJSONFile(CosmicComicsData + "/ListOfComics.json", "read", true, name_of_the_current_book);
-		document
-			.getElementById("btn_id_read_" + name_of_the_current_book)
-			.classList.add("active");
-		document
-			.getElementById("btn_id_reading_" + name_of_the_current_book)
-			.classList.remove("active");
-		document
-			.getElementById("btn_id_unread_" + name_of_the_current_book)
-			.classList.remove("active");
-		name_of_the_current_book = "";
-	}
-}
-
-//mark book as unread
-function markasunread() {
-	if (name_of_the_current_book !== "") {
-		Toastifycation(language["marked_as_unread"], "#00C33C");
-		ModifyJSONFile(CosmicComicsData + "/ListOfComics.json", "reading", false, name_of_the_current_book);
-		ModifyJSONFile(CosmicComicsData + "/ListOfComics.json", "read", false, name_of_the_current_book);
-		ModifyJSONFile(CosmicComicsData + "/ListOfComics.json", "unread", true, name_of_the_current_book);
-		document
-			.getElementById("btn_id_unread_" + name_of_the_current_book)
-			.classList.add("active");
-		document
-			.getElementById("btn_id_reading_" + name_of_the_current_book)
-			.classList.remove("active");
-		document
-			.getElementById("btn_id_read_" + name_of_the_current_book)
-			.classList.remove("active");
-	}
-}
-
-//marked as reading
-function markasreading() {
-	if (name_of_the_current_book !== "") {
-		Toastifycation(language["marked_as_reading"], "#00C33C");
-		ModifyJSONFile(CosmicComicsData + "/ListOfComics.json", "reading", true, name_of_the_current_book);
-		ModifyJSONFile(CosmicComicsData + "/ListOfComics.json", "read", false, name_of_the_current_book);
-		ModifyJSONFile(CosmicComicsData + "/ListOfComics.json", "unread", false, name_of_the_current_book);
-		document
-			.getElementById("btn_id_reading_" + name_of_the_current_book)
-			.classList.add("active");
-		document
-			.getElementById("btn_id_unread_" + name_of_the_current_book)
-			.classList.remove("active");
-		document
-			.getElementById("btn_id_read_" + name_of_the_current_book)
-			.classList.remove("active");
-		name_of_the_current_book = "";
-	}
-}
-
-//Toogle Favorite
-function favorite() {
-	// TODO favorite
 }
 
 //Open a single file
@@ -2310,40 +1982,12 @@ document.addEventListener("dragleave", (event) => {
 	console.log("File has left the Drop Space");
 });
 
-// Toggle "active" class
-function toggleActive(object) {
-	object.classList.toggle("active");
-}
-
-function clearTN() {
-}
-
-function changeVM() {
-	if (cardMode === true) {
-		cardMode = false;
-		document.getElementById("icon_id_viewmode").innerHTML = "grid_view";
-		Modify_JSON_For_Config(CosmicComicsData + "/config.json", "display_style", 1);
-	} else {
-		cardMode = true;
-		document.getElementById("icon_id_viewmode").innerHTML = "view_list";
-		Modify_JSON_For_Config(CosmicComicsData + "/config.json", "display_style", 0);
-	}
-}
 
 function selectTheme() {
 	document.head.getElementsByTagName("link")[5].href = "/themes/" + document.getElementById("themeselector").value;
-	modifyConfigJson(CosmicComicsTemp + "/config.json", "theme", document.getElementById("themeselector").value);
+	modifyConfigJson("theme", document.getElementById("themeselector").value);
 }
 
-function ToggleTBY() {
-	if (Get_From_Config("theme_date", JSON.parse(fs.readFileSync(CosmicComicsData + "/config.json"))) === true) {
-		Modify_JSON_For_Config(CosmicComicsData + "/config.json", "theme_date", false);
-		document.getElementById("id_btn_TE").innerHTML = language["activate_theme_date"];
-	} else {
-		Modify_JSON_For_Config(CosmicComicsData + "/config.json", "theme_date", true);
-		document.getElementById("id_btn_TE").innerHTML = language["deactivate_theme_date"];
-	}
-}
 
 fetch('http://' + domain + ":" + port + "/getThemes").then((response) => {
 	return response.text();
@@ -2386,34 +2030,6 @@ async function WConv() {
 		}
 	}
 }
-
-function saveToTheme(el, value, d = "", d2 = "") {
-	if (d === "" && d2 === "") {
-		var mod = el.value;
-	} else {
-		if (el.checked === true) {
-			var mod = d2;
-		} else {
-			var mod = d;
-		}
-	}
-	Modify_JSON_For_Config(__dirname + "/themes/[CUSTOM] - Custom.json", value, mod);
-}
-
-const download = (url, destination) => new Promise((resolve, reject) => {
-	const file = fs.createWriteStream(destination);
-	https.get(url, response => {
-		response.pipe(file);
-		file.on('finish', () => {
-			file.close(resolve(true));
-		});
-	}).on('error', error => {
-		fs.unlink(destination, () => {
-			reject(error);
-		});
-		reject(error.message);
-	});
-});
 
 async function downloader() {
 	let url = document.getElementById("id_URLDL").value;
@@ -3278,7 +2894,7 @@ async function createSeries(provider, path, libraryPath, res) {
 				}
 			})
 		} else if (provider == 2) {
-			getAPIANILIST_SEARCH(search.value).then((el) => {
+			API_ANILIST_GET_SEARCH(search.value).then((el) => {
 				if (el != null) {
 					for (let o = 0; o < el.length; o++) {
 						let l = createCard(null, null, null, el[o].id, null, el[o].title)
@@ -4055,7 +3671,7 @@ async function refreshMeta(id, provider, type) {
 			//TODO Anilist
 			await getFromDB("Series", "* FROM Series WHERE ID_Series='" + id + "'").then(async (res) => {
 				let book = JSON.parse(res)[0];
-				await getAPIANILIST_ByID(parseInt(id)).then(async (res2) => {
+				await API_ANILIST_GET_ID(parseInt(id)).then(async (res2) => {
 					let blacklisted = ["note", "favorite", "PATH", "lock", "ID_Series"]
 					let asso = {}
 					for (var i = 0; i < book.length; i++) {
@@ -4807,12 +4423,13 @@ function AccountMenu() {
 	});
 }
 
+/* TODO ↑ CODE VERIFICATION ↑ */
 fetch("/profile/custo/getNumber").then((res) => {
 	return res.json();
 }).then((data) => {
 	data = data.length;
-	temp = document.getElementsByTagName("template")[0];
-	item = temp.content.querySelector("img");
+	let temp = document.getElementsByTagName("template")[0];
+	let item = temp.content.querySelector("img");
 	for (let i = 1; i < data + 1; i++) {
 		const newone = document.importNode(item, true);
 		newone.src = "Images/account_default/" + i + ".jpg";
@@ -4829,10 +4446,16 @@ fetch("/profile/custo/getNumber").then((res) => {
 	}
 });
 
+/**
+ * Download the database
+ */
 function DownloadBDD() {
 	window.open('http://' + domain + ":" + port + "/profile/DLBDD/" + userToken);
 }
 
+/**
+ * Delete the account
+ */
 async function DeleteAccount() {
 	window.location.href = 'login';
 	const option = {
@@ -4858,6 +4481,10 @@ fetch("http://" + domain + ":" + port + "/profile/discover").then(function (resp
 	});
 });
 
+
+/**
+ * Create an account on the server
+ */
 async function createAccount() {
 	if (!accountsNames.includes(document.getElementById("usernameManager").value.toLowerCase())) {
 		const option = {
@@ -4878,8 +4505,14 @@ async function createAccount() {
 	}
 }
 
+/**
+ * Change the element rating
+ * @param table the table to update
+ * @param where the where clause
+ * @param value the new value
+ */
 function changeRating(table, where, value) {
-	if (table == "Books") {
+	if (table === "Books") {
 		console.log(table, value + " from Book");
 		const options = {
 			method: "POST", headers: {
@@ -4894,7 +4527,7 @@ function changeRating(table, where, value) {
 			}, null, 2)
 		};
 		fetch("http://" + domain + ":" + port + "/DB/update", options);
-	} else if (table == "Series") {
+	} else if (table === "Series") {
 		console.log(table, value);
 		const options = {
 			method: "POST", headers: {

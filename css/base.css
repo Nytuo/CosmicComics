@@ -1286,6 +1286,7 @@ a[href^="http://marvel.com"] {
 .libmenu {
     border-color: transparent;
     background-color: transparent;
+    float: right;
 }
 
 .libmenu:hover {
@@ -1636,4 +1637,11 @@ a[href^="http://marvel.com"] {
 ::selection {
     background-color: var(--line-color);
     color: var(--text);
+}
+
+.libLogo{
+    width: 25px;
+    float: left;
+    line-height: 1;
+
 }

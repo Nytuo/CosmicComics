@@ -1052,6 +1052,9 @@ app.get("/profile/getPPBN/:name", (req, res) => {
 app.get("/profile/custo/getNumber", (req, res) => {
 	res.send({"length": fs.readdirSync(__dirname + "/public/Images/account_default").length});
 });
+app.get("/api/", (req, res) => {
+
+})
 
 //Modifications of the profile
 app.post("/profile/modification", (req, res) => {
