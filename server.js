@@ -1087,3 +1087,33 @@ app.post("/profile/deleteAccount", (req, res) => {
 app.all('*', (req, res) => {
 	res.sendFile(__dirname + '/404.html');
 });
+/*
+* async function WConv() {
+	try {
+		webp.grant_permission();
+	} catch (error) {
+		console.log("error");
+	}
+	var dir = fs.readdirSync(CosmicComicsData + "/FirstImageOfAll/");
+	for (var i = 0; i < dir.length; i++) {
+		try {
+			var file = fs.readdirSync(CosmicComicsData + "/FirstImageOfAll/" + dir[i]);
+			if (patha.extname(file[0]) !== ".webp") {
+				var oldfile = CosmicComicsData + "/FirstImageOfAll/" + dir[i] + "/" + file[0];
+				var newfile = CosmicComicsData + "/FirstImageOfAll/" + dir[i] + "/cover.webp";
+				await webp
+					.cwebp(oldfile, newfile, "-q 80 -noalpha -resize 250 380", (logging = "-v"))
+					.then((response) => {
+						console.log(response);
+						fs.unlinkSync(oldfile);
+						document.getElementById("prgs").style.width = (i * 100) / dir.length + "%";
+						remote.getCurrentWindow().setProgressBar(i / dir.length);
+					});
+			}
+		} catch (error) {
+			console.log(error);
+		}
+	}
+}
+*
+* */
