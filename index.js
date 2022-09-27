@@ -1556,7 +1556,7 @@ async function loadContent(provider, FolderRes, libraryPath) {
 					}
 					listOfImages.push(imagelink);
 					//Setting Card Div
-					let carddiv = createCard(null, null, null, res[0]["ID_Series"], res[0]["cover"], res[0]["title"], res[0]["favorite"])
+					let carddiv = createCard(null, null, null, n, res[0]["cover"], res[0]["title"], res[0]["favorite"])
 					carddiv.querySelector(".card__play").addEventListener("click", function () {
 						alert("ici2");
 						window.location.href = "viewer.html?" + encodeURIComponent(path.replaceAll("/", "%C3%B9"));
@@ -3683,7 +3683,7 @@ function createCard(unread, read, reading, ID, URLCover, NOM, favorite = 0) {
 	cardimage.style.backgroundColor = theme_BG_CI;
 	const imgcard = document.createElement("img");
 	imgcard.style.width = "100%";
-	imgcard.id = "card_img_id_" + ID + "_" + Math.random() * 8000;
+	imgcard.id = "card_img_id_" + ID;
 	imgcard.src = imagelink;
 	cardimage.appendChild(imgcard);
 	carddiv.appendChild(cardimage);
