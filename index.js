@@ -806,39 +806,68 @@ async function getAPIANILIST(name) {
 	});
 }
 
-/* TODO CODE VERIFICATION */
-function generateBookTemplate() {
-	let TheBookTemplate = {
-		"NOM": null,
-		"id": null,
-		"note": null,
-		"read": null,
-		"reading": null,
-		"unread": null,
-		"favorite": null,
-		"last_page": null,
-		"folder": null,
-		"PATH": null,
-		"URLCover": null,
-		"issueNumber": null,
-		"description": null,
-		"format": null,
-		"pageCount": null,
-		"URLs": null,
-		"series": null,
-		"creators": null,
-		"characters": null,
-		"prices": null,
-		"dates": null,
-		"collectedIssues": null,
-		"collections": null,
-		"variants": null,
-		"lock": null
-	}
-
-	TheBookTemplate.NOM
-
-	return TheBookTemplate;
+/**
+ * Generation of the Book Object for not yet DB inserted items
+ * @param NOM The name of the item
+ * @param ID The ID of the item
+ * @param COVER The cover of the item
+ * @param DESCRIPTION The description of the item
+ * @param STAFF The staff of the item
+ * @param CHARACTERS The characters of the item
+ * @param SITEURL The site URL of the item
+ * @param NOTE The note of the item
+ * @param READ The read status of the item
+ * @param READING The reading status of the item
+ * @param UNREAD  The unread status of the item
+ * @param FAVORITE The favorite status of the item
+ * @param LAST_PAGE The last page of the item
+ * @param FOLDER The folder of the item
+ * @param PATH The path of the item
+ * @param ISSUENUMBER The issue number of the item
+ * @param FORMAT The format of the item
+ * @param PAGECOUNT The page count of the item
+ * @param SERIES The series of the item
+ * @param PRICES The prices of the item
+ * @param DATES The dates of the item
+ * @param COLLECTEDISSUES The collected issues of the item
+ * @param COLLECTIONS The collections of the item
+ * @param VARIANTS The variants of the item
+ * @param LOCK The lock status of the item
+ * @return {{PATH: null, note: null, unread: null, creators: null, issueNumber: null, description: null, variants: null, characters: null, collections: null, lock: null, id: null, prices: null, collectedIssues: null, pageCount: null, read: null, URLs: null, last_page: null, format: null, reading: null, dates: null, NOM: null, folder: null, series: null, favorite: null, URLCover: null}} The Book Object
+ */
+function generateBookTemplate(NOM = null, ID = null, NOTE = null, READ = null, READING = null,
+                              UNREAD = null, FAVORITE = null, LAST_PAGE = null, FOLDER = null,
+                              PATH = null, COVER = null, ISSUENUMBER = null, DESCRIPTION = null,
+                              FORMAT = null, PAGECOUNT = null, SITEURL = null, SERIES = null,
+                              STAFF = null, CHARACTERS = null, PRICES = null, DATES = null,
+                              COLLECTEDISSUES = null, COLLECTIONS = null, VARIANTS = null, LOCK = null) {
+	return {
+		"NOM": NOM,
+		"id": ID,
+		"note": NOTE,
+		"read": READ,
+		"reading": READING,
+		"unread": UNREAD,
+		"favorite": FAVORITE,
+		"last_page": LAST_PAGE,
+		"folder": FOLDER,
+		"PATH": PATH,
+		"URLCover": COVER,
+		"issueNumber": ISSUENUMBER,
+		"description": DESCRIPTION,
+		"format": FORMAT,
+		"pageCount": PAGECOUNT,
+		"URLs": SITEURL,
+		"series": SERIES,
+		"creators": STAFF,
+		"characters": CHARACTERS,
+		"prices": PRICES,
+		"dates": DATES,
+		"collectedIssues": COLLECTEDISSUES,
+		"collections": COLLECTIONS,
+		"variants": VARIANTS,
+		"lock": LOCK
+	};
 }
 
 /**
@@ -879,33 +908,11 @@ function loadView(FolderRes, libraryPath, date = "", provider = providerEnum.MAN
 							if (cdata["data"]["total"] > 0) {
 								cdata = cdata["data"]["results"][0];
 								await InsertIntoDB("Books", "", `(?,'${cdata["id"]}','${realname}',null,${0},${0},${1},${0},${0},${0},'${path}','${cdata["thumbnail"].path + "/detail." + cdata["thumbnail"].extension}','${cdata["issueNumber"]}','${cdata["description"].replaceAll("'", "''")}','${cdata["format"]}',${cdata["pageCount"]},'${JSON.stringify(cdata["urls"])}','${JSON.stringify(cdata["series"])}','${JSON.stringify(cdata["creators"])}','${JSON.stringify(cdata["characters"])}','${JSON.stringify(cdata["prices"])}','${JSON.stringify(cdata["dates"])}','${JSON.stringify(cdata["collectedIssues"])}','${JSON.stringify(cdata["collections"])}','${JSON.stringify(cdata["variants"])}',false)`).then(() => {
+									TheBook = generateBookTemplate(realname, cdata["id"], null, 0, 0, 1, 0, 0, 0, path,
+										cdata["thumbnail"].path + "/detail." + cdata["thumbnail"].extension, cdata["issueNumber"], cdata["description"], cdata["format"],
+										cdata["pageCount"], cdata["urls"], cdata["series"], cdata["creators"], cdata["characters"], cdata["prices"], cdata["dates"],
+										cdata["collectedIssues"], cdata["collections"], cdata["variants"], false);
 									console.log("inserted");
-									TheBook = {NOM: realname,
-										id: cdata["id"],
-										note: null,
-										read: 0,
-										reading: 0,
-										unread: 1,
-										favorite: 0,
-										last_page: 0,
-										folder: 0,
-										note: -1,
-										PATH: path,
-										URLCover: cdata["thumbnail"].path + "/detail." + cdata["thumbnail"].extension,
-										issueNumber: cdata["issueNumber"],
-										description: cdata["description"],
-										format: cdata["format"],
-										pageCount: cdata["pageCount"],
-										URLs: cdata["urls"],
-										series: cdata["series"],
-										creators: cdata["creators"],
-										characters: cdata["characters"],
-										prices: cdata["prices"],
-										dates: cdata["dates"],
-										collectedIssues: cdata["collectedIssues"],
-										collections: cdata["collections"],
-										variants: cdata["variants"],
-										lock: false}
 								});
 								await GETMARVELAPI_Creators(cdata["id"], "comics").then(async (ccdata) => {
 									ccdata = ccdata["data"]["results"];
@@ -926,32 +933,7 @@ function loadView(FolderRes, libraryPath, date = "", provider = providerEnum.MAN
 							} else {
 								await InsertIntoDB("Books", "", `(?,'${null}','${realname}',null,${0},${0},${1},${0},${0},${0},'${path}','${null}','${null}','${null}','${null}',${null},'${null}','${null}','${null}','${null}','${null}','${null}','${null}','${null}','${null}',false)`).then(() => {
 									console.log("inserted");
-									TheBook = {
-										NOM: realname,
-										read: 0,
-										reading: 0,
-										unread: 1,
-										note: null,
-										favorite: 0,
-										last_page: 0,
-										folder: 0,
-										PATH: path,
-										URLCover: null,
-										issueNumber: null,
-										description: null,
-										format: null,
-										pageCount: null,
-										URLs: null,
-										series: null,
-										creators: null,
-										characters: null,
-										prices: null,
-										dates: null,
-										collectedIssues: null,
-										collections: null,
-										variants: null,
-										lock: null
-									};
+									TheBook = generateBookTemplate(realname, null, null, 0, 0, 1, 0, 0, 0, path, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null)
 								});
 							}
 						});
@@ -984,32 +966,7 @@ function loadView(FolderRes, libraryPath, date = "", provider = providerEnum.MAN
 							console.log(SerieName);
 							await InsertIntoDB("Books", "", `(?,'${null}','${realname}',${null},${0},${0},${1},${0},${0},${0},'${path}','${null}','${null}','${null}','${null}',${null},'${null}','${"Anilist_" + realname.replaceAll(" ", "$") + "_" + SerieName.replaceAll(" ", "$")}','${null}','${null}','${null}','${null}','${null}','${null}','${null}',false)`).then(() => {
 								console.log("inserted");
-								TheBook = {
-									NOM: realname,
-									read: 0,
-									reading: 0,
-									unread: 1,
-									note: null,
-									favorite: 0,
-									last_page: 0,
-									folder: 0,
-									PATH: path,
-									URLCover: null,
-									issueNumber: null,
-									description: null,
-									format: null,
-									pageCount: null,
-									URLs: null,
-									series: null,
-									creators: null,
-									characters: null,
-									prices: null,
-									dates: null,
-									collectedIssues: null,
-									collections: null,
-									variants: null,
-									lock: false
-								};
+								TheBook = generateBookTemplate(realname, null, null, 0, 0, 1, 0, 0, 0, path, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null)
 							});
 						});
 					}
