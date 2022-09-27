@@ -1023,58 +1023,56 @@ CosmicComicsData + "/ListOfComics.json",
                 }
             }*/
 				//Setting Card Div
-				let carddiv = createCard(TheBook["unread"],TheBook["read"],TheBook["reading"],TheBook["ID_book"]+"_"+n,TheBook["URLCover"],TheBook["NOM"],TheBook["favorite"])
+				let carddiv = createCard(TheBook["unread"], TheBook["read"], TheBook["reading"], TheBook["ID_book"] + "_" + n, TheBook["URLCover"], TheBook["NOM"], TheBook["favorite"])
 				carddiv.querySelector(".card__play").addEventListener("click", function () {
-							/*            ModifyJSONFile(
-                                            CosmicComicsData + "/ListOfComics.json",
-                                            "reading",
-                                            true,
+					/*            ModifyJSONFile(
+									CosmicComicsData + "/ListOfComics.json",
+									"reading",
+									true,
 
-                                        );
-                                        ModifyJSONFile(
-                                            CosmicComicsData + "/ListOfComics.json",
-                                            "unread",
-                                            false,
-                                        );
-                                        Modify_JSON_For_Config(
-                                            CosmicComicsData + "/config.json",
-                                            "last_opened",
-                                            path
-                                        );*/
-							alert("ici4");
-							let encoded = encodeURIComponent(path.replaceAll("/", "%C3%B9"));
-							window.location.href = "viewer.html?" + encoded;
-						});
-						carddiv.addEventListener("click", async function () {
-							await createDetails(TheBook, provider);
-						});
+								);
+								ModifyJSONFile(
+									CosmicComicsData + "/ListOfComics.json",
+									"unread",
+									false,
+								);
+								Modify_JSON_For_Config(
+									CosmicComicsData + "/config.json",
+									"last_opened",
+									path
+								);*/
+					alert("ici4");
+					let encoded = encodeURIComponent(path.replaceAll("/", "%C3%B9"));
+					window.location.href = "viewer.html?" + encoded;
+				});
+				carddiv.addEventListener("click", async function () {
+					await createDetails(TheBook, provider);
+				});
+				n++;
+				const element = document.getElementById("ContentView");
+				divlist.appendChild(carddiv);
+				element.appendChild(divlist);
+				/* if (stat.isDirectory()) {
+					 const imgNode = document.createElement("img");
+					 imgNode.src = "";
+					 imgNode.style = "padding-top: 330px";
+					 carddiv.appendChild(imgNode);
+				 } else if (readed) {
+					 //readed
+				 } else if (reading) {
+					 //reazading
+				 } else {
+					 //rien
+				 }
 
-					n++;
-					const element = document.getElementById("ContentView");
-					divlist.appendChild(carddiv);
-					element.appendChild(divlist);
-					/* if (stat.isDirectory()) {
-                         const imgNode = document.createElement("img");
-                         imgNode.src = "";
-                         imgNode.style = "padding-top: 330px";
-                         carddiv.appendChild(imgNode);
-                     } else if (readed) {
-                         //readed
-                     } else if (reading) {
-                         //reazading
-                     } else {
-                         //rien
-                     }
+				 if (favorite_v) {
 
-                     if (favorite_v) {
-
-                         //favorite
-                     } else if (stat.isDirectory()) {
-                         //fav folder
-                     } else {
-                         //pas fav
-                     }*/
-
+					 //favorite
+				 } else if (stat.isDirectory()) {
+					 //fav folder
+				 } else {
+					 //pas fav
+				 }*/
 				/*if (readed) {
                     //readed
                 } else if (reading) {
@@ -1558,255 +1556,48 @@ async function loadContent(provider, FolderRes, libraryPath) {
 					}
 					listOfImages.push(imagelink);
 					//Setting Card Div
-					const carddiv = document.createElement("div");
-					carddiv.style.cursor = "pointer";
-					console.log("DEBUG 2");
-					if (cardMode === true) {
-						console.log("DEBUG 3");
-						carddiv.className = "cardcusto";
-						carddiv.setAttribute("data-effect", "zoom");
-						//button card_save
-						//figure card__image
-						const cardimage = document.createElement("div");
-						cardimage.className = "card__image";
-						cardimage.style.backgroundColor = theme_BG_CI;
-						const imgcard = document.createElement("img");
-						imgcard.style.width = "100%";
-						imgcard.id = "card_img_id_" + index;
-						cardimage.appendChild(imgcard);
-						carddiv.appendChild(cardimage);
-						//card__body
-						const bodycard = document.createElement("div");
-						bodycard.className = "card__body";
-						//button play
-						const playbtn = document.createElement("button");
-						playbtn.className = "card__play js-play";
-						playbtn.type = "button";
-						const playarr = document.createElement("i");
-						playarr.className = "material-icons";
-						playarr.innerHTML = "play_arrow";
-						playarr.style.color = theme_button_card;
-						playbtn.appendChild(playarr);
-						bodycard.appendChild(playbtn);
-						/*            new bootstrap.Tooltip(playbtn, {
-                                        title: language["Play"],
-                                        placement: "bottom",
-                                    });*/
-						const pcard_bio = document.createElement("p");
-						pcard_bio.className = "card__bio";
-						pcard_bio.style = "text-align: center;";
-						pcard_bio.style.color = theme_FG;
-						pcard_bio.innerHTML = node.textContent;
-						bodycard.appendChild(pcard_bio);
-						carddiv.appendChild(bodycard);
-						carddiv.id = "id" + n;
-						if (playbtn.addEventListener) {
-							console.log("DEBUG 3b");
-							/*          if (stat.isDirectory()) {*/
-							carddiv.addEventListener("click", async function () {
-								await createSeries(provider, path, libraryPath, res);
-							});
-							playbtn.addEventListener("click", function () {
-								Modify_JSON_For_Config(CosmicComicsData + "/config.json", "last_opened", path);
-								alert("ici2");
-								window.location.href = "viewer.html?" + encodeURIComponent(path.replaceAll("/", "%C3%B9"));
-							});
-							/* } else {
-                                 playbtn.addEventListener("click", function () {
-                                     ModifyJSONFile(
-                                         CosmicComicsData + "/ListOfComics.json",
-                                         "reading",
-                                         true,
-                                     );
-                                     ModifyJSONFile(
-                                         CosmicComicsData + "/ListOfComics.json",
-                                         "unread",
-                                         false,
-                                     );
-                                     Modify_JSON_For_Config(
-                                         CosmicComicsData + "/config.json",
-                                         "last_opened",
-                                         path
-                                     );
-                                     window.location.href = "viewer.html?" + path;
-                                 });
-                             }*/
-						}
-						console.log("DEBUG 3c");
-						n++;
-						const element = document.getElementById("ContainerExplorer");
-						element.style.display = "none";
-						const divrating = document.createElement("div");
-						carddiv.appendChild(divrating);
-						element.appendChild(carddiv);
-						/*
-                                    if (stat.isDirectory()) {
-                        */
-						const imgNode = document.createElement("img");
-						imgNode.src = "";
-						imgNode.style = "padding-top: 330px";
-						carddiv.appendChild(imgNode);
-						/*     } else if (readed) {
-                                 //readed
-                             } else if (reading) {
-                                 //reazading
-                             } else {
-                                 //rien
-                             }
+					let carddiv = createCard(null, null, null, res[0]["ID_Series"], res[0]["cover"], res[0]["title"], res[0]["favorite"])
+					carddiv.querySelector(".card__play").addEventListener("click", function () {
+						alert("ici2");
+						window.location.href = "viewer.html?" + encodeURIComponent(path.replaceAll("/", "%C3%B9"));
+					});
+					carddiv.addEventListener("click", async function () {
+						await createSeries(provider, path, libraryPath, res);
+					});
+					console.log("DEBUG 3c");
+					n++;
+					const element = document.getElementById("ContainerExplorer");
+					element.style.display = "none";
+					const divrating = document.createElement("div");
+					carddiv.appendChild(divrating);
+					element.appendChild(carddiv);
+					/*
+								if (stat.isDirectory()) {
+					*/
+					const imgNode = document.createElement("img");
+					imgNode.src = "";
+					imgNode.style = "padding-top: 330px";
+					carddiv.appendChild(imgNode);
+					/*     } else if (readed) {
+							 //readed
+						 } else if (reading) {
+							 //reazading
+						 } else {
+							 //rien
+						 }
 
-                             if (favorite_v) {
+						 if (favorite_v) {
 
-                                 //favorite
-                             } else if (stat.isDirectory()) {
-                                 //fav folder
-                             } else {
-                                 //pas fav
-                             }*/
-						console.log("DEBUG 3d");
-					} else {
-						//POINTER TO LISTGROUP
-						console.log("DEBUG 4");
-						const alist = document.createElement("a");
-						alist.className = "list-group-item list-group-item-action";
-						alist.style.backgroundColor = "transparent";
-						alist.style.color = theme_FG;
-						alist.style.cursor = "pointer";
-						alist.id = "id" + index;
-						alist.addEventListener("mouseover", function () {
-							alist.style.backgroundColor = theme_hover_listview;
-						});
-						alist.addEventListener("mouseleave", function () {
-							alist.style.backgroundColor = "transparent";
-						});
-						alist.innerHTML = node.textContent;
-						divlist.appendChild(alist);
-						const playbtn = document.createElement("button");
-						playbtn.className = "card__play js-play";
-						playbtn.type = "button";
-						playbtn.style.opacity = 1;
-						playbtn.style.top = "10px";
-						const playarr = document.createElement("i");
-						playarr.className = "material-icons";
-						playarr.style.color = theme_button_card;
-						playarr.innerHTML = "play_arrow";
-						playbtn.appendChild(playarr);
-						alist.appendChild(playbtn);
-						/*            new bootstrap.Tooltip(playbtn, {
-                                        title: language["Play"],
-                                        placement: "bottom",
-                                    });*/
-						//button card_save
-						const buttonfav = document.createElement("button");
-						buttonfav.className = "card__save js-fav";
-						buttonfav.style.opacity = 1;
-						buttonfav.style.top = "10px";
-						buttonfav.style.right = "190px";
-						buttonfav.type = "button";
-						buttonfav.addEventListener("click", function () {
-							favorite();
-						});
-						buttonfav.id = "btn_id_fav_" + Math.random() * 10000;
-						if (currenttheme > 1) buttonfav.className = "js-fav card__save" + theme_button_card;
-						/*            new bootstrap.Tooltip(buttonfav, {
-                                        title: language["toogle_fav"],
-                                        placement: "bottom",
-                                    });*/
-						//icon
-						const favicon = document.createElement("i");
-						favicon.className = "material-icons";
-						favicon.innerHTML = "favorite";
-						buttonfav.appendChild(favicon);
-						alist.appendChild(buttonfav);
-						//button card__close
-						const button_unread = document.createElement("button");
-						button_unread.className = "card__close js-unread";
-						button_unread.type = "button";
-						button_unread.style.opacity = 1;
-						button_unread.style.top = "10px";
-						button_unread.style.right = "70px";
-						button_unread.addEventListener("click", function () {
-							markasunread();
-						});
-						button_unread.id = "btn_id_unread_" + Math.random() * 10000;
-						if (currenttheme > 1) button_unread.className = "js-unread card__close" + theme_button_card;
-						/*            new bootstrap.Tooltip(button_unread, {
-                                        title: language["mkunread"],
-                                        placement: "bottom",
-                                    });*/
-						//icon
-						const unread_icon = document.createElement("i");
-						unread_icon.className = "material-icons";
-						unread_icon.innerHTML = "close";
-						button_unread.appendChild(unread_icon);
-						alist.appendChild(button_unread);
-						//button card__reading
-						const button_reading = document.createElement("button");
-						button_reading.className = "card__reading js-reading";
-						button_reading.type = "button";
-						button_reading.style.opacity = 1;
-						button_reading.style.top = "10px";
-						button_reading.style.right = "110px";
-						button_reading.addEventListener("click", function () {
-							markasreading();
-						});
-						button_reading.id = "btn_id_reading_" + Math.random() * 10000;
-						if (currenttheme > 1) button_reading.className = "js-reading card__reading" + theme_button_card;
-						/*            new bootstrap.Tooltip(button_reading, {
-                                        title: language["mkreading"],
-                                        placement: "bottom",
-                                    });*/
-						//icon
-						const reading_icon = document.createElement("i");
-						reading_icon.className = "material-icons";
-						reading_icon.innerHTML = "auto_stories";
-						button_reading.appendChild(reading_icon);
-						alist.appendChild(button_reading);
-						//button card__read
-						const button_read = document.createElement("button");
-						button_read.className = "card__read js-read";
-						button_read.type = "button";
-						button_read.style.opacity = 1;
-						button_read.style.top = "10px";
-						button_read.style.right = "150px";
-						button_read.addEventListener("click", function () {
-							markasread();
-						});
-						button_read.id = "btn_id_read_" + Math.random() * 10000;
-						if (currenttheme > 1) button_read.className = "js-read card__read" + theme_button_card;
-						/*            new bootstrap.Tooltip(button_read, {
-                                        title: language["mkread"],
-                                        placement: "bottom",
-                                    });*/
-						//ico
-						const read_ion = document.createElement("i");
-						read_ion.className = "material-icons";
-						read_ion.innerHTML = "done";
-						button_read.appendChild(read_ion);
-						alist.appendChild(button_read);
-						if (playbtn.addEventListener) {
-							/*
-                                            if (stat.isDirectory()) {
-                            */
-							alist.addEventListener("dblclick", function () {
-								launchDetect(path, root);
-							});
-							playbtn.addEventListener("click", function () {
-								Modify_JSON_For_Config(CosmicComicsData + "/config.json", "last_opened", path);
-								alert("ici3");
-								window.location.href = "viewer.html?" + encodeURIComponent(path.replaceAll("/", "%C3%B9"));
-							});
-						}
-						n++;
-						const element = document.getElementById("ContainerExplorer");
-						const divrating = document.createElement("div");
-						divrating.appendChild(alist);
-						divlist.appendChild(divrating);
-						element.appendChild(divlist);
-					}
+							 //favorite
+						 } else if (stat.isDirectory()) {
+							 //fav folder
+						 } else {
+							 //pas fav
+						 }*/
+					console.log("DEBUG 3d");
 				});
 			}
 		}
-
 	});
 	if (cardMode === true) {
 		preloadImage(listOfImages, n);
@@ -1982,12 +1773,10 @@ document.addEventListener("dragleave", (event) => {
 	console.log("File has left the Drop Space");
 });
 
-
 function selectTheme() {
 	document.head.getElementsByTagName("link")[5].href = "/themes/" + document.getElementById("themeselector").value;
 	modifyConfigJson("theme", document.getElementById("themeselector").value);
 }
-
 
 fetch('http://' + domain + ":" + port + "/getThemes").then((response) => {
 	return response.text();
@@ -2101,143 +1890,43 @@ async function updateLibrary(forma, id) {
 
 function HomeRoutine() {
 	getFromDB("Books", "* FROM Books WHERE reading = 1").then(async (resa) => {
-		var TheBookun = JSON.parse(resa);
+		let TheBookun = JSON.parse(resa);
 		console.log(TheBookun);
 		for (let i = 0; i < TheBookun.length; i++) {
-			var TheBook = TheBookun[i];
-			var imagelink = TheBook["URLCover"];
-			var node = document.createTextNode(TheBook["NOM"]);
-			const carddiv = document.createElement("div");
-			carddiv.style.cursor = "pointer";
-			if (cardMode === true) {
-				carddiv.className = "cardcusto";
-				carddiv.setAttribute("data-effect", "zoom");
-				//button card_save
-				const buttonfav = document.createElement("button");
-				buttonfav.className = "card__save js-fav";
-				buttonfav.type = "button";
-				buttonfav.addEventListener("click", function () {
-					favorite();
-				});
-				buttonfav.id = "btn_id_fav_" + TheBook["ID_book"];
-				//icon
-				const favicon = document.createElement("i");
-				favicon.className = "material-icons";
-				favicon.innerHTML = "favorite";
-				if (currenttheme > 1) buttonfav.className = "js-fav card__save" + theme_button_card;
-				buttonfav.appendChild(favicon);
-				carddiv.appendChild(buttonfav);
-				//button card__close
-				const button_unread = document.createElement("button");
-				button_unread.className = "card__close js-unread";
-				button_unread.type = "button";
-				button_unread.addEventListener("click", function () {
-					markasunread();
-				});
-				button_unread.id = "btn_id_unread_" + TheBook["ID_book"];
-				//icon
-				const unread_icon = document.createElement("i");
-				unread_icon.className = "material-icons";
-				unread_icon.innerHTML = "close";
-				if (currenttheme > 1) button_unread.className = "js-unread card__close" + theme_button_card;
-				button_unread.appendChild(unread_icon);
-				carddiv.appendChild(button_unread);
-				//button card__reading
-				const button_reading = document.createElement("button");
-				button_reading.className = "card__reading js-reading";
-				button_reading.type = "button";
-				button_reading.addEventListener("click", function () {
-					markasreading();
-				});
-				button_reading.id = "btn_id_reading_" + TheBook["ID_book"];
-				//icon
-				const reading_icon = document.createElement("i");
-				reading_icon.className = "material-icons";
-				reading_icon.innerHTML = "auto_stories";
-				if (currenttheme > 1) button_reading.className = "js-reading card__reading" + theme_button_card;
-				button_reading.appendChild(reading_icon);
-				carddiv.appendChild(button_reading);
-				//button card__read
-				const button_read = document.createElement("button");
-				button_read.className = "card__read js-read";
-				button_read.type = "button";
-				button_read.addEventListener("click", function () {
-					markasread();
-				});
-				button_read.id = "btn_id_read_" + TheBook["ID_book"];
-				//ico
-				const read_ion = document.createElement("i");
-				read_ion.className = "material-icons";
-				read_ion.innerHTML = "done";
-				if (currenttheme > 1) button_read.className = "js-read card__read" + theme_button_card;
-				button_read.appendChild(read_ion);
-				carddiv.appendChild(button_read);
-				//figure card__image
-				const cardimage = document.createElement("div");
-				cardimage.className = "card__image";
-				cardimage.style.backgroundColor = theme_BG_CI;
-				const imgcard = document.createElement("img");
-				imgcard.style.width = "100%";
-				imgcard.id = "card_img_id_" + TheBook["ID_book"];
-				imgcard.src = imagelink;
-				cardimage.appendChild(imgcard);
-				carddiv.appendChild(cardimage);
-				//card__body
-				const bodycard = document.createElement("div");
-				bodycard.className = "card__body";
-				//button play
-				const playbtn = document.createElement("button");
-				playbtn.className = "card__play js-play";
-				playbtn.type = "button";
-				const playarr = document.createElement("i");
-				playarr.className = "material-icons";
-				playarr.innerHTML = "play_arrow";
-				playarr.style.color = theme_button_card;
-				playbtn.appendChild(playarr);
-				bodycard.appendChild(playbtn);
-				const pcard_bio = document.createElement("p");
-				pcard_bio.className = "card__bio";
-				pcard_bio.style = "text-align: center;";
-				pcard_bio.style.color = theme_FG;
-				pcard_bio.innerHTML = node.textContent;
-				bodycard.appendChild(pcard_bio);
-				carddiv.appendChild(bodycard);
-				carddiv.id = "id_vol" + TheBook["ID_book"];
-				if (playbtn.addEventListener) {
-					playbtn.addEventListener("click", function () {
-						/*            ModifyJSONFile(
-										CosmicComicsData + "/ListOfComics.json",
-										"reading",
-										true,
+			let TheBook = TheBookun[i];
+			let carddiv = createCard(TheBook["unread"], TheBook["read"], TheBook["reading"], TheBook["ID_book"], TheBook["URLCover"], TheBook["NOM"], TheBook["favorite"])
+			carddiv.querySelector(".card__play").addEventListener("click", function () {
+				/*            ModifyJSONFile(
+								CosmicComicsData + "/ListOfComics.json",
+								"reading",
+								true,
 
-									);
-									ModifyJSONFile(
-										CosmicComicsData + "/ListOfComics.json",
-										"unread",
-										false,
-									);
-									Modify_JSON_For_Config(
-										CosmicComicsData + "/config.json",
-										"last_opened",
-										path
-									);*/
-						alert("ici4");
-						let encoded = encodeURIComponent(path.replaceAll("/", "%C3%B9"));
-						window.location.href = "viewer.html?" + encoded;
-					});
-					let brook = TheBook;
-					carddiv.addEventListener("click", function () {
-						let provider = ((brook.series.includes("marvel")) ? (1) : ((brook.series.includes("Anilist")) ? (2) : (0)));
-						createDetails(brook, provider);
-					});
-				}
-				const element = document.getElementById("continueReadingHome");
-				const divrating = document.createElement("div");
-				carddiv.appendChild(divrating);
-				element.appendChild(carddiv);
-			}
+							);
+							ModifyJSONFile(
+								CosmicComicsData + "/ListOfComics.json",
+								"unread",
+								false,
+							);
+							Modify_JSON_For_Config(
+								CosmicComicsData + "/config.json",
+								"last_opened",
+								path
+							);*/
+				alert("ici4");
+				let encoded = encodeURIComponent(path.replaceAll("/", "%C3%B9"));
+				window.location.href = "viewer.html?" + encoded;
+			});
+			let brook = TheBook;
+			carddiv.addEventListener("click", function () {
+				let provider = ((brook.series.includes("marvel")) ? (1) : ((brook.series.includes("Anilist")) ? (2) : (0)));
+				createDetails(brook, provider);
+			});
+			const element = document.getElementById("continueReadingHome");
+			const divrating = document.createElement("div");
+			carddiv.appendChild(divrating);
+			element.appendChild(carddiv);
 		}
-		if (TheBookun.length == 0) {
+		if (TheBookun.length === 0) {
 			const element = document.getElementById("continueReadingHome");
 			let node = document.createElement("p");
 			node.innerHTML = "Nothing to display here !<br/>Open a new book or try one of those below.";
@@ -2245,138 +1934,40 @@ function HomeRoutine() {
 		}
 	});
 	getFromDB("Books", "* FROM Books ORDER BY ID_book DESC LIMIT 10").then((resa) => {
-		var TheBookun = JSON.parse(resa);
+		let TheBookun = JSON.parse(resa);
 		console.log(TheBookun);
 		const element = document.getElementById("recentlyAdded");
 		for (let i = 0; i < TheBookun.length; i++) {
-			var TheBook = TheBookun[i];
-			var imagelink = TheBook["URLCover"];
-			var node = document.createTextNode(TheBook["NOM"]);
-			let carddiv = document.createElement("div");
-			carddiv.style.cursor = "pointer";
-			if (cardMode === true) {
-				carddiv.className = "cardcusto";
-				carddiv.setAttribute("data-effect", "zoom");
-				//button card_save
-				const buttonfav = document.createElement("button");
-				buttonfav.className = "card__save js-fav";
-				buttonfav.type = "button";
-				buttonfav.addEventListener("click", function () {
-					favorite();
-				});
-				buttonfav.id = "btn_id_fav_" + Math.random() * 100000;
-				//icon
-				const favicon = document.createElement("i");
-				favicon.className = "material-icons";
-				favicon.innerHTML = "favorite";
-				if (currenttheme > 1) buttonfav.className = "js-fav card__save" + theme_button_card;
-				buttonfav.appendChild(favicon);
-				carddiv.appendChild(buttonfav);
-				//button card__close
-				const button_unread = document.createElement("button");
-				button_unread.className = "card__close js-unread";
-				button_unread.type = "button";
-				button_unread.addEventListener("click", function () {
-					markasunread();
-				});
-				button_unread.id = "btn_id_unread_" + Math.random() * 100000;
-				//icon
-				const unread_icon = document.createElement("i");
-				unread_icon.className = "material-icons";
-				unread_icon.innerHTML = "close";
-				if (currenttheme > 1) button_unread.className = "js-unread card__close" + theme_button_card;
-				button_unread.appendChild(unread_icon);
-				carddiv.appendChild(button_unread);
-				//button card__reading
-				const button_reading = document.createElement("button");
-				button_reading.className = "card__reading js-reading";
-				button_reading.type = "button";
-				button_reading.addEventListener("click", function () {
-					markasreading();
-				});
-				button_reading.id = "btn_id_reading_" + Math.random() * 100000;
-				//icon
-				const reading_icon = document.createElement("i");
-				reading_icon.className = "material-icons";
-				reading_icon.innerHTML = "auto_stories";
-				if (currenttheme > 1) button_reading.className = "js-reading card__reading" + theme_button_card;
-				button_reading.appendChild(reading_icon);
-				carddiv.appendChild(button_reading);
-				//button card__read
-				const button_read = document.createElement("button");
-				button_read.className = "card__read js-read";
-				button_read.type = "button";
-				button_read.addEventListener("click", function () {
-					markasread();
-				});
-				button_read.id = "btn_id_read_" + Math.random() * 100000;
-				//ico
-				const read_ion = document.createElement("i");
-				read_ion.className = "material-icons";
-				read_ion.innerHTML = "done";
-				if (currenttheme > 1) button_read.className = "js-read card__read" + theme_button_card;
-				button_read.appendChild(read_ion);
-				carddiv.appendChild(button_read);
-				//figure card__image
-				const cardimage = document.createElement("div");
-				cardimage.className = "card__image";
-				cardimage.style.backgroundColor = theme_BG_CI;
-				const imgcard = document.createElement("img");
-				imgcard.style.width = "100%";
-				imgcard.id = "card_img_id_" + Math.random() * 100000;
-				imgcard.src = imagelink;
-				cardimage.appendChild(imgcard);
-				carddiv.appendChild(cardimage);
-				//card__body
-				const bodycard = document.createElement("div");
-				bodycard.className = "card__body";
-				//button play
-				const playbtn = document.createElement("button");
-				playbtn.className = "card__play js-play";
-				playbtn.type = "button";
-				const playarr = document.createElement("i");
-				playarr.className = "material-icons";
-				playarr.innerHTML = "play_arrow";
-				playarr.style.color = theme_button_card;
-				playbtn.appendChild(playarr);
-				bodycard.appendChild(playbtn);
-				const pcard_bio = document.createElement("p");
-				pcard_bio.className = "card__bio";
-				pcard_bio.style = "text-align: center;";
-				pcard_bio.style.color = theme_FG;
-				pcard_bio.innerHTML = node.textContent;
-				bodycard.appendChild(pcard_bio);
-				carddiv.appendChild(bodycard);
-				carddiv.id = "id_vol" + Math.random() * 100000;
-				playbtn.addEventListener("click", function () {
-					/*            ModifyJSONFile(
-									CosmicComicsData + "/ListOfComics.json",
-									"reading",
-									true,
-								);
-								ModifyJSONFile(
-									CosmicComicsData + "/ListOfComics.json",
-									"unread",
-									false,
-								);
-								Modify_JSON_For_Config(
-									CosmicComicsData + "/config.json",
-									"last_opened",
-									path
-								);*/
-					alert("ici4");
-					let encoded = encodeURIComponent(path.replaceAll("/", "%C3%B9"));
-					window.location.href = "viewer.html?" + encoded;
-				});
-				let brook = TheBook;
-				carddiv.addEventListener("click", function () {
-					let provider = ((brook.series.includes("marvel")) ? (1) : ((brook.series.includes("Anilist")) ? (2) : (0)));
-					createDetails(brook, provider);
-				});
-				element.appendChild(carddiv);
-			}
+			let TheBook = TheBookun[i];
+			let carddiv = createCard(TheBook["unread"], TheBook["read"], TheBook["reading"], TheBook["ID_book"], TheBook["URLCover"], TheBook["NOM"], TheBook["favorite"])
+			carddiv.querySelector(".card__play").addEventListener("click", function () {
+				/*            ModifyJSONFile(
+								CosmicComicsData + "/ListOfComics.json",
+								"reading",
+								true,
+							);
+							ModifyJSONFile(
+								CosmicComicsData + "/ListOfComics.json",
+								"unread",
+								false,
+							);
+							Modify_JSON_For_Config(
+								CosmicComicsData + "/config.json",
+								"last_opened",
+								path
+							);*/
+				alert("ici4");
+				let encoded = encodeURIComponent(path.replaceAll("/", "%C3%B9"));
+				window.location.href = "viewer.html?" + encoded;
+			});
+			let brook = TheBook;
+			carddiv.addEventListener("click", function () {
+				let provider = ((brook.series.includes("marvel")) ? (1) : ((brook.series.includes("Anilist")) ? (2) : (0)));
+				createDetails(brook, provider);
+			});
+			element.appendChild(carddiv);
 		}
-		if (TheBookun.length == 0) {
+		if (TheBookun.length === 0) {
 			const element = document.getElementById("recentlyAdded");
 			let node = document.createElement("p");
 			node.innerHTML = "Nothing to display here !";
@@ -2384,142 +1975,41 @@ function HomeRoutine() {
 		}
 	});
 	getFromDB("Books", "* FROM Books WHERE unread = 1").then(async (resa) => {
-		var TheBookun = JSON.parse(resa);
-		console.log(TheBookun);
+		let TheBookun = JSON.parse(resa);
 		for (let i = 0; i < TheBookun.length; i++) {
-			var TheBook = TheBookun[i];
-			var imagelink = TheBook["URLCover"];
-			var node = document.createTextNode(TheBook["NOM"]);
-			const carddiv = document.createElement("div");
-			carddiv.style.cursor = "pointer";
-			if (cardMode === true) {
-				carddiv.className = "cardcusto";
-				carddiv.setAttribute("data-effect", "zoom");
-				//button card_save
-				const buttonfav = document.createElement("button");
-				buttonfav.className = "card__save js-fav";
-				buttonfav.type = "button";
-				buttonfav.addEventListener("click", function () {
-					favorite();
-				});
-				buttonfav.id = "btn_id_fav_" + Math.random() * 100000;
-				//icon
-				const favicon = document.createElement("i");
-				favicon.className = "material-icons";
-				favicon.innerHTML = "favorite";
-				if (currenttheme > 1) buttonfav.className = "js-fav card__save" + theme_button_card;
-				buttonfav.appendChild(favicon);
-				carddiv.appendChild(buttonfav);
-				//button card__close
-				const button_unread = document.createElement("button");
-				button_unread.className = "card__close js-unread";
-				button_unread.type = "button";
-				button_unread.addEventListener("click", function () {
-					markasunread();
-				});
-				button_unread.id = "btn_id_unread_" + Math.random() * 100000;
-				//icon
-				const unread_icon = document.createElement("i");
-				unread_icon.className = "material-icons";
-				unread_icon.innerHTML = "close";
-				if (currenttheme > 1) button_unread.className = "js-unread card__close" + theme_button_card;
-				button_unread.appendChild(unread_icon);
-				carddiv.appendChild(button_unread);
-				//button card__reading
-				const button_reading = document.createElement("button");
-				button_reading.className = "card__reading js-reading";
-				button_reading.type = "button";
-				button_reading.addEventListener("click", function () {
-					markasreading();
-				});
-				button_reading.id = "btn_id_reading_" + Math.random() * 100000;
-				//icon
-				const reading_icon = document.createElement("i");
-				reading_icon.className = "material-icons";
-				reading_icon.innerHTML = "auto_stories";
-				if (currenttheme > 1) button_reading.className = "js-reading card__reading" + theme_button_card;
-				button_reading.appendChild(reading_icon);
-				carddiv.appendChild(button_reading);
-				//button card__read
-				const button_read = document.createElement("button");
-				button_read.className = "card__read js-read";
-				button_read.type = "button";
-				button_read.addEventListener("click", function () {
-					markasread();
-				});
-				button_read.id = "btn_id_read_" + Math.random() * 100000;
-				//ico
-				const read_ion = document.createElement("i");
-				read_ion.className = "material-icons";
-				read_ion.innerHTML = "done";
-				if (currenttheme > 1) button_read.className = "js-read card__read" + theme_button_card;
-				button_read.appendChild(read_ion);
-				carddiv.appendChild(button_read);
-				//figure card__image
-				const cardimage = document.createElement("div");
-				cardimage.className = "card__image";
-				cardimage.style.backgroundColor = theme_BG_CI;
-				const imgcard = document.createElement("img");
-				imgcard.style.width = "100%";
-				imgcard.id = "card_img_id_" + Math.random() * 100000;
-				imgcard.src = imagelink;
-				cardimage.appendChild(imgcard);
-				carddiv.appendChild(cardimage);
-				//card__body
-				const bodycard = document.createElement("div");
-				bodycard.className = "card__body";
-				//button play
-				const playbtn = document.createElement("button");
-				playbtn.className = "card__play js-play";
-				playbtn.type = "button";
-				const playarr = document.createElement("i");
-				playarr.className = "material-icons";
-				playarr.innerHTML = "play_arrow";
-				playarr.style.color = theme_button_card;
-				playbtn.appendChild(playarr);
-				bodycard.appendChild(playbtn);
-				const pcard_bio = document.createElement("p");
-				pcard_bio.className = "card__bio";
-				pcard_bio.style = "text-align: center;";
-				pcard_bio.style.color = theme_FG;
-				pcard_bio.innerHTML = node.textContent;
-				bodycard.appendChild(pcard_bio);
-				carddiv.appendChild(bodycard);
-				carddiv.id = "id_vol" + Math.random() * 100000;
-				if (playbtn.addEventListener) {
-					playbtn.addEventListener("click", function () {
-						/*            ModifyJSONFile(
-										CosmicComicsData + "/ListOfComics.json",
-										"reading",
-										true,
-									);
-									ModifyJSONFile(
-										CosmicComicsData + "/ListOfComics.json",
-										"unread",
-										false,
-									);
-									Modify_JSON_For_Config(
-										CosmicComicsData + "/config.json",
-										"last_opened",
-										path
-									);*/
-						alert("ici4");
-						let encoded = encodeURIComponent(path.replaceAll("/", "%C3%B9"));
-						window.location.href = "viewer.html?" + encoded;
-					});
-					let brook = TheBook;
-					carddiv.addEventListener("click", function () {
-						let provider = ((brook.series.includes("marvel")) ? (1) : ((brook.series.includes("Anilist")) ? (2) : (0)));
-						createDetails(brook, provider);
-					});
-				}
-				const element = document.getElementById("toRead");
-				const divrating = document.createElement("div");
-				carddiv.appendChild(divrating);
-				element.appendChild(carddiv);
-			}
+			let TheBook = TheBookun[i];
+			let carddiv = createCard(TheBook["unread"], TheBook["read"], TheBook["reading"], TheBook["ID_book"], TheBook["URLCover"], TheBook["NOM"], TheBook["favorite"])
+			carddiv.querySelector(".card__play").addEventListener("click", function () {
+				/*            ModifyJSONFile(
+								CosmicComicsData + "/ListOfComics.json",
+								"reading",
+								true,
+							);
+							ModifyJSONFile(
+								CosmicComicsData + "/ListOfComics.json",
+								"unread",
+								false,
+							);
+							Modify_JSON_For_Config(
+								CosmicComicsData + "/config.json",
+								"last_opened",
+								path
+							);*/
+				alert("ici4");
+				let encoded = encodeURIComponent(path.replaceAll("/", "%C3%B9"));
+				window.location.href = "viewer.html?" + encoded;
+			});
+			let brook = TheBook;
+			carddiv.addEventListener("click", function () {
+				let provider = ((brook.series.includes("marvel")) ? (1) : ((brook.series.includes("Anilist")) ? (2) : (0)));
+				createDetails(brook, provider);
+			});
+			const element = document.getElementById("toRead");
+			const divrating = document.createElement("div");
+			carddiv.appendChild(divrating);
+			element.appendChild(carddiv);
 		}
-		if (TheBookun.length == 0) {
+		if (TheBookun.length === 0) {
 			const element = document.getElementById("toRead");
 			let node = document.createElement("p");
 			node.innerHTML = "Nothing to display here !<br/>Look's like you read all your books. Consider to import new ones!";
@@ -2527,142 +2017,42 @@ function HomeRoutine() {
 		}
 	});
 	getFromDB("Books", "* FROM Books WHERE favorite = 1").then(async (resa) => {
-		var TheBookun = JSON.parse(resa);
+		let TheBookun = JSON.parse(resa);
 		console.log(TheBookun);
 		for (let i = 0; i < TheBookun.length; i++) {
-			var TheBook = TheBookun[i];
-			var imagelink = TheBook["URLCover"];
-			var node = document.createTextNode(TheBook["NOM"]);
-			const carddiv = document.createElement("div");
-			carddiv.style.cursor = "pointer";
-			if (cardMode === true) {
-				carddiv.className = "cardcusto";
-				carddiv.setAttribute("data-effect", "zoom");
-				//button card_save
-				const buttonfav = document.createElement("button");
-				buttonfav.className = "card__save js-fav";
-				buttonfav.type = "button";
-				buttonfav.addEventListener("click", function () {
-					favorite();
-				});
-				buttonfav.id = "btn_id_fav_" + Math.random() * 10000;
-				//icon
-				const favicon = document.createElement("i");
-				favicon.className = "material-icons";
-				favicon.innerHTML = "favorite";
-				if (currenttheme > 1) buttonfav.className = "js-fav card__save" + theme_button_card;
-				buttonfav.appendChild(favicon);
-				carddiv.appendChild(buttonfav);
-				//button card__close
-				const button_unread = document.createElement("button");
-				button_unread.className = "card__close js-unread";
-				button_unread.type = "button";
-				button_unread.addEventListener("click", function () {
-					markasunread();
-				});
-				button_unread.id = "btn_id_unread_" + Math.random() * 10000;
-				//icon
-				const unread_icon = document.createElement("i");
-				unread_icon.className = "material-icons";
-				unread_icon.innerHTML = "close";
-				if (currenttheme > 1) button_unread.className = "js-unread card__close" + theme_button_card;
-				button_unread.appendChild(unread_icon);
-				carddiv.appendChild(button_unread);
-				//button card__reading
-				const button_reading = document.createElement("button");
-				button_reading.className = "card__reading js-reading";
-				button_reading.type = "button";
-				button_reading.addEventListener("click", function () {
-					markasreading();
-				});
-				button_reading.id = "btn_id_reading_" + Math.random() * 10000;
-				//icon
-				const reading_icon = document.createElement("i");
-				reading_icon.className = "material-icons";
-				reading_icon.innerHTML = "auto_stories";
-				if (currenttheme > 1) button_reading.className = "js-reading card__reading" + theme_button_card;
-				button_reading.appendChild(reading_icon);
-				carddiv.appendChild(button_reading);
-				//button card__read
-				const button_read = document.createElement("button");
-				button_read.className = "card__read js-read";
-				button_read.type = "button";
-				button_read.addEventListener("click", function () {
-					markasread();
-				});
-				button_read.id = "btn_id_read_" + Math.random() * 10000;
-				//ico
-				const read_ion = document.createElement("i");
-				read_ion.className = "material-icons";
-				read_ion.innerHTML = "done";
-				if (currenttheme > 1) button_read.className = "js-read card__read" + theme_button_card;
-				button_read.appendChild(read_ion);
-				carddiv.appendChild(button_read);
-				//figure card__image
-				const cardimage = document.createElement("div");
-				cardimage.className = "card__image";
-				cardimage.style.backgroundColor = theme_BG_CI;
-				const imgcard = document.createElement("img");
-				imgcard.style.width = "100%";
-				imgcard.id = "card_img_id_" + Math.random() * 10000;
-				imgcard.src = imagelink;
-				cardimage.appendChild(imgcard);
-				carddiv.appendChild(cardimage);
-				//card__body
-				const bodycard = document.createElement("div");
-				bodycard.className = "card__body";
-				//button play
-				const playbtn = document.createElement("button");
-				playbtn.className = "card__play js-play";
-				playbtn.type = "button";
-				const playarr = document.createElement("i");
-				playarr.className = "material-icons";
-				playarr.innerHTML = "play_arrow";
-				playarr.style.color = theme_button_card;
-				playbtn.appendChild(playarr);
-				bodycard.appendChild(playbtn);
-				const pcard_bio = document.createElement("p");
-				pcard_bio.className = "card__bio";
-				pcard_bio.style = "text-align: center;";
-				pcard_bio.style.color = theme_FG;
-				pcard_bio.innerHTML = node.textContent;
-				bodycard.appendChild(pcard_bio);
-				carddiv.appendChild(bodycard);
-				carddiv.id = "id_vol" + Math.random() * 10000;
-				if (playbtn.addEventListener) {
-					playbtn.addEventListener("click", function () {
-						/*            ModifyJSONFile(
-										CosmicComicsData + "/ListOfComics.json",
-										"reading",
-										true,
-									);
-									ModifyJSONFile(
-										CosmicComicsData + "/ListOfComics.json",
-										"unread",
-										false,
-									);
-									Modify_JSON_For_Config(
-										CosmicComicsData + "/config.json",
-										"last_opened",
-										path
-									);*/
-						alert("ici4");
-						let encoded = encodeURIComponent(path.replaceAll("/", "%C3%B9"));
-						window.location.href = "viewer.html?" + encoded;
-					});
-					let brook = TheBook;
-					carddiv.addEventListener("click", function () {
-						let provider = ((brook.series.includes("marvel")) ? (1) : ((brook.series.includes("Anilist")) ? (2) : (0)));
-						createDetails(brook, provider);
-					});
-				}
-				const element = document.getElementById("myfavoriteHome");
-				const divrating = document.createElement("div");
-				carddiv.appendChild(divrating);
-				element.appendChild(carddiv);
-			}
+			let TheBook = TheBookun[i];
+			let carddiv = createCard(TheBook["unread"], TheBook["read"], TheBook["reading"], TheBook["ID_book"], TheBook["URLCover"], TheBook["NOM"], TheBook["favorite"])
+			carddiv.querySelector(".card__play").addEventListener("click", function () {
+				/*            ModifyJSONFile(
+								CosmicComicsData + "/ListOfComics.json",
+								"reading",
+								true,
+							);
+							ModifyJSONFile(
+								CosmicComicsData + "/ListOfComics.json",
+								"unread",
+								false,
+							);
+							Modify_JSON_For_Config(
+								CosmicComicsData + "/config.json",
+								"last_opened",
+								path
+							);*/
+				alert("ici4");
+				let encoded = encodeURIComponent(path.replaceAll("/", "%C3%B9"));
+				window.location.href = "viewer.html?" + encoded;
+			});
+			let brook = TheBook;
+			carddiv.addEventListener("click", function () {
+				let provider = ((brook.series.includes("marvel")) ? (1) : ((brook.series.includes("Anilist")) ? (2) : (0)));
+				createDetails(brook, provider);
+			});
+			const element = document.getElementById("myfavoriteHome");
+			const divrating = document.createElement("div");
+			carddiv.appendChild(divrating);
+			element.appendChild(carddiv);
 		}
-		if (TheBookun.length == 0) {
+		if (TheBookun.length === 0) {
 			const element = document.getElementById("myfavoriteHome");
 			let node = document.createElement("p");
 			node.innerHTML = "Nothing to display here !<br/>Look's like you don't love any comic book yet !";
@@ -4207,21 +3597,23 @@ function createVariants(TheBook) {
 	});
 }
 
-function createCard(unread, read, reading, ID, URLCover, NOM,favorite = 0) {
+function createCard(unread, read, reading, ID, URLCover, NOM, favorite = 0) {
 	/*document.getElementById("relations").appendChild(createCard(TheBook.unread,TheBook.read,TheBook.reading,TheBook.ID,TheBook.URLCover,TheBook.NOM));*/
 	const carddiv = document.createElement("div");
 	carddiv.style.cursor = "pointer";
 	const rib = document.createElement("div");
 	imagelink = URLCover;
 	let node = document.createTextNode(NOM);
-	if (unread == 1) {
-		rib.className = "pointR";
-	}
-	if (reading == 1) {
-		rib.className = "pointY";
-	}
-	if (favorite == 1) {
-		rib.innerHTML = "<i class='material-icons' style='font-size: 16px;position: relative;left: -17px;'>favorite</i>";
+	if (unread != null && read != null && reading != null) {
+		if (unread === 1) {
+			rib.className = "pointR";
+		}
+		if (reading == 1) {
+			rib.className = "pointY";
+		}
+		if (favorite == 1) {
+			rib.innerHTML = "<i class='material-icons' style='font-size: 16px;position: relative;left: -17px;'>favorite</i>";
+		}
 	}
 	carddiv.className = "cardcusto";
 	carddiv.setAttribute("data-effect", "zoom");
@@ -4232,7 +3624,7 @@ function createCard(unread, read, reading, ID, URLCover, NOM,favorite = 0) {
 	buttonfav.addEventListener("click", function () {
 		favorite();
 	});
-	buttonfav.id = "btn_id_fav_" + ID;
+	buttonfav.id = "btn_id_fav_" + ID + "_" + Math.random() * 8000;
 	//icon
 	const favicon = document.createElement("i");
 	favicon.className = "material-icons";
@@ -4247,7 +3639,7 @@ function createCard(unread, read, reading, ID, URLCover, NOM,favorite = 0) {
 	button_unread.addEventListener("click", function () {
 		markasunread();
 	});
-	button_unread.id = "btn_id_unread_" + ID;
+	button_unread.id = "btn_id_unread_" + ID + "_" + Math.random() * 8000;
 	//icon
 	const unread_icon = document.createElement("i");
 	unread_icon.className = "material-icons";
@@ -4262,7 +3654,7 @@ function createCard(unread, read, reading, ID, URLCover, NOM,favorite = 0) {
 	button_reading.addEventListener("click", function () {
 		markasreading();
 	});
-	button_reading.id = "btn_id_reading_" + ID;
+	button_reading.id = "btn_id_reading_" + ID + "_" + Math.random() * 8000;
 	//icon
 	const reading_icon = document.createElement("i");
 	reading_icon.className = "material-icons";
@@ -4277,7 +3669,7 @@ function createCard(unread, read, reading, ID, URLCover, NOM,favorite = 0) {
 	button_read.addEventListener("click", function () {
 		markasread();
 	});
-	button_read.id = "btn_id_read_" + ID;
+	button_read.id = "btn_id_read_" + ID + "_" + Math.random() * 8000;
 	//ico
 	const read_ion = document.createElement("i");
 	read_ion.className = "material-icons";
@@ -4291,7 +3683,7 @@ function createCard(unread, read, reading, ID, URLCover, NOM,favorite = 0) {
 	cardimage.style.backgroundColor = theme_BG_CI;
 	const imgcard = document.createElement("img");
 	imgcard.style.width = "100%";
-	imgcard.id = "card_img_id_" + ID;
+	imgcard.id = "card_img_id_" + ID + "_" + Math.random() * 8000;
 	imgcard.src = imagelink;
 	cardimage.appendChild(imgcard);
 	carddiv.appendChild(cardimage);
@@ -4315,7 +3707,7 @@ function createCard(unread, read, reading, ID, URLCover, NOM,favorite = 0) {
 	pcard_bio.innerHTML = node.textContent;
 	bodycard.appendChild(pcard_bio);
 	carddiv.appendChild(bodycard);
-	carddiv.id = "id_vol" + ID;
+	carddiv.id = "id_vol" + ID + "_" + Math.random() * 8000;
 	carddiv.appendChild(rib);
 	return carddiv;
 }
@@ -4480,7 +3872,6 @@ fetch("http://" + domain + ":" + port + "/profile/discover").then(function (resp
 		accountsNames.push(item.name.toLowerCase());
 	});
 });
-
 
 /**
  * Create an account on the server
