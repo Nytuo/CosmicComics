@@ -1020,13 +1020,22 @@ function convertDate(inputFormat) {
 }
 
 /* TODO CODE VERIFICATION */
+
+function recoverMarvelAPILink(what,id,what2,noVariants=true,orderBy="issueNumber",type=null){
+	if (type !=null){
+		return"https://gateway.marvel.com:443/v1/public/"+what+"/?" + type + "=" + id + "&apikey=1ad92a16245cfdb9fecffa6745b3bfdc";
+	}
+	return "https://gateway.marvel.com:443/v1/public/"+what+"/" + id + "/"+what2+"?noVariants="+ noVariants+"&orderBy="+orderBy+"&apikey=1ad92a16245cfdb9fecffa6745b3bfdc";
+
+}
+
 /**
  * Get from the Marvel API the list of comics
  * @param {string} id - The id of the comic
  * @return {string} The list of comics
  */
 async function GETMARVELAPI_variants(id) {
-	let url = "https://gateway.marvel.com:443/v1/public/series/" + id + "/comics?noVariants=false&orderBy=issueNumber&apikey=1ad92a16245cfdb9fecffa6745b3bfdc";
+	let url = recoverMarvelAPILink("series",id,"comics",true,"issueNumber")
 	let response = await fetch(url);
 	let data = await response.json();
 	console.log(data);
@@ -1034,31 +1043,31 @@ async function GETMARVELAPI_variants(id) {
 }
 
 async function GETMARVELAPI_relations(id) {
-	var url = "https://gateway.marvel.com:443/v1/public/series/" + id + "/comics?noVariants=true&orderBy=issueNumber&apikey=1ad92a16245cfdb9fecffa6745b3bfdc";
-	var response = await fetch(url);
-	var data = await response.json();
+	let url = recoverMarvelAPILink("series",id,"comics",true,"issueNumber")
+	let response = await fetch(url);
+	let data = await response.json();
 	console.log(data);
 	return data;
 }
 
 async function GETMARVELAPI_Characters(id, type) {
-	var url = "https://gateway.marvel.com:443/v1/public/characters?" + type + "=" + id + "&apikey=1ad92a16245cfdb9fecffa6745b3bfdc";
-	var response = await fetch(url);
-	var data = await response.json();
+	let url = recoverMarvelAPILink("characters",id,"comics",true,"issueNumber",type)
+	let response = await fetch(url);
+	let data = await response.json();
 	console.log(data);
 	return data;
 }
 
 async function GETMARVELAPI_Creators(id, type) {
-	var url = "https://gateway.marvel.com:443/v1/public/creators?" + type + "=" + id + "&apikey=1ad92a16245cfdb9fecffa6745b3bfdc";
-	var response = await fetch(url);
-	var data = await response.json();
+	let url = recoverMarvelAPILink("creators",id,"comics",true,"issueNumber",type)
+	let response = await fetch(url);
+	let data = await response.json();
 	console.log(data);
 	return data;
 }
 
 async function GETMARVELAPI_Comics_ByID(id) {
-	let url = "https://gateway.marvel.com:443/v1/public/comics?id=" + id + "&noVariants=true&apikey=1ad92a16245cfdb9fecffa6745b3bfdc";
+	let url = recoverMarvelAPILink("comics",id,"",true,"issueNumber")
 	var response = await fetch(url);
 	var data = await response.json();
 	console.log(data);

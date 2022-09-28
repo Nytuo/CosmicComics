@@ -1052,8 +1052,11 @@ app.get("/profile/getPPBN/:name", (req, res) => {
 app.get("/profile/custo/getNumber", (req, res) => {
 	res.send({"length": fs.readdirSync(__dirname + "/public/Images/account_default").length});
 });
-app.get("/api/", (req, res) => {
-
+app.get("/api/marvel", (req, res) => {
+	let id = req.body.id
+	fetch("https://gateway.marvel.com:443/v1/public/series/" + id + "/comics?noVariants=false&orderBy=issueNumber&apikey=1ad92a16245cfdb9fecffa6745b3bfdc").then((e)=>{
+		res.send(e)
+	})
 })
 
 //Modifications of the profile

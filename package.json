@@ -134,8 +134,8 @@
     "electron-builder": "^23.3.3"
   },
   "dependencies": {
-    "7zip-bin": "^5.1.1",
     "@popperjs/core": "^2.9.2",
+    "7zip-bin": "^5.1.1",
     "anilist-node": "^1.12.1",
     "anilist.js": "^1.2.1",
     "bootstrap": "^5.0.2",
@@ -148,6 +148,7 @@
     "html-magnifier": "^2.0.2",
     "multer": "^1.4.5-lts.1",
     "node-7z": "^3.0.0",
+    "node-fetch": "^3.2.10",
     "nodemon": "^2.0.15",
     "pdf-extractor": "^2.1.2",
     "sqlite3": "^5.0.11",
