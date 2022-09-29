@@ -793,8 +793,8 @@ async function API_ANILIST_GET_SEARCH(name) {
  * @param {string} name The name of the manga
  * @param {string} path The path to the manga
  */
-async function API_ANILIST_POST_SEARCH(name,path) {
-	await fetch("http://" + domain + ":" + port + "/api/anilist", {
+function API_ANILIST_POST_SEARCH(name,path) {
+	fetch("http://" + domain + ":" + port + "/api/anilist", {
 		method: "POST",
 		headers: {
 			"Content-Type": "application/json",
@@ -802,6 +802,8 @@ async function API_ANILIST_POST_SEARCH(name,path) {
 			"token": userToken,
 			"path": path
 		}
+	}).then((	)=>{
+		Toastifycation("Manga added to the database");
 	})
 }
 
@@ -1216,7 +1218,7 @@ async function loadContent(provider, FolderRes, libraryPath) {
 			if (found === false) {
 				if (provider === providerEnum.Anilist) {
 					console.log("provider 2");
-					await API_ANILIST_POST_SEARCH(name,path)
+					API_ANILIST_POST_SEARCH(name,path)
 				} else if (provider === providerEnum.Marvel) {
 					console.log("Provider: Marvel Comics");
 					await GETMARVELAPI(name).then(async (data) => {
@@ -1266,7 +1268,6 @@ async function loadContent(provider, FolderRes, libraryPath) {
 							});
 						}
 					});
-				} else {
 				}
 			} else {
 				await getFromDB("Series", "* FROM Series where PATH = '" + foundPATH + "'").then((res) => {
@@ -3560,10 +3561,9 @@ async function logout() {
  * @param {{}} elements
  *
  */
-function createContextMenu(elements = {}) {
-	// TODO TEST
-	const ul = document.createElement("ul");
-	for (let i = 0; elements.length < i; i++) {
+function createContextMenu(elements = [{}]) {
+	let ul = document.createElement("ul");
+	for (let i = 0; i<elements.length; i++) {
 		let el = elements[i];
 		let liTemp = document.createElement("li")
 		liTemp.innerHTML = el.nom;
@@ -3571,7 +3571,7 @@ function createContextMenu(elements = {}) {
 			liTemp.setAttribute(elo, el.attribs[elo]);
 		}
 		for (let elo in el.listeners) {
-			liTemp.addEventListener(elo, el.event[elo]);
+			liTemp.addEventListener(elo, el.listeners[elo]);
 		}
 		ul.appendChild(liTemp);
 	}
@@ -3586,11 +3586,13 @@ function createContextMenu(elements = {}) {
  *
  */
 function AccountMenu() {
-	// TODO TEST
 	let menu = createContextMenu(
 		[{
 			"nom": "Modify your account",
-			"attribs": {},
+			"attribs": {
+				"data-bs-toggle": "modal",
+				"data-bs-target": "#modifAccount"
+			},
 			"listeners": {}
 		},
 			{
@@ -3626,7 +3628,7 @@ function AccountMenu() {
 	menu.style.display = "flex";
 	document.addEventListener("click", function (e) {
 		if (e.target !== menu && e.target !== document.getElementById("id_accountSystem") && e.target !== document.getElementById("icon_id_accountSystem")) {
-			menu.style.display = "none";
+			document.body.removeChild(menu);
 		}
 	});
 }

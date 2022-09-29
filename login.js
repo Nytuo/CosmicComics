@@ -2,8 +2,8 @@ window.scroll(0, 0);
 const profilesDiv = document.getElementById("login_discover")
 const url = document.createElement("a");
 url.setAttribute("href", window.location.href);
-var domain = url.hostname;
-var port = url.port;
+let domain = url.hostname;
+let port = url.port;
 
 
 async function discover(){
@@ -11,7 +11,7 @@ async function discover(){
         return response.text();
     }).then(async function (data) {
         data = JSON.parse(data);
-        if (data.length == 0) {
+        if (data.length === 0) {
             document.getElementById("createAccount").style.display = "block";
     
             return;
@@ -27,21 +27,21 @@ async function discover(){
             profileDiv.appendChild(profileImage);
             profileDiv.appendChild(profileName);
             profileDiv.className = "login_elements";
-            if (profile.passcode == true) {
+            if (profile.passcode === true) {
                 profileDiv.addEventListener("click", function () {
                     document.getElementById("id_log").innerText = "Login for : " + profile.name;
-                    var myModal = new bootstrap.Modal(document.getElementById('passcode'), {
+                    let myModal = new bootstrap.Modal(document.getElementById('passcode'), {
                         keyboard: false
                     })
-                    var modalToggle = document.getElementById('passcode') // relatedTarget
+                    let modalToggle = document.getElementById('passcode') // relatedTarget
                     myModal.show(modalToggle)
     
                     document.getElementById("loginInBtn").addEventListener("click", async function () {
-                        if (document.getElementById("ThePassToWord").value.trim() == "") alert("This account needs a password to login. Please enter a password below.");
+                        if (document.getElementById("ThePassToWord").value.trim() === "") alert("This account needs a password to login. Please enter a password below.");
                         await fetch("http://" + domain + ":" + port + "/profile/login/" + profile.name + "/" + document.getElementById("ThePassToWord").value.trim()).then(function (response) {
                             return response.text();
                         }).then(function (data) {
-                            if (data == "false") {
+                            if (data === "false") {
                                 alert("Wrong password");
                             } else if(data){
                                 setCookie('selectedProfile', data, 2);
