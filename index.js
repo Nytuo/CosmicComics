@@ -78,7 +78,6 @@ if (userToken == null) {
 	});
 }
 let cardMode = true;
-
 //Search element on the JSON
 function SearchInJSON(search, info) {
 	for (let i in info) {
@@ -790,20 +789,20 @@ async function API_ANILIST_GET_SEARCH(name) {
 }
 
 /**
- * Search and get data from the ANILIST API
+ * Add the manga and all related information to the database
  * @param {string} name The name of the manga
- * @return {Promise<*>} The list of mangas and the data of the manga
+ * @param {string} path The path to the manga
  */
-async function getAPIANILIST(name) {
-	return fetch("http://" + domain + ":" + port + "/api/anilist/search/" + name).then(function (response) {
-		return response.text();
-	}).then(function (data) {
-		data = JSON.parse(data);
-		console.log(data);
-		return data;
-	}).catch(function (error) {
-		console.log(error);
-	});
+async function API_ANILIST_POST_SEARCH(name,path) {
+	await fetch("http://" + domain + ":" + port + "/api/anilist", {
+		method: "POST",
+		headers: {
+			"Content-Type": "application/json",
+			"name": name,
+			"token": userToken,
+			"path": path
+		}
+	})
 }
 
 /**
@@ -869,6 +868,7 @@ function generateBookTemplate(NOM = null, ID = null, NOTE = null, READ = null, R
 		"lock": LOCK
 	};
 }
+/* TODO BACKEND */
 
 /**
  * Load the content of the element
@@ -1019,14 +1019,21 @@ function convertDate(inputFormat) {
 	return [pad(d.getDate()), pad(d.getMonth() + 1), d.getFullYear()].join('/');
 }
 
-/* TODO CODE VERIFICATION */
-
-function recoverMarvelAPILink(what,id,what2,noVariants=true,orderBy="issueNumber",type=null){
-	if (type !=null){
-		return"https://gateway.marvel.com:443/v1/public/"+what+"/?" + type + "=" + id + "&apikey=1ad92a16245cfdb9fecffa6745b3bfdc";
+/**
+ * Recover the Marvel API data from the server
+ * @param {string} what - What to recover (characters, comics, creators, events, series, stories)
+ * @param {string} id - The id of the element to recover
+ * @param {string} what2 - What to recover (characters, comics, creators, events, series, stories)
+ * @param {boolean|string} noVariants - If the comics should be without variants
+ * @param {string} orderBy - How to order the results
+ * @param {string} type - The type of the element to recover (comic, collection, creator, event, story, series, character)
+ */
+function recoverMarvelAPILink(what, id, what2, noVariants = true, orderBy = "issueNumber", type = null) {
+	// TODO BACKEND
+	if (type != null) {
+		return "https://gateway.marvel.com:443/v1/public/" + what + "/?" + type + "=" + id + "&apikey=1ad92a16245cfdb9fecffa6745b3bfdc";
 	}
-	return "https://gateway.marvel.com:443/v1/public/"+what+"/" + id + "/"+what2+"?noVariants="+ noVariants+"&orderBy="+orderBy+"&apikey=1ad92a16245cfdb9fecffa6745b3bfdc";
-
+	return "https://gateway.marvel.com:443/v1/public/" + what + "/" + id + "/" + what2 + "?noVariants=" + noVariants + "&orderBy=" + orderBy + "&apikey=1ad92a16245cfdb9fecffa6745b3bfdc";
 }
 
 /**
@@ -1035,7 +1042,7 @@ function recoverMarvelAPILink(what,id,what2,noVariants=true,orderBy="issueNumber
  * @return {string} The list of comics
  */
 async function GETMARVELAPI_variants(id) {
-	let url = recoverMarvelAPILink("series",id,"comics",true,"issueNumber")
+	let url = recoverMarvelAPILink("series", id, "comics", true, "issueNumber")
 	let response = await fetch(url);
 	let data = await response.json();
 	console.log(data);
@@ -1043,7 +1050,7 @@ async function GETMARVELAPI_variants(id) {
 }
 
 async function GETMARVELAPI_relations(id) {
-	let url = recoverMarvelAPILink("series",id,"comics",true,"issueNumber")
+	let url = recoverMarvelAPILink("series", id, "comics", true, "issueNumber")
 	let response = await fetch(url);
 	let data = await response.json();
 	console.log(data);
@@ -1051,7 +1058,7 @@ async function GETMARVELAPI_relations(id) {
 }
 
 async function GETMARVELAPI_Characters(id, type) {
-	let url = recoverMarvelAPILink("characters",id,"comics",true,"issueNumber",type)
+	let url = recoverMarvelAPILink("characters", id, "comics", true, "issueNumber", type)
 	let response = await fetch(url);
 	let data = await response.json();
 	console.log(data);
@@ -1059,7 +1066,7 @@ async function GETMARVELAPI_Characters(id, type) {
 }
 
 async function GETMARVELAPI_Creators(id, type) {
-	let url = recoverMarvelAPILink("creators",id,"comics",true,"issueNumber",type)
+	let url = recoverMarvelAPILink("creators", id, "comics", true, "issueNumber", type)
 	let response = await fetch(url);
 	let data = await response.json();
 	console.log(data);
@@ -1067,13 +1074,14 @@ async function GETMARVELAPI_Creators(id, type) {
 }
 
 async function GETMARVELAPI_Comics_ByID(id) {
-	let url = recoverMarvelAPILink("comics",id,"",true,"issueNumber")
-	var response = await fetch(url);
-	var data = await response.json();
+	let url = recoverMarvelAPILink("comics", id, "", true, "issueNumber")
+	let response = await fetch(url);
+	let data = await response.json();
 	console.log(data);
 	return data;
 }
 
+/* TODO CODE VERIFICATION */
 async function GETMARVELAPI_Comics(name = "", seriesStartDate = "") {
 	if (name === "") {
 		console.log("GETMARVELAPI_Comics : name is empty");
@@ -1083,8 +1091,8 @@ async function GETMARVELAPI_Comics(name = "", seriesStartDate = "") {
 		console.log("GETMARVELAPI_Comics : seriesStartDate is empty");
 		return;
 	}
-	var issueNumber = "";
-	var inbFromName = name.replace(/[^#0-9]/g, "&");
+	let issueNumber = "";
+	let inbFromName = name.replace(/[^#0-9]/g, "&");
 	console.log("inbFromName : " + inbFromName);
 	inbFromName.split("&").forEach(function (element) {
 		if (element.match(/^[#][0-9]{1,}$/)) {
@@ -1100,21 +1108,21 @@ async function GETMARVELAPI_Comics(name = "", seriesStartDate = "") {
 	console.log("GETMARVELAPI_Comics : issueNumber : " + issueNumber);
 	console.log("GETMARVELAPI_Comics : seriesStartDate : " + seriesStartDate);
 	if (seriesStartDate !== "" && issueNumber !== "") {
-		var url = "https://gateway.marvel.com:443/v1/public/comics?titleStartsWith=" + encodeURIComponent(name) + "&startYear=" + seriesStartDate + "&issueNumber=" + issueNumber + "&noVariants=true&apikey=1ad92a16245cfdb9fecffa6745b3bfdc";
+		let url = "https://gateway.marvel.com:443/v1/public/comics?titleStartsWith=" + encodeURIComponent(name) + "&startYear=" + seriesStartDate + "&issueNumber=" + issueNumber + "&noVariants=true&apikey=1ad92a16245cfdb9fecffa6745b3bfdc";
 	} else {
-		var url = "https://gateway.marvel.com:443/v1/public/comics?titleStartsWith=" + encodeURIComponent(name) + "&noVariants=true&apikey=1ad92a16245cfdb9fecffa6745b3bfdc";
+		let url = "https://gateway.marvel.com:443/v1/public/comics?titleStartsWith=" + encodeURIComponent(name) + "&noVariants=true&apikey=1ad92a16245cfdb9fecffa6745b3bfdc";
 	}
-	var response = await fetch(url);
-	var data = await response.json();
+	let response = await fetch(url);
+	let data = await response.json();
 	console.log(data);
 	return data;
 }
 
 async function GETMARVELAPI_Series_ByID(id) {
-	var url = "https://gateway.marvel.com:443/v1/public/series?id=" + id + "&apikey=1ad92a16245cfdb9fecffa6745b3bfdc";
+	let url = "https://gateway.marvel.com:443/v1/public/series?id=" + id + "&apikey=1ad92a16245cfdb9fecffa6745b3bfdc";
 	console.log(url);
-	var response = await fetch(url);
-	var data = await response.json();
+	let response = await fetch(url);
+	let data = await response.json();
 	console.log(data);
 	return data;
 }
@@ -1126,18 +1134,18 @@ async function GETMARVELAPI_SEARCH(name = "", date = "") {
 	}
 	name = name.replaceAll(/[(].+[)]/g, "");
 	name = name.replace(/\s+$/, "");
-	var encodedName = encodeURIComponent(name);
-	if (navigator.userAgent.indexOf("Firefox") != -1) {
+	let encodedName = encodeURIComponent(name);
+	if (navigator.userAgent.indexOf("Firefox") !== -1) {
 		encodedName = encodedName.replaceAll(" ", "%20");
 	}
 	if (date !== "") {
-		var url = "https://gateway.marvel.com:443/v1/public/series?titleStartsWith=" + encodedName + "&startYear=" + date + "&apikey=1ad92a16245cfdb9fecffa6745b3bfdc";
+		let url = "https://gateway.marvel.com:443/v1/public/series?titleStartsWith=" + encodedName + "&startYear=" + date + "&apikey=1ad92a16245cfdb9fecffa6745b3bfdc";
 	} else {
-		var url = "https://gateway.marvel.com:443/v1/public/series?titleStartsWith=" + encodedName + "&apikey=1ad92a16245cfdb9fecffa6745b3bfdc";
+		let url = "https://gateway.marvel.com:443/v1/public/series?titleStartsWith=" + encodedName + "&apikey=1ad92a16245cfdb9fecffa6745b3bfdc";
 	}
 	console.log(url);
-	var response = await fetch(url);
-	var data = await response.json();
+	let response = await fetch(url);
+	let data = await response.json();
 	console.log(data);
 	return data;
 }
@@ -1147,105 +1155,53 @@ async function GETMARVELAPI(name = "") {
 		console.log("no name provided, aborting GETMARVELAPI");
 		return;
 	}
-	var date = "";
-	var dateNb = 0;
-	var dateFromName = name.replace(/[^0-9]/g, "#");
+	let date = "";
+	let dateNb = 0;
+	let dateFromName = name.replace(/[^0-9]/g, "#");
 	dateFromName.split("#").forEach(function (element) {
-		if (dateNb == 0 && element.match(/^[0-9]{4}$/)) {
+		if (dateNb === 0 && element.match(/^[0-9]{4}$/)) {
 			dateNb++;
 			date = element;
 		}
 	});
 	name = name.replaceAll(/[(].+[)]/g, "");
 	name = name.replace(/\s+$/, "");
-	var encodedName = encodeURIComponent(name);
-	if (navigator.userAgent.indexOf("Firefox") != -1) {
+	let encodedName = encodeURIComponent(name);
+	if (navigator.userAgent.indexOf("Firefox") !== -1) {
 		encodedName = encodedName.replaceAll(" ", "%20");
 	}
 	if (date !== "") {
-		var url = "https://gateway.marvel.com:443/v1/public/series?titleStartsWith=" + encodedName + "&startYear=" + date + "&apikey=1ad92a16245cfdb9fecffa6745b3bfdc";
+		let url = "https://gateway.marvel.com:443/v1/public/series?titleStartsWith=" + encodedName + "&startYear=" + date + "&apikey=1ad92a16245cfdb9fecffa6745b3bfdc";
 	} else {
-		var url = "https://gateway.marvel.com:443/v1/public/series?titleStartsWith=" + encodedName + "&apikey=1ad92a16245cfdb9fecffa6745b3bfdc";
+		let url = "https://gateway.marvel.com:443/v1/public/series?titleStartsWith=" + encodedName + "&apikey=1ad92a16245cfdb9fecffa6745b3bfdc";
 	}
 	console.log(url);
-	var response = await fetch(url);
-	var data = await response.json();
+	let response = await fetch(url);
+	let data = await response.json();
 	console.log(data);
 	return data;
 }
 
-async function GETANILISTAPI_CREATOR(Creators = []) {
-	if (Creators === {}) {
-		console.log("object invalid, aborting GETANILISTAPI_CREATOR");
-		return;
-	}
-	var tempObj = [];
-	for (var i = 0; i < Creators.length; i++) {
-		var id = Creators[i].id;
-		tempObj.push(await fetch("http://" + domain + ":" + port + "/api/anilist/creator/" + id).then(function (response) {
-			return response.text();
-		}).then(function (data) {
-			data = JSON.parse(data);
-			return data;
-		}).catch(function (error) {
-			console.log(error);
-		}));
-	}
-	return tempObj;
-}
-
-async function GETANILISTAPI_CHARACTER(characters = []) {
-	if (characters === {}) {
-		console.log("object invalid, aborting GETANILISTAPI_CHARACTER");
-		return;
-	}
-	var tempObj = [];
-	for (var i = 0; i < characters.length; i++) {
-		var id = characters[i].id;
-		tempObj.push(await fetch("http://" + domain + ":" + port + "/api/anilist/character/" + id).then(function (response) {
-			return response.text();
-		}).then(function (data) {
-			data = JSON.parse(data);
-			return data;
-		}).catch(function (error) {
-			console.log(error);
-		}));
-	}
-	return tempObj;
-}
-
-async function GETANILISTAPI_RELATION(title) {
-	return fetch("http://" + domain + ":" + port + "/api/anilist/relations/" + title).then(function (response) {
-		return response.text();
-	}).then(function (data) {
-		data = JSON.parse(data);
-		console.log(data);
-		return data;
-	}).catch(function (error) {
-		console.log(error);
-	});
-}
-
-//Loading the content
+// TODO BACKEND
 async function loadContent(provider, FolderRes, libraryPath) {
-	var n = 0;
+	let n = 0;
 	listOfImages = [];
 	document.getElementById("overlay2").style.display = "block";
 	FolderRes = JSON.parse(FolderRes);
 	const divlist = document.createElement("div");
 	divlist.className = "list-group";
 	await getFromDB("Series", "PATH FROM Series").then(async (res) => {
-		for (var index = 0; index < FolderRes.length; index++) {
+		for (let index = 0; index < FolderRes.length; index++) {
 			const path = FolderRes[index];
-			var name = path.replaceAll(libraryPath.replaceAll("\\", "/"), "").replace("/", "");
-			var path_without_file = path.replace(name, "");
-			var realname = name;
+			let name = path.replaceAll(libraryPath.replaceAll("\\", "/"), "").replace("/", "");
+			let path_without_file = path.replace(name, "");
+			let realname = name;
 			console.log(realname);
-			var found = false;
-			var titlesList = [];
-			var returnedPath = JSON.parse(res);
-			var foundPATH = "";
-			for (var i = 0; i < returnedPath.length; i++) {
+			let found = false;
+			let titlesList = [];
+			let returnedPath = JSON.parse(res);
+			let foundPATH = "";
+			for (let i = 0; i < returnedPath.length; i++) {
 				titlesList.push(returnedPath[i].PATH);
 			}
 			console.log(titlesList);
@@ -1257,129 +1213,16 @@ async function loadContent(provider, FolderRes, libraryPath) {
 					foundPATH = el;
 				}
 			});
-			if (found == false) {
-				if (provider == 2) {
+			if (found === false) {
+				if (provider === providerEnum.Anilist) {
 					console.log("provider 2");
-					await getAPIANILIST(name).then(async (data) => {
-						let randID = Math.floor(Math.random() * 1000000);
-						if (data == null) {
-							await InsertIntoDB("Series", "(ID_Series,title,note,statut,start_date,end_date,description,Score,genres,cover,BG,CHARACTERS,TRENDING,STAFF,SOURCE,volumes,chapters,favorite,PATH,lock)", "('" + randID + "U_2" + "','" + JSON.stringify(name.replaceAll("'", "''")) + "',null,null,null,null,null,'0',null,null,null,null,null,null,null,null,null,0,'" + path + "',false)");
-						} else {
-							await InsertIntoDB("Series", "(ID_Series,title,note,statut,start_date,end_date,description,Score,genres,cover,BG,CHARACTERS,TRENDING,STAFF,SOURCE,volumes,chapters,favorite,PATH,lock)", "('" + data["id"] + "_2" + "','" + JSON.stringify(data["title"]).replaceAll("'", "''") + "',null,'" + data["status"].replaceAll("'", "''") + "','" + JSON.stringify(data["startDate"]).replaceAll("'", "''") + "','" + JSON.stringify(data["endDate"]).replaceAll("'", "''") + "','" + data["description"].replaceAll("'", "''") + "','" + data["meanScore"] + "','" + JSON.stringify(data["genres"]).replaceAll("'", "''") + "','" + data["coverImage"]["large"] + "','" + data["bannerImage"] + "','" + JSON.stringify(data["characters"]).replaceAll("'", "''") + "','" + data["trending"] + "','" + JSON.stringify(data["staff"]).replaceAll("'", "''") + "','" + data["siteUrl"].replaceAll("'", "''") + "','" + data["volumes"] + "','" + data["chapters"] + "',0,'" + path + "',false)");
-							await GETANILISTAPI_CREATOR(data["staff"]).then(async (ccdata) => {
-								for (let i = 0; i < ccdata.length; i++) {
-									try {
-										if (ccdata[i]["description"] == null) {
-											await InsertIntoDB("Creators", "", `('${ccdata[i]["id"] + "_2"}','${ccdata[i]["name"]["english"].replaceAll("'", "''")}','${JSON.stringify(ccdata[i]["image"]["medium"])}','${null}','${JSON.stringify(ccdata[i]["siteUrl"])}')`).then(() => {
-												console.log("inserted");
-											});
-										} else {
-											await InsertIntoDB("Creators", "", `('${ccdata[i]["id"] + "_2"}','${ccdata[i]["name"]["english"].replaceAll("'", "''")}','${JSON.stringify(ccdata[i]["image"]["medium"])}','${JSON.stringify(ccdata[i]["description"].replaceAll("'", "''"))}','${JSON.stringify(ccdata[i]["siteUrl"])}')`).then(() => {
-												console.log("inserted");
-											});
-										}
-									} catch (e) {
-										try {
-											if (ccdata[i]["description"] == null) {
-												await InsertIntoDB("Creators", "", `('${ccdata[i]["id"] + "_2"}','${ccdata[i]["name"]["romaji"].replaceAll("'", "''")}','${JSON.stringify(ccdata[i]["image"]["medium"])}','${null}','${JSON.stringify(ccdata[i]["siteUrl"])}')`).then(() => {
-													console.log("inserted");
-												});
-											} else {
-												await InsertIntoDB("Creators", "", `('${ccdata[i]["id"] + "_2"}','${ccdata[i]["name"]["romaji"].replaceAll("'", "''")}','${JSON.stringify(ccdata[i]["image"]["medium"])}','${JSON.stringify(ccdata[i]["description"].replaceAll("'", "''"))}','${JSON.stringify(ccdata[i]["siteUrl"])}')`).then(() => {
-													console.log("inserted");
-												});
-											}
-										} catch (e) {
-											try {
-												if (ccdata[i]["description"] == null) {
-													await InsertIntoDB("Creators", "", `('${ccdata[i]["id"] + "_2"}','${ccdata[i]["name"]["native"].replaceAll("'", "''")}','${JSON.stringify(ccdata[i]["image"]["medium"])}','${null}','${JSON.stringify(ccdata[i]["siteUrl"])}')`).then(() => {
-														console.log("inserted");
-													});
-												} else {
-													await InsertIntoDB("Creators", "", `('${ccdata[i]["id"] + "_2"}','${ccdata[i]["name"]["native"].replaceAll("'", "''")}','${JSON.stringify(ccdata[i]["image"]["medium"])}','${JSON.stringify(ccdata[i]["description"].replaceAll("'", "''"))}','${JSON.stringify(ccdata[i]["siteUrl"])}')`).then(() => {
-														console.log("inserted");
-													});
-												}
-											} catch (e) {
-												try {
-													if (ccdata[i]["description"] == null) {
-														await InsertIntoDB("Creators", "", `('${ccdata[i]["id"] + "_2"}','Unknown','${JSON.stringify(ccdata[i]["image"]["medium"])}','${null}','${JSON.stringify(ccdata[i]["siteUrl"])}')`).then(() => {
-															console.log("inserted");
-														});
-													} else {
-														await InsertIntoDB("Creators", "", `('${ccdata[i]["id"] + "_2"}','Unknown','${JSON.stringify(ccdata[i]["image"]["medium"])}','${JSON.stringify(ccdata[i]["description"].replaceAll("'", "''"))}','${JSON.stringify(ccdata[i]["siteUrl"])}')`).then(() => {
-															console.log("inserted");
-														});
-													}
-												} catch (e) {
-													console.log(e);
-												}
-											}
-										}
-									}
-								}
-							});
-							await GETANILISTAPI_CHARACTER(data["characters"]).then(async (ccdata) => {
-								for (let i = 0; i < ccdata.length; i++) {
-									try {
-										if (ccdata[i]["description"] == null) {
-											await InsertIntoDB("Characters", "", `('${ccdata[i]["id"] + "_2"}','${ccdata[i]["name"]["english"].replaceAll("'", "''")}','${JSON.stringify(ccdata[i]["image"]["medium"])}','${null}','${JSON.stringify(ccdata[i]["siteUrl"])}')`).then(() => {
-												console.log("inserted");
-											});
-										} else {
-											await InsertIntoDB("Characters", "", `('${ccdata[i]["id"] + "_2"}','${ccdata[i]["name"]["english"].replaceAll("'", "''")}','${JSON.stringify(ccdata[i]["image"]["medium"])}','${JSON.stringify(ccdata[i]["description"].replaceAll("'", "''"))}','${JSON.stringify(ccdata[i]["siteUrl"])}')`).then(() => {
-												console.log("inserted");
-											});
-										}
-									} catch (e) {
-										try {
-											if (ccdata[i]["description"] == null) {
-												await InsertIntoDB("Characters", "", `('${ccdata[i]["id"] + "_2"}','${ccdata[i]["name"]["romaji"].replaceAll("'", "''")}','${JSON.stringify(ccdata[i]["image"]["medium"])}','${null}','${JSON.stringify(ccdata[i]["siteUrl"])}')`).then(() => {
-													console.log("inserted");
-												});
-											} else {
-												await InsertIntoDB("Characters", "", `('${ccdata[i]["id"] + "_2"}','${ccdata[i]["name"]["romaji"].replaceAll("'", "''")}','${JSON.stringify(ccdata[i]["image"]["medium"])}','${JSON.stringify(ccdata[i]["description"].replaceAll("'", "''"))}','${JSON.stringify(ccdata[i]["siteUrl"])}')`).then(() => {
-													console.log("inserted");
-												});
-											}
-										} catch (e) {
-											try {
-												if (ccdata[i]["description"] == null) {
-													await InsertIntoDB("Characters", "", `('${ccdata[i]["id"] + "_2"}','${ccdata[i]["name"]["native"].replaceAll("'", "''")}','${JSON.stringify(ccdata[i]["image"]["medium"])}','${null}','${JSON.stringify(ccdata[i]["siteUrl"])}')`).then(() => {
-														console.log("inserted");
-													});
-												} else {
-													await InsertIntoDB("Characters", "", `('${ccdata[i]["id"] + "_2"}','${ccdata[i]["name"]["native"].replaceAll("'", "''")}','${JSON.stringify(ccdata[i]["image"]["medium"])}','${JSON.stringify(ccdata[i]["description"].replaceAll("'", "''"))}','${JSON.stringify(ccdata[i]["siteUrl"])}')`).then(() => {
-														console.log("inserted");
-													});
-												}
-											} catch (e) {
-												console.log(e);
-											}
-										}
-									}
-								}
-							});
-							await GETANILISTAPI_RELATION(data["title"]["english"]).then(async (ccdata) => {
-								for (let i = 0; i < ccdata.length; i++) {
-									var dataR = ccdata[i]["node"];
-									if (dataR.title.english == null) {
-										await InsertIntoDB("relations", "", `('${dataR["id"] + "_2"}','${dataR["title"]["romaji"].replaceAll("'", "''")}','${dataR["coverImage"]["large"]}','${dataR["type"] + " / " + dataR["relationType"] + " / " + dataR["format"]}',${null},'${data["id"] + "_2"}')`);
-										console.log("inserted");
-									} else {
-										await InsertIntoDB("relations", "", `('${dataR["id"] + "_2"}','${dataR["title"]["english"].replaceAll("'", "''")}','${dataR["coverImage"]["large"]}','${dataR["type"] + " / " + dataR["relationType"] + " / " + dataR["format"]}',${null},'${data["id"] + "_2"}')`);
-										console.log("inserted");
-									}
-								}
-							});
-						}
-					});
-				} else if (provider == 1) {
+					await API_ANILIST_POST_SEARCH(name,path)
+				} else if (provider === providerEnum.Marvel) {
 					console.log("Provider: Marvel Comics");
 					await GETMARVELAPI(name).then(async (data) => {
 						console.log(data);
 						let randID = Math.floor(Math.random() * 1000000);
-						if (data["data"]["total"] == 0) {
+						if (data["data"]["total"] === 0) {
 							await InsertIntoDB("Series", "(ID_Series,title,note,start_date,end_date,description,Score,cover,BG,CHARACTERS,STAFF,SOURCE,volumes,chapters,favorite,PATH,lock)", "('" + randID + "U_1" + "','" + JSON.stringify(name.replaceAll("'", "''")) + "',null,null,null,null,'0',null,null,null,null,null,null,null,0,'" + path + "',false)");
 						} else {
 							await InsertIntoDB("Series", "(ID_Series,title,note,start_date,end_date,description,Score,cover,BG,CHARACTERS,STAFF,SOURCE,volumes,chapters,favorite,PATH,lock)", "('" + data["data"]["results"][0]["id"] + "_1" + "','" + JSON.stringify(data["data"]["results"][0]["title"]).replaceAll("'", "''") + "',null,'" + JSON.stringify(data["data"]["results"][0]["startYear"]).replaceAll("'", "''") + "','" + JSON.stringify(data["data"]["results"][0]["endYear"]).replaceAll("'", "''") + "','" + data["data"]["results"][0]["description"] + "','" + data["data"]["results"][0]["rating"] + "','" + JSON.stringify(data["data"]["results"][0]["thumbnail"]) + "','" + JSON.stringify(data["data"]["results"][0]["thumbnail"]) + "','" + JSON.stringify(data["data"]["results"][0]["characters"]).replaceAll("'", "''") + "','" + JSON.stringify(data["data"]["results"][0]["creators"]).replaceAll("'", "''") + "','" + JSON.stringify(data["data"]["results"][0]["urls"][0]) + "','" + JSON.stringify(data["data"]["results"][0]["comics"]["items"]) + "','" + data["data"]["results"][0]["comics"]["available"] + "',0,'" + path + "',false)");
@@ -1432,20 +1275,22 @@ async function loadContent(provider, FolderRes, libraryPath) {
 					console.log(res);
 					let node;
 					if (cardMode === true) {
-						if (provider == 1) {
-							node = document.createTextNode(JSON.parse(res[0].title));
+						if (provider === 1) {
+							node = JSON.parse(res[0].title);
 						} else {
-							if (JSON.parse(res[0].title)["english"] !== undefined) {
-								node = document.createTextNode(JSON.parse(res[0].title)["english"]);
-							} else {
-								node = document.createTextNode(JSON.parse(res[0].title));
+							if (JSON.parse(res[0].title)["english"] !== undefined && JSON.parse(res[0].title)["english"] !== null) {
+								node = JSON.parse(res[0].title)["english"];
+							} else if (JSON.parse(res[0].title)["romaji"] !== undefined && JSON.parse(res[0].title)["romaji"] !== null) {
+								node = JSON.parse(res[0].title)["romaji"];
+							}else {
+								node = JSON.parse(res[0].title);
 							}
 						}
 					} else {
-						node = document.createTextNode(JSON.parse(res[0].title)["english"]);
+						node = JSON.parse(res[0].title)["english"];
 					}
-					var invertedPath = path.replaceAll("\\", "/");
-					if (provider == 1) {
+					let invertedPath = path.replaceAll("\\", "/");
+					if (provider === 1) {
 						try {
 							imagelink = JSON.parse(res[0].cover).path + "/detail." + JSON.parse(res[0].cover).extension;
 						} catch (e) {
@@ -1456,7 +1301,7 @@ async function loadContent(provider, FolderRes, libraryPath) {
 					}
 					listOfImages.push(imagelink);
 					//Setting Card Div
-					let carddiv = createCard(null, null, null, n, res[0]["cover"], res[0]["title"], res[0]["favorite"])
+					let carddiv = createCard(null, null, null, n, imagelink, node, res[0]["favorite"])
 					carddiv.querySelector(".card__play").addEventListener("click", function () {
 						alert("ici2");
 						window.location.href = "viewer.html?" + encodeURIComponent(path.replaceAll("/", "%C3%B9"));
@@ -1509,7 +1354,7 @@ async function loadContent(provider, FolderRes, libraryPath) {
 			document.getElementById("home").style.display = "block";
 			document.getElementById("home").style.fontSize = "24px";
 		} else {
-			var random = coolanimations[Math.floor(Math.random() * coolanimations.length)];
+			let random = coolanimations[Math.floor(Math.random() * coolanimations.length)];
 			document.getElementById("home").style.display = "none";
 			for (let i = 0; i < n; i++) {
 				animateCSS(document.getElementById("id" + i), random).then((message) => {
@@ -1526,7 +1371,7 @@ async function loadContent(provider, FolderRes, libraryPath) {
 }
 
 //preload the images
-var preloadedImages = [];
+let preloadedImages = [];
 
 function preloadImage(listImages, n) {
 	/* for (var i = 0; i < listImages.length; i++) {
@@ -1538,9 +1383,12 @@ function preloadImage(listImages, n) {
 	}, 500);
 }
 
-//Load Images
+/**
+ * Load the images
+ * @param numberOf the number of images to load
+ */
 function LoadImages(numberOf) {
-	var random = coolanimations[Math.floor(Math.random() * coolanimations.length)];
+	let random = coolanimations[Math.floor(Math.random() * coolanimations.length)];
 	if (numberOf === 0) {
 		Toastifycation(language["empty_notSupported"], "#ff0000");
 		animateCSS(document.getElementById("overlay"), "fadeOut").then((message) => {
@@ -1570,20 +1418,21 @@ function LoadImages(numberOf) {
 	}
 }
 
+/* TODO CODE VERIFICATION */
 //Sorting number in a string
-var SortingNumInStr = function (a, b) {
+let SortingNumInStr = function (a, b) {
 	return Number(a.match(/(\d+)/g)[0]) - Number(b.match(/(\d+)/g)[0]);
 };
 
 //Check if the passed element contains numbers
 function hasNumbers(t) {
-	var regex = /\d/g;
+	let regex = /\d/g;
 	return regex.test(t);
 }
 
 //Open a single file
 function openInViewer() {
-	var file = document.getElementById("fileUp").files[0];
+	let file = document.getElementById("fileUp").files[0];
 	if (file) {
 		let url = CosmicComicsTemp + "/uploads/" + file.name;
 		let encoded = encodeURIComponent(url.replaceAll("/", "%C3%B9"));
@@ -1600,9 +1449,9 @@ function openBOOKM(path) {
 
 //List of Bookmarked folder
 function listBM() {
-	return; // TODO bookmark
-	var data = fs.readFileSync(CosmicComicsData + "/bookmarks.json");
-	var info = JSON.parse(data);
+	// TODO bookmark
+	/*let data = fs.readFileSync(CosmicComicsData + "/bookmarks.json");
+	let info = JSON.parse(data);
 	console.log(info);
 	info.forEach((file) => {
 		if (file["bookmarked"] === true) {
@@ -1618,12 +1467,12 @@ function listBM() {
 		}
 	});
 	if (info.length === 0) {
-		var iblock = document.createElement("i");
+		let iblock = document.createElement("i");
 		iblock.innerHTML = "block";
 		iblock.className = "material-icons";
 		if (currenttheme > 1) iblock.style.color = theme_FG;
 		document.getElementById("bookmarkContainer").appendChild(iblock);
-	}
+	}*/
 }
 
 //the Bookmarked loading
@@ -1965,7 +1814,7 @@ function returnToHome() {
 	resetOverlay();
 	let breadCrumb = document.querySelector(".breadcrumb");
 	/* Delete all childs after this one */
-	while (breadCrumb.lastChild != breadCrumb.childNodes[1]) {
+	while (breadCrumb.lastChild !== breadCrumb.childNodes[1]) {
 		breadCrumb.removeChild(breadCrumb.lastChild);
 	}
 }
@@ -1973,13 +1822,13 @@ function returnToHome() {
 theSearchList = [];
 getFromDB("Books", "NOM,PATH,URLCover,Series FROM Books").then(async (resa) => {
 	resa = JSON.parse(resa);
-	for (var i = 0; i < resa.length; i++) {
+	for (let i = 0; i < resa.length; i++) {
 		theSearchList.push(resa[i]);
 	}
 });
 getFromDB("Series", "title,cover,PATH FROM Series").then(async (resa) => {
 	resa = JSON.parse(resa);
-	for (var i = 0; i < resa.length; i++) {
+	for (let i = 0; i < resa.length; i++) {
 		theSearchList.push(resa[i]);
 	}
 });
@@ -2000,7 +1849,7 @@ async function setSearch(res) {
 				try {
 					series.innerHTML = res[key].series.split("_")[2].replaceAll("$", " ");
 				} catch (e) {
-					if (res[key].series != null && res[key].series != "null") {
+					if (res[key].series != null && res[key].series !== "null") {
 						series.innerHTML = res[key].series;
 					} else {
 						series.innerHTML = "No series linked";
@@ -2060,9 +1909,9 @@ async function setSearch(res) {
 					let libPath = result.replaceAll("\\", "/");
 					libPath = libPath.replace(/\/[^\/]+$/, "");
 					libPath = libPath.replaceAll("/", "\\");
-					if (provider == 1) {
+					if (provider === 1) {
 						await createSeries(provider, result, libPath, bookList);
-					} else if (provider == 2) {
+					} else if (provider === 2) {
 						try {
 							await createSeries(provider, result, libPath, bookList);
 						} catch (e) {
@@ -2078,7 +1927,7 @@ async function setSearch(res) {
 		});
 		document.getElementById("searchResults").appendChild(resItem);
 	}
-	if (res.length == 0) {
+	if (res.length === 0) {
 		const resItem = document.createElement("li");
 		resItem.classList.add("resItem");
 		const text = document.createTextNode("No results found");
@@ -2154,13 +2003,13 @@ async function createSeries(provider, path, libraryPath, res) {
 		})
 	}
 	let isLocked = () => {
-		return res[0].lock == 1 || res[0].lock == true;
+		return res[0].lock === 1 || res[0].lock === true;
 	}
 	document.getElementById("rematchSearchSender").addEventListener("click", () => {
 		let rematchResult = document.getElementById("resultRematch")
 		let search = document.getElementById("rematchSearch")
 		let year = document.getElementById('rematchYearSearch')
-		if (provider == 1) {
+		if (provider === 1) {
 			GETMARVELAPI_SEARCH(search.value, year.value).then((cdata) => {
 				if (cdata["data"]["total"] > 0) {
 					for (let i = 0; i < cdata["data"]["total"]; i++) {
@@ -2173,7 +2022,7 @@ async function createSeries(provider, path, libraryPath, res) {
 					}
 				}
 			})
-		} else if (provider == 2) {
+		} else if (provider === 2) {
 			API_ANILIST_GET_SEARCH(search.value).then((el) => {
 				if (el != null) {
 					for (let o = 0; o < el.length; o++) {
@@ -2185,7 +2034,7 @@ async function createSeries(provider, path, libraryPath, res) {
 					}
 				}
 			})
-		} else if (provider == 0) {
+		} else if (provider === 0) {
 		} else {
 		}
 		//fetch API
@@ -2201,7 +2050,7 @@ async function createSeries(provider, path, libraryPath, res) {
 		}
 	}
 	if (!APINOTFOUND) {
-		document.getElementById("provider_text").innerHTML = ((provider == 1) ? ("Data provided by Marvel. © 2014 Marvel") : ((provider == 2) ? ("Data provided by Anilist.") : ("The Data are not provided by an API.")));
+		document.getElementById("provider_text").innerHTML = ((provider === 1) ? ("Data provided by Marvel. © 2014 Marvel") : ((provider === 2) ? ("Data provided by Anilist.") : ("The Data are not provided by an API.")));
 	} else {
 		document.getElementById("provider_text").innerHTML = "The data are not from the API";
 	}
@@ -2223,11 +2072,11 @@ async function createSeries(provider, path, libraryPath, res) {
 	});
 	document.getElementById("readingbtndetails").style.display = "none";
 	if (!APINOTFOUND) {
-		if (res[0].BG != null && res[0].BG != "null" && res[0].BG != "") {
+		if (res[0].BG != null && res[0].BG !== "null" && res[0].BG !== "") {
 			const options = {
 				method: "GET", headers: {
 					"Content-Type": "application/json",
-					"img": ((provider == 1) ? (JSON.parse(res[0].BG).path + "/detail." + JSON.parse(res[0].BG).extension) : (res[0].BG))
+					"img": ((provider === 1) ? (JSON.parse(res[0].BG).path + "/detail." + JSON.parse(res[0].BG).extension) : (res[0].BG))
 				}
 			};
 			await fetch("http://" + domain + ":" + port + "/img/getPalette/" + userToken, options).then(function (response) {
@@ -2241,7 +2090,7 @@ async function createSeries(provider, path, libraryPath, res) {
 			});
 		}
 	} else {
-		if (res[0].BG != null && res[0].BG != "null" && res[0].BG != "") {
+		if (res[0].BG != null && res[0].BG !== "null" && res[0].BG !== "") {
 			const options = {
 				method: "GET", headers: {
 					"Content-Type": "application/json", "img": res[0].BG
@@ -2259,30 +2108,30 @@ async function createSeries(provider, path, libraryPath, res) {
 		}
 	}
 	if (!APINOTFOUND) {
-		document.getElementById("ColTitle").innerHTML = "<a target='_blank' href='" + ((provider == 1) ? (JSON.parse(res[0].SOURCE).url) : (res[0].SOURCE)) + "' style='color:white'>" + ((provider == 1) ? (JSON.parse(res[0].title)) : (JSON.parse(res[0].title).english + " / " + JSON.parse(res[0].title).romaji + " / " + JSON.parse(res[0].title).native)) + "<i style='font-size: 18px;top: -10px;position: relative' class='material-icons'>open_in_new</i></a>";
-		document.getElementById("ImgColCover").src = ((provider == 1) ? (JSON.parse(res[0].cover).path + "/detail." + JSON.parse(res[0].cover).extension) : (res[0].cover));
-		if (((provider == 1) ? (JSON.parse(res[0].start_date)) : (JSON.parse(res[0].start_date).year)) == null) {
+		document.getElementById("ColTitle").innerHTML = "<a target='_blank' href='" + ((provider === 1) ? (JSON.parse(res[0].SOURCE).url) : (res[0].SOURCE)) + "' style='color:white'>" + ((provider === 1) ? (JSON.parse(res[0].title)) : (JSON.parse(res[0].title).english + " / " + JSON.parse(res[0].title).romaji + " / " + JSON.parse(res[0].title).native)) + "<i style='font-size: 18px;top: -10px;position: relative' class='material-icons'>open_in_new</i></a>";
+		document.getElementById("ImgColCover").src = ((provider === 1) ? (JSON.parse(res[0].cover).path + "/detail." + JSON.parse(res[0].cover).extension) : (res[0].cover));
+		if (((provider === 1) ? (JSON.parse(res[0].start_date)) : (JSON.parse(res[0].start_date).year)) == null) {
 			document.getElementById("startDate").innerHTML = "?";
 		} else {
-			document.getElementById("startDate").innerHTML = ((provider == 1) ? (JSON.parse(res[0].start_date)) : (JSON.parse(res[0].start_date).year));
+			document.getElementById("startDate").innerHTML = ((provider === 1) ? (JSON.parse(res[0].start_date)) : (JSON.parse(res[0].start_date).year));
 		}
-		if (((provider == 1) ? (JSON.parse(res[0].end_date)) : (JSON.parse(res[0].end_date).year)) == null || JSON.parse(res[0].end_date) > new Date().getFullYear()) {
+		if (((provider === 1) ? (JSON.parse(res[0].end_date)) : (JSON.parse(res[0].end_date).year)) == null || JSON.parse(res[0].end_date) > new Date().getFullYear()) {
 			document.getElementById("startDate").innerHTML += " - ?";
 		} else {
-			document.getElementById("startDate").innerHTML += " - " + ((provider == 1) ? (JSON.parse(res[0].end_date)) : (JSON.parse(res[0].end_date).year));
+			document.getElementById("startDate").innerHTML += " - " + ((provider === 1) ? (JSON.parse(res[0].end_date)) : (JSON.parse(res[0].end_date).year));
 		}
-		var NameToFetchList = [];
-		if (provider == 1) {
+		let NameToFetchList = [];
+		if (provider === 1) {
 			JSON.parse(res[0].CHARACTERS)["items"].forEach((el) => {
 				NameToFetchList.push("'" + el.name.replaceAll("'", "''") + "'");
 			});
-		} else if (provider == 2) {
+		} else if (provider === 2) {
 			JSON.parse(res[0].CHARACTERS).forEach((el) => {
 				NameToFetchList.push("'" + el.name.replaceAll("'", "''") + "'");
 			});
 		}
-		var NameToFetch = NameToFetchList.join(",");
-		var container = document.createElement("div");
+		let NameToFetch = NameToFetchList.join(",");
+		let container = document.createElement("div");
 		await getFromDB("Characters", "* FROM Characters WHERE name IN (" + NameToFetch + ")").then((clres) => {
 			clres = JSON.parse(clres);
 			console.log(clres);
@@ -2297,7 +2146,7 @@ async function createSeries(provider, path, libraryPath, res) {
 				divs2.setAttribute("data-bs-toggle", "modal");
 				divs2.setAttribute("data-bs-target", "#moreinfo");
 				divs2.addEventListener("click", function (e) {
-					if (provider == 1) {
+					if (provider === 1) {
 						document.getElementById("moreinfo_img").src = JSON.parse(image).path + "/detail." + JSON.parse(image).extension;
 						document.getElementById("moreinfo_btn").href = JSON.parse(urlo)[0].url;
 						if (desc == null) {
@@ -2305,7 +2154,7 @@ async function createSeries(provider, path, libraryPath, res) {
 						} else {
 							document.getElementById("moreinfo_txt").innerHTML = name + "<br/>" + desc;
 						}
-					} else if (provider == 2) {
+					} else if (provider === 2) {
 						document.getElementById("moreinfo_img").src = image.replaceAll('"', "");
 						document.getElementById("moreinfo_btn").href = urlo;
 						if (desc == null) {
@@ -2321,9 +2170,9 @@ async function createSeries(provider, path, libraryPath, res) {
 					document.getElementById("moreinfo_btn").target = "_blank";
 					document.getElementById("moreinfo_btn").innerHTML = "See more";
 				});
-				if (provider == 1) {
+				if (provider === 1) {
 					divs2.innerHTML += "<img src='" + JSON.parse(el.image).path + "/detail." + JSON.parse(el.image).extension + "' class='img-charac'/><br><span>" + el.name + "</span>";
-				} else if (provider == 2) {
+				} else if (provider === 2) {
 					divs2.innerHTML += "<img src='" + el.image.replaceAll('"', '') + "' class='img-charac'/><br><span>" + el.name + "</span>";
 				}
 				divs.appendChild(divs2);
@@ -2333,7 +2182,7 @@ async function createSeries(provider, path, libraryPath, res) {
 				container.appendChild(divs);
 			});
 		});
-		document.getElementById("characters").innerHTML = "<h1>" + "Characters" + ":</h1> " + "Number of characters : " + ((provider == 1) ? (JSON.parse(res[0].CHARACTERS)["available"]) : (JSON.parse(res[0].CHARACTERS).length)) + "<br/>";
+		document.getElementById("characters").innerHTML = "<h1>" + "Characters" + ":</h1> " + "Number of characters : " + ((provider === 1) ? (JSON.parse(res[0].CHARACTERS)["available"]) : (JSON.parse(res[0].CHARACTERS).length)) + "<br/>";
 		let scrollCharactersAmount = 0;
 		let moveRight = document.createElement("button");
 		moveRight.className = "scrollBtnR";
@@ -2354,7 +2203,7 @@ async function createSeries(provider, path, libraryPath, res) {
 		document.getElementById("characters").appendChild(moveLeft);
 		document.getElementById("characters").appendChild(moveRight);
 		document.getElementById("characters").appendChild(container);
-		document.getElementById("OtherTitles").innerHTML = ((provider == 1) ? ("A few comics in this series (for a complete view check the Marvel's website)") : ("Relations")) + " : ";
+		document.getElementById("OtherTitles").innerHTML = ((provider === 1) ? ("A few comics in this series (for a complete view check the Marvel's website)") : ("Relations")) + " : ";
 		await getFromDB("relations", "* FROM relations WHERE series = '" + res[0].ID_Series + "'").then((clres) => {
 			clres = JSON.parse(clres);
 			console.log(clres);
@@ -2386,7 +2235,7 @@ async function createSeries(provider, path, libraryPath, res) {
 				let name = el.name;
 				reltxt.onclick = function () {
 					document.getElementById("moreinfo_img").className = "img-relation";
-					if (provider == 1) {
+					if (provider === 1) {
 						document.getElementById("moreinfo_img").src = JSON.parse(image).path + "/detail." + JSON.parse(image).extension;
 						document.getElementById("moreinfo_btn").href = JSON.parse(urlo)[0].url;
 						if (desc == null) {
@@ -2394,7 +2243,7 @@ async function createSeries(provider, path, libraryPath, res) {
 						} else {
 							document.getElementById("moreinfo_txt").innerHTML = name + "<br/>" + desc;
 						}
-					} else if (provider == 2) {
+					} else if (provider === 2) {
 						document.getElementById("moreinfo_img").src = image.replaceAll('"', "");
 						document.getElementById("moreinfo_btn").href = urlo;
 						if (desc == null) {
@@ -2416,7 +2265,7 @@ async function createSeries(provider, path, libraryPath, res) {
 				reltxt.setAttribute("data-bs-target", "#moreinfo");
 				const relimg = document.createElement("div");
 				const imgcard = document.createElement("img");
-				imgcard.src = ((provider == 1) ? (JSON.parse(el.image).path + "/detail." + JSON.parse(el.image).extension) : (el.image));
+				imgcard.src = ((provider === 1) ? (JSON.parse(el.image).path + "/detail." + JSON.parse(el.image).extension) : (el.image));
 				imgcard.style.width = "100%";
 				relimg.className = "card__image";
 				relimg.style.backgroundColor = "rgba(0,0,0,0.753)";
@@ -2427,24 +2276,24 @@ async function createSeries(provider, path, libraryPath, res) {
 			});
 			document.getElementById("OtherTitles").appendChild(divlist);
 		});
-		var tmpstaff = "Number of people : " + ((provider == 1) ? (JSON.parse(res[0].STAFF)["available"]) : (JSON.parse(res[0].STAFF).length)) + "<br/>";
-		var StaffToFetchList = [];
-		if (provider == 1) {
+		let tmpstaff = "Number of people : " + ((provider === 1) ? (JSON.parse(res[0].STAFF)["available"]) : (JSON.parse(res[0].STAFF).length)) + "<br/>";
+		let StaffToFetchList = [];
+		if (provider === 1) {
 			JSON.parse(res[0].STAFF)["items"].forEach((el) => {
 				StaffToFetchList.push("'" + el.name.replaceAll("'", "''") + "'");
 			});
-		} else if (provider == 2) {
+		} else if (provider === 2) {
 			JSON.parse(res[0].STAFF).forEach((el) => {
 				StaffToFetchList.push("'" + el.name.replaceAll("'", "''") + "'");
 			});
 		}
-		var StaffToFetch = StaffToFetchList.join(",");
-		var container2 = document.createElement("div");
+		let StaffToFetch = StaffToFetchList.join(",");
+		let container2 = document.createElement("div");
 		await getFromDB("Creators", "* FROM Creators WHERE name IN (" + StaffToFetch + ")").then((clres) => {
 			clres = JSON.parse(clres);
 			container2.className = "item-list";
-			for (var i = 0; i < clres.length; i++) {
-				var el = clres[i];
+			for (let i = 0; i < clres.length; i++) {
+				let el = clres[i];
 				const divs = document.createElement("div");
 				const divs2 = document.createElement("div");
 				divs2.className = "CCDIV";
@@ -2455,7 +2304,7 @@ async function createSeries(provider, path, libraryPath, res) {
 				divs2.setAttribute("data-bs-toggle", "modal");
 				divs2.setAttribute("data-bs-target", "#moreinfo");
 				divs2.addEventListener("click", function (e) {
-					if (provider == 1) {
+					if (provider === 1) {
 						document.getElementById("moreinfo_img").src = JSON.parse(image).path + "/detail." + JSON.parse(image).extension;
 						document.getElementById("moreinfo_btn").href = JSON.parse(urlo)[0].url;
 						if (desc == null) {
@@ -2463,7 +2312,7 @@ async function createSeries(provider, path, libraryPath, res) {
 						} else {
 							document.getElementById("moreinfo_txt").innerHTML = name + "<br/>" + desc;
 						}
-					} else if (provider == 2) {
+					} else if (provider === 2) {
 						document.getElementById("moreinfo_img").src = image.replaceAll('"', "");
 						document.getElementById("moreinfo_btn").href = urlo;
 						if (desc == null) {
@@ -2479,13 +2328,13 @@ async function createSeries(provider, path, libraryPath, res) {
 					document.getElementById("moreinfo_btn").target = "_blank";
 					document.getElementById("moreinfo_btn").innerHTML = "See more";
 				});
-				for (var j = 0; j < clres.length; j++) {
-					if (provider == 1) {
-						if (el.name == JSON.parse(res[0]["STAFF"])["items"][j].name) {
+				for (let j = 0; j < clres.length; j++) {
+					if (provider === 1) {
+						if (el.name === JSON.parse(res[0]["STAFF"])["items"][j].name) {
 							divs2.innerHTML += "<img src='" + JSON.parse(el.image).path + "/detail." + JSON.parse(el.image).extension + "' class='img-charac'/><br><span>" + el.name + "</span><br/><span style='font-size: 14px;color: #a8a8a8a8'>" + JSON.parse(res[0]["STAFF"])["items"][j]["role"] + "</span>";
 						}
-					} else if (provider == 2) {
-						if (el.name == JSON.parse(res[0]["STAFF"])[j].name) {
+					} else if (provider === 2) {
+						if (el.name === JSON.parse(res[0]["STAFF"])[j].name) {
 							divs2.innerHTML += "<img src='" + el.image.replaceAll('"', "") + "' class='img-charac'/><br><span>" + el.name + "</span>";
 						}
 					}
@@ -2533,7 +2382,7 @@ async function createSeries(provider, path, libraryPath, res) {
 		}
 	}
 	if (res[0]["chapters"] != null) {
-		document.getElementById("chapters").innerHTML = ((provider == 1) ? ("Number of Comics in this series : ") : ("Number of chapter in this series : ")) + res[0]["chapters"];
+		document.getElementById("chapters").innerHTML = ((provider === 1) ? ("Number of Comics in this series : ") : ("Number of chapter in this series : ")) + res[0]["chapters"];
 	}
 	document.getElementById("contentViewer").style.display = "block";
 	animateCSS(document.getElementById("onContentViewer"), "fadeIn").then((message) => {
@@ -2544,7 +2393,7 @@ async function createSeries(provider, path, libraryPath, res) {
 		let continueSeriesReading;
 		let bookList = JSON.parse(resa);
 		console.log(bookList);
-		for (var i = 0; i < bookList.length; i++) {
+		for (let i = 0; i < bookList.length; i++) {
 			if (bookList[i].PATH.toLowerCase().includes(res[0].title.toLowerCase().replaceAll('"', ''))) {
 				continueSeriesReading = bookList[i].PATH;
 				break;
@@ -2569,14 +2418,14 @@ async function createSeries(provider, path, libraryPath, res) {
 	});
 	let currentFav = res[0].favorite;
 	document.getElementById("favoritebtn").addEventListener("click", async function (e) {
-		if (currentFav == 1) {
+		if (currentFav === 1) {
 			Toastifycation("Removed from favorite", "#00C33C");
 			currentFav = 0;
 			await getFromDB("Series", "* FROM Series WHERE favorite=1").then(async (resa) => {
 				let bookList = JSON.parse(resa);
 				console.log(bookList);
-				for (var i = 0; i < bookList.length; i++) {
-					if (res[0].title == bookList[i].title) {
+				for (let i = 0; i < bookList.length; i++) {
+					if (res[0].title === bookList[i].title) {
 						let options = {
 							method: "POST", headers: {
 								"Content-Type": "application/json"
@@ -2599,8 +2448,8 @@ async function createSeries(provider, path, libraryPath, res) {
 			await getFromDB("Series", "* FROM Series WHERE favorite=0").then(async (resa) => {
 				let bookList = JSON.parse(resa);
 				console.log(bookList);
-				for (var i = 0; i < bookList.length; i++) {
-					if (res[0].title == bookList[i].title) {
+				for (let i = 0; i < bookList.length; i++) {
+					if (res[0].title === bookList[i].title) {
 						let options = {
 							method: "POST", headers: {
 								"Content-Type": "application/json"
@@ -2620,7 +2469,7 @@ async function createSeries(provider, path, libraryPath, res) {
 		}
 	});
 	if (!APINOTFOUND) {
-		if (provider == 1) {
+		if (provider === 1) {
 			loadView(path, libraryPath, JSON.parse(res[0].start_date), provider);
 			document.getElementById("id").innerText = "This series ID from Marvel : " + parseInt(res[0].ID_Series);
 			if (res[0].description != null && res[0].description !== "null") {
@@ -2638,19 +2487,19 @@ async function createSeries(provider, path, libraryPath, res) {
 			} else if (JSON.parse(res[0].start_date) > new Date().getFullYear()) {
 				document.getElementById("Status").innerHTML = "NOT YET RELEASED";
 				document.getElementById("Status").className = "NotYet";
-			} else if (JSON.parse(res[0].start_date) == new Date().getFullYear()) {
+			} else if (JSON.parse(res[0].start_date) === new Date().getFullYear()) {
 				document.getElementById("Status").innerHTML = "END SOON";
 				document.getElementById("Status").className = "releasing";
 			} else {
 				document.getElementById("Status").innerHTML = "UNKNOWN";
 				document.getElementById("Status").className = "NotYet";
 			}
-		} else if (provider == 2) {
+		} else if (provider === 2) {
 			loadView(path, libraryPath, "", provider);
 			document.getElementById("description").innerHTML = res[0].description;
 			document.getElementById("genres").innerHTML = "Genres " + ":";
 			JSON.parse(res[0].genres).forEach((el, index) => {
-				if (index != JSON.parse(res[0].genres).length - 1) {
+				if (index !== JSON.parse(res[0].genres).length - 1) {
 					document.getElementById("genres").innerHTML += " " + el + ", ";
 				} else {
 					document.getElementById("genres").innerHTML += " " + el;
@@ -2664,16 +2513,16 @@ async function createSeries(provider, path, libraryPath, res) {
 			});
 			document.documentElement.style.setProperty('--averageScore', Math.abs(100 - res[0]["Score"]));
 			document.getElementById("Status").innerHTML = res[0]["statut"];
-			if (res[0]["statut"] == "RELEASING") {
+			if (res[0]["statut"] === "RELEASING") {
 				document.getElementById("Status").className = "releasing";
-			} else if (res[0]["statut"] == "FINISHED") {
+			} else if (res[0]["statut"] === "FINISHED") {
 				document.getElementById("Status").className = "released";
-			} else if (res[0]["statut"] == "Not_YET_RELEASED") {
+			} else if (res[0]["statut"] === "Not_YET_RELEASED") {
 				document.getElementById("Status").className = "NotYet";
 			}
 		}
 	} else {
-		if (provider == 1) {
+		if (provider === 1) {
 			loadView(path, libraryPath, JSON.parse(res[0].start_date), provider);
 			if (res[0].description != null && res[0].description !== "null") {
 				document.getElementById("description").innerHTML = res[0].description;
@@ -2694,7 +2543,7 @@ async function createSeries(provider, path, libraryPath, res) {
 				} else if (JSON.parse(res[0].start_date) > new Date().getFullYear()) {
 					document.getElementById("Status").innerHTML = "NOT YET RELEASED";
 					document.getElementById("Status").className = "NotYet";
-				} else if (JSON.parse(res[0].start_date) == new Date().getFullYear()) {
+				} else if (JSON.parse(res[0].start_date) === new Date().getFullYear()) {
 					document.getElementById("Status").innerHTML = "END SOON";
 					document.getElementById("Status").className = "releasing";
 				} else {
@@ -2702,7 +2551,7 @@ async function createSeries(provider, path, libraryPath, res) {
 					document.getElementById("Status").className = "NotYet";
 				}
 			}
-		} else if (provider == 2) {
+		} else if (provider === 2) {
 			loadView(path, libraryPath, "", provider);
 			document.getElementById("description").innerHTML = res[0].description;
 			if (res[0]["TRENDING"] != null && res[0]["TRENDING"] !== "null") {
@@ -2724,33 +2573,34 @@ async function createSeries(provider, path, libraryPath, res) {
 			} else {
 				document.getElementById("averageScore").innerHTML = "";
 				document.querySelectorAll(".circle-small .progress.one").forEach((el) => {
-					el.style.strokeDashoffset = Math.abs(100 - 0);
+					el.style.strokeDashoffset = Math.abs(100);
 				});
-				document.documentElement.style.setProperty('--averageScore', Math.abs(100 - 0));
+				document.documentElement.style.setProperty('--averageScore', Math.abs(100));
 			}
 			document.getElementById("Status").innerHTML = ((res[0]["statut"] == null) ? "UNKNOWN" : res[0]["statut"]);
-			if (res[0]["statut"] == "RELEASING") {
+			if (res[0]["statut"] === "RELEASING") {
 				document.getElementById("Status").className = "releasing";
-			} else if (res[0]["statut"] == "FINISHED") {
+			} else if (res[0]["statut"] === "FINISHED") {
 				document.getElementById("Status").className = "released";
-			} else if (res[0]["statut"] == "Not_YET_RELEASED") {
+			} else if (res[0]["statut"] === "Not_YET_RELEASED") {
 				document.getElementById("Status").className = "NotYet";
 			} else {
 				document.getElementById("Status").className = "NotYet";
 			}
 		}
 	}
-	if (res[0].favorite == 1) {
+	if (res[0].favorite === 1) {
 		document.getElementById("Status").innerHTML += " (Favorite)";
 		document.getElementById("Status").classList.add("favorite");
 	}
 }
 
+//TODO BACKEND
 async function OneForAll(W1, W2, A, title) {
 	await getFromDB("Books", "* FROM Books WHERE " + W1 + "=1 OR " + W2 + "=1").then(async (resa) => {
 		let bookList = JSON.parse(resa);
 		console.log(bookList);
-		for (var i = 0; i < bookList.length; i++) {
+		for (let i = 0; i < bookList.length; i++) {
 			if (bookList[i].PATH.toLowerCase().includes(title.toLowerCase().replaceAll('"', ''))) {
 				let options = {
 					method: "POST", headers: {
@@ -2798,6 +2648,7 @@ async function OneForAll(W1, W2, A, title) {
 	});
 }
 
+//TODO BACKEND
 async function AllForOne(W1, W2, A, ID) {
 	let options = {
 		method: "POST", headers: {
@@ -2836,10 +2687,11 @@ addToBreadCrumb("Home", () => {
 	returnToHome();
 });
 
+// TODO BACKEND
 async function refreshMeta(id, provider, type) {
 	Toastifycation("Refreshing metadata...");
-	if (provider == 1) {
-		if (type == "book") {
+	if (provider === 1) {
+		if (type === "book") {
 			await getFromDB("Books", "* FROM Books WHERE ID_book=" + id).then(async (res) => {
 				let book = JSON.parse(res)[0];
 				console.log(book);
@@ -2847,8 +2699,8 @@ async function refreshMeta(id, provider, type) {
 					res2 = res2.data.results[0];
 					let blacklisted = ["note", "read", "reading", "unread", "favorite", "last_page", "folder", "PATH", "lock", "ID_book"]
 					let asso = {}
-					for (var i = 0; i < book.length; i++) {
-						for (var key in book[i]) {
+					for (let i = 0; i < book.length; i++) {
+						for (let key in book[i]) {
 							if (!blacklisted.includes(key)) {
 								asso[key] = book[i][key];
 							}
@@ -2871,7 +2723,7 @@ async function refreshMeta(id, provider, type) {
 					asso["collections"] = JSON.stringify(res2.collections);
 					let columns = [];
 					let values = [];
-					for (var key in asso) {
+					for (let key in asso) {
 						columns.push(key);
 						values.push(asso[key]);
 					}
@@ -2901,8 +2753,8 @@ async function refreshMeta(id, provider, type) {
 					res2 = res2.data.results[0];
 					let blacklisted = ["note", "favorite", "PATH", "lock", "ID_Series"]
 					let asso = {}
-					for (var i = 0; i < book.length; i++) {
-						for (var key in book[i]) {
+					for (let i = 0; i < book.length; i++) {
+						for (let key in book[i]) {
 							if (!blacklisted.includes(key)) {
 								asso[key] = book[i][key];
 							}
@@ -2925,7 +2777,7 @@ async function refreshMeta(id, provider, type) {
 					asso["chapters"] = JSON.stringify(res2.comics.available).replaceAll("'", "''");
 					let columns = [];
 					let values = [];
-					for (var key in asso) {
+					for (let key in asso) {
 						columns.push(key);
 						values.push(asso[key]);
 					}
@@ -2946,16 +2798,15 @@ async function refreshMeta(id, provider, type) {
 				});
 			})
 		}
-	} else if (provider == 2) {
+	} else if (provider === 2) {
 		if (type !== "book") {
-			//TODO Anilist
 			await getFromDB("Series", "* FROM Series WHERE ID_Series='" + id + "'").then(async (res) => {
 				let book = JSON.parse(res)[0];
 				await API_ANILIST_GET_ID(parseInt(id)).then(async (res2) => {
 					let blacklisted = ["note", "favorite", "PATH", "lock", "ID_Series"]
 					let asso = {}
-					for (var i = 0; i < book.length; i++) {
-						for (var key in book[i]) {
+					for (let i = 0; i < book.length; i++) {
+						for (let key in book[i]) {
 							if (!blacklisted.includes(key)) {
 								asso[key] = book[i][key];
 							}
@@ -2982,7 +2833,7 @@ async function refreshMeta(id, provider, type) {
 					asso["TRENDING"] = JSON.stringify(res2["trending"]).replaceAll("'", "''");
 					let columns = [];
 					let values = [];
-					for (var key in asso) {
+					for (let key in asso) {
 						columns.push(key);
 						values.push(asso[key]);
 					}
@@ -3010,6 +2861,12 @@ async function refreshMeta(id, provider, type) {
 document.getElementById("rematch").setAttribute("data-bs-toggle", "modal");
 document.getElementById("rematch").setAttribute("data-bs-target", "#rematchModal");
 
+/**
+ *
+ * @param {{}} TheBook
+ * @param provider
+ * @return {Promise<void>}
+ */
 async function createDetails(TheBook, provider) {
 	resetOverlay();
 	document.documentElement.style.overflow = "hidden";
@@ -3024,13 +2881,13 @@ async function createDetails(TheBook, provider) {
 		e.value = TheBook[e.id.replaceAll("edit_", "")];
 	})
 	let isLocked = () => {
-		return TheBook.lock == 1 || TheBook.lock == true;
+		return TheBook.lock === 1 || TheBook.lock === true;
 	}
 	document.getElementById("rematchSearchSender").addEventListener("click", () => {
 		let rematchResult = document.getElementById("resultRematch")
 		let search = document.getElementById("rematchSearch")
 		let year = document.getElementById('rematchYearSearch')
-		if (provider == 1) {
+		if (provider === 1) {
 			GETMARVELAPI_Comics(search.value, year.value).then((cdata) => {
 				if (cdata["data"]["total"] > 0) {
 					for (let i = 0; i < cdata["data"]["total"]; i++) {
@@ -3043,8 +2900,8 @@ async function createDetails(TheBook, provider) {
 					}
 				}
 			})
-		} else if (provider == 2) {
-		} else if (provider == 0) {
+		} else if (provider === 2) {
+		} else if (provider === 0) {
 		} else {
 		}
 		//fetch API
@@ -3053,7 +2910,7 @@ async function createDetails(TheBook, provider) {
 	})
 	document.getElementById("lockCheck").checked = isLocked();
 	document.getElementById('refresh').onclick = async () => {
-		if (provider == 2) {
+		if (provider === 2) {
 			Toastifycation("Anilist is not compatible for this feature", "#ff0000")
 		} else {
 			if (!isLocked()) {
@@ -3093,7 +2950,7 @@ async function createDetails(TheBook, provider) {
 	addToBreadCrumb(TheBook.NOM, () => {
 		return createDetails(TheBook, provider);
 	});
-	document.getElementById("provider_text").innerHTML = ((provider == 1) ? ("Data provided by Marvel. © 2014 Marvel") : ((provider == 2) ? ("Data provided by Anilist.") : ("The Data are not provided by an API.")));
+	document.getElementById("provider_text").innerHTML = ((provider === 1) ? ("Data provided by Marvel. © 2014 Marvel") : ((provider === 2) ? ("Data provided by Anilist.") : ("The Data are not provided by an API.")));
 	document.getElementById("contentViewer").style.display = "block";
 	document.getElementById("DLBOOK").addEventListener("click", function (e) {
 		let path = TheBook.PATH;
@@ -3120,21 +2977,21 @@ async function createDetails(TheBook, provider) {
 	document.getElementById("readingbtndetails").style.display = "inline";
 	document.getElementById("OtherTitles").innerHTML = "";
 	document.getElementById("relations").innerHTML = "";
-	if (TheBook.characters != "null") {
+	if (TheBook.characters !== "null") {
 		document.getElementById("id").innerHTML = "This is a " + TheBook.format + " of " + TheBook.pageCount + " pages. <br/> This is part of the '" + JSON.parse(TheBook.series).name + "' series.";
 	} else {
-		if (provider == 2) {
+		if (provider === 2) {
 			document.getElementById("id").innerHTML = "This is part of the '" + TheBook.series.split("_")[2].replaceAll("$", " ") + "' series.";
-		} else if (provider == 1) {
+		} else if (provider === 1) {
 			document.getElementById("id").innerHTML = "This is part of the '" + JSON.parse(TheBook.series).name + "' series.";
 		}
 	}
 	document.getElementById("averageProgress").style.display = "none";
 	document.getElementById("ContentView").innerHTML = "";
 	try {
-		if (provider == 1) {
+		if (provider === 1) {
 			document.getElementById("ColTitle").innerHTML = "<a target='_blank' href='" + ((TheBook.URLs == null) ? ("#") : (JSON.parse(TheBook.URLs)[0].url)) + "' style='color:white'>" + TheBook.NOM + "<i style='font-size: 18px;top: -10px;position: relative' class='material-icons'>open_in_new</i></a>";
-		} else if (provider == 2) {
+		} else if (provider === 2) {
 			document.getElementById("ColTitle").innerHTML = "<a target='_blank' style='color:white'>" + TheBook.NOM + "</a>";
 		} else {
 			document.getElementById("ColTitle").innerHTML = "<a target='_blank' style='color:white'>" + TheBook.NOM + "</a>";
@@ -3144,7 +3001,7 @@ async function createDetails(TheBook, provider) {
 	}
 	document.getElementById("ImgColCover").src = TheBook.URLCover;
 	document.getElementById("Status").innerHTML = "";
-	if (TheBook.description != null && TheBook.description != "null") {
+	if (TheBook.description != null && TheBook.description !== "null") {
 		document.getElementById("description").innerHTML = TheBook.description;
 	} else {
 		document.getElementById("description").innerHTML = "";
@@ -3161,7 +3018,7 @@ async function createDetails(TheBook, provider) {
 		AllForOne("read", "reading", "unread", TheBook.ID_book);
 		Toastifycation("Set all as Unread", "#00C33C");
 	});
-	if (TheBook.URLCover != null && TheBook.URLCover != "null") {
+	if (TheBook.URLCover != null && TheBook.URLCover !== "null") {
 		const options = {
 			method: "GET", headers: {
 				"Content-Type": "application/json", "img": TheBook.URLCover
@@ -3177,13 +3034,13 @@ async function createDetails(TheBook, provider) {
 		});
 	}
 	document.getElementById("favoritebtn").addEventListener("click", async function (e) {
-		if (TheBook.favorite == 1) {
+		if (TheBook.favorite === 1) {
 			TheBook.favorite = 0;
 			Toastifycation("Removed from favorite", "#00C33C");
 			await getFromDB("Books", "* FROM Books WHERE favorite=1").then(async (resa) => {
 				let bookList = JSON.parse(resa);
 				console.log(bookList);
-				for (var i = 0; i < bookList.length; i++) {
+				for (let i = 0; i < bookList.length; i++) {
 					if (bookList[i].PATH.toLowerCase().includes(TheBook.NOM.toLowerCase().replaceAll('"', ''))) {
 						let options = {
 							method: "POST", headers: {
@@ -3197,7 +3054,7 @@ async function createDetails(TheBook, provider) {
 								"where": "PATH"
 							}, null, 2)
 						};
-						fetch("http://" + domain + ":" + port + "/DB/update", options);
+						await fetch("http://" + domain + ":" + port + "/DB/update", options);
 					}
 				}
 			});
@@ -3207,7 +3064,7 @@ async function createDetails(TheBook, provider) {
 			await getFromDB("Books", "* FROM Books WHERE favorite=0").then(async (resa) => {
 				let bookList = JSON.parse(resa);
 				console.log(bookList);
-				for (var i = 0; i < bookList.length; i++) {
+				for (let i = 0; i < bookList.length; i++) {
 					if (bookList[i].PATH.toLowerCase().includes(TheBook.NOM.toLowerCase().replaceAll('"', ''))) {
 						let options = {
 							method: "POST", headers: {
@@ -3221,25 +3078,25 @@ async function createDetails(TheBook, provider) {
 								"where": "PATH"
 							}, null, 2)
 						};
-						fetch("http://" + domain + ":" + port + "/DB/update", options);
+						await fetch("http://" + domain + ":" + port + "/DB/update", options);
 					}
 				}
 			});
 		}
 	});
-	if (TheBook.characters != "null") {
-		var NameToFetchList = [];
-		if (provider == 1) {
+	if (TheBook.characters !== "null") {
+		let NameToFetchList = [];
+		if (provider === 1) {
 			JSON.parse(TheBook.characters)["items"].forEach((el) => {
 				NameToFetchList.push("'" + el.name + "'");
 			});
-		} else if (provider == 2) {
+		} else if (provider === 2) {
 			JSON.parse(TheBook.characters).forEach((el) => {
 				NameToFetchList.push("'" + el.name + "'");
 			});
 		}
-		var NameToFetch = NameToFetchList.join(",");
-		var container = document.createElement("div");
+		let NameToFetch = NameToFetchList.join(",");
+		let container = document.createElement("div");
 		await getFromDB("Characters", "* FROM Characters WHERE name IN (" + NameToFetch + ")").then((clres) => {
 			clres = JSON.parse(clres);
 			console.log(clres);
@@ -3254,7 +3111,7 @@ async function createDetails(TheBook, provider) {
 				divs2.setAttribute("data-bs-toggle", "modal");
 				divs2.setAttribute("data-bs-target", "#moreinfo");
 				divs2.addEventListener("click", function (e) {
-					if (provider == 1) {
+					if (provider === 1) {
 						document.getElementById("moreinfo_img").src = JSON.parse(image).path + "/detail." + JSON.parse(image).extension;
 						document.getElementById("moreinfo_btn").href = JSON.parse(urlo)[0].url;
 						if (desc == null) {
@@ -3262,7 +3119,7 @@ async function createDetails(TheBook, provider) {
 						} else {
 							document.getElementById("moreinfo_txt").innerHTML = name + "<br/>" + desc;
 						}
-					} else if (provider == 2) {
+					} else if (provider === 2) {
 						document.getElementById("moreinfo_img").src = image.replaceAll('"', "");
 						document.getElementById("moreinfo_btn").href = urlo;
 						if (desc == null) {
@@ -3278,10 +3135,10 @@ async function createDetails(TheBook, provider) {
 					document.getElementById("moreinfo_btn").target = "_blank";
 					document.getElementById("moreinfo_btn").innerHTML = "See more";
 				});
-				if (provider == 1) {
-					divs2.innerHTML = "<img src='" + JSON.parse(el.image).path + "/detail." + JSON.parse(el.image).extension + "' class='img-charac'/><br><span>" + el.name + "</span>";
-				} else if (provider == 2) {
-					divs2.innerHTML = "<img src='" + el.image.replaceAll('"', '') + "' class='img-charac'/><br><span>" + el.name + "</span>";
+				if (provider === 1) {
+					divs2.innerHTML = "<img alt='a character' src='" + JSON.parse(el.image).path + "/detail." + JSON.parse(el.image).extension + "' class='img-charac'/><br><span>" + el.name + "</span>";
+				} else if (provider === 2) {
+					divs2.innerHTML = "<img alt='a character' src='" + el.image.replaceAll('"', '') + "' class='img-charac'/><br><span>" + el.name + "</span>";
 				}
 				divs.appendChild(divs2);
 				divs2.style.marginTop = "10px";
@@ -3290,17 +3147,17 @@ async function createDetails(TheBook, provider) {
 				container.appendChild(divs);
 			});
 		});
-		if (TheBook.read == 1) {
+		if (TheBook.read === 1) {
 			document.getElementById("Status").innerHTML = "READ";
 			document.getElementById("Status").className = "released";
-		} else if (TheBook.unread == 1) {
+		} else if (TheBook.unread === 1) {
 			document.getElementById("Status").innerHTML = "UNREAD";
 			document.getElementById("Status").className = "NotYet";
-		} else if (TheBook.reading == 1) {
+		} else if (TheBook.reading === 1) {
 			document.getElementById("Status").innerHTML = "READING";
 			document.getElementById("Status").className = "releasing";
 		}
-		if (TheBook.favorite == 1) {
+		if (TheBook.favorite === 1) {
 			document.getElementById("Status").innerHTML += "(Favorite)";
 		}
 		document.getElementById("readstat").innerHTML = "<input type=\"number\" step=\"1\" min=\"0\" id=\"readAddInput\">" + " / " + TheBook.pageCount + " pages read";
@@ -3323,7 +3180,7 @@ async function createDetails(TheBook, provider) {
 				Toastifycation("Error", "#d92027");
 			});
 		});
-		document.getElementById("characters").innerHTML = "<h1>" + "Characters" + ":</h1> " + "Number of characters : " + ((provider == 1) ? (JSON.parse(TheBook.characters)["available"]) : ((TheBook.characters != "null") ? (JSON.parse(TheBook.characters).length) : (0))) + "<br/>";
+		document.getElementById("characters").innerHTML = "<h1>" + "Characters" + ":</h1> " + "Number of characters : " + ((provider === 1) ? (JSON.parse(TheBook.characters)["available"]) : ((TheBook.characters !== "null") ? (JSON.parse(TheBook.characters).length) : (0))) + "<br/>";
 		document.getElementById("detailSeparator").style.marginTop = "5vh";
 		let scrollCharactersAmount = 0;
 		let moveRight = document.createElement("button");
@@ -3347,34 +3204,34 @@ async function createDetails(TheBook, provider) {
 		document.getElementById("characters").appendChild(container);
 	}
 	//Genres
-	if (TheBook.creators != "null") {
-		var tmpstaff = "Number of people : " + ((provider == 1) ? (JSON.parse(TheBook["creators"])["available"]) : ((TheBook["creators"] != "null") ? (JSON.parse(TheBook["creators"]).length) : ("0"))) + "<br/>";
-		var StaffToFetchList = [];
-		if (provider == 1) {
+	if (TheBook.creators !== "null") {
+		let tmpstaff = "Number of people : " + ((provider === 1) ? (JSON.parse(TheBook["creators"])["available"]) : ((TheBook["creators"] !== "null") ? (JSON.parse(TheBook["creators"]).length) : ("0"))) + "<br/>";
+		let StaffToFetchList = [];
+		if (provider === 1) {
 			JSON.parse(TheBook.creators)["items"].forEach((el) => {
 				StaffToFetchList.push("'" + el.name.replaceAll("'", "''") + "'");
 			});
-		} else if (provider == 2) {
+		} else if (provider === 2) {
 			JSON.parse(TheBook.creators).forEach((el) => {
 				StaffToFetchList.push("'" + el.name.replaceAll("'", "''") + "'");
 			});
 		}
-		var StaffToFetch = StaffToFetchList.join(",");
-		var container2 = document.createElement("div");
+		let StaffToFetch = StaffToFetchList.join(",");
+		let container2 = document.createElement("div");
 		await getFromDB("Creators", "* FROM Creators WHERE name IN (" + StaffToFetch + ")").then((clres) => {
 			clres = JSON.parse(clres);
 			container2.className = "item-list";
-			for (var i = 0; i < clres.length; i++) {
-				var el = clres[i];
+			for (let i = 0; i < clres.length; i++) {
+				let el = clres[i];
 				const divs = document.createElement("div");
 				const divs2 = document.createElement("div");
-				for (var j = 0; j < clres.length; j++) {
-					if (provider == 1) {
-						if (el.name == JSON.parse(TheBook.creators)["items"][j].name) {
+				for (let j = 0; j < clres.length; j++) {
+					if (provider === 1) {
+						if (el.name === JSON.parse(TheBook.creators)["items"][j].name) {
 							divs2.innerHTML = "<img src='" + JSON.parse(el.image).path + "/detail." + JSON.parse(el.image).extension + "' class='img-charac'/><br><span>" + el.name + "</span><br/><span style='font-size: 14px;color: #a8a8a8a8'>" + JSON.parse(TheBook.creators)["items"][j]["role"] + "</span>";
 						}
-					} else if (provider == 2) {
-						if (el.name == JSON.parse(TheBook.creators)[j].name) {
+					} else if (provider === 2) {
+						if (el.name === JSON.parse(TheBook.creators)[j].name) {
 							divs2.innerHTML = "<img src='" + el.image.replaceAll('"', "") + "' class='img-charac'/><br><span>" + el.name + "</span>";
 						}
 					}
@@ -3385,7 +3242,7 @@ async function createDetails(TheBook, provider) {
 					divs2.setAttribute("data-bs-toggle", "modal");
 					divs2.setAttribute("data-bs-target", "#moreinfo");
 					divs2.addEventListener("click", function (e) {
-						if (provider == 1) {
+						if (provider === 1) {
 							document.getElementById("moreinfo_img").src = JSON.parse(image).path + "/detail." + JSON.parse(image).extension;
 							document.getElementById("moreinfo_btn").href = JSON.parse(urlo)[0].url;
 							if (desc == null) {
@@ -3393,7 +3250,7 @@ async function createDetails(TheBook, provider) {
 							} else {
 								document.getElementById("moreinfo_txt").innerHTML = name + "<br/>" + desc;
 							}
-						} else if (provider == 2) {
+						} else if (provider === 2) {
 							document.getElementById("moreinfo_img").src = image.replaceAll('"', "");
 							document.getElementById("moreinfo_btn").href = urlo;
 							if (desc == null) {
@@ -3439,38 +3296,38 @@ async function createDetails(TheBook, provider) {
 		document.getElementById("Staff").appendChild(moveRight2);
 		document.getElementById("Staff").appendChild(container2);
 	}
-	if (TheBook.collectedIssues != "null") {
-		for (var a = 0; a < JSON.parse(TheBook.collectedIssues).length; a++) {
+	if (TheBook.collectedIssues !== "null") {
+		for (let a = 0; a < JSON.parse(TheBook.collectedIssues).length; a++) {
 			document.getElementById("colissue").innerHTML += JSON.parse(TheBook.collectedIssues)[a].name + "<br/>";
 		}
 	}
-	if (TheBook.collections != "null") {
-		for (var a = 0; a < JSON.parse(TheBook.collections).length; a++) {
+	if (TheBook.collections !== "null") {
+		for (let a = 0; a < JSON.parse(TheBook.collections).length; a++) {
 			document.getElementById("col").innerHTML += JSON.parse(TheBook.collections)[a].name + "<br/>";
 		}
 	}
-	if (TheBook.issueNumber != "null" && TheBook.issueNumber != "" && TheBook.issueNumber != null) {
+	if (TheBook.issueNumber !== "null" && TheBook.issueNumber !== "" && TheBook.issueNumber != null) {
 		document.getElementById("chapters").innerHTML = "Number of this volume within the series : " + TheBook.issueNumber;
 	} else {
 		document.getElementById("chapters").innerHTML = "";
 	}
-	if (TheBook.prices != "null" && TheBook.prices != "" && TheBook.prices != null) {
-		if (provider == 1) {
+	if (TheBook.prices !== "null" && TheBook.prices !== "" && TheBook.prices != null) {
+		if (provider === 1) {
 			document.getElementById("price").innerHTML += "Prices : <br/>";
-			for (var a = 0; a < JSON.parse(TheBook.prices).length; a++) {
+			for (let a = 0; a < JSON.parse(TheBook.prices).length; a++) {
 				console.log(JSON.parse(TheBook.prices)[a]);
 				document.getElementById("price").innerHTML += JSON.parse(TheBook.prices)[a].type.replace(/([A-Z])/g, ' $1').trim() + " : " + JSON.parse(TheBook.prices)[a].price + "<br/>";
 			}
 		}
 	}
-	if (TheBook.dates != "null") {
+	if (TheBook.dates !== "null") {
 		document.getElementById("startDate").innerHTML = "Dates : <br/>";
-		for (var b = 0; b < JSON.parse(TheBook.dates).length; b++) {
+		for (let b = 0; b < JSON.parse(TheBook.dates).length; b++) {
 			document.getElementById("startDate").innerHTML += JSON.parse(TheBook.dates)[b].type.replace(/([A-Z])/g, ' $1').trim() + " : " + convertDate(JSON.parse(TheBook.dates)[b].date) + "<br/>";
 		}
 	}
-	if (TheBook.variants != "null" && TheBook.variants != "" && TheBook.variants != null) {
-		if (provider == 1) {
+	if (TheBook.variants !== "null" && TheBook.variants !== "" && TheBook.variants != null) {
+		if (provider === 1) {
 			createVariants(TheBook);
 		}
 	}
@@ -3497,7 +3354,7 @@ function createVariants(TheBook) {
  * @param {int | null} unread - 0 if read, 1 if unread
  * @param {int|null} read - 0 if unread, 1 if read
  * @param {int|null} reading - 0 if not reading, 1 if reading
- * @param {string} ID - ID of the book
+ * @param {string|int} ID - ID of the book
  * @param {string} URLCover - URL of the cover
  * @param {string} NOM - Name of the book
  * @param {int|null} favorite  - 0 if not favorite, 1 if favorite
@@ -3608,7 +3465,7 @@ function createCard(unread, read, reading, ID, URLCover, NOM, favorite = 0) {
 	bodycard.appendChild(playbtn);
 	const pcard_bio = document.createElement("p");
 	pcard_bio.className = "card__bio";
-	pcard_bio.style = "text-align: center;";
+	pcard_bio.style.textAlign = "center";
 	pcard_bio.style.color = theme_FG;
 	pcard_bio.innerHTML = node.textContent;
 	bodycard.appendChild(pcard_bio);
@@ -3700,7 +3557,7 @@ async function logout() {
 
 /**
  * Template for the context menu
- * @param {[{listeners: {}, nom: string, attribs: {}}]} elements
+ * @param {{}} elements
  *
  */
 function createContextMenu(elements = {}) {
@@ -3749,7 +3606,7 @@ function AccountMenu() {
 						document.getElementById("sendbdd").style.display = "none";
 						document.getElementById("sendaccount").onclick = async function () {
 							console.log("sendaccount");
-							createAccount();
+							await createAccount();
 						};
 					}
 				}
@@ -3807,7 +3664,6 @@ function DownloadBDD() {
  * Delete the account
  */
 async function DeleteAccount() {
-	window.location.href = 'login';
 	const option = {
 		method: 'POST', headers: {'Content-Type': 'application/json'}, body: JSON.stringify({
 			"token": userToken
@@ -3819,6 +3675,7 @@ async function DeleteAccount() {
 	}).catch((err) => {
 		Toastifycation("Account not deleted", "#ff0000");
 	});
+	window.location.href = 'login';
 }
 
 let accountsNames = [];

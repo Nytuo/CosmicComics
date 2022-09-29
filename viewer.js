@@ -998,30 +998,6 @@ function Reader(listOfImg, page) {
 	}
 }
 
-//Getting the list of images
-function GetListOfImg(dirPath) {
-	var listoffiles = fs.readdirSync(dirPath);
-	var listOfImage = [];
-	listoffiles.forEach((file) => {
-		var ext = file.split(".").pop();
-		if (ValidatedExtensionV.includes(ext)) {
-			listOfImage.push(file);
-		} else {
-			console.log(file + " has an no compatible Viewer Extension: " + ext);
-		}
-	});
-	if (mangaMode == true) {
-		return invertList(listOfImage);
-	} else {
-		if (listOfImage.length == 0) {
-			return false;
-		} else {
-			return listOfImage;
-		}
-	}
-	return listOfImage;
-}
-
 //Getting the current page
 function GetCurrentPage() {
 	if (mangaMode == true) {
@@ -1348,17 +1324,6 @@ async function getFromDB(dbname, request) {
 	});
 }
 
-//TODO REBUILD FOR DB
-function GetElFromInfo(search, info) {
-	for (var i in info) {
-		if (i == search) {
-			return info[i];
-		}
-	}
-	return null;
-}
-
-//Send BE
 //mark as read
 function markasread() {
 	Toastifycation(language[0]["marked_as_read"], "#00C33C");
@@ -1384,7 +1349,6 @@ function markasread() {
 	});
 }
 
-//Send BE
 //Mark as unread
 function markasunread() {
 	Toastifycation(language[0]["marked_as_unread"], "#00C33C");

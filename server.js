@@ -209,7 +209,6 @@ app.use(cors());
 app.use(express.json({limit: "50mb"}));
 app.use(express.urlencoded({extended: true}));
 let host, port;
-
 app.listen(JSON.parse(fs.readFileSync(CosmicComicsTemp + "/serverconfig.json").toString()).port, "0.0.0.0", function () {
 	host = this.address().address;
 	port = this.address().port;
@@ -528,6 +527,19 @@ app.post("/DB/lib/update/:token/:id", (req, res) => {
 	}
 	res.sendStatus(200);
 });
+
+function insertIntoDB(into, val, tokenu, dbName) {
+	try {
+		const dbinfo = into;
+		const values = val;
+		const token = resolveToken(tokenu);
+		console.log(dbinfo + values);
+		getDB(token).run("INSERT OR IGNORE INTO " + dbName + " " + dbinfo + " VALUES " + values + ";");
+	} catch (e) {
+		console.log(e);
+	}
+}
+
 app.post("/DB/insert/:token/:dbName", (req, res) => {
 	try {
 		const dbinfo = req.body.into;
@@ -695,37 +707,229 @@ app.get("/getListOfFilesAndFolders/:path", (req, res) => {
 	});
 	res.send(result);
 });
-app.get("/api/anilist/search/:name", (req, res) => {
-	var name = req.params.name;
-	let isSend = false;
-	AniList.searchEntry.manga(
-		name,
-		null, 1,
-		25
-	).then(async function (data) {
-		if (data == null || data.pageInfo.total == 0) {
-			res.send(null);
-		} else {
-			for (let i = 0; i < data.media.length; i++) {
-				console.log(isSend, i);
-				let item = data.media[i];
-				console.log(item.title.romaji, name);
-				if (item.title.romaji.toLowerCase() == name.toLowerCase() || item.title.english.toLowerCase() == name.toLowerCase() || item.title.native.toLowerCase() == name.toLowerCase()) {
-					if (!isSend) {
-						await AniList.media.manga(data.media[i].id).then(function (data2) {
-							isSend = true;
-							res.send(data2);
-						});
-					}
+
+async function API_ANILIST_GET(name) {
+	let query =
+		`query ($page: Int, $perPage: Int, $search: String) {
+  Page(page:$page,perPage:$perPage){
+    pageInfo{
+      total
+    }
+    media(type: MANGA,search:$search){
+      id
+      title{
+        romaji
+        english
+        native
+      }
+      status
+      startDate{
+        year
+        month
+        day
+      }
+      endDate{
+        year
+        month
+        day
+	  }
+	  description
+	  meanScore
+	  genres
+	  coverImage{
+	  large
+	  }
+	  bannerImage
+	  trending
+	  siteUrl
+	  volumes
+	  chapters
+      staff{
+        nodes{
+          id
+          name {
+            full
+            native
+          }
+          image {
+            medium
+          }
+          description
+          siteUrl
+        }
+        edges{
+        role
+        }
+      }
+      characters{
+        nodes{
+          id
+          name {
+            full
+            native
+          }
+          image {
+            medium
+          }
+          description
+          siteUrl
+        }
+        edges{
+        role
+        }
+      }
+      relations{
+        nodes{
+          id
+          title{
+            romaji
+            english
+            native
+          }
+          coverImage{
+          large
+          }
+          type
+          format
+        }
+        edges{
+          relationType
+        }        
+      }
+    }
+  }
+}`;
+	let variables = {
+		search: name,
+		page: 1,
+		perPage: 5
+	}
+	let url = 'https://graphql.anilist.co',
+		options = {
+			method: 'POST',
+			headers: {
+				'Content-Type': 'application/json',
+				'Accept': 'application/json',
+			},
+			body: JSON.stringify({
+				query: query,
+				variables: variables
+			})
+		};
+	let results = {};
+
+	await fetch(url, options).then(handleResponse).then(handleData).catch(handleError);
+
+	function handleResponse(response) {
+		return response.json().then(function (json) {
+			return response.ok ? json : Promise.reject(json);
+		});
+	}
+		// duplicate an object
+	function clone(obj) {
+		return JSON.parse(JSON.stringify(obj));
+	}
+
+
+	function handleData(data) {
+		console.log(data);
+		let baseObject = clone(data.data.Page.media[0]);
+
+		let staffObject = clone(data.data.Page.media[0].staff.nodes);
+		let charactersObject = clone(data.data.Page.media[0].characters.nodes);
+		let relationsObjectNodes = clone(data.data.Page.media[0].relations.nodes);
+		let relationsObjectEdges = clone(data.data.Page.media[0].relations.edges);
+		let relationsObject = [];
+		for (let i = 0; i < relationsObjectNodes.length; i++) {
+			relationsObject[i] = relationsObjectNodes[i];
+			relationsObject[i]["relationType"] = relationsObjectEdges[i].relationType;
+		}
+		delete baseObject["relations"];
+
+
+		for (let i=0;i<baseObject.staff.nodes.length;i++) {
+			for (let key in baseObject.staff.nodes[i]) {
+				if (key !== "id" && key !== "name") {
+					delete baseObject.staff.nodes[i][key];
 				}
 			}
-			if (!isSend) {
-				res.send(null);
-			}
+			baseObject.staff.nodes[i]["name"] = baseObject.staff.nodes[i]["name"]["full"];
 		}
-	}).catch(function (err) {
-		console.log(err);
-	});
+		baseObject.staff = baseObject.staff.nodes;
+
+		for (let i=0;i<baseObject.characters.nodes.length;i++) {
+			for (let key in baseObject.characters.nodes[i]) {
+				if (key !== "id" && key !== "name") {
+					delete baseObject.characters.nodes[i][key];
+				}
+			}
+			baseObject.characters.nodes[i]["name"] = baseObject.characters.nodes[i]["name"]["full"];
+		}
+		baseObject.characters = baseObject.characters.nodes;
+		results = {
+			"base": baseObject,
+			"staff": staffObject,
+			"characters": charactersObject,
+			"relations": relationsObject
+		}
+	}
+	return results;
+	function handleError(error) {
+		console.error(error);
+	}
+}
+
+app.post("/api/anilist", async (req, res) => {
+	let name = req.headers.name;
+	let token = req.headers.token;
+	let path = req.headers.path;
+	await API_ANILIST_GET(name).then(async function (thedata) {
+		console.log(thedata);
+		let data = thedata["base"];
+		let relationsData = thedata["relations"];
+		let charactersData = thedata["characters"];
+		let staffData = thedata["staff"];
+		console.log(staffData);
+		let randID = Math.floor(Math.random() * 1000000);
+		if (data === null) {
+			await insertIntoDB("(ID_Series,title,note,statut,start_date,end_date,description,Score,genres,cover,BG,CHARACTERS,TRENDING,STAFF,SOURCE,volumes,chapters,favorite,PATH,lock)", "('" + randID + "U_2" + "','" + JSON.stringify(name.replaceAll("'", "''")) + "',null,null,null,null,null,'0',null,null,null,null,null,null,null,null,null,0,'" + path + "',false)", token, "Series");
+		} else {
+			await insertIntoDB("(ID_Series,title,note,statut,start_date,end_date,description,Score,genres,cover,BG,CHARACTERS,TRENDING,STAFF,SOURCE,volumes,chapters,favorite,PATH,lock)", "('" + data["id"] + "_2" + "','" + JSON.stringify(data["title"]).replaceAll("'", "''") + "',null,'" + data["status"].replaceAll("'", "''") + "','" + JSON.stringify(data["startDate"]).replaceAll("'", "''") + "','" + JSON.stringify(data["endDate"]).replaceAll("'", "''") + "','" + data["description"].replaceAll("'", "''") + "','" + data["meanScore"] + "','" + JSON.stringify(data["genres"]).replaceAll("'", "''") + "','" + data["coverImage"]["large"] + "','" + data["bannerImage"] + "','" + JSON.stringify(data["characters"]).replaceAll("'", "''") + "','" + data["trending"] + "','" + JSON.stringify(data["staff"]).replaceAll("'", "''") + "','" + data["siteUrl"].replaceAll("'", "''") + "','" + data["volumes"] + "','" + data["chapters"] + "',0,'" + path + "',false)", token, "Series");
+		}
+			for (let i = 0; i < staffData.length; i++) {
+				try {
+					if (staffData[i]["description"] == null) {
+						await insertIntoDB("", `('${staffData[i]["id"] + "_2"}','${staffData[i]["name"]["full"].replaceAll("'", "''")}','${JSON.stringify(staffData[i]["image"]["medium"])}','${null}','${JSON.stringify(staffData[i]["siteUrl"])}')`, token, "Creators")
+					} else {
+						await insertIntoDB("", `('${staffData[i]["id"] + "_2"}','${staffData[i]["name"]["full"].replaceAll("'", "''")}','${JSON.stringify(staffData[i]["image"]["medium"])}','${JSON.stringify(staffData[i]["description"].replaceAll("'", "''"))}','${JSON.stringify(staffData[i]["siteUrl"])}')`, token, "Creators")
+					}
+				} catch (e) {
+					console.log(e);
+				}
+			}
+			for (let i = 0; i < charactersData.length; i++) {
+				try {
+					if (charactersData[i]["description"] == null) {
+						await insertIntoDB("", `('${charactersData[i]["id"] + "_2"}','${charactersData[i]["name"]["full"].replaceAll("'", "''")}','${JSON.stringify(charactersData[i]["image"]["medium"])}','${null}','${JSON.stringify(charactersData[i]["siteUrl"])}')`, token, "Characters")
+					} else {
+						await insertIntoDB("", `('${charactersData[i]["id"] + "_2"}','${charactersData[i]["name"]["full"].replaceAll("'", "''")}','${JSON.stringify(charactersData[i]["image"]["medium"])}','${JSON.stringify(charactersData[i]["description"].replaceAll("'", "''"))}','${JSON.stringify(charactersData[i]["siteUrl"])}')`, token, "Characters")
+					}
+				} catch (e) {
+					console.log(e);
+				}
+			}
+			for (let i = 0; i < relationsData.length; i++) {
+				let dataR = relationsData[i];
+				if (dataR.title.english == null) {
+					await insertIntoDB("", `('${dataR["id"] + "_2"}','${dataR["title"]["romaji"].replaceAll("'", "''")}','${dataR["coverImage"]["large"]}','${dataR["type"] + " / " + dataR["relationType"] + " / " + dataR["format"]}',${null},'${data["id"] + "_2"}')`, token, "relations");
+					console.log("inserted");
+				} else {
+					await insertIntoDB("", `('${dataR["id"] + "_2"}','${dataR["title"]["english"].replaceAll("'", "''")}','${dataR["coverImage"]["large"]}','${dataR["type"] + " / " + dataR["relationType"] + " / " + dataR["format"]}',${null},'${data["id"] + "_2"}')`, token, "relations");
+					console.log("inserted");
+				}
+			}
+	})
+	res.sendStatus(200)
 });
 app.get("/api/anilist/searchByID/:id", (req, res) => {
 	try {
@@ -751,38 +955,45 @@ app.get("/api/anilist/searchOnly/:id", (req, res) => {
 		}
 	});
 });
-app.get("/api/anilist/creator/:id", (req, res) => {
+
+async function API_ANILIST_GET_CREATORS(id) {
 	try {
-		AniList.people.staff(parseInt(req.params.id)).then(function (data) {
-			res.send(data);
+		await AniList.people.staff(parseInt(id)).then(function (data) {
+			return data;
 		});
 	} catch (e) {
 		console.log(e);
 	}
-});
-app.get("/api/anilist/character/:id", (req, res) => {
+	return null;
+}
+
+async function API_ANILIST_GET_CHARACTERS(id) {
 	try {
-		AniList.people.character(parseInt(req.params.id)).then(function (data) {
-			res.send(data);
+		await AniList.people.character(parseInt(id)).then(function (data) {
+			return data;
 		});
 	} catch (e) {
 		console.log(e);
 	}
-});
-app.get("/api/anilist/relations/:name", (req, res) => {
+	return null
+}
+
+async function API_ANILIST_GET_RELATIONS(name) {
 	try {
-		AniList2.searchMedia({
-			search: req.params.name,
+		await AniList2.searchMedia({
+			search: name,
 			format: "MANGA",
 			perPage: 25
 		})
 			.then(function (data) {
-				res.send(data["Results"][0]["info"]["relations"]["edges"]);
+				return (data["Results"][0]["info"]["relations"]["edges"]);
 			});
 	} catch (e) {
 		console.log(e);
 	}
-});
+	return null;
+}
+
 app.get("/getThemes", (req, res) => {
 	var oi = fs.readdirSync(__dirname + "/public/themes");
 	let result = [];
@@ -1052,13 +1263,12 @@ app.get("/profile/getPPBN/:name", (req, res) => {
 app.get("/profile/custo/getNumber", (req, res) => {
 	res.send({"length": fs.readdirSync(__dirname + "/public/Images/account_default").length});
 });
-app.get("/api/marvel", (req, res) => {
+/*app.get("/api/marvel", (req, res) => {
 	let id = req.body.id
 	fetch("https://gateway.marvel.com:443/v1/public/series/" + id + "/comics?noVariants=false&orderBy=issueNumber&apikey=1ad92a16245cfdb9fecffa6745b3bfdc").then((e)=>{
 		res.send(e)
 	})
-})
-
+})*/
 //Modifications of the profile
 app.post("/profile/modification", (req, res) => {
 	const token = resolveToken(req.body.token);
@@ -1075,7 +1285,6 @@ app.post("/profile/modification", (req, res) => {
 	}
 	res.sendStatus(200);
 });
-
 //Deleting an account
 app.post("/profile/deleteAccount", (req, res) => {
 	const token = resolveToken(req.body.token);
@@ -1085,7 +1294,6 @@ app.post("/profile/deleteAccount", (req, res) => {
 		console.log(err);
 	});
 });
-
 //If page not found
 app.all('*', (req, res) => {
 	res.sendFile(__dirname + '/404.html');
