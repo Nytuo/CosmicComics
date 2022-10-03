@@ -485,13 +485,47 @@ app.get("/DB/update/:token/:dbName/:colName/:value/:id", (req, res) => {
 	}
 	res.sendStatus(200);
 });
-app.post("/DB/update/", (req, res) => {
-	if (req.body.type == "edit") {
-		let listOfColumns = req.body.column;
-		let listOfValues = req.body.value;
+app.post("/DB/update/OneForAll", (req, res) => {
+	let token = resolveToken(req.body.token);
+	let W1 = req.body.W1;
+	let W2 = req.body.W2;
+	let A = req.body.A;
+	let title = req.body.title;
+	try {
+		let resa = [];
+		getDB(token).all("SELECT * FROM Books WHERE " + W1 + "=1 OR " + W2 + "=1" + ";", function (err, resD) {
+			if (err) return console.log("Error getting element", err);
+			resD.forEach((row) => {
+				resa.push(row);
+			});
+		});
+		let bookList = JSON.parse(resa);
+		for (let i = 0; i < bookList.length; i++) {
+			if (bookList[i].PATH.toLowerCase().includes(title.toLowerCase().replaceAll('"', ''))) {
+				let asso = {}
+				asso[A] = true;
+				asso[W1] = false
+				asso[W2] = false;
+				let columns = [];
+				let values = [];
+				for (let key in asso) {
+					columns.push(key);
+					values.push(asso[key]);
+				}
+				UpdateDB("edit",columns,values,token,"Books","PATH",bookList[i].PATH);
+			}
+		}
+	} catch (e) {
+		console.log(e);
+	}
+})
+function UpdateDB(type, column, value, token, table, where, whereEl) {
+	if (type === "edit") {
+		let listOfColumns = column;
+		let listOfValues = value;
 		let what = [];
 		for (let i = 0; i < listOfColumns.length; i++) {
-			if (listOfColumns[i] == "description") {
+			if (listOfColumns[i] === "description") {
 				what.push(listOfColumns[i] + " = \"" + listOfValues[i] + "\"");
 			} else {
 				what.push(listOfColumns[i] + " = '" + listOfValues[i] + "'");
@@ -499,17 +533,20 @@ app.post("/DB/update/", (req, res) => {
 		}
 		console.log(what);
 		try {
-			getDB(resolveToken(req.body.token)).run("UPDATE " + req.body.table + " SET " + what.toString() + " WHERE " + req.body.where + "='" + req.body.whereEl + "';");
+			getDB(resolveToken(token)).run("UPDATE " + table + " SET " + what.toString() + " WHERE " + where + "='" + whereEl + "';");
 		} catch (e) {
 			console.log(e);
 		}
 	} else {
 		try {
-			getDB(resolveToken(req.body.token)).run("UPDATE " + req.body.table + " SET " + req.body.column + " = " + req.body.value + " WHERE " + req.body.where + "='" + req.body.whereEl + "';");
+			getDB(resolveToken(token)).run("UPDATE " + table + " SET " + column + " = " + value + " WHERE " + where + "='" + whereEl + "';");
 		} catch (e) {
 			console.log(e);
 		}
 	}
+}
+app.post("/DB/update/", (req, res) => {
+	UpdateDB(req.body.type,req.body.column,req.body.value,req.body.token,req.body.table,req.body.where,req.body.whereEl);
 	res.sendStatus(200);
 });
 app.post("/DB/lib/update/:token/:id", (req, res) => {
@@ -880,6 +917,213 @@ async function API_ANILIST_GET(name) {
 	}
 }
 
+async function API_MARVEL_GET(name = "") {
+	if (name === "") {
+		console.log("no name provided, aborting GETMARVELAPI");
+		return;
+	}
+	let date = "";
+	let dateNb = 0;
+	let dateFromName = name.replace(/[^0-9]/g, "#");
+	dateFromName.split("#").forEach(function (element) {
+		if (dateNb === 0 && element.match(/^[0-9]{4}$/)) {
+			dateNb++;
+			date = element;
+		}
+	});
+	name = name.replaceAll(/[(].+[)]/g, "");
+	name = name.replace(/\s+$/, "");
+	let encodedName = encodeURIComponent(name);
+	let url;
+	if (date !== "") {
+		url = "https://gateway.marvel.com:443/v1/public/series?titleStartsWith=" + encodedName + "&startYear=" + date + "&apikey=1ad92a16245cfdb9fecffa6745b3bfdc";
+	} else {
+		url = "https://gateway.marvel.com:443/v1/public/series?titleStartsWith=" + encodedName + "&apikey=1ad92a16245cfdb9fecffa6745b3bfdc";
+	}
+	let response = await fetch(url);
+	return await response.json();
+}
+
+/**
+ * Recover the Marvel API data from the server
+ * @param {string} what - What to recover (characters, comics, creators, events, series, stories)
+ * @param {string} id - The id of the element to recover
+ * @param {string} what2 - What to recover (characters, comics, creators, events, series, stories)
+ * @param {boolean|string} noVariants - If the comics should be without variants
+ * @param {string} orderBy - How to order the results
+ * @param {string} type - The type of the element to recover (comic, collection, creator, event, story, series, character)
+ */
+function recoverMarvelAPILink(what, id, what2, noVariants = true, orderBy = "issueNumber", type = null) {
+	if (type != null) {
+		return "https://gateway.marvel.com:443/v1/public/" + what + "/?" + type + "=" + id + "&apikey=1ad92a16245cfdb9fecffa6745b3bfdc";
+	}
+	return "https://gateway.marvel.com:443/v1/public/" + what + "/" + id + "/" + what2 + "?noVariants=" + noVariants + "&orderBy=" + orderBy + "&apikey=1ad92a16245cfdb9fecffa6745b3bfdc";
+}
+
+async function GETMARVELAPI_variants(id) {
+	let url = recoverMarvelAPILink("series", id, "comics", true, "issueNumber")
+	let response = await fetch(url);
+	let data = await response.json();
+	console.log(data);
+	return data;
+}
+
+async function GETMARVELAPI_relations(id) {
+	let url = recoverMarvelAPILink("series", id, "comics", true, "issueNumber")
+	let response = await fetch(url);
+	let data = await response.json();
+	console.log(data);
+	return data;
+}
+
+async function GETMARVELAPI_Characters(id, type) {
+	let url = recoverMarvelAPILink("characters", id, "comics", true, "issueNumber", type)
+	let response = await fetch(url);
+	let data = await response.json();
+	console.log(data);
+	return data;
+}
+
+async function GETMARVELAPI_Creators(id, type) {
+	let url = recoverMarvelAPILink("creators", id, "comics", true, "issueNumber", type)
+	let response = await fetch(url);
+	let data = await response.json();
+	console.log(data);
+	return data;
+}
+
+/**
+ * Get from the Marvel API the list of comics
+ * @param {string} id - The id of the comic
+ * @return {string} The list of comics
+ */
+
+
+async function GETMARVELAPI_Comics_ByID(id) {
+	let url = recoverMarvelAPILink("comics", id, "", true, "issueNumber")
+	let response = await fetch(url);
+	let data = await response.json();
+	console.log(data);
+	return data;
+}
+
+app.get("/api/marvel/getComics/:name/:date", async function (req, res) {
+	GETMARVELAPI_Comics(req.params.name, req.params.date).then(function (data) {
+		res.send(data);
+	})
+})
+
+async function GETMARVELAPI_Comics(name = "", seriesStartDate = "") {
+	if (name === "") {
+		console.log("GETMARVELAPI_Comics : name is empty");
+		return;
+	}
+	if (seriesStartDate === "") {
+		console.log("GETMARVELAPI_Comics : seriesStartDate is empty");
+		return;
+	}
+	let issueNumber = "";
+	let inbFromName = name.replace(/[^#0-9]/g, "&");
+	console.log("inbFromName : " + inbFromName);
+	inbFromName.split("&").forEach(function (element) {
+		if (element.match(/^[#][0-9]{1,}$/)) {
+			issueNumber = element.replaceAll("#", "");
+		}
+	});
+	name = name.replaceAll(/[(].+[)]/g, "");
+	name = name.replaceAll(/[\[].+[\]]/g, "");
+	name = name.replaceAll(/[\{].+[\}]/g, "");
+	name = name.replaceAll(/[#][0-9]{1,}/g, "");
+	name = name.replace(/\s+$/, "");
+	console.log("GETMARVELAPI_Comics : name : " + name);
+	console.log("GETMARVELAPI_Comics : issueNumber : " + issueNumber);
+	console.log("GETMARVELAPI_Comics : seriesStartDate : " + seriesStartDate);
+	let url;
+	if (seriesStartDate !== "" && issueNumber !== "") {
+		url = "https://gateway.marvel.com:443/v1/public/comics?titleStartsWith=" + encodeURIComponent(name) + "&startYear=" + seriesStartDate + "&issueNumber=" + issueNumber + "&noVariants=true&apikey=1ad92a16245cfdb9fecffa6745b3bfdc";
+	} else {
+		url = "https://gateway.marvel.com:443/v1/public/comics?titleStartsWith=" + encodeURIComponent(name) + "&noVariants=true&apikey=1ad92a16245cfdb9fecffa6745b3bfdc";
+	}
+	let response = await fetch(url);
+	let data = await response.json();
+	console.log(data);
+	return data;
+}
+
+async function GETMARVELAPI_Series_ByID(id) {
+	let url = "https://gateway.marvel.com:443/v1/public/series?id=" + id + "&apikey=1ad92a16245cfdb9fecffa6745b3bfdc";
+	console.log(url);
+	let response = await fetch(url);
+	let data = await response.json();
+	console.log(data);
+	return data;
+}
+
+app.get("/api/marvel/searchonly/:name/:date", async (req, res) => {
+	GETMARVELAPI_SEARCH(req.params.name, req.params.date).then(function (data) {
+		res.send(data);
+	})
+})
+
+async function GETMARVELAPI_SEARCH(name = "", date = "") {
+	if (name === "") {
+		console.log("no name provided, aborting GETMARVELAPI");
+		return;
+	}
+	name = name.replaceAll(/[(].+[)]/g, "");
+	name = name.replace(/\s+$/, "");
+	let encodedName = encodeURIComponent(name);
+	let url;
+	if (date !== "") {
+		url = "https://gateway.marvel.com:443/v1/public/series?titleStartsWith=" + encodedName + "&startYear=" + date + "&apikey=1ad92a16245cfdb9fecffa6745b3bfdc";
+	} else {
+		url = "https://gateway.marvel.com:443/v1/public/series?titleStartsWith=" + encodedName + "&apikey=1ad92a16245cfdb9fecffa6745b3bfdc";
+	}
+	let response = await fetch(url);
+	return await response.json();
+}
+
+app.post("/api/marvel", (req, res) => {
+	let token = req.body.token;
+	API_MARVEL_GET(req.body.name).then(async function (data) {
+		let randID = Math.floor(Math.random() * 1000000);
+		if (data["data"]["total"] === 0) {
+			await insertIntoDB("(ID_Series,title,note,start_date,end_date,description,Score,cover,BG,CHARACTERS,STAFF,SOURCE,volumes,chapters,favorite,PATH,lock)", "('" + randID + "U_1" + "','" + JSON.stringify(name.replaceAll("'", "''")) + "',null,null,null,null,'0',null,null,null,null,null,null,null,0,'" + path + "',false)", token, "Series");
+		} else {
+			await insertIntoDB("(ID_Series,title,note,start_date,end_date,description,Score,cover,BG,CHARACTERS,STAFF,SOURCE,volumes,chapters,favorite,PATH,lock)", "('" + data["data"]["results"][0]["id"] + "_1" + "','" + JSON.stringify(data["data"]["results"][0]["title"]).replaceAll("'", "''") + "',null,'" + JSON.stringify(data["data"]["results"][0]["startYear"]).replaceAll("'", "''") + "','" + JSON.stringify(data["data"]["results"][0]["endYear"]).replaceAll("'", "''") + "','" + data["data"]["results"][0]["description"] + "','" + data["data"]["results"][0]["rating"] + "','" + JSON.stringify(data["data"]["results"][0]["thumbnail"]) + "','" + JSON.stringify(data["data"]["results"][0]["thumbnail"]) + "','" + JSON.stringify(data["data"]["results"][0]["characters"]).replaceAll("'", "''") + "','" + JSON.stringify(data["data"]["results"][0]["creators"]).replaceAll("'", "''") + "','" + JSON.stringify(data["data"]["results"][0]["urls"][0]) + "','" + JSON.stringify(data["data"]["results"][0]["comics"]["items"]) + "','" + data["data"]["results"][0]["comics"]["available"] + "',0,'" + path + "',false)", token, "Series");
+			await GETMARVELAPI_Creators(data["data"]["results"][0]["id"], "series").then(async (ccdata) => {
+				ccdata = ccdata["data"]["results"];
+				for (let i = 0; i < ccdata.length; i++) {
+					await insertIntoDB("", `('${ccdata[i]["id"] + "_1"}','${ccdata[i]["fullName"].replaceAll("'", "''")}','${JSON.stringify(ccdata[i]["thumbnail"])}',${null},'${JSON.stringify(ccdata[i]["urls"])}')`, token, "Creators")
+				}
+			});
+			await GETMARVELAPI_Characters(data["data"]["results"][0]["id"], "series").then(async (ccdata) => {
+				ccdata = ccdata["data"]["results"];
+				for (let i = 0; i < ccdata.length; i++) {
+					await insertIntoDB("", `('${ccdata[i]["id"] + "_1"}','${ccdata[i]["name"].replaceAll("'", "''")}','${JSON.stringify(ccdata[i]["thumbnail"])}','${ccdata[i]["description"].replaceAll("'", "''")}','${JSON.stringify(ccdata[i]["urls"])}')`, token, "Characters")
+				}
+			});
+			/*  await GETMARVELAPI_variants(data["data"]["results"][0]["id"]).then(async (cvdata) => {
+				  cvdata = cvdata["data"]["results"];
+				  for (let i = 0; i < cvdata.length; i++) {
+						  await insertIntoDB("variants", "", `('${cvdata[i]["id"] + "_1"}','${cvdata[i]["title"].replaceAll("'", "''")}','${JSON.stringify(cvdata[i]["thumbnail"])}','${null}','${JSON.stringify(cvdata[i]["urls"])}','${data["data"]["results"][0]["id"] + "_1"}')`).then(() => {
+							  console.log("inserted");
+						  });
+				  }
+			  })*/
+			await GETMARVELAPI_relations(data["data"]["results"][0]["id"]).then(async (cvdata) => {
+				cvdata = cvdata["data"]["results"];
+				for (let i = 0; i < cvdata.length; i++) {
+					if (cvdata[i]["description"] == null) {
+						await insertIntoDB("", `('${cvdata[i]["id"] + "_1"}','${cvdata[i]["title"].replaceAll("'", "''")}','${JSON.stringify(cvdata[i]["thumbnail"])}','${null}','${JSON.stringify(cvdata[i]["urls"])}','${data["data"]["results"][0]["id"] + "_1"}')`, token, "relations")
+					} else {
+						await insertIntoDB("", `('${cvdata[i]["id"] + "_1"}','${cvdata[i]["title"].replaceAll("'", "''")}','${JSON.stringify(cvdata[i]["thumbnail"])}','${cvdata[i]["description"].replaceAll("'", "''")}','${JSON.stringify(cvdata[i]["urls"])}','${data["data"]["results"][0]["id"] + "_1"}')`, token, "relations")
+					}
+				}
+			});
+		}
+	})
+})
 app.post("/api/anilist", async (req, res) => {
 	let name = req.headers.name;
 	let token = req.headers.token;
