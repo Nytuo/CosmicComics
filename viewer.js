@@ -35,20 +35,20 @@ const ValidatedExtensionV = [
 	"webp",
 	"gif"
 ];
-var imagelink = "null";
-var nabc = 0;
-var toogleBGC = false;
-var dirnameFE;
-var CosmicComicsData = "C:/Users/Public/Cosmic-Comics/data";
-var CosmicComicsTemp = "C:/Users/Public/Cosmic-Comics/data";
-var CosmicComicsTempI = "C:/Users/Public/Cosmic-Comics/data";
-var listofImg;
+let imagelink = "null";
+let nabc = 0;
+let toogleBGC = false;
+let dirnameFE;
+let CosmicComicsData = "C:/Users/Public/Cosmic-Comics/data";
+let CosmicComicsTemp = "C:/Users/Public/Cosmic-Comics/data";
+let CosmicComicsTempI = "C:/Users/Public/Cosmic-Comics/data";
+let listofImg;
 const url = document.createElement("a");
 url.setAttribute("href", window.location.href);
-var domain = url.hostname;
-var port = url.port;
-var currentUser = "";
-var connected = getCookie("selectedProfile");
+let domain = url.hostname;
+let port = url.port;
+let currentUser = "";
+let connected = getCookie("selectedProfile");
 console.log(connected);
 
 function setTheme(theme) {
@@ -108,31 +108,30 @@ fetch("http://" + domain + ":" + port + "/CosmicDataLoc").then(function (respons
 	return response.text();
 }).then(function (data) {
 	dirnameFE = data;
-
 	CosmicComicsTemp = dirnameFE;
 }).catch(function (error) {
 	console.log(error);
 });
-var name1 = GetFilePath().split("/").pop();
+let name1 = GetFilePath().split("/").pop();
 let path = GetFilePath();
 console.log(name1);
-var realname1 = name1.split(".")[0];
+let realname1 = name1.split(".")[0];
 console.log(realname1);
-var shortname = GetTheName(realname1);
+let shortname = GetTheName(realname1);
 console.log(shortname);
-var rarlength = 0;
-var Dpath = GetFilePath();
+let rarlength = 0;
+let Dpath = GetFilePath();
 /*
 var DPageTotal = GetListOfImg(CosmicComicsTempI).length;
 */
-var DPageActu = 1;
-var DoublePageMode = false;
-var BlankFirstPage = false;
-var DPMNoH = false;
-var wasDPM = false;
-var PPwasDPM = false;
-var mangaMode = false;
-var language;
+let DPageActu = 1;
+let DoublePageMode = false;
+let BlankFirstPage = false;
+let DPMNoH = false;
+let wasDPM = false;
+let PPwasDPM = false;
+let mangaMode = false;
+let language;
 console.log(language);
 
 async function getResponse() {
@@ -141,10 +140,10 @@ async function getResponse() {
 	console.log("Requested");
 	const dataa = await response.json().then((data) => {
 		console.log(data);
-		var configFile = data;
+		let configFile = data;
 		configFile = JSON.stringify(configFile);
-		var parsedJSON = JSON.parse(configFile);
-		var configlang = GetElFromInforPath("language", parsedJSON);
+		let parsedJSON = JSON.parse(configFile);
+		let configlang = GetElFromInforPath("language", parsedJSON);
 		console.log(configlang);
 		fetch("http://" + domain + ":" + port + "/lang/" + configlang).then(
 			(response) => {
@@ -152,7 +151,6 @@ async function getResponse() {
 					console.log(datoo);
 					language = datoo;
 					loadParameters();
-
 					//Languages for ToolTips and other things
 					new bootstrap.Tooltip(document.getElementById("goback_id"), {
 						title: language[0]["go_back"],
@@ -281,18 +279,18 @@ async function getResponse() {
 	});
 }
 
-var BGBT = false; // Background By Theme
+let BGBT = false; // Background By Theme
 //toolTips
-var tooltipTriggerList = [].slice.call(
+let tooltipTriggerList = [].slice.call(
 	document.querySelectorAll('[data-bs-toggle="tooltip"]')
 );
-var tooltipList = tooltipTriggerList.map(function (tooltipTriggerEl) {
+let tooltipList = tooltipTriggerList.map(function (tooltipTriggerEl) {
 	return new bootstrap.Tooltip(tooltipTriggerEl);
 });
-var popoverTriggerList = [].slice.call(
+let popoverTriggerList = [].slice.call(
 	document.querySelectorAll('[data-bs-toggle="popover"]')
 );
-var popoverList = popoverTriggerList.map(function (popoverTriggerEl) {
+let popoverList = popoverTriggerList.map(function (popoverTriggerEl) {
 	return new bootstrap.Popover(popoverTriggerEl);
 });
 //#endregion
@@ -310,8 +308,8 @@ function lang(langg) {
 
 //get element from config.json
 function GetElFromInforPath(search, info) {
-	for (var i in info) {
-		if (i == search) {
+	for (let i in info) {
+		if (i === search) {
 			return info[i];
 		}
 	}
@@ -319,7 +317,7 @@ function GetElFromInforPath(search, info) {
 }
 
 function hasNumbers(t) {
-	var regex = /\d/g;
+	let regex = /\d/g;
 	return regex.test(t);
 }
 
@@ -333,12 +331,12 @@ function GetTheName(CommonName = "") {
 	CommonName = CommonName.replaceAll("]", " ");
 	/* remove the extension using regex */
 	CommonName = CommonName.replace(/\.[^/.]+$/, "");
-	var s = CommonName.split(" ");
-	var finalName = "";
+	let s = CommonName.split(" ");
+	let finalName = "";
 	console.log(s);
 	s.forEach((el) => {
 		console.log(parseInt(el));
-		if (el != "") {
+		if (el !== "") {
 			if (hasNumbers(el)) {
 				finalName += el;
 			} else if (isNaN(parseInt(el))) {
@@ -354,7 +352,7 @@ function GetTheName(CommonName = "") {
 
 //Send Notification to User
 function Toastifycation(message, BGColor = "#333", FrontColor = "#ffffff") {
-	var x = document.getElementById("snackbar");
+	let x = document.getElementById("snackbar");
 	x.className = "show";
 	x.innerHTML = message;
 	x.style.backgroundColor = BGColor;
@@ -365,41 +363,41 @@ function Toastifycation(message, BGColor = "#333", FrontColor = "#ffffff") {
 }
 
 //Theme set up
-var theme_BG = "#181818";
-var theme_FG = "white";
-var theme_BG_CI = "rgba(0,0,0,0.753)";
-var currenttheme;
-var theme_O2 = "black";
-var theme_notifBG = "rgb(143, 143, 143)";
-var theme_button_card = "";
-var theme_progress = "";
-var theme_hover_listview = "#242424";
-var theme_nohover_listview = "transparent";
-var theme_hover_close;
-var theme_btn_FG = "white";
-var theme_btn_BG = "#0d6efd";
-var theme_btn_FG_s = "white";
-var theme_btn_BG_s = "#6c757d";
-var theme_btn_border = theme_btn_BG;
-var theme_btn_hover = "#0b5ed7";
-var theme_btn_border_s = theme_btn_BG;
-var theme_btn_hover_s = "#5c636a";
-var linkBG = "";
+let theme_BG = "#181818";
+let theme_FG = "white";
+let theme_BG_CI = "rgba(0,0,0,0.753)";
+let currenttheme;
+let theme_O2 = "black";
+let theme_notifBG = "rgb(143, 143, 143)";
+let theme_button_card = "";
+let theme_progress = "";
+let theme_hover_listview = "#242424";
+let theme_nohover_listview = "transparent";
+let theme_hover_close;
+let theme_btn_FG = "white";
+let theme_btn_BG = "#0d6efd";
+let theme_btn_FG_s = "white";
+let theme_btn_BG_s = "#6c757d";
+let theme_btn_border = theme_btn_BG;
+let theme_btn_hover = "#0b5ed7";
+let theme_btn_border_s = theme_btn_BG;
+let theme_btn_hover_s = "#5c636a";
+let linkBG = "";
 document.getElementsByTagName("html")[0].className = "black";
 
 function Themes() {
-	if (currenttheme != "[DEFAULT] - Default.json") {
-		if (currenttheme == "[EVENT] - Halloween.json") {
+	if (currenttheme !== "[DEFAULT] - Default.json") {
+		if (currenttheme === "[EVENT] - Halloween.json") {
 			document.getElementById("logo_id").src = "Images/Logo_h.png";
-		} else if (currenttheme == "[EVENT] - X-Mas.json") {
+		} else if (currenttheme === "[EVENT] - X-Mas.json") {
 			document.getElementById("logo_id").src = "Images/Logo_n.png";
 		}
 		fetch("http://" + domain + ":" + port + "/themes/read/" + currenttheme).then(function (response) {
 			return response.text();
 		}).then(function (data) {
 			console.log("theme loaded");
-			var config_JSON = data;
-			var parsedJSON = JSON.parse(config_JSON)[0];
+			let config_JSON = data;
+			let parsedJSON = JSON.parse(config_JSON)[0];
 			linkBG = GetElFromInforPath("linkBG", parsedJSON);
 			theme_BG = GetElFromInforPath("BG", parsedJSON);
 			theme_FG = GetElFromInforPath("FG", parsedJSON);
@@ -424,7 +422,7 @@ function Themes() {
 				GetElFromInforPath("nav_BG", parsedJSON);
 			theme_hover_listview = GetElFromInforPath("hover_listview", parsedJSON);
 			theme_BG_CI = GetElFromInforPath("BG_CI", parsedJSON);
-			if (BGBT == true) {
+			if (BGBT === true) {
 				document.getElementById("overlaymsg").style.color = theme_FG;
 				document.getElementById("snackbar").style.color = theme_FG;
 				document.getElementById("snackbar").style.backgroundColor = theme_notifBG;
@@ -563,7 +561,7 @@ function Themes() {
 			for (let i = 0; i < document.querySelectorAll("h4").length; i++) {
 				document.getElementsByTagName("h4")[i].style.color = theme_FG;
 			}
-			if (linkBG != "" && BGBT == true) {
+			if (linkBG !== "" && BGBT === true) {
 				document.getElementsByTagName("html")[0].style.backgroundImage =
 					"url('" + linkBG + "')";
 			} else {
@@ -576,7 +574,7 @@ function Themes() {
 }
 
 function BGBTF() {
-	if (BGBT == true) {
+	if (BGBT === true) {
 		BGBT = false;
 		Themes();
 	} else {
@@ -588,17 +586,17 @@ function BGBTF() {
 //same as the one in the "end" listener of the ZIP but for RAR archive
 function postunrar() {
 	Toastifycation(language[0]["extraction_completed"], "#00C33C");
-	var filepage = GetFilePage();
+	let filepage = GetFilePage();
 	preloadImage(listofImg);
 	console.log(filepage);
-	if (filepage != false) {
-		var lastpage = filepage;
+	if (filepage !== false) {
+		let lastpage = filepage;
 		document.getElementById("overlay").style.display = "none";
 		setTimeout(() => {
 			Reader(listofImg, lastpage);
 		}, 1000);
 	} else {
-		var lastpage = 0;
+		let lastpage = 0;
 		try {
 			getFromDB("Books", "last_page FROM Books WHERE PATH='" + path + "'").then((res) => {
 				lastpage = JSON.parse(res)[0]["last_page"];
@@ -615,7 +613,7 @@ function postunrar() {
 
 //Getting the File path from the URL Parameters
 function GetFilePath() {
-	var HTMLParam = window.location.search;
+	let HTMLParam = window.location.search;
 	HTMLParam = HTMLParam.replace("?", "");
 	HTMLParam = decodeURIComponent(HTMLParam);
 	HTMLParam = HTMLParam.replaceAll("%20", " ");
@@ -629,15 +627,15 @@ function GetFilePath() {
 
 //Getting the page by HTML URL Parameters
 function GetFilePage() {
-	var HTMLParam = window.location.search;
+	let HTMLParam = window.location.search;
 	HTMLParam = HTMLParam.replace("?", "");
 	HTMLParam = HTMLParam.replaceAll("%20", " ");
 	HTMLParam = HTMLParam.replaceAll("ù", "/").replaceAll("%C3%B9", "/");
 	HTMLParam = HTMLParam.split("&page=");
 	console.log(HTMLParam);
 	HTMLParam = HTMLParam[1];
-	var HN = hasNumbers(HTMLParam);
-	if (HN == true) {
+	let HN = hasNumbers(HTMLParam);
+	if (HN === true) {
 		HTMLParam = parseInt(HTMLParam);
 		return HTMLParam;
 	} else {
@@ -662,7 +660,7 @@ async function prepareReader() {
 					let listofImgLoc = data;
 					listofImg = listofImgLoc;
 					console.log(listofImgLoc);
-					if (listofImgLoc == false) {
+					if (listofImgLoc === false) {
 						Toastifycation("error", "#292929");
 					}
 					listofImgLoc.sort((a, b) => {
@@ -677,14 +675,14 @@ async function prepareReader() {
 						return 0;
 					});
 					console.log(listofImgLoc);
-					var filepage = GetFilePage();
+				let filepage = GetFilePage();
 					preloadImage(listofImgLoc);
 					console.log(filepage);
-					if (filepage != false) {
-						var lastpage = filepage;
+					if (filepage !== false) {
+						let lastpage = filepage;
 						Reader(listofImgLoc, lastpage);
 					} else {
-						var lastpage = 0;
+						let lastpage = 0;
 						try {
 							await getFromDB("Books", "last_page FROM Books WHERE PATH='" + path + "'").then(async (res) => {
 								console.log(res);
@@ -745,7 +743,7 @@ async function Viewer() {
 											let listofImgLoc = data;
 											listofImg = listofImgLoc;
 											console.log(listofImgLoc);
-											if (listofImgLoc == false) {
+											if (listofImgLoc === false) {
 												Toastifycation("error", "#292929");
 											}
 											listofImgLoc.sort((a, b) => {
@@ -760,14 +758,14 @@ async function Viewer() {
 												return 0;
 											});
 											console.log(listofImgLoc);
-											var filepage = GetFilePage();
+										let filepage = GetFilePage();
 											preloadImage(listofImgLoc);
 											console.log(filepage);
-											if (filepage != false) {
-												var lastpage = filepage;
+											if (filepage !== false) {
+												let lastpage = filepage;
 												Reader(listofImgLoc, lastpage);
 											} else {
-												var lastpage = 0;
+												let lastpage = 0;
 												try {
 													await getFromDB("Books", "last_page FROM Books WHERE PATH='" + window.decodeURI(window.location.search.replace("?", "").split("&")[0]).replace("%3A", ":") + "'").then(async (res) => {
 														lastpage = JSON.parse(res)[0]["last_page"];
@@ -777,7 +775,6 @@ async function Viewer() {
 												} catch (error) {
 													console.log(error);
 													Reader(listofImgLoc, lastpage);
-
 												}
 											}
 											Toastifycation(language[0]["loaded_local"], "#00C33C");
@@ -800,7 +797,7 @@ async function Viewer() {
 												console.log("path : " + CosmicComicsTempI + "path.txt");
 												console.log("path2 : " + decodeURIComponent(path).replaceAll("%C3%B9", "/"));
 												if (
-													readCCTIP != decodeURIComponent(path).replaceAll("%C3%B9", "/") ||
+													readCCTIP !== decodeURIComponent(path).replaceAll("%C3%B9", "/") ||
 													path.includes(".pdf")
 												) {
 													// if it's not the same we need to extract it
@@ -863,10 +860,10 @@ function Reader(listOfImg, page) {
 		};
 		fetch("http://" + domain + ":" + port + "/view/readImage", options).then(async (response) => {
 			images.push(URL.createObjectURL(await response.blob()));
-			if (DoublePageMode == true && BlankFirstPage == false) {
+			if (DoublePageMode === true && BlankFirstPage === false) {
 				document.getElementById("imgViewer_0").style.display = "";
 				document.getElementById("imgViewer_1").style.display = "";
-				if (mangaMode == true) {
+				if (mangaMode === true) {
 					document.getElementById("imgViewer_0").src =
 						images[1];
 					document.getElementById("imgViewer_1").src =
@@ -882,11 +879,11 @@ function Reader(listOfImg, page) {
 						page + 2 + " / " + listOfImg.length;
 				}
 				DPageActu = page + 1;
-			} else if (DoublePageMode == true && BlankFirstPage == true) {
-				if (page == 0 || page == -1) {
+			} else if (DoublePageMode === true && BlankFirstPage === true) {
+				if (page === 0 || page === -1) {
 					document.getElementById("imgViewer_0").style.display = "";
 					document.getElementById("imgViewer_1").style.display = "none";
-					if (page == 2) {
+					if (page === 2) {
 						document.getElementById("imgViewer_0").src =
 							images[1];
 						document.getElementById("currentpage").innerHTML =
@@ -901,7 +898,7 @@ function Reader(listOfImg, page) {
 				} else {
 					document.getElementById("imgViewer_0").style.display = "";
 					document.getElementById("imgViewer_1").style.display = "";
-					if (mangaMode == true) {
+					if (mangaMode === true) {
 						document.getElementById("imgViewer_0").src =
 							images[1];
 						document.getElementById("imgViewer_1").src =
@@ -927,8 +924,8 @@ function Reader(listOfImg, page) {
 				DPageActu = page + 1;
 			}
 			setTimeout(() => {
-					if (toogleBGC == true) {
-						var pathBG;
+					if (toogleBGC === true) {
+						let pathBG;
 						if (custom) {
 							pathBG = images[0];
 							console.log("ColorThief : Enable");
@@ -958,11 +955,11 @@ function Reader(listOfImg, page) {
 	document.getElementById("sps").max = listOfImg.length;
 	document.getElementById("imgViewer_0").style.display = "none";
 	document.getElementById("imgViewer_1").style.display = "none";
-	if (RZPV == true) {
+	if (RZPV === true) {
 		if (
-			document.getElementById("imgViewer_0").style.width ==
+			document.getElementById("imgViewer_0").style.width ===
 			window.innerWidth - 5 + "px" ||
-			document.getElementById("imgViewer_0").style.width ==
+			document.getElementById("imgViewer_0").style.width ===
 			window.innerWidth - 205 + "px"
 		) {
 			FixWidth();
@@ -973,7 +970,7 @@ function Reader(listOfImg, page) {
 	document.getElementById("inputonwhat").innerHTML = " / " + listOfImg.length;
 	document.getElementById("input_text").value = page + 1;
 	try {
-		for (var i = 0; i < listOfImg.length; i++) {
+		for (let i = 0; i < listOfImg.length; i++) {
 			document.getElementById("id_img_" + i).className = "";
 		}
 		document.getElementById("id_img_" + page).className = "SideBar_current";
@@ -982,7 +979,7 @@ function Reader(listOfImg, page) {
 	} catch (e) {
 		console.log(e);
 	}
-	if (AlwaysRotateB == false) {
+	if (AlwaysRotateB === false) {
 		document.getElementById("imgViewer_0").style.transform =
 			"rotate(" + 0 + "deg)";
 		document.getElementById("imgViewer_1").style.rotate =
@@ -993,41 +990,41 @@ function Reader(listOfImg, page) {
 		document.getElementById("imgViewer_1").style.rotate =
 			"rotate(" + AlwaysRotateV + "deg)";
 	}
-	if (wasDPM == true) {
+	if (wasDPM === true) {
 		DoublePageMode = true;
 	}
 }
 
 //Getting the current page
 function GetCurrentPage() {
-	if (mangaMode == true) {
-		var CurrentPage = Math.abs(
+	if (mangaMode === true) {
+		let CurrentPage = Math.abs(
 			document.getElementById("currentpage").innerHTML.split(" ")[0] - 1
 		);
 		console.log(CurrentPage);
 		return CurrentPage;
 	} else {
-		var CurrentPage =
+		let CurrentPage =
 			document.getElementById("currentpage").innerHTML.split(" ")[0] - 1;
 		return CurrentPage;
 	}
 }
 
-var scrollindex_next = 1;
+let scrollindex_next = 1;
 
 //Going to the next page
 function NextPage(override = false) {
-	if (mangaMode == true) {
-		if (override == false) {
+	if (mangaMode === true) {
+		if (override === false) {
 			PreviousPage(true);
 			return false;
 		}
 	}
-	if (VIV_On == true) {
-		var CurrentPage = GetCurrentPage();
+	if (VIV_On === true) {
+		let CurrentPage = GetCurrentPage();
 		console.log(scrollindex_next);
 		if (
-			document.getElementById("imgViewer_" + CurrentPage).style.width ==
+			document.getElementById("imgViewer_" + CurrentPage).style.width ===
 			window.innerWidth - 5 + "px"
 		) {
 			if (scrollindex_next > 2) {
@@ -1037,13 +1034,13 @@ function NextPage(override = false) {
 					document.getElementsByTagName("header")[0].offsetHeight
 				);
 			} else {
-				if (scrollindex_next == 1) {
+				if (scrollindex_next === 1) {
 					document
 						.getElementById("div_imgViewer_" + CurrentPage)
 						.scrollIntoView({
 							block: "center"
 						});
-				} else if (scrollindex_next == 2) {
+				} else if (scrollindex_next === 2) {
 					document
 						.getElementById("div_imgViewer_" + CurrentPage)
 						.scrollIntoView({
@@ -1065,20 +1062,20 @@ function NextPage(override = false) {
 		}
 	} else {
 		window.scrollTo(0, 0);
-		var CurrentPage = GetCurrentPage();
-		if (DPMNoH == true) {
-			var NW = preloadedImages[CurrentPage + 1].naturalWidth;
-			var NH = preloadedImages[CurrentPage + 1].naturalHeight;
-			var NW2 = preloadedImages[CurrentPage + 2].naturalWidth;
-			var NH2 = preloadedImages[CurrentPage + 2].naturalHeight;
+		let CurrentPage = GetCurrentPage();
+		if (DPMNoH === true) {
+			let NW = preloadedImages[CurrentPage + 1].naturalWidth;
+			let NH = preloadedImages[CurrentPage + 1].naturalHeight;
+			let NW2 = preloadedImages[CurrentPage + 2].naturalWidth;
+			let NH2 = preloadedImages[CurrentPage + 2].naturalHeight;
 			if (NW > NH || NW2 > NH2) {
 				DoublePageMode = false;
 			}
 		}
-		var max = listofImg.length;
+		let max = listofImg.length;
 		if (CurrentPage < max - 1) {
 			CurrentPage += 1;
-			if (currentpage == max - 1) {
+			if (currentpage === max - 1) {
 				ModifyDB(
 					"Books",
 					"reading",
@@ -1107,15 +1104,15 @@ function NextPage(override = false) {
 
 //Going to the previous page
 function PreviousPage(override = false) {
-	if (mangaMode == true) {
-		if (override == false) {
+	if (mangaMode === true) {
+		if (override === false) {
 			NextPage(true);
 			return false;
 		}
 	}
-	if (VIV_On == true) {
-		var CurrentPage = GetCurrentPage();
-		if (scrollindex_next == 2 || scrollindex_next == 3) {
+	if (VIV_On === true) {
+		let CurrentPage = GetCurrentPage();
+		if (scrollindex_next === 2 || scrollindex_next === 3) {
 			window.scrollTo(
 				0,
 				document.getElementById("imgViewer_" + CurrentPage).offsetTop -
@@ -1132,27 +1129,27 @@ function PreviousPage(override = false) {
 		}
 	} else {
 		window.scrollTo(0, 0);
-		var CurrentPage = GetCurrentPage();
-		if (DoublePageMode == true && BlankFirstPage == false && DPMNoH == false) {
+		let CurrentPage = GetCurrentPage();
+		if (DoublePageMode === true && BlankFirstPage === false && DPMNoH === false) {
 			if (CurrentPage > 2) {
 				CurrentPage -= 3;
 				Reader(listofImg, CurrentPage);
 			} else {
-				if (CurrentPage - 1 != -1) {
+				if (CurrentPage - 1 !== -1) {
 					CurrentPage -= 1;
 					Reader(listofImg, CurrentPage);
 				}
 			}
 		} else if (
-			DoublePageMode == true &&
-			BlankFirstPage == false &&
-			DPMNoH == true
+			DoublePageMode === true &&
+			BlankFirstPage === false &&
+			DPMNoH === true
 		) {
 			if (CurrentPage > 2) {
-				var NW = preloadedImages[CurrentPage - 1].naturalWidth;
-				var NH = preloadedImages[CurrentPage - 1].naturalHeight;
-				var NW2 = preloadedImages[CurrentPage - 2].naturalWidth;
-				var NH2 = preloadedImages[CurrentPage - 2].naturalHeight;
+				let NW = preloadedImages[CurrentPage - 1].naturalWidth;
+				let NH = preloadedImages[CurrentPage - 1].naturalHeight;
+				let NW2 = preloadedImages[CurrentPage - 2].naturalWidth;
+				let NH2 = preloadedImages[CurrentPage - 2].naturalHeight;
 				if (NW > NH || NW2 > NH2) {
 					DoublePageMode = false;
 					CurrentPage -= 1;
@@ -1162,33 +1159,33 @@ function PreviousPage(override = false) {
 					Reader(listofImg, CurrentPage);
 				}
 			} else {
-				if (CurrentPage - 2 != -1) {
+				if (CurrentPage - 2 !== -1) {
 					CurrentPage -= 2;
 					Reader(listofImg, CurrentPage);
 				}
 			}
 		} else if (
-			DoublePageMode == true &&
-			BlankFirstPage == true &&
-			DPMNoH == false
+			DoublePageMode === true &&
+			BlankFirstPage === true &&
+			DPMNoH === false
 		) {
-			if (CurrentPage != 0 && CurrentPage - 3 != -1) {
+			if (CurrentPage !== 0 && CurrentPage - 3 !== -1) {
 				CurrentPage -= 3;
 				Reader(listofImg, CurrentPage);
-			} else if (CurrentPage - 3 == -1) {
+			} else if (CurrentPage - 3 === -1) {
 				CurrentPage -= 2;
 				Reader(listofImg, CurrentPage);
 			}
 		} else if (
-			DoublePageMode == true &&
-			BlankFirstPage == true &&
-			DPMNoH == true
+			DoublePageMode === true &&
+			BlankFirstPage === true &&
+			DPMNoH === true
 		) {
-			if (CurrentPage != 0 && CurrentPage - 3 != -1) {
-				var NW = preloadedImages[CurrentPage - 2].naturalWidth;
-				var NH = preloadedImages[CurrentPage - 2].naturalHeight;
-				var NW2 = preloadedImages[CurrentPage - 3].naturalWidth;
-				var NH2 = preloadedImages[CurrentPage - 3].naturalHeight;
+			if (CurrentPage !== 0 && CurrentPage - 3 !== -1) {
+				let NW = preloadedImages[CurrentPage - 2].naturalWidth;
+				let NH = preloadedImages[CurrentPage - 2].naturalHeight;
+				let NW2 = preloadedImages[CurrentPage - 3].naturalWidth;
+				let NH2 = preloadedImages[CurrentPage - 3].naturalHeight;
 				if (NW > NH || NW2 > NH2) {
 					DoublePageMode = false;
 					CurrentPage -= 2;
@@ -1197,11 +1194,11 @@ function PreviousPage(override = false) {
 					CurrentPage -= 2;
 					Reader(listofImg, CurrentPage);
 				}
-			} else if (CurrentPage - 3 == -1) {
-				var NW = preloadedImages[CurrentPage - 1].naturalWidth;
-				var NH = preloadedImages[CurrentPage - 1].naturalHeight;
-				var NW2 = preloadedImages[CurrentPage - 2].naturalWidth;
-				var NH2 = preloadedImages[CurrentPage - 2].naturalHeight;
+			} else if (CurrentPage - 3 === -1) {
+				let NW = preloadedImages[CurrentPage - 1].naturalWidth;
+				let NH = preloadedImages[CurrentPage - 1].naturalHeight;
+				let NW2 = preloadedImages[CurrentPage - 2].naturalWidth;
+				let NH2 = preloadedImages[CurrentPage - 2].naturalHeight;
 				if (NW > NH || NW2 > NH2) {
 					DoublePageMode = false;
 					CurrentPage -= 1;
@@ -1212,7 +1209,7 @@ function PreviousPage(override = false) {
 				}
 			}
 		} else {
-			if (CurrentPage != 0) {
+			if (CurrentPage !== 0) {
 				CurrentPage -= 1;
 				Reader(listofImg, CurrentPage);
 			}
@@ -1222,15 +1219,15 @@ function PreviousPage(override = false) {
 
 //Display by Height
 function FixHeight() {
-	var height =
+	let height =
 		window.innerHeight - document.getElementsByTagName("nav")[0].offsetHeight;
-	if (VIV_On == true) {
+	if (VIV_On === true) {
 		for (let i = 0; i < VIV_Count; i++) {
 			document.getElementById("imgViewer_" + i).style.height = height + "px";
 			document.getElementById("imgViewer_" + i).style.width = "auto";
 		}
 	}
-	if (BarOn == false) {
+	if (BarOn === false) {
 		document.getElementById("imgViewer_0").style.height = window.innerHeight + "px";
 		document.getElementById("imgViewer_0").style.width = "auto";
 		document.getElementById("imgViewer_1").style.height = window.innerHeight + "px";
@@ -1245,7 +1242,7 @@ function FixHeight() {
 
 //GO to the beginning
 function Start() {
-	if (mangaMode == true) {
+	if (mangaMode === true) {
 		Reader(listofImg, 0);
 	} else {
 		Reader(listofImg, 0);
@@ -1255,10 +1252,11 @@ function Start() {
 //Send BE
 //Go to the end
 function End() {
-	if (DoublePageMode == true) {
-		var max = listofImg.length - 2;
+	let max;
+	if (DoublePageMode === true) {
+		max = listofImg.length - 2;
 	} else {
-		var max = listofImg.length - 1;
+		max = listofImg.length - 1;
 	}
 	ModifyDB(
 		"Books",
@@ -1282,9 +1280,9 @@ async function GetInfoFromJSON(json, name) {
 	return fetch("http://" + domain + ":" + port + "/DB/read/" + json).then(function (response) {
 		return response.text();
 	}).then(function (data) {
-		var info = JSON.parse(data);
+		let info = JSON.parse(data);
 		console.log(info);
-		var Info = GetInfo("name", info, name);
+		let Info = GetInfo("name", info, name);
 		console.log(Info);
 		return Info;
 	}).catch(function (error) {
@@ -1294,10 +1292,10 @@ async function GetInfoFromJSON(json, name) {
 
 //Search in the object getted and for the book ID
 function GetInfo(search, info, name) {
-	for (var i in info) {
-		for (var j in info[i]) {
-			if (j == search) {
-				if (name == info[i][j]) {
+	for (let i in info) {
+		for (let j in info[i]) {
+			if (j === search) {
+				if (name === info[i][j]) {
 					return info[i];
 				}
 			}
@@ -1315,7 +1313,7 @@ async function getFromDB(dbname, request) {
 			"request": request
 		}, null, 2)
 	};
-	return fetch("http://" + domain + ":" + port +'/DB/get/' + connected + "/" + dbname, option).then(function (response) {
+	return fetch("http://" + domain + ":" + port + '/DB/get/' + connected + "/" + dbname, option).then(function (response) {
 		return response.text();
 	}).then(function (data) {
 		return data;
@@ -1386,11 +1384,11 @@ function getCookie(cName) {
 }
 
 async function ModifyDB(dbName, ColName, value, id) {
-	return fetch("http://" + domain + ":" + port +'/DB/update/' + connected + "/" + dbName + "/" + ColName + "/" + value + "/" + id);
+	return fetch("http://" + domain + ":" + port + '/DB/update/' + connected + "/" + dbName + "/" + ColName + "/" + value + "/" + id);
 }
 
 async function DeleteFromDB(dbName, id, option) {
-	return fetch("http://" + domain + ":" + port +'/DB/delete/' + connected + "/" + dbName + "/" + id + "/" + option);
+	return fetch("http://" + domain + ":" + port + '/DB/delete/' + connected + "/" + dbName + "/" + id + "/" + option);
 }
 
 async function InsertIntoDB(dbname, dbinfo, values) {
@@ -1402,7 +1400,7 @@ async function InsertIntoDB(dbname, dbinfo, values) {
 			"val": values
 		}, null, 2)
 	};
-	return fetch("http://" + domain + ":" + port +'/DB/insert/' + connected + "/" + dbname, option);
+	return fetch("http://" + domain + ":" + port + '/DB/insert/' + connected + "/" + dbname, option);
 }
 
 //Send BE
@@ -1437,9 +1435,9 @@ function markasreading() {
 function ToogleFav() {
 	getFromDB("Books", "favorite FROM Books WHERE PATH='" + path + "'").then((res) => {
 		console.log(info);
-		var res = JSON.parse(res)[0]["favorite"];
+		res = JSON.parse(res)[0]["favorite"];
 		console.log(res);
-		if (res == true) {
+		if (res === true) {
 			Toastifycation(language[0]["remove_fav"], "#00C33C");
 			document.getElementById("favoicon").innerHTML = "favorite_border";
 			ModifyDB(
@@ -1448,7 +1446,7 @@ function ToogleFav() {
 				false,
 				shortname
 			);
-		} else if (res == false) {
+		} else if (res === false) {
 			Toastifycation(language[0]["add_fav"], "#00C33C");
 			document.getElementById("favoicon").innerHTML = "favorite";
 			ModifyDB(
@@ -1466,52 +1464,52 @@ function ToogleFav() {
 
 //keyboard Shortcuts
 window.addEventListener("keydown", (e) => {
-	if ((e.code == "Equal" || e.code == "NumpadAdd") && e.ctrlKey == true) {
+	if ((e.code === "Equal" || e.code === "NumpadAdd") && e.ctrlKey === true) {
 		ZoomIn();
 	} else if (
-		(e.code == "Digit6" || e.code == "NumpadSubtract") &&
-		e.ctrlKey == true
+		(e.code === "Digit6" || e.code === "NumpadSubtract") &&
+		e.ctrlKey === true
 	) {
 		ZoomOut();
-	} else if (e.code == "ArrowLeft" && e.ctrlKey == false) {
+	} else if (e.code === "ArrowLeft" && e.ctrlKey === false) {
 		PreviousPage();
-	} else if (e.code == "ArrowRight" && e.ctrlKey == false) {
+	} else if (e.code === "ArrowRight" && e.ctrlKey === false) {
 		NextPage();
-	} else if (e.code == "ArrowUp" && e.ctrlKey == false) {
+	} else if (e.code === "ArrowUp" && e.ctrlKey === false) {
 		PreviousPage();
-	} else if (e.code == "ArrowDown" && e.ctrlKey == false) {
+	} else if (e.code === "ArrowDown" && e.ctrlKey === false) {
 		NextPage();
-	} else if (e.code == "ArrowLeft" && e.ctrlKey == true) {
+	} else if (e.code === "ArrowLeft" && e.ctrlKey === true) {
 		Start();
-	} else if (e.code == "ArrowRight" && e.ctrlKey == true) {
+	} else if (e.code === "ArrowRight" && e.ctrlKey === true) {
 		End();
-	} else if (e.code == "ArrowUp" && e.ctrlKey == true) {
+	} else if (e.code === "ArrowUp" && e.ctrlKey === true) {
 		Start();
-	} else if (e.code == "ArrowDown" && e.ctrlKey == true) {
+	} else if (e.code === "ArrowDown" && e.ctrlKey === true) {
 		End();
-	} else if (e.ctrlKey == true) {
+	} else if (e.ctrlKey === true) {
 		ctrlisDown = true;
-	} else if (e.code == "KeyF") {
+	} else if (e.code === "KeyF") {
 		fullscreen();
-	} else if (e.code == "8") {
+	} else if (e.code === "8") {
 		window.location.href = "index";
-	} else if (e.code == "KeyH") {
+	} else if (e.code === "KeyH") {
 		FixHeight();
-	} else if (e.code == "KeyL") {
+	} else if (e.code === "KeyL") {
 		FixWidth();
-	} else if (e.code == "KeyB") {
+	} else if (e.code === "KeyB") {
 		TBM();
-	} else if (e.code == "KeyR" && e.shiftKey == false) {
+	} else if (e.code === "KeyR" && e.shiftKey === false) {
 		rotate(90);
-	} else if (e.code == "KeyR" && e.shiftKey == true) {
+	} else if (e.code === "KeyR" && e.shiftKey === true) {
 		rotate(-90);
-	} else if (e.code == "KeyO") {
+	} else if (e.code === "KeyO") {
 		markasread();
-	} else if (e.code == "KeyI") {
+	} else if (e.code === "KeyI") {
 		markasreading();
-	} else if (e.code == "KeyU") {
+	} else if (e.code === "KeyU") {
 		markasunread();
-	} else if (e.code == "KeyP") {
+	} else if (e.code === "KeyP") {
 		ToogleFav();
 	}
 });
@@ -1522,9 +1520,9 @@ function modifyConfigJson(json, tomod, mod) {
 	fetch("http://" + domain + ":" + port + "/config/getConfig/" + connected).then(function (response) {
 		return response.text();
 	}).then(function (data) {
-		var configFile = data;
-		var config = JSON.parse(configFile);
-		for (var i in config) {
+		let configFile = data;
+		let config = JSON.parse(configFile);
+		for (let i in config) {
 			config[tomod] = mod;
 		}
 		const option = {
@@ -1540,10 +1538,10 @@ function modifyConfigJson(json, tomod, mod) {
 
 //Send BE
 //Change the Zoom Level when Zooming
-var ZoomLVL = 20;
+let ZoomLVL = 20;
 
 function changeZoomLVL() {
-	var val = document.getElementById("zlvls").value;
+	let val = document.getElementById("zlvls").value;
 	ZoomLVL = parseInt(val);
 	document.getElementById("zlvll").innerHTML =
 		language[0]["zoomlvl"] + " (" + ZoomLVL + "px):";
@@ -1552,7 +1550,7 @@ function changeZoomLVL() {
 
 //Zoom in
 function ZoomIn() {
-	if (VIV_On == true) {
+	if (VIV_On === true) {
 		for (let i = 0; i < VIV_Count; i++) {
 			document.getElementById("imgViewer_" + i).style.height =
 				parseInt(document.getElementById("imgViewer_" + i).style.height) +
@@ -1564,7 +1562,7 @@ function ZoomIn() {
 			parseInt(document.getElementById("imgViewer_0").style.height) +
 			ZoomLVL +
 			"px";
-		if (DoublePageMode == true) {
+		if (DoublePageMode === true) {
 			document.getElementById("imgViewer_1").style.height =
 				parseInt(document.getElementById("imgViewer_1").style.height) +
 				ZoomLVL +
@@ -1575,7 +1573,7 @@ function ZoomIn() {
 
 //To Zoom Out
 function ZoomOut() {
-	if (VIV_On == true) {
+	if (VIV_On === true) {
 		for (let i = 0; i < VIV_Count; i++) {
 			document.getElementById("imgViewer_" + i).style.height =
 				parseInt(document.getElementById("imgViewer_" + i).style.height) -
@@ -1587,7 +1585,7 @@ function ZoomOut() {
 			parseInt(document.getElementById("imgViewer_0").style.height) -
 			ZoomLVL +
 			"px";
-		if (DoublePageMode == true) {
+		if (DoublePageMode === true) {
 			document.getElementById("imgViewer_1").style.height =
 				parseInt(document.getElementById("imgViewer_1").style.height) -
 				ZoomLVL +
@@ -1598,7 +1596,7 @@ function ZoomOut() {
 
 //Detect where the wheel go
 function detectMouseWheelDirection(e) {
-	var delta = null,
+	let delta = null,
 		direction = false;
 	if (!e) {
 		// if the event is not provided, we get it from the window object
@@ -1617,13 +1615,13 @@ function detectMouseWheelDirection(e) {
 	return direction;
 }
 
-var ctrlisDown = false;
-var maxHeight = 10000000;
-var minHeight = 100;
+let ctrlisDown = false;
+let maxHeight = 10000000;
+let minHeight = 100;
 //Send BE
 //Trigger Automatic background
 function AutoBGC() {
-	if (toogleBGC == true) {
+	if (toogleBGC === true) {
 		toogleBGC = false;
 		modifyConfigJson(
 			CosmicComicsData + "/config.json",
@@ -1660,7 +1658,7 @@ function FixWidth() {
 	document.getElementById("imgViewer_0").style.width =
 		window.innerWidth - 5 + "px";
 	document.getElementById("imgViewer_0").style.height = "auto";
-	if (DoublePageMode == true) {
+	if (DoublePageMode === true) {
 		document.getElementById("imgViewer_0").style.width =
 			(window.innerWidth - 5) / 2 + "px";
 		document.getElementById("imgViewer_0").style.height = "auto";
@@ -1668,7 +1666,7 @@ function FixWidth() {
 			(window.innerWidth - 5) / 2 + "px";
 		document.getElementById("imgViewer_1").style.height = "auto";
 	}
-	if (SideBarOn == true) {
+	if (SideBarOn === true) {
 		document.getElementById("imgViewer_0").style.width =
 			window.innerWidth - 205 + "px";
 		document.getElementById("imgViewer_0").style.height = "auto";
@@ -1676,9 +1674,9 @@ function FixWidth() {
 			window.innerWidth - 205 + "px";
 		document.getElementById("imgViewer_1").style.height = "auto";
 	}
-	if (VIV_On == true) {
+	if (VIV_On === true) {
 		for (let i = 0; i < VIV_Count; i++) {
-			if (SideBarOn == true) {
+			if (SideBarOn === true) {
 				document.getElementById("imgViewer_" + i).style.width =
 					window.innerWidth - 205 + "px";
 				document.getElementById("imgViewer_" + i).style.height = "auto";
@@ -1695,12 +1693,12 @@ function FixWidth() {
 //Send BE
 function TBM() {
 	//check if bookmark is already bookmarked
-	var thepage = GetCurrentPage();
+	let thepage = GetCurrentPage();
 	getFromDB("Bookmarks", "PATH,page FROM Bookmarks WHERE BOOK_ID='" + shortname + "' AND page=" + thepage + ";").then((res1) => {
-		var jres = JSON.parse(res1);
+		let jres = JSON.parse(res1);
 		if (jres.length !== 0) {
 			console.log(jres);
-			if (jres[0]["page"] == thepage.toString()) {
+			if (jres[0]["page"] === thepage.toString()) {
 				DeleteFromDB(
 					"Bookmarks",
 					shortname,
@@ -1727,7 +1725,7 @@ function LoadBMI(pagec = 0) {
 		getFromDB("Bookmarks", "* FROM Bookmarks WHERE BOOK_ID='" + shortname + "' AND page=" + pagec + ";").then((res) => {
 			res = JSON.parse(res);
 			console.log(res);
-			if (res.length != 0) {
+			if (res.length !== 0) {
 				document.getElementById("BMI").innerHTML = "bookmark";
 			} else {
 				document.getElementById("BMI").innerHTML = "bookmark_border";
@@ -1755,7 +1753,7 @@ document.getElementById("MarginValue").setAttribute("disabled", "");
 //Send BE
 //Toggle active Double Page Mode
 function TDPM() {
-	if (DoublePageMode == true) {
+	if (DoublePageMode === true) {
 		try {
 			modifyConfigJson(
 				CosmicComicsData + "/config.json",
@@ -1766,11 +1764,11 @@ function TDPM() {
 			console.log(e);
 		}
 		//TODO Desac et enlever les autres modes
-		if (document.getElementById("BPABS").checked == true) {
+		if (document.getElementById("BPABS").checked === true) {
 			document.getElementById("BPABS").checked = false;
 			BPAB();
 		}
-		if (document.getElementById("NDPFHS").checked == true) {
+		if (document.getElementById("NDPFHS").checked === true) {
 			document.getElementById("NDPFHS").checked = false;
 			NDPFH();
 		}
@@ -1796,8 +1794,8 @@ function TDPM() {
 		document.getElementById("NDPFHS").removeAttribute("disabled");
 		DoublePageMode = true;
 		wasDPM = true;
-		var currentPage = GetCurrentPage();
-		if (currentPage % 2 == 0) {
+		let currentPage = GetCurrentPage();
+		if (currentPage % 2 === 0) {
 			Reader(listofImg, currentPage - 1);
 		} else {
 			Reader(listofImg, currentPage);
@@ -1809,7 +1807,7 @@ function TDPM() {
 //Send BE
 //Change the margin
 function MarginSlider() {
-	if (VIV_On == true) {
+	if (VIV_On === true) {
 		for (let i = 0; i < VIV_Count; i++) {
 			document.getElementById("imgViewer_" + i).style.marginBottom =
 				document.getElementById("MarginValue").value;
@@ -1852,14 +1850,14 @@ function showShadow() {
 //Send BE
 //Blank first page at begginning
 function BPAB() {
-	if (BlankFirstPage == true) {
+	if (BlankFirstPage === true) {
 		modifyConfigJson(
 			CosmicComicsData + "/config.json",
 			"Blank_page_At_Begginning",
 			false
 		);
 		BlankFirstPage = false;
-		var currentPage = GetCurrentPage();
+		let currentPage = GetCurrentPage();
 		Reader(listofImg, currentPage);
 	} else {
 		modifyConfigJson(
@@ -1868,7 +1866,7 @@ function BPAB() {
 			true
 		);
 		BlankFirstPage = true;
-		var currentPage = GetCurrentPage();
+		let currentPage = GetCurrentPage();
 		Reader(listofImg, currentPage);
 	}
 }
@@ -1884,35 +1882,35 @@ function DetectHorizontal(page) {
 
 //Getting the orientation (Horizontal or Vertical) of the next image
 function getTheHOfNextImage() {
-	var CurrentPage = GetCurrentPage();
-	var NextPage = CurrentPage + 1;
-	var image = new Image();
+	let CurrentPage = GetCurrentPage();
+	let NextPage = CurrentPage + 1;
+	let image = new Image();
 	image.src = CosmicComicsTempI + listofImg[NextPage];
-	var H = DetectHorizontal(image);
+	let H = DetectHorizontal(image);
 	return H;
 }
 
 //Getting the orientation (Horizontal or Vertical) of the previous image
 function GetTheHOfPreviousImage() {
-	var CurrentPage = GetCurrentPage();
-	var NextPage = CurrentPage - 2;
-	var image = new Image();
+	let CurrentPage = GetCurrentPage();
+	let NextPage = CurrentPage - 2;
+	let image = new Image();
 	image.src = CosmicComicsTempI + listofImg[NextPage];
-	var H = DetectHorizontal(image);
+	let H = DetectHorizontal(image);
 	return H;
 }
 
 //Send BE
 //No Double Page when Horizontal
 function NDPFH() {
-	if (DPMNoH == true) {
+	if (DPMNoH === true) {
 		modifyConfigJson(
 			CosmicComicsData + "/config.json",
 			"No_Double_Page_For_Horizontal",
 			false
 		);
 		DPMNoH = false;
-		var currentPage = GetCurrentPage();
+		let currentPage = GetCurrentPage();
 	} else {
 		modifyConfigJson(
 			CosmicComicsData + "/config.json",
@@ -1920,15 +1918,15 @@ function NDPFH() {
 			true
 		);
 		DPMNoH = true;
-		var currentPage = GetCurrentPage();
+		let currentPage = GetCurrentPage();
 	}
 }
 
 //preloading images
-var preloadedImages = [];
+let preloadedImages = [];
 
 function preloadImage(listImages) {
-	for (var i = 0; i < listImages.length; i++) {
+	for (let i = 0; i < listImages.length; i++) {
 		preloadedImages[i] = new Image();
 		let options = {
 			"method": "GET",
@@ -1975,7 +1973,7 @@ document.getElementById("imgViewer_2").onload = function () {
 //Send BE
 //Manga Mode
 function MMT() {
-	if (mangaMode == true) {
+	if (mangaMode === true) {
 		modifyConfigJson(
 			"config",
 			"Manga_Mode",
@@ -1995,7 +1993,7 @@ function MMT() {
 
 //Invert the list passed in parameters
 function invertList(list = []) {
-	var newlist = [];
+	let newlist = [];
 	for (let i = 0; i < list.length; i++) {
 		newlist[i] = list[i];
 	}
@@ -2004,13 +2002,13 @@ function invertList(list = []) {
 }
 
 //Rotation of an element
-var degreesT = 0;
-var AlwaysRotateB = false;
-var AlwaysRotateV = 0;
+let degreesT = 0;
+let AlwaysRotateB = false;
+let AlwaysRotateV = 0;
 
 function rotate(degrees = 0) {
 	degreesT += degrees;
-	if (VIV_On == true) {
+	if (VIV_On === true) {
 		for (let i = 0; i < VIV_Count; i++) {
 			document.getElementById("imgViewer_" + i).style.transform =
 				"rotate(" + degreesT + "deg)";
@@ -2026,14 +2024,14 @@ function rotate(degrees = 0) {
 //Send BE
 //Always rotate image
 function AlwaysRotate() {
-	var rotateval = document.getElementById("RotateValue").value;
+	let rotateval = document.getElementById("RotateValue").value;
 	AlwaysRotateB = true;
 	AlwaysRotateV = rotateval;
-	if (rotateval == 0) {
+	if (rotateval === 0) {
 		AlwaysRotateB = false;
 		AlwaysRotateV = 0;
 	}
-	if (VIV_On == true) {
+	if (VIV_On === true) {
 		for (let i = 0; i < VIV_Count; i++) {
 			document.getElementById("imgViewer_" + i).style.transform =
 				"rotate(" + AlwaysRotateV + "deg)";
@@ -2055,10 +2053,10 @@ function AlwaysRotate() {
 
 //Send BE
 //Slide Show
-var TSSON = false;
+let TSSON = false;
 
 function TSS() {
-	if (TSSON == true) {
+	if (TSSON === true) {
 		modifyConfigJson(
 			CosmicComicsData + "/config.json",
 			"SlideShow",
@@ -2068,9 +2066,9 @@ function TSS() {
 	} else {
 		modifyConfigJson(CosmicComicsData + "/config.json", "SlideShow", true);
 		TSSON = true;
-		var intervalTime = document.getElementById("SSValue").value * 1000;
-		var slideshowID = setInterval(() => {
-			if (TSSON == false) {
+		let intervalTime = document.getElementById("SSValue").value * 1000;
+		let slideshowID = setInterval(() => {
+			if (TSSON === false) {
 				clearInterval(slideshowID);
 			} else {
 				NextPage();
@@ -2091,10 +2089,10 @@ function ShowOnChangeSlideShow() {
 }
 
 //FullScreen
-var fsOn = false;
+let fsOn = false;
 
 function fullscreen() {
-	if (fsOn == true) {
+	if (fsOn === true) {
 		fsOn = false;
 		document.exitFullscreen();
 		document.getElementById("fullscreen_i_id").innerHTML = "fullscreen";
@@ -2107,14 +2105,14 @@ function fullscreen() {
 
 //Send BE
 //No bar Mode
-var BarOn = true;
+let BarOn = true;
 
 function NoBAR() {
-	if (BarOn == true) {
+	if (BarOn === true) {
 		document.getElementsByTagName("header")[0].style.display = "none";
 		modifyConfigJson(CosmicComicsData + "/config.json", "NoBar", true);
 		BarOn = false;
-		var newdiv = document.createElement("div");
+		let newdiv = document.createElement("div");
 		newdiv.id = "nobarr";
 		newdiv.style.width = "100%";
 		newdiv.style.height = "10px";
@@ -2135,11 +2133,11 @@ function NoBAR() {
 	}
 }
 
-var SideBarOn = false;
+let SideBarOn = false;
 //Send BE
 //Toggle SideBar
 function TSB() {
-	if (SideBarOn == true) {
+	if (SideBarOn === true) {
 		SideBarOn = false;
 		modifyConfigJson(CosmicComicsData + "/config.json", "SideBar", false);
 		document.getElementById("SideBar").style.display = "none";
@@ -2156,10 +2154,10 @@ function TSB() {
 
 //Construct the SideBar
 function ConstructSideBar() {
-	if (document.getElementById("SideBar").childElementCount == 0) {
+	if (document.getElementById("SideBar").childElementCount === 0) {
 		console.log(listofImg);
 		listofImg.forEach((image, index) => {
-			var el = document.getElementById("SideBar");
+			let el = document.getElementById("SideBar");
 			const divcontainer = document.createElement("div");
 			const acontainer = document.createElement("a");
 			const pel = document.createElement("p");
@@ -2187,7 +2185,7 @@ function ConstructSideBar() {
 			divcontainer.style.cursor = "pointer";
 			divcontainer.addEventListener("click", function (e) {
 				e.preventDefault();
-				if (VIV_On == true) {
+				if (VIV_On === true) {
 					window.scrollTo(
 						0,
 						document.getElementById("imgViewer_" + index).offsetTop -
@@ -2208,10 +2206,10 @@ function ConstructSideBar() {
 FixHeight();
 //Send BE
 //Page Counter on/off
-var DM_CurrentPage = true;
+let DM_CurrentPage = true;
 
 function ChangeDM_CurrentPage() {
-	if (DM_CurrentPage == true) {
+	if (DM_CurrentPage === true) {
 		modifyConfigJson(
 			CosmicComicsData + "/config.json",
 			"Page_Counter",
@@ -2232,11 +2230,11 @@ function ChangeDM_CurrentPage() {
 
 //Send BE
 //Vertical Image Viewer Mode
-var VIV_On = false;
-var VIV_Count = 0;
+let VIV_On = false;
+let VIV_Count = 0;
 
 function VIVT() {
-	if (VIV_On == true) {
+	if (VIV_On === true) {
 		modifyConfigJson(
 			CosmicComicsData + "/config.json",
 			"Vertical_Reader_Mode",
@@ -2261,7 +2259,7 @@ function VIVT() {
 
 //Create all Vertical Image
 function CreateAllVIV() {
-	var el = document.getElementById("viewport");
+	let el = document.getElementById("viewport");
 	document.getElementById("imgViewer_0").remove();
 	document.getElementById("imgViewer_1").remove();
 	VIV_Count = listofImg.length;
@@ -2290,7 +2288,7 @@ function CreateAllVIV() {
 }
 
 //observer to know where you are on the page
-var observer = new IntersectionObserver(
+let observer = new IntersectionObserver(
 	function (entries) {
 		if (entries[0].isIntersecting === true)
 			document.getElementById("currentpage").innerHTML =
@@ -2299,7 +2297,7 @@ var observer = new IntersectionObserver(
 				" / " +
 				VIV_Count;
 		try {
-			for (var i = 0; i < VIV_Count; i++) {
+			for (let i = 0; i < VIV_Count; i++) {
 				document.getElementById("id_img_" + i).className = "";
 			}
 			document.getElementById(
@@ -2326,7 +2324,7 @@ var observer = new IntersectionObserver(
 
 //Can move direclty to a page by using a slider
 function pageslide() {
-	var pageto = document.getElementById("sps").value - 1;
+	let pageto = document.getElementById("sps").value - 1;
 	document.getElementById("lsps").innerHTML =
 		language[0]["page_slider"] +
 		" (" +
@@ -2337,7 +2335,7 @@ function pageslide() {
 
 //Do not remember what this do, sorry
 function pagechoose() {
-	var pageto = document.getElementById("input_text").value - 1;
+	let pageto = document.getElementById("input_text").value - 1;
 	if (
 		pageto >= document.getElementById("sps").min - 1 &&
 		pageto <= document.getElementById("sps").max - 1
@@ -2350,10 +2348,10 @@ function pagechoose() {
 
 //Send BE
 //Webtoon Mode
-var WTMTV = false;
+let WTMTV = false;
 
 function WTMT() {
-	if (WTMTV == true) {
+	if (WTMTV === true) {
 		WTMTV = false;
 		modifyConfigJson(
 			CosmicComicsData + "/config.json",
@@ -2382,7 +2380,7 @@ function WTMT() {
 //Send BE
 //Change Background Color by color picker
 function changeBGColorByPicker() {
-	var value = document.getElementById("exampleColorInput").value;
+	let value = document.getElementById("exampleColorInput").value;
 	document.getElementsByTagName("html")[0].style.backgroundColor = value;
 	modifyConfigJson(
 		CosmicComicsData + "/config.json",
@@ -2393,10 +2391,10 @@ function changeBGColorByPicker() {
 
 //Send BE
 //reset zoom for each page
-var RZPV = false;
+let RZPV = false;
 
 function RZP() {
-	if (RZPV == true) {
+	if (RZPV === true) {
 		modifyConfigJson(
 			CosmicComicsData + "/config.json",
 			"reset_zoom",
@@ -2415,10 +2413,10 @@ function RZP() {
 
 //Send BE
 //Scroll bar visible
-var scrollbarvisibiel = true;
+let scrollbarvisibiel = true;
 
 function SBVT() {
-	if (scrollbarvisibiel == true) {
+	if (scrollbarvisibiel === true) {
 		setNoScrollbar();
 		modifyConfigJson(
 			CosmicComicsData + "/config.json",
@@ -2439,13 +2437,13 @@ function SBVT() {
 
 //Set no scrollbar
 function setNoScrollbar() {
-	var styleSheet = document.styleSheets[document.styleSheets.length - 3];
+	let styleSheet = document.styleSheets[document.styleSheets.length - 3];
 	styleSheet.insertRule("::-webkit-scrollbar {display: none;}");
 }
 
 //Set scrollbar
 function setScrollbar() {
-	var styleSheet = document.styleSheets[document.styleSheets.length - 3];
+	let styleSheet = document.styleSheets[document.styleSheets.length - 3];
 	styleSheet.removeRule("::-webkit-scrollbar {display: none;}");
 }
 
@@ -2456,70 +2454,70 @@ function loadParameters() {
 		return response.text();
 	}).then(function (data) {
 		console.log(data);
-		var configFile = data;
-		var parsedJSON = JSON.parse(configFile);
-		var configZoomLVL = GetElFromInforPath("ZoomLVL", parsedJSON);
-		var configSBV = GetElFromInforPath("Scroll_bar_visible", parsedJSON);
-		var configBGC = GetElFromInforPath("Background_color", parsedJSON);
-		var configWTM = GetElFromInforPath("WebToonMode", parsedJSON);
-		var configVRM = GetElFromInforPath("Vertical_Reader_Mode", parsedJSON);
-		var configPC = GetElFromInforPath("Page_Counter", parsedJSON);
-		var configSB = GetElFromInforPath("SideBar", parsedJSON);
-		var configNB = GetElFromInforPath("NoBar", parsedJSON);
-		var configSS = GetElFromInforPath("SlideShow", parsedJSON);
-		var configSST = GetElFromInforPath("SlideShow_Time", parsedJSON);
-		var configRA = GetElFromInforPath("Rotate_All", parsedJSON);
-		var configM = GetElFromInforPath("Margin", parsedJSON);
-		var configMM = GetElFromInforPath("Manga_Mode", parsedJSON);
-		var configNDPFH = GetElFromInforPath(
+		let configFile = data;
+		let parsedJSON = JSON.parse(configFile);
+		let configZoomLVL = GetElFromInforPath("ZoomLVL", parsedJSON);
+		let configSBV = GetElFromInforPath("Scroll_bar_visible", parsedJSON);
+		let configBGC = GetElFromInforPath("Background_color", parsedJSON);
+		let configWTM = GetElFromInforPath("WebToonMode", parsedJSON);
+		let configVRM = GetElFromInforPath("Vertical_Reader_Mode", parsedJSON);
+		let configPC = GetElFromInforPath("Page_Counter", parsedJSON);
+		let configSB = GetElFromInforPath("SideBar", parsedJSON);
+		let configNB = GetElFromInforPath("NoBar", parsedJSON);
+		let configSS = GetElFromInforPath("SlideShow", parsedJSON);
+		let configSST = GetElFromInforPath("SlideShow_Time", parsedJSON);
+		let configRA = GetElFromInforPath("Rotate_All", parsedJSON);
+		let configM = GetElFromInforPath("Margin", parsedJSON);
+		let configMM = GetElFromInforPath("Manga_Mode", parsedJSON);
+		let configNDPFH = GetElFromInforPath(
 			"No_Double_Page_For_Horizontal",
 			parsedJSON
 		);
-		var configBPAB = GetElFromInforPath("Blank_page_At_Begginning", parsedJSON);
-		var configDPM = GetElFromInforPath("Double_Page_Mode", parsedJSON);
-		var configABC = GetElFromInforPath("Automatic_Background_Color", parsedJSON);
-		var configMZ = GetElFromInforPath("magnifier_zoom", parsedJSON);
-		var configMW = GetElFromInforPath("magnifier_Width", parsedJSON);
-		var configMH = GetElFromInforPath("magnifier_Height", parsedJSON);
-		var configMR = GetElFromInforPath("magnifier_Radius", parsedJSON);
-		var configRZ = GetElFromInforPath("reset_zoom", parsedJSON);
+		let configBPAB = GetElFromInforPath("Blank_page_At_Begginning", parsedJSON);
+		let configDPM = GetElFromInforPath("Double_Page_Mode", parsedJSON);
+		let configABC = GetElFromInforPath("Automatic_Background_Color", parsedJSON);
+		let configMZ = GetElFromInforPath("magnifier_zoom", parsedJSON);
+		let configMW = GetElFromInforPath("magnifier_Width", parsedJSON);
+		let configMH = GetElFromInforPath("magnifier_Height", parsedJSON);
+		let configMR = GetElFromInforPath("magnifier_Radius", parsedJSON);
+		let configRZ = GetElFromInforPath("reset_zoom", parsedJSON);
 		ZoomLVL = configZoomLVL;
-		if (configSBV == false) {
+		if (configSBV === false) {
 			SBVT();
 			document.getElementById("SBVS").checked = false;
 		}
-		if (configWTM == true) {
+		if (configWTM === true) {
 			WTMT();
 			document.getElementById("WTM").checked = true;
 		}
-		var value = configBGC;
+		let value = configBGC;
 		document.getElementsByTagName("html")[0].style.backgroundColor = value;
 		document.getElementById("exampleColorInput").value = value;
-		if (configVRM == true) {
+		if (configVRM === true) {
 			VIVT();
 			document.getElementById("VIV").checked = true;
 		}
-		if (configPC == false) {
+		if (configPC === false) {
 			ChangeDM_CurrentPage();
 			document.getElementById("PC").checked = false;
 		}
-		if (configSB == true) {
+		if (configSB === true) {
 			TSB();
 			document.getElementById("SSB").checked = true;
 		}
-		if (configNB == true) {
+		if (configNB === true) {
 			NoBAR();
 			document.getElementById("NBAR").checked = true;
 		}
-		if (configSS == true) {
+		if (configSS === true) {
 			document.getElementById("SS").checked = true;
-			if (TSSON == true) {
+			if (TSSON === true) {
 				TSSON = false;
 			} else {
 				TSSON = true;
-				var intervalTime = configSST;
-				var slideshowID = setInterval(() => {
-					if (TSSON == false) {
+				let intervalTime = configSST;
+				let slideshowID = setInterval(() => {
+					if (TSSON === false) {
 						clearInterval(slideshowID);
 					} else {
 						NextPage();
@@ -2536,7 +2534,7 @@ function loadParameters() {
 			"):";
 		document.getElementById("RotateValue").value = configRA;
 		AlwaysRotate();
-		if (VIV_On == true) {
+		if (VIV_On === true) {
 			for (let i = 0; i < VIV_Count; i++) {
 				document.getElementById("imgViewer_" + i).style.marginBottom = configM;
 				document.getElementById("marginlvl").innerHTML =
@@ -2547,23 +2545,23 @@ function loadParameters() {
 			document.getElementById("marginlvl").innerHTML =
 				language[0]["margin"] + " (" + configM + " px):";
 		}
-		if (configMM == true) {
+		if (configMM === true) {
 			MMT();
 			document.getElementById("MMS").checked = true;
 		}
-		if (configNDPFH == true) {
+		if (configNDPFH === true) {
 			NDPFH();
 			document.getElementById("NDPFHS").checked = true;
 		}
-		if (configBPAB == true) {
+		if (configBPAB === true) {
 			BPAB();
 			document.getElementById("BPABS").checked = true;
 		}
-		if (configDPM == true) {
+		if (configDPM === true) {
 			TDPM();
 			document.getElementById("TDPMS").checked = true;
 		}
-		if (configABC == true) {
+		if (configABC === true) {
 			AutoBGC();
 		}
 		document.getElementById("Heightvalue").value = configMH;
@@ -2572,7 +2570,7 @@ function loadParameters() {
 		document.getElementById("Radiusvalue").value = configMR;
 		document.getElementById("SSValue").value = configSST;
 		document.getElementById("MarginValue").value = configM;
-		if (configRZ == true) {
+		if (configRZ === true) {
 			RZP();
 			document.getElementById("RZPS").checked = true;
 		}
@@ -2619,8 +2617,8 @@ document.getElementById("SSValue").onchange = function () {
 	);
 };
 //Detect if you are on the bottom or top
-var Auth_Prev = false;
-var Auth_next = false;
+let Auth_Prev = false;
+let Auth_next = false;
 window.onscroll = function (ev) {
 	if (window.innerHeight + window.scrollY >= document.body.offsetHeight) {
 		console.log("You're at the bottom");
@@ -2628,30 +2626,30 @@ window.onscroll = function (ev) {
 	} else {
 		Auth_next = false;
 	}
-	if (document.body.scrollTop == 0) {
+	if (document.body.scrollTop === 0) {
 		console.log("You're at the top");
 		Auth_Prev = true;
 	} else {
 		Auth_Prev = false;
 	}
 };
-var nb_of_next = 0;
-var nb_of_prev = 0;
+let nb_of_next = 0;
+let nb_of_prev = 0;
 //Go to the next or previous page by scrolling
 window.addEventListener("wheel", function (e) {
 	if (ctrlisDown) {
 		console.log(ctrlisDown);
 		ctrlisDown = false;
-		var direc = detectMouseWheelDirection(e);
+		let direc = detectMouseWheelDirection(e);
 		console.log(direc);
-		if (direc == "down") {
+		if (direc === "down") {
 			if (
 				parseInt(document.getElementById("imgViewer_0").style.height) - 100 >
 				minHeight
 			) {
 				ZoomOut();
 			}
-		} else if (direc == "up") {
+		} else if (direc === "up") {
 			if (
 				parseInt(document.getElementById("imgViewer_0").style.height) + 100 <
 				maxHeight
@@ -2660,23 +2658,23 @@ window.addEventListener("wheel", function (e) {
 			}
 		}
 	} else {
-		if (Auth_next == true) {
+		if (Auth_next === true) {
 			nb_of_next += 1;
-			if (nb_of_next == 2) {
+			if (nb_of_next === 2) {
 				nb_of_next = 0;
 				nb_of_prev = 0;
-				Auth_next == false;
-				Auth_Prev == false;
+				Auth_next === false;
+				Auth_Prev === false;
 				NextPage();
 			}
 		}
-		if (Auth_Prev == true) {
+		if (Auth_Prev === true) {
 			nb_of_prev += 1;
-			if (nb_of_prev == 2) {
+			if (nb_of_prev === 2) {
 				nb_of_next = 0;
-				Auth_next == false;
+				Auth_next === false;
 				nb_of_prev = 0;
-				Auth_Prev == false;
+				Auth_Prev === false;
 				PreviousPage();
 			}
 		}

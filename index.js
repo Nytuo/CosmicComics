@@ -872,7 +872,6 @@ function generateBookTemplate(NOM = null, ID = null, NOTE = null, READ = null, R
 	};
 }
 
-/* TODO BACKEND */
 /**
  * Load the content of the element
  * @param {string} FolderRes The folder path
@@ -904,74 +903,32 @@ function loadView(FolderRes, libraryPath, date = "", provider = providerEnum.MAN
 				let TheBook = bookList[0];
 				if (bookList.length === 0) {
 					if (provider === providerEnum.Marvel) {
-						await GETMARVELAPI_Comics(realname, date).then(async (cdata) => {
+						await GETMARVELAPI_Comics_INSERT(realname, date).then(async (cdata) => {
 							if (cdata === undefined) {
 								throw new Error("no data");
 							}
 							if (cdata["data"]["total"] > 0) {
-								cdata = cdata["data"]["results"][0];
-								await InsertIntoDB("Books", "", `(?,'${cdata["id"]}','${realname}',null,${0},${0},${1},${0},${0},${0},'${path}','${cdata["thumbnail"].path + "/detail." + cdata["thumbnail"].extension}','${cdata["issueNumber"]}','${cdata["description"].replaceAll("'", "''")}','${cdata["format"]}',${cdata["pageCount"]},'${JSON.stringify(cdata["urls"])}','${JSON.stringify(cdata["series"])}','${JSON.stringify(cdata["creators"])}','${JSON.stringify(cdata["characters"])}','${JSON.stringify(cdata["prices"])}','${JSON.stringify(cdata["dates"])}','${JSON.stringify(cdata["collectedIssues"])}','${JSON.stringify(cdata["collections"])}','${JSON.stringify(cdata["variants"])}',false)`).then(() => {
-									TheBook = generateBookTemplate(realname, cdata["id"], null, 0, 0, 1, 0, 0, 0, path,
-										cdata["thumbnail"].path + "/detail." + cdata["thumbnail"].extension, cdata["issueNumber"], cdata["description"], cdata["format"],
-										cdata["pageCount"], cdata["urls"], cdata["series"], cdata["creators"], cdata["characters"], cdata["prices"], cdata["dates"],
-										cdata["collectedIssues"], cdata["collections"], cdata["variants"], false);
-									console.log("inserted");
-								});
-								await GETMARVELAPI_Creators(cdata["id"], "comics").then(async (ccdata) => {
-									ccdata = ccdata["data"]["results"];
-									for (let i = 0; i < ccdata.length; i++) {
-										await InsertIntoDB("Creators", "", `('${ccdata[i]["id"] + "_1"}','${ccdata[i]["fullName"].replaceAll("'", "''")}','${JSON.stringify(ccdata[i]["thumbnail"])}',${null},'${JSON.stringify(ccdata[i]["urls"])}')`).then(() => {
-											console.log("inserted");
-										});
-									}
-								});
-								await GETMARVELAPI_Characters(cdata["id"], "comics").then(async (ccdata) => {
-									ccdata = ccdata["data"]["results"];
-									for (let i = 0; i < ccdata.length; i++) {
-										await InsertIntoDB("Characters", "", `('${ccdata[i]["id"] + "_1"}','${ccdata[i]["name"].replaceAll("'", "''")}','${JSON.stringify(ccdata[i]["thumbnail"])}','${ccdata[i]["description"].replaceAll("'", "''")}','${JSON.stringify(ccdata[i]["urls"])}')`).then(() => {
-											console.log("inserted");
-										});
-									}
-								});
+								TheBook = generateBookTemplate(realname, cdata["id"], null, 0, 0, 1, 0, 0, 0, path,
+									cdata["thumbnail"].path + "/detail." + cdata["thumbnail"].extension, cdata["issueNumber"], cdata["description"], cdata["format"],
+									cdata["pageCount"], cdata["urls"], cdata["series"], cdata["creators"], cdata["characters"], cdata["prices"], cdata["dates"],
+									cdata["collectedIssues"], cdata["collections"], cdata["variants"], false);
 							} else {
-								await InsertIntoDB("Books", "", `(?,'${null}','${realname}',null,${0},${0},${1},${0},${0},${0},'${path}','${null}','${null}','${null}','${null}',${null},'${null}','${null}','${null}','${null}','${null}','${null}','${null}','${null}','${null}',false)`).then(() => {
-									console.log("inserted");
-									TheBook = generateBookTemplate(realname, null, null, 0, 0, 1, 0, 0, 0, path, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null)
-								});
+								TheBook = generateBookTemplate(realname, null, null, 0, 0, 1, 0, 0, 0, path, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null)
 							}
 						});
 					} else if (provider === providerEnum.Anilist) {
-						await getFromDB("Series", "title FROM Series").then(async (data) => {
-							let SerieName = "";
-							data = JSON.parse(data);
-							console.log(data);
-							for (let i = 0; i < data.length; i++) {
-								let el = JSON.parse(data[i].title);
-								console.log(el);
-								path.split("/").forEach((ele) => {
-									console.log(ele);
-									if (ele === el.english || ele === el.romaji || ele === el.native) {
-										if (el.english != null) {
-											SerieName = el.english;
-										} else if (el.romaji != null) {
-											SerieName = el.romaji;
-										} else if (el.native != null) {
-											SerieName = el.native;
-										} else {
-											SerieName = el.english;
-										}
-									}
-								});
-								if (SerieName !== "") {
-									break;
-								}
-							}
-							console.log(SerieName);
-							await InsertIntoDB("Books", "", `(?,'${null}','${realname}',${null},${0},${0},${1},${0},${0},${0},'${path}','${null}','${null}','${null}','${null}',${null},'${null}','${"Anilist_" + realname.replaceAll(" ", "$") + "_" + SerieName.replaceAll(" ", "$")}','${null}','${null}','${null}','${null}','${null}','${null}','${null}',false)`).then(() => {
-								console.log("inserted");
-								TheBook = generateBookTemplate(realname, null, null, 0, 0, 1, 0, 0, 0, path, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null)
-							});
-						});
+						fetch("http://" + domain + ":" + port + "/insert/anilist/book", {
+							headers: {
+								"method": "POST",
+								'Content-Type': 'application/json',
+							},
+							body: JSON.stringify({
+								"token": userToken,
+								"path": path,
+								"realname": realname,
+							})
+						})
+						TheBook = generateBookTemplate(realname, null, null, 0, 0, 1, 0, 0, 0, path, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null)
 					}
 				}
 				let carddiv = createCard(TheBook["unread"], TheBook["read"], TheBook["reading"], TheBook["ID_book"] + "_" + n, TheBook["URLCover"], TheBook["NOM"], TheBook["favorite"])
@@ -1787,6 +1744,17 @@ async function GETMARVELAPI_Comics(name = "", date = "") {
 	});
 }
 
+async function GETMARVELAPI_Comics_INSERT(name = "", date = "") {
+	return fetch("http://" + domain + ":" + port + "/insert/marvel/book/" + name + "/" + date+"/"+userToken).then(function (response) {
+		return response.text();
+	}).then(function (data) {
+		data = JSON.parse(data);
+		return data;
+	}).catch(function (error) {
+		console.log(error);
+	});
+}
+
 async function createSeries(provider, path, libraryPath, res) {
 	resetOverlay();
 	console.log(provider);
@@ -2424,7 +2392,7 @@ async function createSeries(provider, path, libraryPath, res) {
 }
 
 function OneForAll(W1, W2, A, title) {
-	fetch("http"+domain+":"+port+"/DB/update/OneForAll", {
+	fetch("http" + domain + ":" + port + "/DB/update/OneForAll", {
 		method: "POST",
 		headers: {
 			"Content-Type": "application/json",

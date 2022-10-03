@@ -11,6 +11,7 @@ let Unrar = require("unrar");
 const Seven = require("node-7z");
 const {getColor, getPalette} = require('color-extr-thief');
 const Path27Zip = SevenBin.path7za;
+const webp = require('webp-converter');
 app.use(express.static(path.join(__dirname, '/public')));
 const isPortable = fs.existsSync(path.join(__dirname, "portable.txt"));
 const isElectron = fs.existsSync(path.join(__dirname, 'portable.txt')) && fs.readFileSync(path.join(__dirname, "portable.txt"), "utf8") === "electron";
@@ -104,8 +105,8 @@ function GetTheName(CommonName = "") {
 	CommonName = CommonName.replaceAll("[", " ");
 	CommonName = CommonName.replaceAll("]", " ");
 	CommonName = CommonName.replace(/\.[^/.]+$/, "");
-	var s = CommonName.split(" ");
-	var finalName = "";
+	let s = CommonName.split(" ");
+	let finalName = "";
 	console.log(s);
 	s.forEach((el) => {
 		console.log(parseInt(el));
@@ -165,10 +166,10 @@ function makeDB(forwho) {
 }
 
 function resolveToken(token) {
-	var configFile = fs.readFileSync(CosmicComicsTemp + "/serverconfig.json", "utf8");
-	var config = JSON.parse(configFile);
-	for (var i in config) {
-		for (var j in config["Token"]) {
+	let configFile = fs.readFileSync(CosmicComicsTemp + "/serverconfig.json", "utf8");
+	let config = JSON.parse(configFile);
+	for (let i in config) {
+		for (let j in config["Token"]) {
 			if (config["Token"][j] === token) {
 				return j;
 			}
@@ -209,7 +210,7 @@ app.use(cors());
 app.use(express.json({limit: "50mb"}));
 app.use(express.urlencoded({extended: true}));
 let host, port;
-app.listen(JSON.parse(fs.readFileSync(CosmicComicsTemp + "/serverconfig.json").toString()).port, "0.0.0.0", function () {
+const server = app.listen(JSON.parse(fs.readFileSync(CosmicComicsTemp + "/serverconfig.json").toString()).port, "0.0.0.0", function () {
 	host = this.address().address;
 	port = this.address().port;
 	console.log("Listening on port %s:%s!", host, port);
@@ -279,7 +280,7 @@ app.post("/createUser", function (req, res) {
 			JSON.stringify(obj, null, 2), {encoding: "utf8"}
 		);
 	}
-	if (req.body.pp == {}) {
+	if (req.body.pp === {}) {
 		let random = Math.floor(Math.random() * (fs.readdirSync(__dirname + "/public/Images/account_default/").length - 1) + 1);
 		fs.copyFileSync(__dirname + "/public/Images/account_default/" + random + ".jpg", CosmicComicsTemp + "/profiles/" + name + "/pp.png");
 	} else {
@@ -299,7 +300,7 @@ app.post("/DL", function (req, res) {
 	res.sendStatus(200);
 });
 app.get("/getDLBook", function (req, res) {
-	if (DLBOOKPATH == "") {
+	if (DLBOOKPATH === "") {
 		res.sendStatus(404);
 	} else if (fs.existsSync(DLBOOKPATH) && !fs.statSync(DLBOOKPATH).isDirectory()) {
 		res.download(DLBOOKPATH);
@@ -512,13 +513,14 @@ app.post("/DB/update/OneForAll", (req, res) => {
 					columns.push(key);
 					values.push(asso[key]);
 				}
-				UpdateDB("edit",columns,values,token,"Books","PATH",bookList[i].PATH);
+				UpdateDB("edit", columns, values, token, "Books", "PATH", bookList[i].PATH);
 			}
 		}
 	} catch (e) {
 		console.log(e);
 	}
 })
+
 function UpdateDB(type, column, value, token, table, where, whereEl) {
 	if (type === "edit") {
 		let listOfColumns = column;
@@ -545,8 +547,9 @@ function UpdateDB(type, column, value, token, table, where, whereEl) {
 		}
 	}
 }
+
 app.post("/DB/update/", (req, res) => {
-	UpdateDB(req.body.type,req.body.column,req.body.value,req.body.token,req.body.table,req.body.where,req.body.whereEl);
+	UpdateDB(req.body.type, req.body.column, req.body.value, req.body.token, req.body.table, req.body.where, req.body.whereEl);
 	res.sendStatus(200);
 });
 app.post("/DB/lib/update/:token/:id", (req, res) => {
@@ -1012,6 +1015,72 @@ app.get("/api/marvel/getComics/:name/:date", async function (req, res) {
 		res.send(data);
 	})
 })
+app.get("/insert/marvel/book/:name/:date/:token", async function (req, res) {
+	let token = req.params.token;
+	let realname = req.params.name;
+	let date = req.params.date;
+	GETMARVELAPI_Comics(realname, date).then(async function (cdata) {
+		res.send(cdata);
+		if (cdata === undefined) {
+			throw new Error("no data");
+		}
+		if (cdata["data"]["total"] > 0) {
+			cdata = cdata["data"]["results"][0];
+			await insertIntoDB("", `(?,'${cdata["id"]}','${realname}',null,${0},${0},${1},${0},${0},${0},'${path}','${cdata["thumbnail"].path + "/detail." + cdata["thumbnail"].extension}','${cdata["issueNumber"]}','${cdata["description"].replaceAll("'", "''")}','${cdata["format"]}',${cdata["pageCount"]},'${JSON.stringify(cdata["urls"])}','${JSON.stringify(cdata["series"])}','${JSON.stringify(cdata["creators"])}','${JSON.stringify(cdata["characters"])}','${JSON.stringify(cdata["prices"])}','${JSON.stringify(cdata["dates"])}','${JSON.stringify(cdata["collectedIssues"])}','${JSON.stringify(cdata["collections"])}','${JSON.stringify(cdata["variants"])}',false)`, token, "Books")
+			GETMARVELAPI_Creators(cdata["id"], "comics").then(async (ccdata) => {
+				ccdata = ccdata["data"]["results"];
+				for (let i = 0; i < ccdata.length; i++) {
+					await insertIntoDB("", `('${ccdata[i]["id"] + "_1"}','${ccdata[i]["fullName"].replaceAll("'", "''")}','${JSON.stringify(ccdata[i]["thumbnail"])}',${null},'${JSON.stringify(ccdata[i]["urls"])}')`, token, "Creators")
+				}
+			});
+			GETMARVELAPI_Characters(cdata["id"], "comics").then(async (ccdata) => {
+				ccdata = ccdata["data"]["results"];
+				for (let i = 0; i < ccdata.length; i++) {
+					await insertIntoDB("", `('${ccdata[i]["id"] + "_1"}','${ccdata[i]["name"].replaceAll("'", "''")}','${JSON.stringify(ccdata[i]["thumbnail"])}','${ccdata[i]["description"].replaceAll("'", "''")}','${JSON.stringify(ccdata[i]["urls"])}')`, token, "Characters")
+				}
+			});
+		} else {
+			await insertIntoDB("", `(?,'${null}','${realname}',null,${0},${0},${1},${0},${0},${0},'${path}','${null}','${null}','${null}','${null}',${null},'${null}','${null}','${null}','${null}','${null}','${null}','${null}','${null}','${null}',false)`, token, "Books")
+		}
+	})
+})
+app.post("/insert/anilist/book", async function (req, res) {
+	let token = req.body.token;
+	let path = req.body.path;
+	let realname = req.body.realname;
+	try {
+		let data = [];
+		getDB(resolveToken(token)).run("SELECT title FROM Series;", function (err, resD) {
+			if (err) return console.log("Error getting element", err);
+			resD.forEach((row) => {
+				data.push(row);
+			});
+			let SerieName = "";
+			for (let i = 0; i < data.length; i++) {
+				let el = JSON.parse(data[i].title);
+				path.split("/").forEach((ele) => {
+					if (ele === el.english || ele === el.romaji || ele === el.native) {
+						if (el.english != null) {
+							SerieName = el.english;
+						} else if (el.romaji != null) {
+							SerieName = el.romaji;
+						} else if (el.native != null) {
+							SerieName = el.native;
+						} else {
+							SerieName = el.english;
+						}
+					}
+				});
+				if (SerieName !== "") {
+					break;
+				}
+			}
+			insertIntoDB("", `(?,'${null}','${realname}',${null},${0},${0},${1},${0},${0},${0},'${path}','${null}','${null}','${null}','${null}',${null},'${null}','${"Anilist_" + realname.replaceAll(" ", "$") + "_" + SerieName.replaceAll(" ", "$")}','${null}','${null}','${null}','${null}','${null}','${null}','${null}',false)`, token, "Books")
+		});
+	} catch (e) {
+		console.log(e);
+	}
+})
 
 async function GETMARVELAPI_Comics(name = "", seriesStartDate = "") {
 	if (name === "") {
@@ -1289,8 +1358,7 @@ function UnZip(zipPath, ExtractDir, name, ext, token) {
 		if (ext === "pdf") {
 			alert(language[0]["pdf"]);
 			window.location.href = zipPath;
-		}
-		if (
+		} else if (
 			ext == "zip" ||
 			ext == "cbz" ||
 			ext == "7z" ||
@@ -1334,8 +1402,7 @@ function UnZip(zipPath, ExtractDir, name, ext, token) {
 			Stream.on("error", (err) => {
 				console.log("An error occured" + err);
 			});
-		}
-		if (ext == "rar" || ext == "cbr") {
+		} else if (ext == "rar" || ext == "cbr") {
 			var configFile = fs.readFileSync(CosmicComicsTemp + "/profiles/" + token + "/config.json");
 			var parsedJSON = JSON.parse(configFile);
 			var provider = GetElFromInforPath("update_provider", parsedJSON);
@@ -1396,6 +1463,8 @@ function UnZip(zipPath, ExtractDir, name, ext, token) {
 				});
 				/*postunrar();*/
 			});
+		} else {
+			console.log("not supported");
 		}
 	} catch (error) {
 		console.log(error);
@@ -1430,7 +1499,155 @@ function GetListOfImg(dirPath) {
 	}
 }
 
-const server = app.listen(8000);
+function unzip_first(zipPath, ExtractDir, ext, token, fileName) {
+	//Unzip the first image
+	//premiere image si dossier
+	try {
+		let n = 0;
+		if (
+			ext === "zip" ||
+			ext === "cbz" ||
+			ext === "7z" ||
+			ext === "cb7" ||
+			ext === "tar" ||
+			ext === "cbt"
+		) {
+			let fromfile = [];
+			let cherrypick = [
+				"*.jpg",
+				"*.png",
+				"*.jpeg",
+				"*.bmp",
+				"*.apng",
+				"*.svg",
+				"*.ico",
+				"*.webp",
+				"*.gif",
+			];
+			const Streamer = Seven.list(zipPath, {
+				recursive: true,
+				$cherryPick: cherrypick,
+				$bin: Path27Zip,
+			});
+			Streamer.on("data", function (data) {
+				fromfile.push(data.file);
+				console.log(fromfile);
+			});
+			Streamer.on("end", function () {
+				const Stream = Seven.extract(zipPath, ExtractDir, {
+					recursive: true,
+					$cherryPick: fromfile[0],
+					$bin: Path27Zip
+				});
+
+				Stream.on("end", function () {
+					if (Stream.info.get("Files") === "0") {
+						console.log("no file found");
+						//no file found
+					} else {
+						fs.renameSync(ExtractDir + "/" + fromfile[0], ExtractDir + "/" + fileName + ".jpg");
+						console.log("file found and extracted : " + ExtractDir + "/" + fileName + ".jpg");
+					}
+				});
+				Stream.on("error", (err) => {
+					console.log("An error occured" + err);
+				});
+			})
+		} else if (ext === "rar" || ext === "cbr") {
+			let configFile = fs.readFileSync(CosmicComicsTemp + "/profiles/" + token + "/config.json");
+			let parsedJSON = JSON.parse(configFile);
+			let provider = GetElFromInforPath("update_provider", parsedJSON);
+			let archive;
+			if (provider === "msstore") {
+				archive = new Unrar({
+					path: zipPath,
+					bin: CosmicComicsTemp + "/unrar_bin/UnRAR.exe"
+				});
+			} else {
+				archive = new Unrar({
+					path: zipPath,
+					bin: unrarBin
+				});
+			}
+			archive.list(function (err, entries) {
+				console.log(entries);
+				//tri numérique
+				entries.sort((a, b) => {
+					let fa = a.name.toLowerCase(),
+						fb = b.name.toLowerCase();
+					if (fa < fb) {
+						return -1;
+					}
+					if (fa > fb) {
+						return 1;
+					}
+					return 0;
+				});
+				entries.forEach((file) => {
+					for (let i in file) {
+						if (i === "name") {
+							let currentName = file[i];
+							currentName = currentName.toString();
+							let stream = archive.stream(currentName);
+							stream.on("error", console.error);
+							if (
+								currentName.includes("png") ||
+								currentName.includes("jpg") ||
+								currentName.includes("jpeg") ||
+								currentName.includes(".gif") ||
+								currentName.includes("bmp") ||
+								currentName.includes("apng") ||
+								currentName.includes("svg") ||
+								currentName.includes("ico") ||
+								currentName.includes("webp")
+							) {
+								if (!fs.existsSync(ExtractDir + "/" + fileName + ".jpg")) {
+									stream.pipe(
+										fs.createWriteStream(ExtractDir + "/" + fileName + ".jpg")
+									);
+								}else{
+									console.log("file already exist");
+								}
+								return;
+							}
+						}
+					}
+				});
+			});
+		} else {
+			console.log("not supported");
+		}
+	} catch (error) {
+		console.log(error);
+	}
+}
+
+function fillBlankImages(token) {
+	//get the null, "null", "undefined", blank cover or BannerImage from the books DB
+	try {
+		let result = [];
+		getDB(resolveToken(token)).run("select * from Books where URLCover IS NULL OR URLCover = 'null' OR URLCover='undefined';", function (err, resD) {
+			if (err) return console.log("Error getting element", err);
+			resD.forEach((row) => {
+				console.log(row);
+				result.push(row);
+			});
+			console.log("Beggining fillBlankImages for : " + result);
+			result.forEach((book) => {
+				let filename = book.ID
+				unzip_first(book.PATH,CosmicComicsTemp+"/FirstImagesOfAll",path.extname(book.PATH),token,filename);
+				let newpath = WConv(filename + ".jpg");
+				UpdateDB("noedit", "URLCover", newpath, token, "Books", "ID_book", book.ID);
+			})
+		});
+	} catch (e) {
+		console.log(e);
+	}
+	//Unzip the first image for each with their path to a folder
+	//Convert it in webp
+	//Replace the null, "null", "undefined", blank cover or BannerImage from the books DB with the new webp
+}
+
 process.on('SIGINT', () => {
 	console.log('SIGINT signal received: closing server');
 	console.log("Removing ZIPs to DL");
@@ -1543,33 +1760,26 @@ app.post("/profile/deleteAccount", (req, res) => {
 app.all('*', (req, res) => {
 	res.sendFile(__dirname + '/404.html');
 });
-/*
-* async function WConv() {
+
+async function WConv(file) {
 	try {
 		webp.grant_permission();
 	} catch (error) {
 		console.log("error");
 	}
-	var dir = fs.readdirSync(CosmicComicsData + "/FirstImageOfAll/");
-	for (var i = 0; i < dir.length; i++) {
-		try {
-			var file = fs.readdirSync(CosmicComicsData + "/FirstImageOfAll/" + dir[i]);
-			if (patha.extname(file[0]) !== ".webp") {
-				var oldfile = CosmicComicsData + "/FirstImageOfAll/" + dir[i] + "/" + file[0];
-				var newfile = CosmicComicsData + "/FirstImageOfAll/" + dir[i] + "/cover.webp";
-				await webp
-					.cwebp(oldfile, newfile, "-q 80 -noalpha -resize 250 380", (logging = "-v"))
-					.then((response) => {
-						console.log(response);
-						fs.unlinkSync(oldfile);
-						document.getElementById("prgs").style.width = (i * 100) / dir.length + "%";
-						remote.getCurrentWindow().setProgressBar(i / dir.length);
-					});
-			}
-		} catch (error) {
-			console.log(error);
+	try {
+		if (path.extname(file) !== ".webp") {
+			let oldfile = CosmicComicsTemp + "/FirstImageOfAll/" + file;
+			let newfile = CosmicComicsTemp + "/FirstImageOfAll/" + path.basename(file) + ".webp";
+			await webp
+				.cwebp(oldfile, newfile, "-q 80 -noalpha -resize 250 380", (logging = "-v"))
+				.then((response) => {
+					console.log(response);
+					fs.rmSync(oldfile);
+				})
+			return newfile;
 		}
+	} catch (error) {
+		console.log(error);
 	}
 }
-*
-* */
