@@ -1745,7 +1745,7 @@ async function GETMARVELAPI_Comics(name = "", date = "") {
 }
 
 async function GETMARVELAPI_Comics_INSERT(name = "", date = "") {
-	return fetch("http://" + domain + ":" + port + "/insert/marvel/book/" + name + "/" + date+"/"+userToken).then(function (response) {
+	return fetch("http://" + domain + ":" + port + "/insert/marvel/book/" + name + "/" + date + "/" + userToken).then(function (response) {
 		return response.text();
 	}).then(function (data) {
 		data = JSON.parse(data);
@@ -2437,175 +2437,28 @@ addToBreadCrumb("Home", () => {
 	returnToHome();
 });
 
-// TODO BACKEND
+/**
+ * Launch the metadata refresh
+ * @param {*} id The ID in the DB of the element to refresh
+ * @param {int} provider The provider of the element to refresh
+ * @param {string} type The type of the element to refresh
+ */
 async function refreshMeta(id, provider, type) {
 	Toastifycation("Refreshing metadata...");
-	if (provider === 1) {
-		if (type === "book") {
-			await getFromDB("Books", "* FROM Books WHERE ID_book=" + id).then(async (res) => {
-				let book = JSON.parse(res)[0];
-				console.log(book);
-				await GETMARVELAPI_Comics_ByID(book.API_ID).then(async (res2) => {
-					res2 = res2.data.results[0];
-					let blacklisted = ["note", "read", "reading", "unread", "favorite", "last_page", "folder", "PATH", "lock", "ID_book"]
-					let asso = {}
-					for (let i = 0; i < book.length; i++) {
-						for (let key in book[i]) {
-							if (!blacklisted.includes(key)) {
-								asso[key] = book[i][key];
-							}
-						}
-					}
-					asso["NOM"] = res2.title;
-					asso["URLCover"] = res2.thumbnail.path + "/detail." + res2.thumbnail.extension;
-					asso["issueNumber"] = res2.issueNumber;
-					asso["description"] = res2.description.replaceAll("'", "''");
-					asso["format"] = res2.format;
-					asso["pageCount"] = res2.pageCount;
-					asso["URLs"] = JSON.stringify(res2.urls);
-					asso["dates"] = JSON.stringify(res2.dates);
-					asso["prices"] = JSON.stringify(res2.prices);
-					asso["creators"] = JSON.stringify(res2.creators);
-					asso["characters"] = JSON.stringify(res2.characters);
-					asso["series"] = JSON.stringify(res2.series);
-					asso["collectedIssues"] = JSON.stringify(res2.collectedIssues);
-					asso["variants"] = JSON.stringify(res2.variants);
-					asso["collections"] = JSON.stringify(res2.collections);
-					let columns = [];
-					let values = [];
-					for (let key in asso) {
-						columns.push(key);
-						values.push(asso[key]);
-					}
-					let options = {
-						method: "POST", headers: {
-							"Content-Type": "application/json"
-						}, body: JSON.stringify({
-							"token": userToken,
-							"table": "Books",
-							"type": "edit",
-							"column": columns,
-							"whereEl": book.PATH,
-							"value": values,
-							"where": "PATH"
-						}, null, 2)
-					};
-					await fetch("http://" + domain + ":" + port + "/DB/update", options);
-				});
-			})
-		} else {
-			await getFromDB("Series", "* FROM Series WHERE ID_Series='" + id + "'").then(async (res) => {
-				let book = JSON.parse(res)[0];
-				await GETMARVELAPI_Series_ByID(parseInt(id)).then(async (res2) => {
-					if (!res2.hasOwnProperty("data")) {
-						return;
-					}
-					res2 = res2.data.results[0];
-					let blacklisted = ["note", "favorite", "PATH", "lock", "ID_Series"]
-					let asso = {}
-					for (let i = 0; i < book.length; i++) {
-						for (let key in book[i]) {
-							if (!blacklisted.includes(key)) {
-								asso[key] = book[i][key];
-							}
-						}
-					}
-					asso["title"] = JSON.stringify(res2.title).replaceAll("'", "''");
-					asso["cover"] = JSON.stringify(res2.thumbnail);
-					if (res2.description != null) {
-						asso["description"] = res2.description.replaceAll("'", "''");
-					} else {
-						asso["description"] = "";
-					}
-					asso["start_date"] = res2.startYear
-					asso["end_date"] = res2.endYear
-					asso["CHARACTERS"] = JSON.stringify(res2.characters).replaceAll("'", "''");
-					asso["STAFF"] = JSON.stringify(res2.creators).replaceAll("'", "''");
-					asso["SOURCE"] = JSON.stringify(res2.urls[0]);
-					asso["BG"] = JSON.stringify(res2.thumbnail);
-					asso["volumes"] = JSON.stringify(res2.comics.items).replaceAll("'", "''");
-					asso["chapters"] = JSON.stringify(res2.comics.available).replaceAll("'", "''");
-					let columns = [];
-					let values = [];
-					for (let key in asso) {
-						columns.push(key);
-						values.push(asso[key]);
-					}
-					let options = {
-						method: "POST", headers: {
-							"Content-Type": "application/json"
-						}, body: JSON.stringify({
-							"token": userToken,
-							"table": "Series",
-							"type": "edit",
-							"column": columns,
-							"whereEl": book.PATH,
-							"value": values,
-							"where": "PATH"
-						}, null, 2)
-					};
-					await fetch("http://" + domain + ":" + port + "/DB/update", options);
-				});
-			})
-		}
-	} else if (provider === 2) {
-		if (type !== "book") {
-			await getFromDB("Series", "* FROM Series WHERE ID_Series='" + id + "'").then(async (res) => {
-				let book = JSON.parse(res)[0];
-				await API_ANILIST_GET_ID(parseInt(id)).then(async (res2) => {
-					let blacklisted = ["note", "favorite", "PATH", "lock", "ID_Series"]
-					let asso = {}
-					for (let i = 0; i < book.length; i++) {
-						for (let key in book[i]) {
-							if (!blacklisted.includes(key)) {
-								asso[key] = book[i][key];
-							}
-						}
-					}
-					asso["title"] = JSON.stringify(res2.title).replaceAll("'", "''");
-					asso["cover"] = res2.coverImage.large;
-					if (res2.description != null) {
-						asso["description"] = res2.description.replaceAll("'", "''");
-					} else {
-						asso["description"] = "";
-					}
-					asso["start_date"] = JSON.stringify(res2.startDate).replaceAll("'", "''");
-					asso["end_date"] = JSON.stringify(res2.endDate).replaceAll("'", "''");
-					asso["CHARACTERS"] = JSON.stringify(res2.characters).replaceAll("'", "''");
-					asso["STAFF"] = JSON.stringify(res2.staff).replaceAll("'", "''");
-					asso["SOURCE"] = JSON.stringify(res2.siteUrl).replaceAll("'", "''");
-					asso["BG"] = res2.bannerImage;
-					asso["volumes"] = JSON.stringify(res2.volumes).replaceAll("'", "''");
-					asso["chapters"] = JSON.stringify(res2.chapters).replaceAll("'", "''");
-					asso["statut"] = res2["status"].replaceAll("'", "''");
-					asso["Score"] = res2["meanScore"]
-					asso["genres"] = JSON.stringify(res2["genres"]).replaceAll("'", "''");
-					asso["TRENDING"] = JSON.stringify(res2["trending"]).replaceAll("'", "''");
-					let columns = [];
-					let values = [];
-					for (let key in asso) {
-						columns.push(key);
-						values.push(asso[key]);
-					}
-					let options = {
-						method: "POST", headers: {
-							"Content-Type": "application/json"
-						}, body: JSON.stringify({
-							"token": userToken,
-							"table": "Series",
-							"type": "edit",
-							"column": columns,
-							"whereEl": book.PATH,
-							"value": values,
-							"where": "PATH"
-						}, null, 2)
-					};
-					await fetch("http://" + domain + ":" + port + "/DB/update", options);
-				});
-			})
-		}
-	}
-	Toastifycation("Metadata updated");
+	fetch("http" + domain + ":" + port + "/refreshMeta", {
+		method: "POST",
+		headers: {
+			"Content-Type": "application/json",
+		},
+		body: JSON.stringify({
+			"ID": id,
+			"provider": provider,
+			"type": type,
+			"token": userToken
+		})
+	}).then((res) => {
+		Toastifycation("Metadata updated");
+	})
 }
 
 document.getElementById("rematch").setAttribute("data-bs-toggle", "modal");

@@ -995,12 +995,160 @@ async function GETMARVELAPI_Creators(id, type) {
 	return data;
 }
 
+async function getFromDB(token,request){
+	try {
+		let result = [];
+		const token = resolveToken(token);
+		getDB(token).all("SELECT " + request + ";", function (err, resD) {
+			if (err) return console.log("Error getting element", err);
+			resD.forEach((row) => {
+				result.push(row);
+			});
+			return result;
+		});
+	} catch (e) {
+		console.log(e);
+	}
+}
+
 /**
  * Get from the Marvel API the list of comics
  * @param {string} id - The id of the comic
  * @return {string} The list of comics
  */
+app.post("/refreshMeta", async function (req, res) {
+	let id = req.body.id;
+	let type = req.body.type;
+	let provider = req.body.provider;
+	let token = req.body.token;
 
+	if (provider === 1) {
+		if (type === "book") {
+			await getFromDB(token, "SELECT * FROM Books WHERE ID_book=" + id).then(async (res) => {
+				let book = res[0];
+				await GETMARVELAPI_Comics_ByID(book.API_ID).then(async (res2) => {
+					res2 = res2.data.results[0];
+					let blacklisted = ["note", "read", "reading", "unread", "favorite", "last_page", "folder", "PATH", "lock", "ID_book"]
+					let asso = {}
+					for (let i = 0; i < book.length; i++) {
+						for (let key in book[i]) {
+							if (!blacklisted.includes(key)) {
+								asso[key] = book[i][key];
+							}
+						}
+					}
+					asso["NOM"] = res2.title;
+					asso["URLCover"] = res2.thumbnail.path + "/detail." + res2.thumbnail.extension;
+					asso["issueNumber"] = res2.issueNumber;
+					asso["description"] = res2.description.replaceAll("'", "''");
+					asso["format"] = res2.format;
+					asso["pageCount"] = res2.pageCount;
+					asso["URLs"] = JSON.stringify(res2.urls);
+					asso["dates"] = JSON.stringify(res2.dates);
+					asso["prices"] = JSON.stringify(res2.prices);
+					asso["creators"] = JSON.stringify(res2.creators);
+					asso["characters"] = JSON.stringify(res2.characters);
+					asso["series"] = JSON.stringify(res2.series);
+					asso["collectedIssues"] = JSON.stringify(res2.collectedIssues);
+					asso["variants"] = JSON.stringify(res2.variants);
+					asso["collections"] = JSON.stringify(res2.collections);
+					let columns = [];
+					let values = [];
+					for (let key in asso) {
+						columns.push(key);
+						values.push(asso[key]);
+					}
+					UpdateDB("edit", columns, values, token, "Books", "PATH", book.PATH);
+				});
+			})
+		} else {
+			await getFromDB(token, "SELECT * FROM Series WHERE ID_Series='" + id + "'").then(async (res) => {
+				let book = res[0];
+				await GETMARVELAPI_Series_ByID(parseInt(id)).then(async (res2) => {
+					if (!res2.hasOwnProperty("data")) {
+						return;
+					}
+					res2 = res2.data.results[0];
+					let blacklisted = ["note", "favorite", "PATH", "lock", "ID_Series"]
+					let asso = {}
+					for (let i = 0; i < book.length; i++) {
+						for (let key in book[i]) {
+							if (!blacklisted.includes(key)) {
+								asso[key] = book[i][key];
+							}
+						}
+					}
+					asso["title"] = JSON.stringify(res2.title).replaceAll("'", "''");
+					asso["cover"] = JSON.stringify(res2.thumbnail);
+					if (res2.description != null) {
+						asso["description"] = res2.description.replaceAll("'", "''");
+					} else {
+						asso["description"] = "";
+					}
+					asso["start_date"] = res2.startYear
+					asso["end_date"] = res2.endYear
+					asso["CHARACTERS"] = JSON.stringify(res2.characters).replaceAll("'", "''");
+					asso["STAFF"] = JSON.stringify(res2.creators).replaceAll("'", "''");
+					asso["SOURCE"] = JSON.stringify(res2.urls[0]);
+					asso["BG"] = JSON.stringify(res2.thumbnail);
+					asso["volumes"] = JSON.stringify(res2.comics.items).replaceAll("'", "''");
+					asso["chapters"] = JSON.stringify(res2.comics.available).replaceAll("'", "''");
+					let columns = [];
+					let values = [];
+					for (let key in asso) {
+						columns.push(key);
+						values.push(asso[key]);
+					}
+					UpdateDB("edit", columns, values, token, "Series", "PATH", book.PATH);
+				});
+			})
+		}
+	} else if (provider === 2) {
+		if (type !== "book") {
+			await getFromDB(token, "SELECT * FROM Series WHERE ID_Series='" + id + "'").then(async (res) => {
+				let book = res[0];
+				await API_ANILIST_GET_ID(parseInt(id)).then(async (res2) => {
+					let blacklisted = ["note", "favorite", "PATH", "lock", "ID_Series"]
+					let asso = {}
+					for (let i = 0; i < book.length; i++) {
+						for (let key in book[i]) {
+							if (!blacklisted.includes(key)) {
+								asso[key] = book[i][key];
+							}
+						}
+					}
+					asso["title"] = JSON.stringify(res2.title).replaceAll("'", "''");
+					asso["cover"] = res2.coverImage.large;
+					if (res2.description != null) {
+						asso["description"] = res2.description.replaceAll("'", "''");
+					} else {
+						asso["description"] = "";
+					}
+					asso["start_date"] = JSON.stringify(res2.startDate).replaceAll("'", "''");
+					asso["end_date"] = JSON.stringify(res2.endDate).replaceAll("'", "''");
+					asso["CHARACTERS"] = JSON.stringify(res2.characters).replaceAll("'", "''");
+					asso["STAFF"] = JSON.stringify(res2.staff).replaceAll("'", "''");
+					asso["SOURCE"] = JSON.stringify(res2.siteUrl).replaceAll("'", "''");
+					asso["BG"] = res2.bannerImage;
+					asso["volumes"] = JSON.stringify(res2.volumes).replaceAll("'", "''");
+					asso["chapters"] = JSON.stringify(res2.chapters).replaceAll("'", "''");
+					asso["statut"] = res2["status"].replaceAll("'", "''");
+					asso["Score"] = res2["meanScore"]
+					asso["genres"] = JSON.stringify(res2["genres"]).replaceAll("'", "''");
+					asso["TRENDING"] = JSON.stringify(res2["trending"]).replaceAll("'", "''");
+					let columns = [];
+					let values = [];
+					for (let key in asso) {
+						columns.push(key);
+						values.push(asso[key]);
+					}
+					UpdateDB("edit", columns, values, token, "Series", "PATH", book.PATH);
+				});
+			})
+		}
+	}
+	res.sendStatus(200);
+})
 
 async function GETMARVELAPI_Comics_ByID(id) {
 	let url = recoverMarvelAPILink("comics", id, "", true, "issueNumber")
@@ -1050,7 +1198,7 @@ app.post("/insert/anilist/book", async function (req, res) {
 	let realname = req.body.realname;
 	try {
 		let data = [];
-		getDB(resolveToken(token)).run("SELECT title FROM Series;", function (err, resD) {
+		getDB(resolveToken(token)).all("SELECT title FROM Series;", function (err, resD) {
 			if (err) return console.log("Error getting element", err);
 			resD.forEach((row) => {
 				data.push(row);
@@ -1539,7 +1687,6 @@ function unzip_first(zipPath, ExtractDir, ext, token, fileName) {
 					$cherryPick: fromfile[0],
 					$bin: Path27Zip
 				});
-
 				Stream.on("end", function () {
 					if (Stream.info.get("Files") === "0") {
 						console.log("no file found");
@@ -1605,7 +1752,7 @@ function unzip_first(zipPath, ExtractDir, ext, token, fileName) {
 									stream.pipe(
 										fs.createWriteStream(ExtractDir + "/" + fileName + ".jpg")
 									);
-								}else{
+								} else {
 									console.log("file already exist");
 								}
 								return;
@@ -1626,7 +1773,7 @@ function fillBlankImages(token) {
 	//get the null, "null", "undefined", blank cover or BannerImage from the books DB
 	try {
 		let result = [];
-		getDB(resolveToken(token)).run("select * from Books where URLCover IS NULL OR URLCover = 'null' OR URLCover='undefined';", function (err, resD) {
+		getDB(resolveToken(token)).all("select * from Books where URLCover IS NULL OR URLCover = 'null' OR URLCover='undefined';", function (err, resD) {
 			if (err) return console.log("Error getting element", err);
 			resD.forEach((row) => {
 				console.log(row);
@@ -1635,7 +1782,7 @@ function fillBlankImages(token) {
 			console.log("Beggining fillBlankImages for : " + result);
 			result.forEach((book) => {
 				let filename = book.ID
-				unzip_first(book.PATH,CosmicComicsTemp+"/FirstImagesOfAll",path.extname(book.PATH),token,filename);
+				unzip_first(book.PATH, CosmicComicsTemp + "/FirstImagesOfAll", path.extname(book.PATH), token, filename);
 				let newpath = WConv(filename + ".jpg");
 				UpdateDB("noedit", "URLCover", newpath, token, "Books", "ID_book", book.ID);
 			})
