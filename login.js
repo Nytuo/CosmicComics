@@ -70,6 +70,11 @@ async function discover(){
     })
 }
 
+document.getElementById("ThePassToWord").addEventListener("keypress", function (event) {
+  if (event.key === "Enter") {
+    document.getElementById("loginInBtn").click();
+  }
+})
 
 // Set a Cookie
 function setCookie(cName, cValue, expHours) {

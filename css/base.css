@@ -1455,6 +1455,7 @@ a[href^="http://marvel.com"] {
 
 @media (max-width: 1250px) {
 
+    /* TODO PHONE */
     #logo_id_txt {
         display: none;
         transition: display 0.3s ease;
@@ -1463,6 +1464,16 @@ a[href^="http://marvel.com"] {
     #login_discover {
         flex-direction: column;
     }
+    .cardcusto{
+        max-width: 123px;
+        height: 186px;
+    }
+    .cardcusto>.pointR{
+        left:103px;
+        top:-319px;
+    }
+
+
 }
 
 #searchResults {

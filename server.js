@@ -124,8 +124,10 @@ function GetTheName(CommonName = "") {
 	return finalName;
 }
 
-if (!fs.existsSync(CosmicComicsTemp + "/FirstImageOfAll")) {
-	fs.mkdirSync(CosmicComicsTemp + "/FirstImageOfAll");
+if (!fs.existsSync(__dirname + "/public/FirstImagesOfAll")) {
+	fs.mkdirSync(__dirname + "/public/FirstImagesOfAll");
+	changePermissionForFilesInFolder(__dirname + "/public/FirstImagesOfAll");
+
 }
 const cors = require('cors');
 const {spawn} = require('child_process');
@@ -239,6 +241,8 @@ app.post("/createUser", function (req, res) {
 	const name = req.body.name;
 	const passcode = req.body.password;
 	fs.mkdirSync(CosmicComicsTemp + "/profiles/" + name, {recursive: true});
+	changePermissionForFilesInFolder(CosmicComicsTemp + "/profiles/"+name);
+
 	console.log("Creating dir " + name);
 	fs.writeFileSync(CosmicComicsTemp + "/profiles/" + name + "/passcode.txt", passcode.trim(), {encoding: "utf8"});
 	if (!fs.existsSync(CosmicComicsTemp + "/profiles/" + name + "/config.json")) {
@@ -486,39 +490,44 @@ app.get("/DB/update/:token/:dbName/:colName/:value/:id", (req, res) => {
 	}
 	res.sendStatus(200);
 });
-app.post("/DB/update/OneForAll", (req, res) => {
+app.post("/DB/update/OneForAll",  (req, res) => {
 	let token = resolveToken(req.body.token);
 	let W1 = req.body.W1;
 	let W2 = req.body.W2;
 	let A = req.body.A;
 	let title = req.body.title;
+	console.log(W1, W2, A, title);
 	try {
-		let resa = [];
+
+
 		getDB(token).all("SELECT * FROM Books WHERE " + W1 + "=1 OR " + W2 + "=1" + ";", function (err, resD) {
 			if (err) return console.log("Error getting element", err);
-			resD.forEach((row) => {
-				resa.push(row);
-			});
-		});
-		let bookList = JSON.parse(resa);
-		for (let i = 0; i < bookList.length; i++) {
-			if (bookList[i].PATH.toLowerCase().includes(title.toLowerCase().replaceAll('"', ''))) {
-				let asso = {}
-				asso[A] = true;
-				asso[W1] = false
-				asso[W2] = false;
-				let columns = [];
-				let values = [];
-				for (let key in asso) {
-					columns.push(key);
-					values.push(asso[key]);
+			console.log(resD);
+			let bookList = resD;
+			console.log(bookList);
+			for (let i = 0; i < bookList.length; i++) {
+				if (bookList[i].PATH.toLowerCase().includes(JSON.parse(title)["english"].toLowerCase().replaceAll('"', ''))) {
+					let asso = {}
+					asso[A] = 1;
+					asso[W1] = 0;
+					asso[W2] = 0;
+					let columns = [];
+					let values = [];
+					for (let key in asso) {
+						columns.push(key);
+						values.push(asso[key]);
+					}
+					console.log(columns);
+					console.log(values);
+					UpdateDB("edit", columns, values, req.body.token, "Books", "PATH", bookList[i].PATH);
 				}
-				UpdateDB("edit", columns, values, token, "Books", "PATH", bookList[i].PATH);
 			}
-		}
+		});
+
 	} catch (e) {
 		console.log(e);
 	}
+	res.sendStatus(200);
 })
 
 function UpdateDB(type, column, value, token, table, where, whereEl) {
@@ -528,7 +537,7 @@ function UpdateDB(type, column, value, token, table, where, whereEl) {
 		let what = [];
 		for (let i = 0; i < listOfColumns.length; i++) {
 			if (listOfColumns[i] === "description") {
-				what.push(listOfColumns[i] + " = \"" + listOfValues[i] + "\"");
+				what.push(listOfColumns[i] + " = '" + listOfValues[i].toString().replaceAll("'","''").replaceAll('"','\"') + "'");
 			} else {
 				what.push(listOfColumns[i] + " = '" + listOfValues[i] + "'");
 			}
@@ -1304,6 +1313,7 @@ app.post("/api/marvel", (req, res) => {
 	let token = req.body.token;
 	API_MARVEL_GET(req.body.name).then(async function (data) {
 		let randID = Math.floor(Math.random() * 1000000);
+		console.log(data);
 		if (data["data"]["total"] === 0) {
 			await insertIntoDB("(ID_Series,title,note,start_date,end_date,description,Score,cover,BG,CHARACTERS,STAFF,SOURCE,volumes,chapters,favorite,PATH,lock)", "('" + randID + "U_1" + "','" + JSON.stringify(name.replaceAll("'", "''")) + "',null,null,null,null,'0',null,null,null,null,null,null,null,0,'" + path + "',false)", token, "Series");
 		} else {
@@ -1650,6 +1660,7 @@ function GetListOfImg(dirPath) {
 function unzip_first(zipPath, ExtractDir, ext, token, fileName) {
 	//Unzip the first image
 	//premiere image si dossier
+	console.log(fileName);
 	try {
 		let n = 0;
 		if (
@@ -1677,9 +1688,9 @@ function unzip_first(zipPath, ExtractDir, ext, token, fileName) {
 				$cherryPick: cherrypick,
 				$bin: Path27Zip,
 			});
+
 			Streamer.on("data", function (data) {
 				fromfile.push(data.file);
-				console.log(fromfile);
 			});
 			Streamer.on("end", function () {
 				const Stream = Seven.extract(zipPath, ExtractDir, {
@@ -1762,30 +1773,58 @@ function unzip_first(zipPath, ExtractDir, ext, token, fileName) {
 				});
 			});
 		} else {
-			console.log("not supported");
+			//throw error for try catch
+			throw "not supported";
+
 		}
 	} catch (error) {
+		if (error === "not supported") {
+			throw "not supported";
+		}
 		console.log(error);
 	}
 }
 
+async function changePermissionForFilesInFolder(folderPath) {
+
+	fs.chmodSync(folderPath , 0o777);
+	console.log("chmod 777 for " + folderPath);
+	fs.readdirSync(folderPath, (err, files) => {
+		files.forEach((file) => {
+			fs.chmodSync(folderPath + "/" + file, 0o777);
+			console.log("chmod 777 for " + folderPath + "/" + file);
+		});
+	});
+}
+app.post("/fillBlankImage", (req, res) => {
+	let token = req.body.token;
+	fillBlankImages(token);
+	res.sendStatus(200);
+})
 function fillBlankImages(token) {
 	//get the null, "null", "undefined", blank cover or BannerImage from the books DB
 	try {
 		let result = [];
-		getDB(resolveToken(token)).all("select * from Books where URLCover IS NULL OR URLCover = 'null' OR URLCover='undefined';", function (err, resD) {
+		getDB(resolveToken(token)).all("select * from Books where URLCover IS NULL OR URLCover = 'null' OR URLCover='undefined';", async function (err, resD) {
 			if (err) return console.log("Error getting element", err);
 			resD.forEach((row) => {
 				console.log(row);
 				result.push(row);
 			});
-			console.log("Beggining fillBlankImages for : " + result);
-			result.forEach((book) => {
-				let filename = book.ID
-				unzip_first(book.PATH, CosmicComicsTemp + "/FirstImagesOfAll", path.extname(book.PATH), token, filename);
-				let newpath = WConv(filename + ".jpg");
-				UpdateDB("noedit", "URLCover", newpath, token, "Books", "ID_book", book.ID);
-			})
+			for (const book of result) {
+				console.log("Beggining fillBlankImages for : " + book.NOM);
+				let filename = book.ID_book
+				try {
+					unzip_first(book.PATH, __dirname + "/public/FirstImagesOfAll", path.extname(book.PATH).replaceAll(".", ""), token, filename);
+					await changePermissionForFilesInFolder(__dirname + "/public/FirstImagesOfAll/");
+/*
+					let newpath = await WConv(filename + ".jpg");
+*/
+					UpdateDB("noedit", "URLCover", "'"+__dirname+"/public/FirstImagesOfAll/"+filename+".jpg'", token, "Books", "ID_book", book.ID_book);
+				} catch (e) {
+					console.log("NOT SUPPORTED");
+				}
+			}
 		});
 	} catch (e) {
 		console.log(e);
@@ -1815,6 +1854,8 @@ app.post("/configServ/:name/:passcode/:port", (req, res) => {
 	const passcode = req.params.passcode;
 	const portServ = req.params.port;
 	fs.mkdirSync(CosmicComicsTemp + "/profiles/" + name, {recursive: true});
+	changePermissionForFilesInFolder(CosmicComicsTemp + "/profiles/"+name);
+
 	console.log("Creating dir " + name);
 	fs.writeFileSync(CosmicComicsTemp + "/profiles/" + name + "/passcode.txt", passcode, {encoding: "utf8"});
 	if (!fs.existsSync(CosmicComicsTemp + "/profiles/" + name + "/config.json")) {
@@ -1912,21 +1953,22 @@ async function WConv(file) {
 	try {
 		webp.grant_permission();
 	} catch (error) {
-		console.log("error");
+		console.log("WEBP CONVERTER ERROR: " + error);
 	}
+			let oldfile = __dirname + "/public/FirstImagesOfAll/" + file;
+			let newfile = __dirname + "/public/FirstImagesOfAll/" + path.basename(file) + ".webp";
 	try {
 		if (path.extname(file) !== ".webp") {
-			let oldfile = CosmicComicsTemp + "/FirstImageOfAll/" + file;
-			let newfile = CosmicComicsTemp + "/FirstImageOfAll/" + path.basename(file) + ".webp";
 			await webp
 				.cwebp(oldfile, newfile, "-q 80 -noalpha -resize 250 380", (logging = "-v"))
 				.then((response) => {
 					console.log(response);
 					fs.rmSync(oldfile);
 				})
-			return newfile;
+			return newfile
 		}
 	} catch (error) {
 		console.log(error);
 	}
+	return newfile
 }

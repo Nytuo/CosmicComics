@@ -34,6 +34,8 @@ let providerEnum = {
 	"LOCG": 3,
 	"OL": 4
 }
+let sidebarMini = false;
+let searchtoggle = true;
 if (userToken == null) {
 	window.location.href = "login";
 } else {
@@ -437,9 +439,46 @@ function removeBreadCrumb(breadcrumb, element) {
 /**
  * Discover the libraries
  */
-function discoverLibraries() {
+async function discoverLibraries() {
 	let listofFolder;
-	getFromDB("Libraries", "* FROM Libraries").then((res) => {
+	const div = document.createElement("div");
+	let btn = document.createElement("button");
+	btn.id = "downloads";
+	btn.addEventListener("click", function () {
+		let breadCrumb = document.querySelector(".breadcrumb");
+		removeBreadCrumb(breadCrumb, breadCrumb.childNodes[1]);
+		document.querySelectorAll(".selectLib").forEach((el) => {
+			el.classList.remove("selectLib");
+		});
+		btn.classList.add("selectLib");
+		document.getElementById("ContainerExplorer").innerHTML = "";
+		document.getElementById("overlay").style.display = "none";
+		document.getElementById("overlay2").style.display = "none";
+		document.getElementById("contentViewer").style.display = "none";
+		addToBreadCrumb("Downloads", () => {
+			return openLibrary(CosmicComicsTemp + "/downloads", 2);
+		});
+		openLibrary(CosmicComicsTemp + "/downloads", 2);
+	});
+	const logo = document.createElement("i");
+	logo.className = "material-icons";
+	logo.innerHTML = "download_file";
+	logo.style.color = "white";
+	logo.style.lineHeight = "1";
+	logo.style.float = "left";
+	logo.style.width = "25px";
+	logo.style.float = "left";
+	logo.style.lineHeight = "1";
+	btn.appendChild(logo);
+	let naming = document.createElement("span");
+	naming.innerHTML = "Downloads";
+	btn.appendChild(naming);
+	btn.className = "btn btns libbtn";
+	div.style.display = "flex";
+	btn.style.float = "left";
+	div.appendChild(btn);
+	document.getElementById("folderExplorer").appendChild(div);
+	await getFromDB("Libraries", "* FROM Libraries").then((res) => {
 		listofFolder = JSON.parse(res);
 		listofFolder.forEach((el) => {
 			const div = document.createElement("div");
@@ -520,46 +559,13 @@ function discoverLibraries() {
 			document.getElementById("folderExplorer").appendChild(div);
 		});
 	});
-	const div = document.createElement("div");
-	let btn = document.createElement("button");
-	btn.id = "downloads";
-	btn.addEventListener("click", function () {
-		let breadCrumb = document.querySelector(".breadcrumb");
-		removeBreadCrumb(breadCrumb, breadCrumb.childNodes[1]);
-		document.querySelectorAll(".selectLib").forEach((el) => {
-			el.classList.remove("selectLib");
-		});
-		btn.classList.add("selectLib");
-		document.getElementById("ContainerExplorer").innerHTML = "";
-		document.getElementById("overlay").style.display = "none";
-		document.getElementById("overlay2").style.display = "none";
-		document.getElementById("contentViewer").style.display = "none";
-		addToBreadCrumb("Downloads", () => {
-			return openLibrary(CosmicComicsTemp + "/downloads", 2);
-		});
-		openLibrary(CosmicComicsTemp + "/downloads", 2);
-	});
-	const logo = document.createElement("i");
-	logo.className = "material-icons";
-	logo.innerHTML = "download_file";
-	logo.style.color = "white";
-	logo.style.lineHeight = "1";
-	logo.style.float = "left";
-	logo.style.width = "25px";
-	logo.style.float = "left";
-	logo.style.lineHeight = "1";
-	btn.appendChild(logo);
-	let naming = document.createElement("span");
-	naming.innerHTML = "Downloads";
-	btn.appendChild(naming);
-	btn.className = "btn btns libbtn";
-	div.style.display = "flex";
-	btn.style.float = "left";
-	div.appendChild(btn);
-	document.getElementById("folderExplorer").appendChild(div);
 }
 
-discoverLibraries();
+discoverLibraries().then(r => {
+	if (window.screen.width <= 1300) {
+		toggleSideBar();
+	}
+});
 
 /**
  * Modify user's profile configuration JSON file
@@ -597,9 +603,6 @@ function Get_From_Config(what_you_want, data) {
 	}
 	return null;
 }
-
-let sidebarMini = false;
-let searchtoggle = true;
 
 /**
  * Toggle the sidebar
@@ -918,8 +921,8 @@ function loadView(FolderRes, libraryPath, date = "", provider = providerEnum.MAN
 						});
 					} else if (provider === providerEnum.Anilist) {
 						fetch("http://" + domain + ":" + port + "/insert/anilist/book", {
+							method: "POST",
 							headers: {
-								"method": "POST",
 								'Content-Type': 'application/json',
 							},
 							body: JSON.stringify({
@@ -985,9 +988,11 @@ function GETMARVELAPI(name = "") {
 		method: 'POST',
 		headers: {
 			'Content-Type': 'application/json',
-			"name": name,
-			'token': userToken
-		}
+		},
+		body: JSON.stringify({
+			"token": userToken,
+			"name": name
+		})
 	}).then(function (response) {
 		Toastifycation("Marvel API : " + response.status);
 	})
@@ -2392,7 +2397,7 @@ async function createSeries(provider, path, libraryPath, res) {
 }
 
 function OneForAll(W1, W2, A, title) {
-	fetch("http" + domain + ":" + port + "/DB/update/OneForAll", {
+	fetch("http://" + domain + ":" + port + "/DB/update/OneForAll", {
 		method: "POST",
 		headers: {
 			"Content-Type": "application/json",
@@ -2401,11 +2406,20 @@ function OneForAll(W1, W2, A, title) {
 			"W1": W1,
 			"W2": W2,
 			"A": A,
-			"title": title
+			"title": title,
+			"token": userToken,
 		})
 	})
 }
 
+/**
+ *
+ * @param W1
+ * @param W2
+ * @param A
+ * @param ID
+ * @constructor
+ */
 function AllForOne(W1, W2, A, ID) {
 	let asso = {}
 	asso[A] = true;
@@ -2527,11 +2541,11 @@ async function createDetails(TheBook, provider) {
 		let values = [];
 		let columns = [];
 		document.querySelectorAll("#commonEdit>label>input").forEach((e) => {
-			values.push(e.value)
+			values.push(e.value.replaceAll("'","''").replaceAll('"',"'"));
 			columns.push(e.id.replaceAll("edit_", ""))
 		})
 		document.querySelectorAll("#bookEdit>label>input").forEach((e) => {
-			values.push(e.value)
+			values.push(e.value.replaceAll("'","''").replaceAll('"',"'"))
 			columns.push(e.id.replaceAll("edit_", ""))
 		})
 		values.push(document.getElementById("lockCheck").checked);
@@ -2602,7 +2616,11 @@ async function createDetails(TheBook, provider) {
 	} catch (e) {
 		document.getElementById("ColTitle").innerHTML = "<a target='_blank' style='color:white'>" + TheBook.NOM + "</a>";
 	}
-	document.getElementById("ImgColCover").src = TheBook.URLCover;
+	if (TheBook.URLCover.includes("public/FirstImagesOfAll")) {
+		document.getElementById("ImgColCover").src = TheBook.URLCover.split("public/")[1];
+	} else {
+		document.getElementById("ImgColCover").src = TheBook.URLCover;
+	}
 	document.getElementById("Status").innerHTML = "";
 	if (TheBook.description != null && TheBook.description !== "null") {
 		document.getElementById("description").innerHTML = TheBook.description;
@@ -2969,6 +2987,11 @@ function createCard(unread, read, reading, ID, URLCover, NOM, favorite = 0) {
 	carddiv.style.cursor = "pointer";
 	const rib = document.createElement("div");
 	imagelink = URLCover;
+	if (imagelink === "null" || imagelink === "" || imagelink == null) {
+		imagelink = "Images/fileDefault.png";
+	} else if (URLCover.includes("public/FirstImagesOfAll")) {
+		imagelink = URLCover.split("public/")[1];
+	}
 	let node = document.createTextNode(NOM);
 	if (unread !== null && read !== null && reading !== null) {
 		if (unread === 1) {
@@ -3354,3 +3377,17 @@ function changeRating(table, where, value) {
 		fetch("http://" + domain + ":" + port + "/DB/update", options);
 	}
 }
+
+document.getElementById("id_firstOfAll").addEventListener("click", function (e) {
+	fetch("http://" + domain + ":" + port + "/fillBlankImage", {
+		method: "POST",
+		headers: {
+			"Content-Type": "application/json"
+		},
+		body: JSON.stringify({
+			"token": userToken
+		}, null, 2)
+	}).then((res) => {
+		Toastifycation("empty image ressources will be filled up", "#00C33C");
+	})
+})

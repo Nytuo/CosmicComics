@@ -675,7 +675,7 @@ async function prepareReader() {
 						return 0;
 					});
 					console.log(listofImgLoc);
-				let filepage = GetFilePage();
+					let filepage = GetFilePage();
 					preloadImage(listofImgLoc);
 					console.log(filepage);
 					if (filepage !== false) {
@@ -758,7 +758,7 @@ async function Viewer() {
 												return 0;
 											});
 											console.log(listofImgLoc);
-										let filepage = GetFilePage();
+											let filepage = GetFilePage();
 											preloadImage(listofImgLoc);
 											console.log(filepage);
 											if (filepage !== false) {
@@ -997,20 +997,17 @@ function Reader(listOfImg, page) {
 
 //Getting the current page
 function GetCurrentPage() {
-	if (mangaMode === true) {
-		let CurrentPage = Math.abs(
+	if (mangaMode === true)
+		return Math.abs(
 			document.getElementById("currentpage").innerHTML.split(" ")[0] - 1
 		);
-		console.log(CurrentPage);
-		return CurrentPage;
-	} else {
-		let CurrentPage =
-			document.getElementById("currentpage").innerHTML.split(" ")[0] - 1;
-		return CurrentPage;
-	}
+	else
+		return document.getElementById("currentpage").innerHTML.split(" ")[0] - 1;
 }
 
 let scrollindex_next = 1;
+let VIV_On = false;
+let VIV_Count = 0;
 
 //Going to the next page
 function NextPage(override = false) {
@@ -1512,7 +1509,56 @@ window.addEventListener("keydown", (e) => {
 	} else if (e.code === "KeyP") {
 		ToogleFav();
 	}
+
 });
+
+document.getElementById('viewport').addEventListener('touchstart', handleTouchStart, false);
+document.getElementById('viewport').addEventListener('touchmove', handleTouchMove, false);
+
+let xDown = null;
+let yDown = null;
+
+function getTouches(evt) {
+	return evt.touches ||             // browser API
+		evt.originalEvent.touches; // jQuery
+}
+
+function handleTouchStart(evt) {
+	const firstTouch = getTouches(evt)[0];
+	xDown = firstTouch.clientX;
+	yDown = firstTouch.clientY;
+};
+
+function handleTouchMove(evt) {
+	if ( ! xDown || ! yDown ) {
+		return;
+	}
+
+	let xUp = evt.touches[0].clientX;
+	let yUp = evt.touches[0].clientY;
+
+	let xDiff = xDown - xUp;
+	let yDiff = yDown - yUp;
+
+	if ( Math.abs( xDiff ) > Math.abs( yDiff ) ) {/*most significant*/
+		if ( xDiff > 0 ) {
+			NextPage();
+		} else {
+			PreviousPage();
+		}
+	} else {
+		if ( yDiff > 0 ) {
+			/* down swipe */
+		} else {
+			/* up swipe */
+		}
+	}
+	/* reset values */
+	xDown = null;
+	yDown = null;
+};
+
+
 //Send BE
 //Modify the JSON for config.json
 function modifyConfigJson(json, tomod, mod) {
@@ -2230,9 +2276,6 @@ function ChangeDM_CurrentPage() {
 
 //Send BE
 //Vertical Image Viewer Mode
-let VIV_On = false;
-let VIV_Count = 0;
-
 function VIVT() {
 	if (VIV_On === true) {
 		modifyConfigJson(
@@ -2682,6 +2725,7 @@ window.addEventListener("wheel", function (e) {
 });
 //Click left do previous and click right do next
 document.getElementById("viewport").addEventListener("click", function () {
+
 	PreviousPage();
 });
 document
