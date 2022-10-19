@@ -12,9 +12,14 @@ const Seven = require("node-7z");
 const {getColor, getPalette} = require('color-extr-thief');
 const Path27Zip = SevenBin.path7za;
 const webp = require('webp-converter');
+let CryptoJS = require("crypto-js");
 app.use(express.static(path.join(__dirname, '/public')));
 const isPortable = fs.existsSync(path.join(__dirname, "portable.txt"));
 const isElectron = fs.existsSync(path.join(__dirname, 'portable.txt')) && fs.readFileSync(path.join(__dirname, "portable.txt"), "utf8") === "electron";
+const dotenv = require('dotenv');
+dotenv.config();
+let MarvelPublicKey = process.env.MARVEL_PUBLIC_KEY;
+let MarvelPrivateKey = process.env.MARVEL_PRIVATE_KEY;
 let path2Data;
 if (isPortable) {
 	if (isElectron) {
@@ -127,7 +132,6 @@ function GetTheName(CommonName = "") {
 if (!fs.existsSync(__dirname + "/public/FirstImagesOfAll")) {
 	fs.mkdirSync(__dirname + "/public/FirstImagesOfAll");
 	changePermissionForFilesInFolder(__dirname + "/public/FirstImagesOfAll");
-
 }
 const cors = require('cors');
 const {spawn} = require('child_process');
@@ -241,8 +245,7 @@ app.post("/createUser", function (req, res) {
 	const name = req.body.name;
 	const passcode = req.body.password;
 	fs.mkdirSync(CosmicComicsTemp + "/profiles/" + name, {recursive: true});
-	changePermissionForFilesInFolder(CosmicComicsTemp + "/profiles/"+name);
-
+	changePermissionForFilesInFolder(CosmicComicsTemp + "/profiles/" + name);
 	console.log("Creating dir " + name);
 	fs.writeFileSync(CosmicComicsTemp + "/profiles/" + name + "/passcode.txt", passcode.trim(), {encoding: "utf8"});
 	if (!fs.existsSync(CosmicComicsTemp + "/profiles/" + name + "/config.json")) {
@@ -490,7 +493,7 @@ app.get("/DB/update/:token/:dbName/:colName/:value/:id", (req, res) => {
 	}
 	res.sendStatus(200);
 });
-app.post("/DB/update/OneForAll",  (req, res) => {
+app.post("/DB/update/OneForAll", (req, res) => {
 	let token = resolveToken(req.body.token);
 	let W1 = req.body.W1;
 	let W2 = req.body.W2;
@@ -498,8 +501,6 @@ app.post("/DB/update/OneForAll",  (req, res) => {
 	let title = req.body.title;
 	console.log(W1, W2, A, title);
 	try {
-
-
 		getDB(token).all("SELECT * FROM Books WHERE " + W1 + "=1 OR " + W2 + "=1" + ";", function (err, resD) {
 			if (err) return console.log("Error getting element", err);
 			console.log(resD);
@@ -523,7 +524,6 @@ app.post("/DB/update/OneForAll",  (req, res) => {
 				}
 			}
 		});
-
 	} catch (e) {
 		console.log(e);
 	}
@@ -537,7 +537,7 @@ function UpdateDB(type, column, value, token, table, where, whereEl) {
 		let what = [];
 		for (let i = 0; i < listOfColumns.length; i++) {
 			if (listOfColumns[i] === "description") {
-				what.push(listOfColumns[i] + " = '" + listOfValues[i].toString().replaceAll("'","''").replaceAll('"','\"') + "'");
+				what.push(listOfColumns[i] + " = '" + listOfValues[i].toString().replaceAll("'", "''").replaceAll('"', '\"') + "'");
 			} else {
 				what.push(listOfColumns[i] + " = '" + listOfValues[i] + "'");
 			}
@@ -928,8 +928,83 @@ async function API_ANILIST_GET(name) {
 		console.error(error);
 	}
 }
+async function API_ANILIST_GET_SEARCH(name) {
+	let query =
+		`query ($page: Int, $perPage: Int, $search: String) {
+  Page(page:$page,perPage:$perPage){
+    pageInfo{
+      total
+    }
+    media(type: MANGA,search:$search){
+      id
+      title{
+        romaji
+        english
+        native
+      }
+	  coverImage{
+	  large
+	  }
+    }
+  }
+}`;
+	let variables = {
+		search: name,
+		page: 1,
+		perPage: 20
+	}
+	let url = 'https://graphql.anilist.co',
+		options = {
+			method: 'POST',
+			headers: {
+				'Content-Type': 'application/json',
+				'Accept': 'application/json',
+			},
+			body: JSON.stringify({
+				query: query,
+				variables: variables
+			})
+		};
+	let results = {};
+	await fetch(url, options).then(handleResponse).then(handleData).catch(handleError);
+
+	function handleResponse(response) {
+		return response.json().then(function (json) {
+			return response.ok ? json : Promise.reject(json);
+		});
+	}
+
+	// duplicate an object
+	function clone(obj) {
+		return JSON.parse(JSON.stringify(obj));
+	}
+
+	function handleData(data) {
+		console.log(data);
+		if (data.data.Page.media.length === 0) {
+			results = null;
+			return;
+		}
+		let baseObject = clone(data.data.Page.media);
+
+		results = {
+			"base": baseObject,
+		}
+	}
+
+	return results;
+
+	function handleError(error) {
+		console.error(error);
+	}
+}
+function generateMarvelAPIAuth() {
+	let ts = new Date().getTime();
+	return "&ts=" + ts + "&hash=" + CryptoJS.MD5(ts + MarvelPrivateKey + MarvelPublicKey).toString() + "&apikey=" + MarvelPublicKey;
+}
 
 async function API_MARVEL_GET(name = "") {
+	console.log("API_MARVEL_GET: " + name);
 	if (name === "") {
 		console.log("no name provided, aborting GETMARVELAPI");
 		return;
@@ -948,9 +1023,9 @@ async function API_MARVEL_GET(name = "") {
 	let encodedName = encodeURIComponent(name);
 	let url;
 	if (date !== "") {
-		url = "https://gateway.marvel.com:443/v1/public/series?titleStartsWith=" + encodedName + "&startYear=" + date + "&apikey=1ad92a16245cfdb9fecffa6745b3bfdc";
+		url = "https://gateway.marvel.com:443/v1/public/series?titleStartsWith=" + encodedName + "&startYear=" + date + generateMarvelAPIAuth();
 	} else {
-		url = "https://gateway.marvel.com:443/v1/public/series?titleStartsWith=" + encodedName + "&apikey=1ad92a16245cfdb9fecffa6745b3bfdc";
+		url = "https://gateway.marvel.com:443/v1/public/series?titleStartsWith=" + encodedName + generateMarvelAPIAuth();
 	}
 	let response = await fetch(url);
 	return await response.json();
@@ -967,9 +1042,13 @@ async function API_MARVEL_GET(name = "") {
  */
 function recoverMarvelAPILink(what, id, what2, noVariants = true, orderBy = "issueNumber", type = null) {
 	if (type != null) {
-		return "https://gateway.marvel.com:443/v1/public/" + what + "/?" + type + "=" + id + "&apikey=1ad92a16245cfdb9fecffa6745b3bfdc";
+		return "https://gateway.marvel.com:443/v1/public/" + what + "?" + type + "=" + id + generateMarvelAPIAuth();
 	}
-	return "https://gateway.marvel.com:443/v1/public/" + what + "/" + id + "/" + what2 + "?noVariants=" + noVariants + "&orderBy=" + orderBy + "&apikey=1ad92a16245cfdb9fecffa6745b3bfdc";
+	if (what2 === "") {
+
+	return "https://gateway.marvel.com:443/v1/public/" + what + "/" + id + "?noVariants=" + noVariants + "&orderBy=" + orderBy + generateMarvelAPIAuth();
+	}
+	return "https://gateway.marvel.com:443/v1/public/" + what + "/" + id + "/" + what2 + "?noVariants=" + noVariants + "&orderBy=" + orderBy + generateMarvelAPIAuth();
 }
 
 async function GETMARVELAPI_variants(id) {
@@ -1004,21 +1083,7 @@ async function GETMARVELAPI_Creators(id, type) {
 	return data;
 }
 
-async function getFromDB(token,request){
-	try {
-		let result = [];
-		const token = resolveToken(token);
-		getDB(token).all("SELECT " + request + ";", function (err, resD) {
-			if (err) return console.log("Error getting element", err);
-			resD.forEach((row) => {
-				result.push(row);
-			});
-			return result;
-		});
-	} catch (e) {
-		console.log(e);
-	}
-}
+
 
 /**
  * Get from the Marvel API the list of comics
@@ -1030,11 +1095,15 @@ app.post("/refreshMeta", async function (req, res) {
 	let type = req.body.type;
 	let provider = req.body.provider;
 	let token = req.body.token;
-
 	if (provider === 1) {
 		if (type === "book") {
-			await getFromDB(token, "SELECT * FROM Books WHERE ID_book=" + id).then(async (res) => {
-				let book = res[0];
+			getDB(resolveToken(token)).all("SELECT * FROM Books WHERE ID_book=" + id + ";", async function (err, resD) {
+				let result = [];
+				if (err) return console.log("Error getting element", err);
+				resD.forEach((row) => {
+					result.push(row);
+				});
+				let book = result[0];
 				await GETMARVELAPI_Comics_ByID(book.API_ID).then(async (res2) => {
 					res2 = res2.data.results[0];
 					let blacklisted = ["note", "read", "reading", "unread", "favorite", "last_page", "folder", "PATH", "lock", "ID_book"]
@@ -1071,8 +1140,14 @@ app.post("/refreshMeta", async function (req, res) {
 				});
 			})
 		} else {
-			await getFromDB(token, "SELECT * FROM Series WHERE ID_Series='" + id + "'").then(async (res) => {
-				let book = res[0];
+			getDB(resolveToken(token)).all("SELECT * FROM Series WHERE ID_Series='" + id + "';", async function (err, resD) {
+					let result = [];
+				if (err) return console.log("Error getting element", err);
+				resD.forEach((row) => {
+					result.push(row);
+				});
+				let book = result[0];
+				console.log(book);
 				await GETMARVELAPI_Series_ByID(parseInt(id)).then(async (res2) => {
 					if (!res2.hasOwnProperty("data")) {
 						return;
@@ -1114,9 +1189,14 @@ app.post("/refreshMeta", async function (req, res) {
 		}
 	} else if (provider === 2) {
 		if (type !== "book") {
-			await getFromDB(token, "SELECT * FROM Series WHERE ID_Series='" + id + "'").then(async (res) => {
-				let book = res[0];
-				await API_ANILIST_GET_ID(parseInt(id)).then(async (res2) => {
+			getDB(resolveToken(token)).all("SELECT * FROM Series WHERE ID_Series='" + id + "';", async function (err, resD) {
+				let result = [];
+				if (err) return console.log("Error getting element", err);
+				resD.forEach((row) => {
+					result.push(row);
+				});
+				let book = result[0];
+				await AniList.media.manga(parseInt(id)).then(function (res2) {
 					let blacklisted = ["note", "favorite", "PATH", "lock", "ID_Series"]
 					let asso = {}
 					for (let i = 0; i < book.length; i++) {
@@ -1168,16 +1248,21 @@ async function GETMARVELAPI_Comics_ByID(id) {
 }
 
 app.get("/api/marvel/getComics/:name/:date", async function (req, res) {
+	let name = decodeURIComponent(req.params.name);
+	let date = decodeURIComponent(req.params.date);
 	GETMARVELAPI_Comics(req.params.name, req.params.date).then(function (data) {
 		res.send(data);
+
 	})
 })
-app.get("/insert/marvel/book/:name/:date/:token", async function (req, res) {
-	let token = req.params.token;
-	let realname = req.params.name;
-	let date = req.params.date;
+app.get("/insert/marvel/book/", async function (req, res) {
+	let token = req.headers.token;
+	let realname = req.headers.name;
+	let date = req.headers.datea;
+	let path = req.headers.path;
 	GETMARVELAPI_Comics(realname, date).then(async function (cdata) {
 		res.send(cdata);
+		console.log(cdata);
 		if (cdata === undefined) {
 			throw new Error("no data");
 		}
@@ -1266,9 +1351,9 @@ async function GETMARVELAPI_Comics(name = "", seriesStartDate = "") {
 	console.log("GETMARVELAPI_Comics : seriesStartDate : " + seriesStartDate);
 	let url;
 	if (seriesStartDate !== "" && issueNumber !== "") {
-		url = "https://gateway.marvel.com:443/v1/public/comics?titleStartsWith=" + encodeURIComponent(name) + "&startYear=" + seriesStartDate + "&issueNumber=" + issueNumber + "&noVariants=true&apikey=1ad92a16245cfdb9fecffa6745b3bfdc";
+		url = "https://gateway.marvel.com:443/v1/public/comics?titleStartsWith=" + encodeURIComponent(name) + "&startYear=" + seriesStartDate + "&issueNumber=" + issueNumber + "&noVariants=true" + generateMarvelAPIAuth();
 	} else {
-		url = "https://gateway.marvel.com:443/v1/public/comics?titleStartsWith=" + encodeURIComponent(name) + "&noVariants=true&apikey=1ad92a16245cfdb9fecffa6745b3bfdc";
+		url = "https://gateway.marvel.com:443/v1/public/comics?titleStartsWith=" + encodeURIComponent(name) + "&noVariants=true" + generateMarvelAPIAuth();
 	}
 	let response = await fetch(url);
 	let data = await response.json();
@@ -1277,14 +1362,18 @@ async function GETMARVELAPI_Comics(name = "", seriesStartDate = "") {
 }
 
 async function GETMARVELAPI_Series_ByID(id) {
-	let url = "https://gateway.marvel.com:443/v1/public/series?id=" + id + "&apikey=1ad92a16245cfdb9fecffa6745b3bfdc";
+	let url = "https://gateway.marvel.com:443/v1/public/series?id=" + id + generateMarvelAPIAuth();
 	console.log(url);
 	let response = await fetch(url);
 	let data = await response.json();
 	console.log(data);
 	return data;
 }
-
+app.get("/api/marvel/searchonly/:name/", async (req, res) => {
+	GETMARVELAPI_SEARCH(req.params.name).then(function (data) {
+		res.send(data);
+	})
+})
 app.get("/api/marvel/searchonly/:name/:date", async (req, res) => {
 	GETMARVELAPI_SEARCH(req.params.name, req.params.date).then(function (data) {
 		res.send(data);
@@ -1301,9 +1390,9 @@ async function GETMARVELAPI_SEARCH(name = "", date = "") {
 	let encodedName = encodeURIComponent(name);
 	let url;
 	if (date !== "") {
-		url = "https://gateway.marvel.com:443/v1/public/series?titleStartsWith=" + encodedName + "&startYear=" + date + "&apikey=1ad92a16245cfdb9fecffa6745b3bfdc";
+		url = "https://gateway.marvel.com:443/v1/public/series?titleStartsWith=" + encodedName + "&startYear=" + date + generateMarvelAPIAuth();
 	} else {
-		url = "https://gateway.marvel.com:443/v1/public/series?titleStartsWith=" + encodedName + "&apikey=1ad92a16245cfdb9fecffa6745b3bfdc";
+		url = "https://gateway.marvel.com:443/v1/public/series?titleStartsWith=" + encodedName + generateMarvelAPIAuth();
 	}
 	let response = await fetch(url);
 	return await response.json();
@@ -1311,9 +1400,12 @@ async function GETMARVELAPI_SEARCH(name = "", date = "") {
 
 app.post("/api/marvel", (req, res) => {
 	let token = req.body.token;
-	API_MARVEL_GET(req.body.name).then(async function (data) {
+	let name = req.body.name;
+	let path = req.body.path;
+	API_MARVEL_GET(name).then(async function (data) {
 		let randID = Math.floor(Math.random() * 1000000);
 		console.log(data);
+		console.log(name);
 		if (data["data"]["total"] === 0) {
 			await insertIntoDB("(ID_Series,title,note,start_date,end_date,description,Score,cover,BG,CHARACTERS,STAFF,SOURCE,volumes,chapters,favorite,PATH,lock)", "('" + randID + "U_1" + "','" + JSON.stringify(name.replaceAll("'", "''")) + "',null,null,null,null,'0',null,null,null,null,null,null,null,0,'" + path + "',false)", token, "Series");
 		} else {
@@ -1323,12 +1415,16 @@ app.post("/api/marvel", (req, res) => {
 				for (let i = 0; i < ccdata.length; i++) {
 					await insertIntoDB("", `('${ccdata[i]["id"] + "_1"}','${ccdata[i]["fullName"].replaceAll("'", "''")}','${JSON.stringify(ccdata[i]["thumbnail"])}',${null},'${JSON.stringify(ccdata[i]["urls"])}')`, token, "Creators")
 				}
+			}).catch((err) => {
+				console.log(err);
 			});
 			await GETMARVELAPI_Characters(data["data"]["results"][0]["id"], "series").then(async (ccdata) => {
 				ccdata = ccdata["data"]["results"];
 				for (let i = 0; i < ccdata.length; i++) {
 					await insertIntoDB("", `('${ccdata[i]["id"] + "_1"}','${ccdata[i]["name"].replaceAll("'", "''")}','${JSON.stringify(ccdata[i]["thumbnail"])}','${ccdata[i]["description"].replaceAll("'", "''")}','${JSON.stringify(ccdata[i]["urls"])}')`, token, "Characters")
 				}
+			}).catch((err) => {
+				console.log(err);
 			});
 			/*  await GETMARVELAPI_variants(data["data"]["results"][0]["id"]).then(async (cvdata) => {
 				  cvdata = cvdata["data"]["results"];
@@ -1347,8 +1443,12 @@ app.post("/api/marvel", (req, res) => {
 						await insertIntoDB("", `('${cvdata[i]["id"] + "_1"}','${cvdata[i]["title"].replaceAll("'", "''")}','${JSON.stringify(cvdata[i]["thumbnail"])}','${cvdata[i]["description"].replaceAll("'", "''")}','${JSON.stringify(cvdata[i]["urls"])}','${data["data"]["results"][0]["id"] + "_1"}')`, token, "relations")
 					}
 				}
+			}).catch((err) => {
+				console.log(err);
 			});
 		}
+	}).catch((err) => {
+		console.log(err);
 	})
 })
 app.post("/api/anilist", async (req, res) => {
@@ -1403,6 +1503,7 @@ app.post("/api/anilist", async (req, res) => {
 	})
 	res.sendStatus(200)
 });
+
 app.get("/api/anilist/searchByID/:id", (req, res) => {
 	try {
 		AniList.media.manga(parseInt(req.params.id)).then(function (data2) {
@@ -1412,20 +1513,12 @@ app.get("/api/anilist/searchByID/:id", (req, res) => {
 		res.sendStatus(500);
 	}
 });
-app.get("/api/anilist/searchOnly/:id", (req, res) => {
-	var name = req.params.name;
-	let isSend = false;
-	AniList.searchEntry.manga(
-		name,
-		null, 1,
-		25
-	).then(async function (data) {
-		if (data == null || data.pageInfo.total == 0) {
-			res.send(null);
-		} else {
-			res.send(data.media)
-		}
-	});
+app.get("/api/anilist/searchOnly/:name", (req, res) => {
+	let name = req.params.name;
+	API_ANILIST_GET_SEARCH(name).then(async function (dataa) {
+		res.send(dataa);
+	})
+
 });
 
 async function API_ANILIST_GET_CREATORS(id) {
@@ -1688,7 +1781,6 @@ function unzip_first(zipPath, ExtractDir, ext, token, fileName) {
 				$cherryPick: cherrypick,
 				$bin: Path27Zip,
 			});
-
 			Streamer.on("data", function (data) {
 				fromfile.push(data.file);
 			});
@@ -1775,7 +1867,6 @@ function unzip_first(zipPath, ExtractDir, ext, token, fileName) {
 		} else {
 			//throw error for try catch
 			throw "not supported";
-
 		}
 	} catch (error) {
 		if (error === "not supported") {
@@ -1786,8 +1877,7 @@ function unzip_first(zipPath, ExtractDir, ext, token, fileName) {
 }
 
 async function changePermissionForFilesInFolder(folderPath) {
-
-	fs.chmodSync(folderPath , 0o777);
+	fs.chmodSync(folderPath, 0o777);
 	console.log("chmod 777 for " + folderPath);
 	fs.readdirSync(folderPath, (err, files) => {
 		files.forEach((file) => {
@@ -1796,11 +1886,13 @@ async function changePermissionForFilesInFolder(folderPath) {
 		});
 	});
 }
+
 app.post("/fillBlankImage", (req, res) => {
 	let token = req.body.token;
 	fillBlankImages(token);
 	res.sendStatus(200);
 })
+
 function fillBlankImages(token) {
 	//get the null, "null", "undefined", blank cover or BannerImage from the books DB
 	try {
@@ -1817,10 +1909,10 @@ function fillBlankImages(token) {
 				try {
 					unzip_first(book.PATH, __dirname + "/public/FirstImagesOfAll", path.extname(book.PATH).replaceAll(".", ""), token, filename);
 					await changePermissionForFilesInFolder(__dirname + "/public/FirstImagesOfAll/");
-/*
-					let newpath = await WConv(filename + ".jpg");
-*/
-					UpdateDB("noedit", "URLCover", "'"+__dirname+"/public/FirstImagesOfAll/"+filename+".jpg'", token, "Books", "ID_book", book.ID_book);
+					/*
+										let newpath = await WConv(filename + ".jpg");
+					*/
+					UpdateDB("noedit", "URLCover", "'" + __dirname + "/public/FirstImagesOfAll/" + filename + ".jpg'", token, "Books", "ID_book", book.ID_book);
 				} catch (e) {
 					console.log("NOT SUPPORTED");
 				}
@@ -1854,8 +1946,7 @@ app.post("/configServ/:name/:passcode/:port", (req, res) => {
 	const passcode = req.params.passcode;
 	const portServ = req.params.port;
 	fs.mkdirSync(CosmicComicsTemp + "/profiles/" + name, {recursive: true});
-	changePermissionForFilesInFolder(CosmicComicsTemp + "/profiles/"+name);
-
+	changePermissionForFilesInFolder(CosmicComicsTemp + "/profiles/" + name);
 	console.log("Creating dir " + name);
 	fs.writeFileSync(CosmicComicsTemp + "/profiles/" + name + "/passcode.txt", passcode, {encoding: "utf8"});
 	if (!fs.existsSync(CosmicComicsTemp + "/profiles/" + name + "/config.json")) {
@@ -1915,7 +2006,7 @@ app.get("/profile/custo/getNumber", (req, res) => {
 });
 /*app.get("/api/marvel", (req, res) => {
 	let id = req.body.id
-	fetch("https://gateway.marvel.com:443/v1/public/series/" + id + "/comics?noVariants=false&orderBy=issueNumber&apikey=1ad92a16245cfdb9fecffa6745b3bfdc").then((e)=>{
+	fetch("https://gateway.marvel.com:443/v1/public/series/" + id + "/comics?noVariants=false&orderBy=issueNumber&apikey=").then((e)=>{
 		res.send(e)
 	})
 })*/
@@ -1955,8 +2046,8 @@ async function WConv(file) {
 	} catch (error) {
 		console.log("WEBP CONVERTER ERROR: " + error);
 	}
-			let oldfile = __dirname + "/public/FirstImagesOfAll/" + file;
-			let newfile = __dirname + "/public/FirstImagesOfAll/" + path.basename(file) + ".webp";
+	let oldfile = __dirname + "/public/FirstImagesOfAll/" + file;
+	let newfile = __dirname + "/public/FirstImagesOfAll/" + path.basename(file) + ".webp";
 	try {
 		if (path.extname(file) !== ".webp") {
 			await webp

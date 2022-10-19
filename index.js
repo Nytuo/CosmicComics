@@ -200,7 +200,7 @@ async function rematch(new_id, provider, type, old_id, isSeries = false) {
 				"Content-Type": "application/json"
 			}, body: JSON.stringify({
 				"token": userToken,
-				"table": "Book",
+				"table": "Books",
 				"type": "noedit",
 				"column": "ID_book",
 				"whereEl": old_id,
@@ -906,11 +906,13 @@ function loadView(FolderRes, libraryPath, date = "", provider = providerEnum.MAN
 				let TheBook = bookList[0];
 				if (bookList.length === 0) {
 					if (provider === providerEnum.Marvel) {
-						await GETMARVELAPI_Comics_INSERT(realname, date).then(async (cdata) => {
+						await GETMARVELAPI_Comics_INSERT(realname, date,path).then(async (cdata) => {
+							console.log(cdata);
 							if (cdata === undefined) {
 								throw new Error("no data");
 							}
 							if (cdata["data"]["total"] > 0) {
+								cdata = cdata["data"]["results"][0];
 								TheBook = generateBookTemplate(realname, cdata["id"], null, 0, 0, 1, 0, 0, 0, path,
 									cdata["thumbnail"].path + "/detail." + cdata["thumbnail"].extension, cdata["issueNumber"], cdata["description"], cdata["format"],
 									cdata["pageCount"], cdata["urls"], cdata["series"], cdata["creators"], cdata["characters"], cdata["prices"], cdata["dates"],
@@ -983,7 +985,7 @@ function convertDate(inputFormat) {
 }
 
 /* TODO CODE VERIFICATION */
-function GETMARVELAPI(name = "") {
+function GETMARVELAPI(name = "",path) {
 	fetch('http://' + domain + ":" + port + '/api/marvel/', {
 		method: 'POST',
 		headers: {
@@ -991,7 +993,8 @@ function GETMARVELAPI(name = "") {
 		},
 		body: JSON.stringify({
 			"token": userToken,
-			"name": name
+			"name": name,
+			"path": path,
 		})
 	}).then(function (response) {
 		Toastifycation("Marvel API : " + response.status);
@@ -1034,7 +1037,7 @@ async function loadContent(provider, FolderRes, libraryPath) {
 					API_ANILIST_POST_SEARCH(name, path)
 				} else if (provider === providerEnum.Marvel) {
 					console.log("Provider: Marvel Comics");
-					GETMARVELAPI(name);
+					GETMARVELAPI(name,path);
 				}
 			} else {
 				await getFromDB("Series", "* FROM Series where PATH = '" + foundPATH + "'").then((res) => {
@@ -1728,9 +1731,10 @@ function resolveTitle(title) {
 }
 
 async function GETMARVELAPI_SEARCH(name = "", date = "") {
-	return fetch("http://" + domain + ":" + port + "/api/marvel/searchOnly/" + name + "/" + date).then(function (response) {
+	return fetch("http://" + domain + ":" + port + "/api/marvel/searchonly/" + name + "/" + date).then(function (response) {
 		return response.text();
 	}).then(function (data) {
+		console.log(data);
 		data = JSON.parse(data);
 		return data;
 	}).catch(function (error) {
@@ -1739,6 +1743,8 @@ async function GETMARVELAPI_SEARCH(name = "", date = "") {
 }
 
 async function GETMARVELAPI_Comics(name = "", date = "") {
+	name = encodeURIComponent(name);
+	date = encodeURIComponent(date);
 	return fetch("http://" + domain + ":" + port + "/api/marvel/getComics/" + name + "/" + date).then(function (response) {
 		return response.text();
 	}).then(function (data) {
@@ -1749,10 +1755,21 @@ async function GETMARVELAPI_Comics(name = "", date = "") {
 	});
 }
 
-async function GETMARVELAPI_Comics_INSERT(name = "", date = "") {
-	return fetch("http://" + domain + ":" + port + "/insert/marvel/book/" + name + "/" + date + "/" + userToken).then(function (response) {
+async function GETMARVELAPI_Comics_INSERT(name = "", date = "",path) {
+
+	return fetch("http://" + domain + ":" + port + "/insert/marvel/book/",{
+		method:"GET",
+		headers: {
+			'Content-Type': 'application/json',
+			"name":name,
+			"datea":date,
+			"path":path,
+			"token":userToken
+		}
+	}).then(function (response) {
 		return response.text();
 	}).then(function (data) {
+		console.log(data);
 		data = JSON.parse(data);
 		return data;
 	}).catch(function (error) {
@@ -1806,7 +1823,7 @@ async function createSeries(provider, path, libraryPath, res) {
 	let isLocked = () => {
 		return res[0].lock === 1 || res[0].lock === true;
 	}
-	document.getElementById("rematchSearchSender").addEventListener("click", () => {
+	document.getElementById("rematchSearchSender").onclick = () => {
 		let rematchResult = document.getElementById("resultRematch")
 		let search = document.getElementById("rematchSearch")
 		let year = document.getElementById('rematchYearSearch')
@@ -1826,8 +1843,9 @@ async function createSeries(provider, path, libraryPath, res) {
 		} else if (provider === 2) {
 			API_ANILIST_GET_SEARCH(search.value).then((el) => {
 				if (el != null) {
+					el=el.base;
 					for (let o = 0; o < el.length; o++) {
-						let l = createCard(null, null, null, el[o].id, null, el[o].title)
+						let l = createCard(null, null, null, el[o].id, el[o].coverImage.large, el[o].title.english+" / "+el[o].title.romaji+" / "+el[o].title.native)
 						l.addEventListener("click", () => {
 							rematch(el[o].id + "_" + provider, provider, "Series", res[0].ID_Series, true)
 						})
@@ -1841,7 +1859,7 @@ async function createSeries(provider, path, libraryPath, res) {
 		//fetch API
 		//return results to DIV#Result
 		//Chaque result to conduire vers rematch()
-	})
+	}
 	document.getElementById("lockCheck").checked = res[0].lock;
 	document.getElementById('refresh').onclick = async () => {
 		if (!isLocked()) {
@@ -2458,14 +2476,15 @@ addToBreadCrumb("Home", () => {
  * @param {string} type The type of the element to refresh
  */
 async function refreshMeta(id, provider, type) {
+	console.log("Refreshing metadata for " + id + " from " + provider + " (" + type + ")");
 	Toastifycation("Refreshing metadata...");
-	fetch("http" + domain + ":" + port + "/refreshMeta", {
+	fetch("http://" + domain + ":" + port + "/refreshMeta", {
 		method: "POST",
 		headers: {
 			"Content-Type": "application/json",
 		},
 		body: JSON.stringify({
-			"ID": id,
+			"id": id,
 			"provider": provider,
 			"type": type,
 			"token": userToken
@@ -2500,9 +2519,9 @@ async function createDetails(TheBook, provider) {
 	let isLocked = () => {
 		return TheBook.lock === 1 || TheBook.lock === true;
 	}
-	document.getElementById("rematchSearchSender").addEventListener("click", () => {
+	document.getElementById("rematchSearchSender").onclick = () => {
 		let rematchResult = document.getElementById("resultRematch")
-		let search = document.getElementById("rematchSearch")
+		let search = document.getElementById("rematchSearch");
 		let year = document.getElementById('rematchYearSearch')
 		if (provider === 1) {
 			GETMARVELAPI_Comics(search.value, year.value).then((cdata) => {
@@ -2524,7 +2543,7 @@ async function createDetails(TheBook, provider) {
 		//fetch API
 		//return results to DIV#Result
 		//Chaque result to conduire vers rematch()
-	})
+	}
 	document.getElementById("lockCheck").checked = isLocked();
 	document.getElementById('refresh').onclick = async () => {
 		if (provider === 2) {
