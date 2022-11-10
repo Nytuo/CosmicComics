@@ -148,7 +148,7 @@
   "license": "GPL-3.0-only",
   "private": false,
   "devDependencies": {
-    "electron": "15.2.0",
+    "electron": "18.3.7",
     "electron-builder": "^22.14.5"
   },
   "scripts": {
