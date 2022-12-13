@@ -133,11 +133,17 @@ let PPwasDPM = false;
 let mangaMode = false;
 let language;
 console.log(language);
-
+let bookID = "NaID_"+Math.random()*100500;
 async function getResponse() {
 	console.log("begin Request");
 	const response = await fetch("http://" + domain + ":" + port + "/config/getConfig/" + connected);
 	console.log("Requested");
+	await getFromDB("Books", "ID_book FROM Books WHERE PATH='" + path + "'").then((res) => {
+		console.log(res);
+		bookID= JSON.parse(res)[0].ID_book;
+		console.log(bookID);
+
+	})
 	const dataa = await response.json().then((data) => {
 		console.log(data);
 		let configFile = data;
@@ -618,7 +624,7 @@ function GetFilePath() {
 	HTMLParam = decodeURIComponent(HTMLParam);
 	HTMLParam = HTMLParam.replaceAll("%20", " ");
 	HTMLParam = HTMLParam.replaceAll("ù", "/").replaceAll("%C3%B9", "/");
-	HTMLParam = HTMLParam.split("&page=");
+	HTMLParam = HTMLParam.split("&");
 	console.log(HTMLParam);
 	HTMLParam = HTMLParam[0];
 	console.log(HTMLParam);
@@ -646,7 +652,7 @@ function GetFilePage() {
 let DirectoryPath = window.decodeURIComponent(window.location.search.replace("?", "").split("&")[0]).replace("%3A", ":").replaceAll("%C3%B9", "/");
 console.log(DirectoryPath);
 let isADirectory;
-fetch("http://" + domain + ":" + port + "/view/isDir/" + window.location.search.replace("?", "").split("&")[0]).then((res) => {
+fetch("http://" + domain + ":" + port + "/view/isDir/" + encodeURIComponent(decodeURIComponent(window.location.search).replace("?", "").split("&")[0])).then((res) => {
 	return res.json();
 }).then((res) => {
 	isADirectory = res;
@@ -1740,15 +1746,16 @@ function FixWidth() {
 function TBM() {
 	//check if bookmark is already bookmarked
 	let thepage = GetCurrentPage();
-	getFromDB("Bookmarks", "PATH,page FROM Bookmarks WHERE BOOK_ID='" + shortname + "' AND page=" + thepage + ";").then((res1) => {
+	let filePath = GetFilePath();
+	getFromDB("Bookmarks", "PATH,page FROM Bookmarks WHERE BOOK_ID='"+bookID+"' AND PATH='" + filePath + "' AND page=" + thepage + ";").then((res1) => {
 		let jres = JSON.parse(res1);
 		if (jres.length !== 0) {
 			console.log(jres);
-			if (jres[0]["page"] === thepage.toString()) {
+			if (jres[0]["page"] === GetCurrentPage()) {
 				DeleteFromDB(
 					"Bookmarks",
-					shortname,
-					"AND page=" + thepage.toString()
+					bookID,
+					"AND page=" + GetCurrentPage()
 				);
 				document.getElementById("BMI").innerHTML = "bookmark_border";
 			}
@@ -1757,7 +1764,7 @@ function TBM() {
 			InsertIntoDB(
 				"bookmarks",
 				"(BOOK_ID,PATH,page)",
-				"('" + shortname + "','" + GetFilePath() + "','" + GetCurrentPage() + "')"
+				"('" + bookID + "','" + GetFilePath() + "','" + GetCurrentPage() + "')"
 			);
 			document.getElementById("BMI").innerHTML = "bookmark";
 		}
@@ -1768,7 +1775,7 @@ function TBM() {
 //Loading the BookMark
 function LoadBMI(pagec = 0) {
 	try {
-		getFromDB("Bookmarks", "* FROM Bookmarks WHERE BOOK_ID='" + shortname + "' AND page=" + pagec + ";").then((res) => {
+		getFromDB("Bookmarks", "* FROM Bookmarks WHERE BOOK_ID='" + bookID + "' AND page=" + pagec + ";").then((res) => {
 			res = JSON.parse(res);
 			console.log(res);
 			if (res.length !== 0) {
@@ -2725,7 +2732,6 @@ window.addEventListener("wheel", function (e) {
 });
 //Click left do previous and click right do next
 document.getElementById("viewport").addEventListener("click", function () {
-
 	PreviousPage();
 });
 document

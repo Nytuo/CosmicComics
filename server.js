@@ -12,6 +12,7 @@ const Seven = require("node-7z");
 const {getColor, getPalette} = require('color-extr-thief');
 const Path27Zip = SevenBin.path7za;
 const webp = require('webp-converter');
+const PdfExtractor = require("pdf-extractor").PdfExtractor;
 let CryptoJS = require("crypto-js");
 app.use(express.static(path.join(__dirname, '/public')));
 const isPortable = fs.existsSync(path.join(__dirname, "portable.txt"));
@@ -441,7 +442,19 @@ app.get("/config/getConfig/:token", (req, res) => {
 	res.send(fs.readFileSync(CosmicComicsTemp + "/profiles/" + token + "/config.json"));
 });
 app.get("/BM/getBM", (req, res) => {
-	res.send(fs.readFileSync(CosmicComicsTemp + "/bookmarks.json"));
+	try {
+		var result = [];
+		const token = resolveToken(req.headers.token);
+		getDB(token).all("SELECT * FROM Bookmarks;", function (err, resD) {
+			if (err) return console.log("Error getting element", err);
+			resD.forEach((row) => {
+				result.push(row);
+			});
+			res.send(result);
+		});
+	} catch (e) {
+		console.log(e);
+	}
 });
 app.get("/lang/:lang", (req, res) => {
 	res.send(fs.readFileSync(__dirname + "/languages/" + req.params.lang + ".json"));
@@ -1607,8 +1620,44 @@ function UnZip(zipPath, ExtractDir, name, ext, token) {
 		fs.mkdirSync(CosmicComicsTemp + "/profiles/" + resolveToken(token) + "/current_book");
 		fs.writeFileSync(CosmicComicsTemp + "/profiles/" + resolveToken(token) + "/current_book/path.txt", zipPath);
 		if (ext === "pdf") {
-			alert(language[0]["pdf"]);
-			window.location.href = zipPath;
+
+			let pdfExtractor = new PdfExtractor(ExtractDir,{
+				viewportScale: (width,height) => {
+					if (width > height) {
+						return 1100/width;
+					}
+					return 800/width;
+				},
+			})
+
+			pdfExtractor.parse(zipPath).then((data) => {
+				listofImg = GetListOfImg(CosmicComicsTemp + "/profiles/" + resolveToken(token) + "/current_book");
+				console.log("finish");
+				var name1 = path.basename(zipPath);
+				console.log(zipPath);
+				var shortname = name1.split(".")[0];
+				var lastpage = 0;
+				try {
+					try {
+						var result = [];
+						getDB(resolveToken(token)).all("SELECT last_page FROM Books WHERE PATH='" + zipPath + "';", function (err, resD) {
+							if (err) return console.log("Error getting element", err);
+							resD.forEach((row) => {
+								console.log(row);
+								result.push(row);
+							});
+							console.log(result);
+							SendTo(result[0].last_page);
+							return result[0].last_page;
+						});
+					} catch (e) {
+						console.log(e);
+					}
+				} catch (error) {
+					console.log(error);
+				}
+			})
+
 		} else if (
 			ext == "zip" ||
 			ext == "cbz" ||

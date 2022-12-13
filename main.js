@@ -11,7 +11,10 @@ if (isPortable) {
 }
 fs.mkdirSync(path2Data, {recursive: true});
 let serverConfig = path2Data + '/serverconfig.json';
-const serverConfigPort = JSON.parse(serverConfig)["port"];
+const serverConfigPort = JSON.parse(fs.readFileSync(serverConfig))["port"];
+
+
+
 
 function createWindow() {
 	const win = new BrowserWindow({

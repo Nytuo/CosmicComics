@@ -1,7 +1,7 @@
 {
   "name": "cosmiccomics",
   "productName": "Cosmic-Comics",
-  "version": "2.00.00",
+  "version": "2.0.0",
   "description": "Server based Books (Comics and Manga) Reader",
   "author": {
     "name": "Nytuo",
@@ -130,12 +130,12 @@
     "dist": "electron-builder"
   },
   "devDependencies": {
-    "electron": "^19.0.10",
+    "electron": "^23.0.0-alpha.2",
     "electron-builder": "^23.3.3"
   },
   "dependencies": {
-    "@popperjs/core": "^2.9.2",
     "7zip-bin": "^5.1.1",
+    "@popperjs/core": "^2.9.2",
     "anilist-node": "^1.12.1",
     "anilist.js": "^1.2.1",
     "bootstrap": "^5.0.2",
@@ -157,5 +157,8 @@
     "unrar": "^0.2.0",
     "unrar-binaries": "^1.1.0",
     "webp-converter": "^2.3.3"
+  },
+  "overrides": {
+    "canvas": "latest"
   }
 }
