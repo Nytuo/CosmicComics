@@ -130,7 +130,7 @@
     "dist": "electron-builder"
   },
   "devDependencies": {
-    "electron": "^23.0.0-alpha.2",
+    "electron": "^23.0.0-alpha.3",
     "electron-builder": "^23.3.3"
   },
   "dependencies": {
@@ -152,6 +152,7 @@
     "node-7z": "^3.0.0",
     "nodemon": "^2.0.15",
     "pdf-extractor": "^2.1.2",
+    "puppeteer": "^19.4.0",
     "sqlite3": "^5.0.11",
     "tinycolor2": "^1.4.2",
     "unrar": "^0.2.0",
@@ -159,6 +160,6 @@
     "webp-converter": "^2.3.3"
   },
   "overrides": {
-    "canvas": "latest"
+    "canvas": "^2.10.2"
   }
 }

@@ -15,7 +15,7 @@ along with Cosmic-Comics.  If not, see <https://www.gnu.org/licenses/>.*/
 //Variables declaration
 //All required nodes modules
 //All other variables and constants
-const ValidatedExtension = ["cbr", "cbz", "pdf", "zip", "7z", "cb7", "tar", "cbt", "rar"];
+const ValidatedExtension = ["cbr", "cbz", "pdf", "zip", "7z", "cb7", "tar", "cbt", "rar",'epub'];
 let coolanimations = ["zoomInDown", "rollIn", "zoomIn", "jackInTheBox", "fadeInUp", "fadeInDown", "fadeIn", "bounceInUp", "bounceInDown", "backInDown"];
 let imagelink = "null";
 let listOfImages = [];
