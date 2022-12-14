@@ -1622,7 +1622,7 @@ function UnZip(zipPath, ExtractDir, name, ext, token) {
         fs.chmodSync(__dirname + "/node_modules/7zip-bin/linux/x64/7za", 0o777);
         if (ext === "epub" || ext === "ebook") {
             var fromfile = "";
-            const Stream = Seven.extract(zipPath, ExtractDir, {
+            const Stream = Seven.extractFull(zipPath, ExtractDir, {
                 recursive: true,
                 $bin: Path27Zip
             });
@@ -1638,7 +1638,7 @@ function UnZip(zipPath, ExtractDir, name, ext, token) {
                         return 800 / width;
                     },
                 })
-                const browser = await puppeteer.launch({headless: false, args: ['--no-sandbox']});
+                const browser = await puppeteer.launch({headless: true, args: ['--no-sandbox']});
                 const page = await browser.newPage();
                 let bignb = 0;
                 for (var i = 0; i < listOfElements.length; i++) {
@@ -1646,36 +1646,41 @@ function UnZip(zipPath, ExtractDir, name, ext, token) {
                     if (el.includes(".xhtml")) {
                         await page.goto("file://" + ExtractDir + "/" + el, {waitUntil: "networkidle0"});
                         await page.emulateMediaType('print');
-                        await page.pdf({
-                            path: ExtractDir + "/" + el.split(".")[0] + ".pdf",
-                            format: 'A4',
-                            printBackground: true
-                        });
-                        pdfExtractor.parse(ExtractDir + "/" + el.split(".")[0] + ".pdf", (err, data) => {
-                            if (err) {
-                                console.log(err);
-                            } else {
-                                console.log(data);
-                            }
-                        });
-                        let pages = fs.readdirSync(ExtractDir);
-                        pages.forEach((el, f) => {
-                            if (el.includes(".png")) {
-                                if (el.includes("page")) {
-                                    fs.renameSync(ExtractDir + "/" + el, ExtractDir + "/" + bignb + ".png");
-                                }
-                            }
-                        });
-                        bignb++;
+                        n = parseInt(name) + 1;
+                        name = Array(5 - String(n).length + 1).join("0") + n;
+                        await page.screenshot({path: ExtractDir + "/" + name + ".png", fullPage: true});
+                    bignb++;
                     }
                 }
                 await browser.close();
-                let pages = fs.readdirSync(ExtractDir);
-                pages.forEach((el) => {
+                let allFiles = fs.readdirSync(ExtractDir);
+                allFiles.forEach((el) => {
                     if (!el.includes(".png")) {
-                        fs.rmSync(ExtractDir + "/" + el, {recursive: true});
+                        fs.rmSync(ExtractDir + "/" + el, { recursive: true });
                     }
                 });
+                listOfElements = GetListOfImg(CosmicComicsTemp + "/profiles/" + resolveToken(token) + "/current_book");
+                console.log("finish");
+                console.log(zipPath);
+                try {
+                    try {
+                        var result = [];
+                        getDB(resolveToken(token)).all("SELECT last_page FROM Books WHERE PATH='" + zipPath + "';", function (err, resD) {
+                            if (err) return console.log("Error getting element", err);
+                            resD.forEach((row) => {
+                                console.log(row);
+                                result.push(row);
+                            });
+                            console.log(result);
+                            SendTo(result[0].last_page);
+                            return result[0].last_page;
+                        });
+                    } catch (e) {
+                        console.log(e);
+                    }
+                } catch (error) {
+                    console.log(error);
+                }
             });
             Stream.on("error", (err) => {
                 console.log("An error occured" + err);
