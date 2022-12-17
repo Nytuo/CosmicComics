@@ -501,10 +501,14 @@ async function discoverLibraries() {
                 openLibrary(el["PATH"], el["API_ID"]);
             });
             const logo = document.createElement("img");
-            if (el["API_ID"] === 1) {
+            if (el["API_ID"] === providerEnum.Marvel) {
                 logo.src = "./Images/marvel-logo-png-10.png";
-            } else if (el["API_ID"] === 2) {
+            } else if (el["API_ID"] === providerEnum.Anilist) {
                 logo.src = "./Images/android-chrome-512x512.png";
+            }
+            else if (el["API_ID"] === providerEnum.MANUAL) {
+                logo.src = "./Images/manual.svg";
+                logo.style.filter = "invert(100%)";
             }
             logo.className = "libLogo";
             btn.appendChild(logo);
@@ -935,6 +939,13 @@ function loadView(FolderRes, libraryPath, date = "", provider = providerEnum.MAN
                         })
                         TheBook = generateBookTemplate(realname, null, null, 0, 0, 1, 0, 0, 0, path, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null)
                     }
+                    else if (provider === providerEnum.MANUAL) {
+                        console.log("manual");
+                        InsertIntoDB("Books", "",`(?,'${null}','${realname}',null,${0},${0},${1},${0},${0},${0},'${path}','${null}','${null}','${null}','${null}',${null},'${null}','${null}','${null}','${null}','${null}','${null}','${null}','${null}','${null}',false)`)
+
+                        TheBook = generateBookTemplate(realname, null, null, 0, 0, 1, 0, 0, 0, path, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null)
+                    }
+                    //TODO implement API HERE
                 }
                 let carddiv = createCard(TheBook["unread"], TheBook["read"], TheBook["reading"], TheBook["ID_book"] + "_" + n, TheBook["URLCover"], TheBook["NOM"], TheBook["favorite"])
                 carddiv.querySelector(".card__play").addEventListener("click", function () {
@@ -1033,12 +1044,16 @@ async function loadContent(provider, FolderRes, libraryPath) {
             });
             if (found === false) {
                 if (provider === providerEnum.Anilist) {
-                    console.log("provider 2");
+                    console.log("provider Anilist");
                     API_ANILIST_POST_SEARCH(name, path)
                 } else if (provider === providerEnum.Marvel) {
                     console.log("Provider: Marvel Comics");
                     GETMARVELAPI(name, path);
+                }else if (provider === providerEnum.MANUAL){
+                    let randID = Math.floor(Math.random()*1000000);
+                    InsertIntoDB("Series", "(ID_Series,title,note,statut,start_date,end_date,description,Score,genres,cover,BG,CHARACTERS,TRENDING,STAFF,SOURCE,volumes,chapters,favorite,PATH,lock)", "('" + randID + "U_0" + "','" + JSON.stringify(name.replaceAll("'", "''")) + "',null,null,null,null,null,'0',null,null,null,null,null,null,null,null,null,0,'" + path + "',false)");
                 }
+                //TODO implement API HERE
             } else {
                 await getFromDB("Series", "* FROM Series where PATH = '" + foundPATH + "'").then((res) => {
                     console.log(foundPATH);
@@ -1046,9 +1061,9 @@ async function loadContent(provider, FolderRes, libraryPath) {
                     console.log(res);
                     let node;
                     if (cardMode === true) {
-                        if (provider === 1) {
+                        if (provider === providerEnum.Marvel) {
                             node = JSON.parse(res[0].title);
-                        } else {
+                        } else if (provider == providerEnum.Anilist) {
                             if (JSON.parse(res[0].title)["english"] !== undefined && JSON.parse(res[0].title)["english"] !== null) {
                                 node = JSON.parse(res[0].title)["english"];
                             } else if (JSON.parse(res[0].title)["romaji"] !== undefined && JSON.parse(res[0].title)["romaji"] !== null) {
@@ -1056,12 +1071,14 @@ async function loadContent(provider, FolderRes, libraryPath) {
                             } else {
                                 node = JSON.parse(res[0].title);
                             }
+                        }else if (provider == providerEnum.MANUAL) {
+                            node = res[0].title;
                         }
                     } else {
                         node = JSON.parse(res[0].title)["english"];
                     }
                     let invertedPath = path.replaceAll("\\", "/");
-                    if (provider === 1) {
+                    if (provider === providerEnum.Marvel) {
                         try {
                             imagelink = JSON.parse(res[0].cover).path + "/detail." + JSON.parse(res[0].cover).extension;
                         } catch (e) {
@@ -1443,7 +1460,8 @@ function HomeRoutine() {
             });
             let brook = TheBook;
             carddiv.addEventListener("click", function () {
-                let provider = ((brook.series.includes("marvel")) ? (1) : ((brook.series.includes("Anilist")) ? (2) : (0)));
+                //TODO implement API HERE
+                let provider = ((brook.series.includes("marvel")) ? (providerEnum.Marvel) : ((brook.series.includes("Anilist")) ? (providerEnum.Anilist) : (providerEnum.MANUAL)));
                 createDetails(brook, provider);
             });
             const element = document.getElementById("continueReadingHome");
@@ -1487,7 +1505,8 @@ function HomeRoutine() {
             });
             let brook = TheBook;
             carddiv.addEventListener("click", function () {
-                let provider = ((brook.series.includes("marvel")) ? (1) : ((brook.series.includes("Anilist")) ? (2) : (0)));
+                //TODO Implement API HERE
+                let provider = ((brook.series.includes("marvel")) ? (providerEnum.Marvel) : ((brook.series.includes("Anilist")) ? (providerEnum.Anilist) : (providerEnum.MANUAL)));
                 createDetails(brook, provider);
             });
             element.appendChild(carddiv);
@@ -1526,7 +1545,8 @@ function HomeRoutine() {
             });
             let brook = TheBook;
             carddiv.addEventListener("click", function () {
-                let provider = ((brook.series.includes("marvel")) ? (1) : ((brook.series.includes("Anilist")) ? (2) : (0)));
+                //TODO Implement API HERE
+                let provider = ((brook.series.includes("marvel")) ? (providerEnum.Marvel) : ((brook.series.includes("Anilist")) ? (providerEnum.Anilist) : (providerEnum.MANUAL)));
                 createDetails(brook, provider);
             });
             const element = document.getElementById("toRead");
@@ -1570,8 +1590,9 @@ function HomeRoutine() {
             });
             let brook = TheBook;
             carddiv.addEventListener("click", function () {
-                let provider = ((brook.series.includes("marvel")) ? (1) : ((brook.series.includes("Anilist")) ? (2) : (0)));
-                createDetails(brook, provider);
+                //TODO Implement API HERE
+                let provider = ((brook.series.includes("marvel")) ? (providerEnum.Marvel) : ((brook.series.includes("Anilist")) ? (providerEnum.Anilist) : (providerEnum.MANUAL)));
+                 createDetails(brook, provider);
             });
             const element = document.getElementById("myfavoriteHome");
             const divrating = document.createElement("div");
@@ -1687,7 +1708,11 @@ async function setSearch(res) {
                 await getFromDB("Books", "* FROM Books WHERE PATH = '" + res[key].PATH + "'").then(async (resa) => {
                     let bookList = JSON.parse(resa);
                     let TheBook = bookList[0];
-                    let provider = ((TheBook.series.includes("marvel")) ? (1) : ((TheBook.series.includes("Anilist")) ? (2) : (0)));
+                    //TODO Implement API HERE
+                    let provider = ((brook.series.includes("marvel")) ? (providerEnum.Marvel) : ((brook.series.includes("Anilist")) ? (providerEnum.Anilist) : (((brook.series.includes("manual")) ? (providerEnum.MANUAL) : (-1)))));
+                    if (provider === -1){
+                        return;
+                    }
                     await createDetails(TheBook, provider);
                 });
             } else {
@@ -1695,23 +1720,20 @@ async function setSearch(res) {
                     console.log("HERE");
                     let bookList = JSON.parse(resa);
                     let TheBook = bookList[0];
-                    let provider = ((TheBook.ID_Series.includes("_1")) ? (1) : ((TheBook.ID_Series.includes("_2")) ? (2) : (0)));
+                    //TODO Implement API HERE
+                    let provider = ((TheBook.ID_Series.includes("_1")) ? (providerEnum.Marvel) : ((TheBook.ID_Series.includes("_2")) ? (providerEnum.Anilist) : (-1)));
                     let result = res[key].PATH;
                     console.log(result);
                     let libPath = result.replaceAll("\\", "/");
                     libPath = libPath.replace(/\/[^\/]+$/, "");
                     libPath = libPath.replaceAll("/", "\\");
-                    if (provider === 1) {
+                    if (provider === providerEnum.Marvel) {
                         await createSeries(provider, result, libPath, bookList);
-                    } else if (provider === 2) {
+                    } else if (provider === providerEnum.Anilist) {
                         try {
                             await createSeries(provider, result, libPath, bookList);
                         } catch (e) {
-                            try {
-                                await createSeries(provider, result, libPath, bookList);
-                            } catch (e) {
-                                await createSeries(provider, result, libPath, bookList);
-                            }
+                            console.log(e);
                         }
                     }
                 });
@@ -1847,7 +1869,7 @@ async function createSeries(provider, path, libraryPath, res) {
         let rematchResult = document.getElementById("resultRematch")
         let search = document.getElementById("rematchSearch")
         let year = document.getElementById('rematchYearSearch')
-        if (provider === 1) {
+        if (provider === providerEnum.Marvel) {
             GETMARVELAPI_SEARCH(search.value, year.value).then((cdata) => {
                 if (cdata["data"]["total"] > 0) {
                     for (let i = 0; i < cdata["data"]["total"]; i++) {
@@ -1860,7 +1882,7 @@ async function createSeries(provider, path, libraryPath, res) {
                     }
                 }
             })
-        } else if (provider === 2) {
+        } else if (provider === providerEnum.Anilist) {
             API_ANILIST_GET_SEARCH(search.value).then((el) => {
                 if (el != null) {
                     el = el.base;
@@ -1873,7 +1895,8 @@ async function createSeries(provider, path, libraryPath, res) {
                     }
                 }
             })
-        } else if (provider === 0) {
+        } else if (provider === providerEnum.MANUAL) {
+            alert("Manual Provider can't be rematched")
         } else {
         }
         //fetch API
@@ -1889,7 +1912,7 @@ async function createSeries(provider, path, libraryPath, res) {
         }
     }
     if (!APINOTFOUND) {
-        document.getElementById("provider_text").innerHTML = ((provider === 1) ? ("Data provided by Marvel. © 2014 Marvel") : ((provider === 2) ? ("Data provided by Anilist.") : ("The Data are not provided by an API.")));
+        document.getElementById("provider_text").innerHTML = ((provider === providerEnum.Marvel) ? ("Data provided by Marvel. © 2014 Marvel") : ((provider === providerEnum.Anilist) ? ("Data provided by Anilist.") : ("The Data are not provided by an API.")));
     } else {
         document.getElementById("provider_text").innerHTML = "The data are not from the API";
     }
@@ -1915,7 +1938,7 @@ async function createSeries(provider, path, libraryPath, res) {
             const options = {
                 method: "GET", headers: {
                     "Content-Type": "application/json",
-                    "img": ((provider === 1) ? (JSON.parse(res[0].BG).path + "/detail." + JSON.parse(res[0].BG).extension) : (res[0].BG))
+                    "img": ((provider === providerEnum.Marvel) ? (JSON.parse(res[0].BG).path + "/detail." + JSON.parse(res[0].BG).extension) : (res[0].BG))
                 }
             };
             await fetch("http://" + domain + ":" + port + "/img/getPalette/" + userToken, options).then(function (response) {
@@ -1947,24 +1970,24 @@ async function createSeries(provider, path, libraryPath, res) {
         }
     }
     if (!APINOTFOUND) {
-        document.getElementById("ColTitle").innerHTML = "<a target='_blank' href='" + ((provider === 1) ? (JSON.parse(res[0].SOURCE).url) : (res[0].SOURCE)) + "' style='color:white'>" + ((provider === 1) ? (JSON.parse(res[0].title)) : (JSON.parse(res[0].title).english + " / " + JSON.parse(res[0].title).romaji + " / " + JSON.parse(res[0].title).native)) + "<i style='font-size: 18px;top: -10px;position: relative' class='material-icons'>open_in_new</i></a>";
-        document.getElementById("ImgColCover").src = ((provider === 1) ? (JSON.parse(res[0].cover).path + "/detail." + JSON.parse(res[0].cover).extension) : (res[0].cover));
-        if (((provider === 1) ? (JSON.parse(res[0].start_date)) : (JSON.parse(res[0].start_date).year)) == null) {
+        document.getElementById("ColTitle").innerHTML = "<a target='_blank' href='" + ((provider === providerEnum.Marvel) ? (JSON.parse(res[0].SOURCE).url) : (res[0].SOURCE)) + "' style='color:white'>" + ((provider === providerEnum.Marvel) ? (JSON.parse(res[0].title)) : (JSON.parse(res[0].title).english + " / " + JSON.parse(res[0].title).romaji + " / " + JSON.parse(res[0].title).native)) + "<i style='font-size: 18px;top: -10px;position: relative' class='material-icons'>open_in_new</i></a>";
+        document.getElementById("ImgColCover").src = ((provider === providerEnum.Marvel) ? (JSON.parse(res[0].cover).path + "/detail." + JSON.parse(res[0].cover).extension) : (res[0].cover));
+        if (((provider === providerEnum.Marvel) ? (JSON.parse(res[0].start_date)) : (JSON.parse(res[0].start_date).year)) == null) {
             document.getElementById("startDate").innerHTML = "?";
         } else {
-            document.getElementById("startDate").innerHTML = ((provider === 1) ? (JSON.parse(res[0].start_date)) : (JSON.parse(res[0].start_date).year));
+            document.getElementById("startDate").innerHTML = ((provider === providerEnum.Marvel) ? (JSON.parse(res[0].start_date)) : (JSON.parse(res[0].start_date).year));
         }
-        if (((provider === 1) ? (JSON.parse(res[0].end_date)) : (JSON.parse(res[0].end_date).year)) == null || JSON.parse(res[0].end_date) > new Date().getFullYear()) {
+        if (((provider === providerEnum.Marvel) ? (JSON.parse(res[0].end_date)) : (JSON.parse(res[0].end_date).year)) == null || JSON.parse(res[0].end_date) > new Date().getFullYear()) {
             document.getElementById("startDate").innerHTML += " - ?";
         } else {
-            document.getElementById("startDate").innerHTML += " - " + ((provider === 1) ? (JSON.parse(res[0].end_date)) : (JSON.parse(res[0].end_date).year));
+            document.getElementById("startDate").innerHTML += " - " + ((provider === providerEnum.Marvel) ? (JSON.parse(res[0].end_date)) : (JSON.parse(res[0].end_date).year));
         }
         let NameToFetchList = [];
-        if (provider === 1) {
+        if (provider === providerEnum.Marvel) {
             JSON.parse(res[0].CHARACTERS)["items"].forEach((el) => {
                 NameToFetchList.push("'" + el.name.replaceAll("'", "''") + "'");
             });
-        } else if (provider === 2) {
+        } else if (provider === providerEnum.Anilist) {
             JSON.parse(res[0].CHARACTERS).forEach((el) => {
                 NameToFetchList.push("'" + el.name.replaceAll("'", "''") + "'");
             });
@@ -1985,7 +2008,7 @@ async function createSeries(provider, path, libraryPath, res) {
                 divs2.setAttribute("data-bs-toggle", "modal");
                 divs2.setAttribute("data-bs-target", "#moreinfo");
                 divs2.addEventListener("click", function (e) {
-                    if (provider === 1) {
+                    if (provider === providerEnum.Marvel) {
                         document.getElementById("moreinfo_img").src = JSON.parse(image).path + "/detail." + JSON.parse(image).extension;
                         document.getElementById("moreinfo_btn").href = JSON.parse(urlo)[0].url;
                         if (desc == null) {
@@ -1993,7 +2016,7 @@ async function createSeries(provider, path, libraryPath, res) {
                         } else {
                             document.getElementById("moreinfo_txt").innerHTML = name + "<br/>" + desc;
                         }
-                    } else if (provider === 2) {
+                    } else if (provider === providerEnum.Anilist || provider === providerEnum.MANUAL) {
                         document.getElementById("moreinfo_img").src = image.replaceAll('"', "");
                         document.getElementById("moreinfo_btn").href = urlo;
                         if (desc == null) {
@@ -2009,9 +2032,9 @@ async function createSeries(provider, path, libraryPath, res) {
                     document.getElementById("moreinfo_btn").target = "_blank";
                     document.getElementById("moreinfo_btn").innerHTML = "See more";
                 });
-                if (provider === 1) {
+                if (provider === providerEnum.Marvel) {
                     divs2.innerHTML += "<img src='" + JSON.parse(el.image).path + "/detail." + JSON.parse(el.image).extension + "' class='img-charac'/><br><span>" + el.name + "</span>";
-                } else if (provider === 2) {
+                } else if (provider === providerEnum.Anilist || provider === providerEnum.MANUAL) {
                     divs2.innerHTML += "<img src='" + el.image.replaceAll('"', '') + "' class='img-charac'/><br><span>" + el.name + "</span>";
                 }
                 divs.appendChild(divs2);
@@ -2021,7 +2044,7 @@ async function createSeries(provider, path, libraryPath, res) {
                 container.appendChild(divs);
             });
         });
-        document.getElementById("characters").innerHTML = "<h1>" + "Characters" + ":</h1> " + "Number of characters : " + ((provider === 1) ? (JSON.parse(res[0].CHARACTERS)["available"]) : (JSON.parse(res[0].CHARACTERS).length)) + "<br/>";
+        document.getElementById("characters").innerHTML = "<h1>" + "Characters" + ":</h1> " + "Number of characters : " + ((provider === providerEnum.Marvel) ? (JSON.parse(res[0].CHARACTERS)["available"]) : (JSON.parse(res[0].CHARACTERS).length)) + "<br/>";
         let scrollCharactersAmount = 0;
         let moveRight = document.createElement("button");
         moveRight.className = "scrollBtnR";
@@ -2042,7 +2065,7 @@ async function createSeries(provider, path, libraryPath, res) {
         document.getElementById("characters").appendChild(moveLeft);
         document.getElementById("characters").appendChild(moveRight);
         document.getElementById("characters").appendChild(container);
-        document.getElementById("OtherTitles").innerHTML = ((provider === 1) ? ("A few comics in this series (for a complete view check the Marvel's website)") : ("Relations")) + " : ";
+        document.getElementById("OtherTitles").innerHTML = ((provider === providerEnum.Marvel) ? ("A few comics in this series (for a complete view check the Marvel's website)") : ("Relations")) + " : ";
         await getFromDB("relations", "* FROM relations WHERE series = '" + res[0].ID_Series + "'").then((clres) => {
             clres = JSON.parse(clres);
             console.log(clres);
@@ -2074,7 +2097,7 @@ async function createSeries(provider, path, libraryPath, res) {
                 let name = el.name;
                 reltxt.onclick = function () {
                     document.getElementById("moreinfo_img").className = "img-relation";
-                    if (provider === 1) {
+                    if (provider === providerEnum.Marvel) {
                         document.getElementById("moreinfo_img").src = JSON.parse(image).path + "/detail." + JSON.parse(image).extension;
                         document.getElementById("moreinfo_btn").href = JSON.parse(urlo)[0].url;
                         if (desc == null) {
@@ -2082,7 +2105,7 @@ async function createSeries(provider, path, libraryPath, res) {
                         } else {
                             document.getElementById("moreinfo_txt").innerHTML = name + "<br/>" + desc;
                         }
-                    } else if (provider === 2) {
+                    } else if (provider === providerEnum.Anilist || provider === providerEnum.MANUAL) {
                         document.getElementById("moreinfo_img").src = image.replaceAll('"', "");
                         document.getElementById("moreinfo_btn").href = urlo;
                         if (desc == null) {
@@ -2104,7 +2127,7 @@ async function createSeries(provider, path, libraryPath, res) {
                 reltxt.setAttribute("data-bs-target", "#moreinfo");
                 const relimg = document.createElement("div");
                 const imgcard = document.createElement("img");
-                imgcard.src = ((provider === 1) ? (JSON.parse(el.image).path + "/detail." + JSON.parse(el.image).extension) : (el.image));
+                imgcard.src = ((provider === providerEnum.Marvel) ? (JSON.parse(el.image).path + "/detail." + JSON.parse(el.image).extension) : (el.image));
                 imgcard.style.width = "100%";
                 relimg.className = "card__image";
                 relimg.style.backgroundColor = "rgba(0,0,0,0.753)";
@@ -2115,13 +2138,13 @@ async function createSeries(provider, path, libraryPath, res) {
             });
             document.getElementById("OtherTitles").appendChild(divlist);
         });
-        let tmpstaff = "Number of people : " + ((provider === 1) ? (JSON.parse(res[0].STAFF)["available"]) : (JSON.parse(res[0].STAFF).length)) + "<br/>";
+        let tmpstaff = "Number of people : " + ((provider === providerEnum.Marvel) ? (JSON.parse(res[0].STAFF)["available"]) : (JSON.parse(res[0].STAFF).length)) + "<br/>";
         let StaffToFetchList = [];
-        if (provider === 1) {
+        if (provider === providerEnum.Marvel) {
             JSON.parse(res[0].STAFF)["items"].forEach((el) => {
                 StaffToFetchList.push("'" + el.name.replaceAll("'", "''") + "'");
             });
-        } else if (provider === 2) {
+        } else if (provider === providerEnum.Anilist || provider === providerEnum.MANUAL) {
             JSON.parse(res[0].STAFF).forEach((el) => {
                 StaffToFetchList.push("'" + el.name.replaceAll("'", "''") + "'");
             });
@@ -2143,7 +2166,7 @@ async function createSeries(provider, path, libraryPath, res) {
                 divs2.setAttribute("data-bs-toggle", "modal");
                 divs2.setAttribute("data-bs-target", "#moreinfo");
                 divs2.addEventListener("click", function (e) {
-                    if (provider === 1) {
+                    if (provider === providerEnum.Marvel) {
                         document.getElementById("moreinfo_img").src = JSON.parse(image).path + "/detail." + JSON.parse(image).extension;
                         document.getElementById("moreinfo_btn").href = JSON.parse(urlo)[0].url;
                         if (desc == null) {
@@ -2151,7 +2174,7 @@ async function createSeries(provider, path, libraryPath, res) {
                         } else {
                             document.getElementById("moreinfo_txt").innerHTML = name + "<br/>" + desc;
                         }
-                    } else if (provider === 2) {
+                    } else if (provider === providerEnum.Anilist || provider === providerEnum.MANUAL) {
                         document.getElementById("moreinfo_img").src = image.replaceAll('"', "");
                         document.getElementById("moreinfo_btn").href = urlo;
                         if (desc == null) {
@@ -2168,11 +2191,11 @@ async function createSeries(provider, path, libraryPath, res) {
                     document.getElementById("moreinfo_btn").innerHTML = "See more";
                 });
                 for (let j = 0; j < clres.length; j++) {
-                    if (provider === 1) {
+                    if (provider === providerEnum.Marvel) {
                         if (el.name === JSON.parse(res[0]["STAFF"])["items"][j].name) {
                             divs2.innerHTML += "<img src='" + JSON.parse(el.image).path + "/detail." + JSON.parse(el.image).extension + "' class='img-charac'/><br><span>" + el.name + "</span><br/><span style='font-size: 14px;color: #a8a8a8a8'>" + JSON.parse(res[0]["STAFF"])["items"][j]["role"] + "</span>";
                         }
-                    } else if (provider === 2) {
+                    } else if (provider === providerEnum.Anilist || provider === providerEnum.MANUAL) {
                         if (el.name === JSON.parse(res[0]["STAFF"])[j].name) {
                             divs2.innerHTML += "<img src='" + el.image.replaceAll('"', "") + "' class='img-charac'/><br><span>" + el.name + "</span>";
                         }
@@ -2221,7 +2244,7 @@ async function createSeries(provider, path, libraryPath, res) {
         }
     }
     if (res[0]["chapters"] != null) {
-        document.getElementById("chapters").innerHTML = ((provider === 1) ? ("Number of Comics in this series : ") : ("Number of chapter in this series : ")) + res[0]["chapters"];
+        document.getElementById("chapters").innerHTML = ((provider === providerEnum.Marvel) ? ("Number of Comics in this series : ") : ("Number of chapter in this series : ")) + res[0]["chapters"];
     }
     document.getElementById("contentViewer").style.display = "block";
     animateCSS(document.getElementById("onContentViewer"), "fadeIn").then((message) => {
@@ -2308,7 +2331,7 @@ async function createSeries(provider, path, libraryPath, res) {
         }
     });
     if (!APINOTFOUND) {
-        if (provider === 1) {
+        if (provider === providerEnum.Marvel) {
             loadView(path, libraryPath, JSON.parse(res[0].start_date), provider);
             document.getElementById("id").innerText = "This series ID from Marvel : " + parseInt(res[0].ID_Series);
             if (res[0].description != null && res[0].description !== "null") {
@@ -2333,7 +2356,7 @@ async function createSeries(provider, path, libraryPath, res) {
                 document.getElementById("Status").innerHTML = "UNKNOWN";
                 document.getElementById("Status").className = "NotYet";
             }
-        } else if (provider === 2) {
+        } else if (provider === providerEnum.Anilist || provider === providerEnum.MANUAL) {
             loadView(path, libraryPath, "", provider);
             document.getElementById("description").innerHTML = res[0].description;
             document.getElementById("genres").innerHTML = "Genres " + ":";
@@ -2361,7 +2384,7 @@ async function createSeries(provider, path, libraryPath, res) {
             }
         }
     } else {
-        if (provider === 1) {
+        if (provider === providerEnum.Marvel) {
             loadView(path, libraryPath, JSON.parse(res[0].start_date), provider);
             if (res[0].description != null && res[0].description !== "null") {
                 document.getElementById("description").innerHTML = res[0].description;
@@ -2390,7 +2413,7 @@ async function createSeries(provider, path, libraryPath, res) {
                     document.getElementById("Status").className = "NotYet";
                 }
             }
-        } else if (provider === 2) {
+        } else if (provider === providerEnum.Anilist || provider === providerEnum.MANUAL) {
             loadView(path, libraryPath, "", provider);
             document.getElementById("description").innerHTML = res[0].description;
             if (res[0]["TRENDING"] != null && res[0]["TRENDING"] !== "null") {
@@ -2543,7 +2566,7 @@ async function createDetails(TheBook, provider) {
         let rematchResult = document.getElementById("resultRematch")
         let search = document.getElementById("rematchSearch");
         let year = document.getElementById('rematchYearSearch')
-        if (provider === 1) {
+        if (provider === providerEnum.Marvel) {
             GETMARVELAPI_Comics(search.value, year.value).then((cdata) => {
                 if (cdata["data"]["total"] > 0) {
                     for (let i = 0; i < cdata["data"]["total"]; i++) {
@@ -2556,8 +2579,10 @@ async function createDetails(TheBook, provider) {
                     }
                 }
             })
-        } else if (provider === 2) {
-        } else if (provider === 0) {
+        } else if (provider === providerEnum.Anilist) {
+            //TODO : Anilist
+        } else if (provider === providerEnum.MANUAL) {
+            alert("You can't rematch a manual entry")
         } else {
         }
         //fetch API
@@ -2566,8 +2591,8 @@ async function createDetails(TheBook, provider) {
     }
     document.getElementById("lockCheck").checked = isLocked();
     document.getElementById('refresh').onclick = async () => {
-        if (provider === 2) {
-            Toastifycation("Anilist is not compatible for this feature", "#ff0000")
+        if (provider === providerEnum.Anilist || provider === providerEnum.MANUAL) {
+            Toastifycation("Provider is not compatible for this feature", "#ff0000")
         } else {
             if (!isLocked()) {
                 await refreshMeta(TheBook.ID_book, provider, "book");
@@ -2606,7 +2631,7 @@ async function createDetails(TheBook, provider) {
     addToBreadCrumb(TheBook.NOM, () => {
         return createDetails(TheBook, provider);
     });
-    document.getElementById("provider_text").innerHTML = ((provider === 1) ? ("Data provided by Marvel. © 2014 Marvel") : ((provider === 2) ? ("Data provided by Anilist.") : ("The Data are not provided by an API.")));
+    document.getElementById("provider_text").innerHTML = ((provider === providerEnum.Marvel) ? ("Data provided by Marvel. © 2014 Marvel") : ((provider === providerEnum.Anilist) ? ("Data provided by Anilist.") : ("The Data are not provided by an API.")));
     document.getElementById("contentViewer").style.display = "block";
     document.getElementById("DLBOOK").addEventListener("click", function (e) {
         let path = TheBook.PATH;
@@ -2638,18 +2663,21 @@ async function createDetails(TheBook, provider) {
     if (TheBook.characters !== "null") {
         document.getElementById("id").innerHTML = "This is a " + TheBook.format + " of " + TheBook.pageCount + " pages. <br/> This is part of the '" + JSON.parse(TheBook.series).name + "' series.";
     } else {
-        if (provider === 2) {
+        if (provider === providerEnum.Anilist) {
             document.getElementById("id").innerHTML = "This is part of the '" + TheBook.series.split("_")[2].replaceAll("$", " ") + "' series.";
-        } else if (provider === 1) {
+        } else if (provider === providerEnum.Marvel) {
             document.getElementById("id").innerHTML = "This is part of the '" + JSON.parse(TheBook.series).name + "' series.";
+        }
+        else if (provider === providerEnum.MANUAL) {
+            document.getElementById("id").innerHTML = "This is part of the '" + TheBook.series + "' series.";
         }
     }
     document.getElementById("averageProgress").style.display = "none";
     document.getElementById("ContentView").innerHTML = "";
     try {
-        if (provider === 1) {
+        if (provider === providerEnum.Marvel) {
             document.getElementById("ColTitle").innerHTML = "<a target='_blank' href='" + ((TheBook.URLs == null) ? ("#") : (JSON.parse(TheBook.URLs)[0].url)) + "' style='color:white'>" + TheBook.NOM + "<i style='font-size: 18px;top: -10px;position: relative' class='material-icons'>open_in_new</i></a>";
-        } else if (provider === 2) {
+        } else if (provider === providerEnum.Anilist) {
             document.getElementById("ColTitle").innerHTML = "<a target='_blank' style='color:white'>" + TheBook.NOM + "</a>";
         } else {
             document.getElementById("ColTitle").innerHTML = "<a target='_blank' style='color:white'>" + TheBook.NOM + "</a>";
@@ -2748,11 +2776,11 @@ async function createDetails(TheBook, provider) {
     });
     if (TheBook.characters !== "null") {
         let NameToFetchList = [];
-        if (provider === 1) {
+        if (provider === providerEnum.Marvel) {
             JSON.parse(TheBook.characters)["items"].forEach((el) => {
                 NameToFetchList.push("'" + el.name + "'");
             });
-        } else if (provider === 2) {
+        } else if (provider === providerEnum.Anilist || provider === providerEnum.MANUAL) {
             JSON.parse(TheBook.characters).forEach((el) => {
                 NameToFetchList.push("'" + el.name + "'");
             });
@@ -2773,7 +2801,7 @@ async function createDetails(TheBook, provider) {
                 divs2.setAttribute("data-bs-toggle", "modal");
                 divs2.setAttribute("data-bs-target", "#moreinfo");
                 divs2.addEventListener("click", function (e) {
-                    if (provider === 1) {
+                    if (provider === providerEnum.Marvel) {
                         document.getElementById("moreinfo_img").src = JSON.parse(image).path + "/detail." + JSON.parse(image).extension;
                         document.getElementById("moreinfo_btn").href = JSON.parse(urlo)[0].url;
                         if (desc == null) {
@@ -2781,7 +2809,7 @@ async function createDetails(TheBook, provider) {
                         } else {
                             document.getElementById("moreinfo_txt").innerHTML = name + "<br/>" + desc;
                         }
-                    } else if (provider === 2) {
+                    } else if (provider === providerEnum.Anilist || provider === providerEnum.MANUAL) {
                         document.getElementById("moreinfo_img").src = image.replaceAll('"', "");
                         document.getElementById("moreinfo_btn").href = urlo;
                         if (desc == null) {
@@ -2797,9 +2825,9 @@ async function createDetails(TheBook, provider) {
                     document.getElementById("moreinfo_btn").target = "_blank";
                     document.getElementById("moreinfo_btn").innerHTML = "See more";
                 });
-                if (provider === 1) {
+                if (provider === providerEnum.Marvel) {
                     divs2.innerHTML = "<img alt='a character' src='" + JSON.parse(el.image).path + "/detail." + JSON.parse(el.image).extension + "' class='img-charac'/><br><span>" + el.name + "</span>";
-                } else if (provider === 2) {
+                } else if (provider === providerEnum.Anilist || provider === providerEnum.MANUAL) {
                     divs2.innerHTML = "<img alt='a character' src='" + el.image.replaceAll('"', '') + "' class='img-charac'/><br><span>" + el.name + "</span>";
                 }
                 divs.appendChild(divs2);
@@ -2842,7 +2870,7 @@ async function createDetails(TheBook, provider) {
                 Toastifycation("Error", "#d92027");
             });
         });
-        document.getElementById("characters").innerHTML = "<h1>" + "Characters" + ":</h1> " + "Number of characters : " + ((provider === 1) ? (JSON.parse(TheBook.characters)["available"]) : ((TheBook.characters !== "null") ? (JSON.parse(TheBook.characters).length) : (0))) + "<br/>";
+        document.getElementById("characters").innerHTML = "<h1>" + "Characters" + ":</h1> " + "Number of characters : " + ((provider === providerEnum.Marvel) ? (JSON.parse(TheBook.characters)["available"]) : ((TheBook.characters !== "null") ? (JSON.parse(TheBook.characters).length) : (0))) + "<br/>";
         document.getElementById("detailSeparator").style.marginTop = "5vh";
         let scrollCharactersAmount = 0;
         let moveRight = document.createElement("button");
@@ -2867,13 +2895,13 @@ async function createDetails(TheBook, provider) {
     }
     //Genres
     if (TheBook.creators !== "null") {
-        let tmpstaff = "Number of people : " + ((provider === 1) ? (JSON.parse(TheBook["creators"])["available"]) : ((TheBook["creators"] !== "null") ? (JSON.parse(TheBook["creators"]).length) : ("0"))) + "<br/>";
+        let tmpstaff = "Number of people : " + ((provider === providerEnum.Marvel) ? (JSON.parse(TheBook["creators"])["available"]) : ((TheBook["creators"] !== "null") ? (JSON.parse(TheBook["creators"]).length) : ("0"))) + "<br/>";
         let StaffToFetchList = [];
-        if (provider === 1) {
+        if (provider === providerEnum.Marvel) {
             JSON.parse(TheBook.creators)["items"].forEach((el) => {
                 StaffToFetchList.push("'" + el.name.replaceAll("'", "''") + "'");
             });
-        } else if (provider === 2) {
+        } else if (provider === providerEnum.Anilist || provider === providerEnum.MANUAL) {
             JSON.parse(TheBook.creators).forEach((el) => {
                 StaffToFetchList.push("'" + el.name.replaceAll("'", "''") + "'");
             });
@@ -2888,11 +2916,11 @@ async function createDetails(TheBook, provider) {
                 const divs = document.createElement("div");
                 const divs2 = document.createElement("div");
                 for (let j = 0; j < clres.length; j++) {
-                    if (provider === 1) {
+                    if (provider === providerEnum.Marvel) {
                         if (el.name === JSON.parse(TheBook.creators)["items"][j].name) {
                             divs2.innerHTML = "<img src='" + JSON.parse(el.image).path + "/detail." + JSON.parse(el.image).extension + "' class='img-charac'/><br><span>" + el.name + "</span><br/><span style='font-size: 14px;color: #a8a8a8a8'>" + JSON.parse(TheBook.creators)["items"][j]["role"] + "</span>";
                         }
-                    } else if (provider === 2) {
+                    } else if (provider === providerEnum.Anilist || provider === providerEnum.MANUAL) {
                         if (el.name === JSON.parse(TheBook.creators)[j].name) {
                             divs2.innerHTML = "<img src='" + el.image.replaceAll('"', "") + "' class='img-charac'/><br><span>" + el.name + "</span>";
                         }
@@ -2904,7 +2932,7 @@ async function createDetails(TheBook, provider) {
                     divs2.setAttribute("data-bs-toggle", "modal");
                     divs2.setAttribute("data-bs-target", "#moreinfo");
                     divs2.addEventListener("click", function (e) {
-                        if (provider === 1) {
+                        if (provider === providerEnum.Marvel) {
                             document.getElementById("moreinfo_img").src = JSON.parse(image).path + "/detail." + JSON.parse(image).extension;
                             document.getElementById("moreinfo_btn").href = JSON.parse(urlo)[0].url;
                             if (desc == null) {
@@ -2912,7 +2940,7 @@ async function createDetails(TheBook, provider) {
                             } else {
                                 document.getElementById("moreinfo_txt").innerHTML = name + "<br/>" + desc;
                             }
-                        } else if (provider === 2) {
+                        } else if (provider === providerEnum.Anilist || provider === providerEnum.MANUAL) {
                             document.getElementById("moreinfo_img").src = image.replaceAll('"', "");
                             document.getElementById("moreinfo_btn").href = urlo;
                             if (desc == null) {
@@ -2974,7 +3002,7 @@ async function createDetails(TheBook, provider) {
         document.getElementById("chapters").innerHTML = "";
     }
     if (TheBook.prices !== "null" && TheBook.prices !== "" && TheBook.prices != null) {
-        if (provider === 1) {
+        if (provider === providerEnum.Marvel) {
             document.getElementById("price").innerHTML += "Prices : <br/>";
             for (let a = 0; a < JSON.parse(TheBook.prices).length; a++) {
                 console.log(JSON.parse(TheBook.prices)[a]);
@@ -2989,7 +3017,7 @@ async function createDetails(TheBook, provider) {
         }
     }
     if (TheBook.variants !== "null" && TheBook.variants !== "" && TheBook.variants != null) {
-        if (provider === 1) {
+        if (provider === providerEnum.Marvel) {
             createVariants(TheBook);
         }
     }
