@@ -627,6 +627,15 @@ app.get("/DB/delete/:token/:dbName/:id/:option", (req, res) => {
     }
     res.sendStatus(200);
 });
+app.get("/DB/truedelete/:token/:dbName/:id", (req, res) => {
+    try {
+        const token = resolveToken(req.params.token);
+        getDB(token).run("DELETE FROM " + req.params.dbName + " WHERE ID_book='" + req.params.id + "';");
+    } catch (e) {
+        console.log(e);
+    }
+    res.sendStatus(200);
+});
 app.get("/DB/lib/delete/:token/:id", (req, res) => {
     try {
         const token = resolveToken(req.params.token);

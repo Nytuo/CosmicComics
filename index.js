@@ -477,7 +477,86 @@ async function discoverLibraries() {
     div.style.display = "flex";
     btn.style.float = "left";
     div.appendChild(btn);
+
+    const div2 = document.createElement("div");
+    let btn2 = document.createElement("button");
+    btn2.id = "all";
+    btn2.addEventListener("click", function () {
+        let breadCrumb = document.querySelector(".breadcrumb");
+        removeBreadCrumb(breadCrumb, breadCrumb.childNodes[1]);
+        document.querySelectorAll(".selectLib").forEach((el) => {
+            el.classList.remove("selectLib");
+        });
+        btn2.classList.add("selectLib");
+        document.getElementById("ContainerExplorer").innerHTML = "";
+        document.getElementById("overlay").style.display = "none";
+        document.getElementById("overlay2").style.display = "none";
+        document.getElementById("contentViewer").style.display = "none";
+        addToBreadCrumb("ALL", () => {
+            return AllBooks();
+        });
+        AllBooks();
+    });
+    const logo2 = document.createElement("i");
+    logo2.className = "material-icons";
+    logo2.innerHTML = "library_books";
+    logo2.style.color = "white";
+    logo2.style.lineHeight = "1";
+    logo2.style.float = "left";
+    logo2.style.width = "25px";
+    logo2.style.float = "left";
+    logo2.style.lineHeight = "1";
+    btn2.appendChild(logo2);
+    let naming2 = document.createElement("span");
+    naming2.innerHTML = "ALL";
+    btn2.appendChild(naming2);
+    btn2.className = "btn btns libbtn";
+    div2.style.display = "flex";
+
+    btn2.style.float = "left";
+    div2.appendChild(btn2);
+    const div3 = document.createElement("div");
+    let btn3 = document.createElement("button");
+    btn3.id = "all";
+    btn3.addEventListener("click", function () {
+        let breadCrumb = document.querySelector(".breadcrumb");
+        removeBreadCrumb(breadCrumb, breadCrumb.childNodes[1]);
+        document.querySelectorAll(".selectLib").forEach((el) => {
+            el.classList.remove("selectLib");
+        });
+        btn3.classList.add("selectLib");
+        document.getElementById("ContainerExplorer").innerHTML = "";
+        document.getElementById("overlay").style.display = "none";
+        document.getElementById("overlay2").style.display = "none";
+        document.getElementById("contentViewer").style.display = "none";
+        addToBreadCrumb("TRACKER", () => {
+            return AllBooks("PATH IS NULL OR PATH = '' OR PATH = 'null'");
+        });
+         AllBooks("PATH IS NULL OR PATH = '' OR PATH = 'null'");
+
+    });
+    const logo3 = document.createElement("i");
+    logo3.className = "material-icons";
+    logo3.innerHTML = "my_location";
+    logo3.style.color = "white";
+    logo3.style.lineHeight = "1";
+    logo3.style.float = "left";
+    logo3.style.width = "25px";
+    logo3.style.float = "left";
+    logo3.style.lineHeight = "1";
+    btn3.appendChild(logo3);
+    let naming3 = document.createElement("span");
+    naming3.innerHTML = "TRACKER";
+    btn3.appendChild(naming3);
+    btn3.className = "btn btns libbtn";
+    div3.style.display = "flex";
+
+    btn3.style.float = "left";
+    div3.appendChild(btn3);
     document.getElementById("folderExplorer").appendChild(div);
+    document.getElementById("folderExplorer").appendChild(div2);
+    document.getElementById("folderExplorer").appendChild(div3);
+
     await getFromDB("Libraries", "* FROM Libraries").then((res) => {
         listofFolder = JSON.parse(res);
         listofFolder.forEach((el) => {
@@ -1632,6 +1711,73 @@ function returnToHome() {
     }
 }
 
+async function AllBooks(filters = "") {
+    document.getElementById("home").style.display = "none";
+    document.getElementById("overlay").style.display = "block";
+    let request;
+    if (filters === "") {
+        request = "* FROM Books";
+    }else{
+        request = "* FROM Books WHERE " + filters;
+    }
+    await getFromDB("Books", request).then(async (res) => {
+        //for all books in res create a card and add it to the container
+        let TheBookun = JSON.parse(res);
+        if (TheBookun.length === 0) {
+            Toastifycation(language["empty_notSupported"], "#ff0000");
+            animateCSS(document.getElementById("overlay"), "fadeOut").then((message) => {
+                document.getElementById("overlay2").style.display = "none";
+                document.getElementById("overlay").style.display = "none";
+                document.getElementById("ContainerExplorer").style.display = "flex";
+                document.getElementById("home").innerHTML = "This library is empty. If you think this is an error, please refresh the page and try again.";
+                document.getElementById("home").style.display = "block";
+                document.getElementById("home").style.fontSize = "24px";
+            });
+            return;
+        }
+        animateCSS(document.getElementById("overlay"), "fadeOut").then((message) => {
+
+            for (let i = 0; i < TheBookun.length; i++) {
+                let TheBook = TheBookun[i];
+                let carddiv = createCard(TheBook["unread"], TheBook["read"], TheBook["reading"], TheBook["ID_book"], TheBook["URLCover"], TheBook["NOM"], TheBook["favorite"])
+                carddiv.querySelector(".card__play").addEventListener("click", function () {
+                    /*            ModifyJSONFile(
+                                    CosmicComicsData + "/ListOfComics.json",
+                                    "reading",
+                                    true,
+                                );
+                                ModifyJSONFile(
+                                    CosmicComicsData + "/ListOfComics.json",
+                                    "unread",
+                                    false,
+                                );
+                                Modify_JSON_For_Config(
+                                    CosmicComicsData + "/config.json",
+                                    "last_opened",
+                                    path
+                                );*/
+                    AllForOne("unread", "read", "reading", TheBook.ID_book);
+                    let encoded = encodeURIComponent(path.replaceAll("/", "%C3%B9"));
+                    window.location.href = "viewer.html?" + encoded;
+                });
+                let brook = TheBook;
+                carddiv.addEventListener("click", function () {
+                    let provider = ((brook.series.includes("marvel")) ? (providerEnum.Marvel) : ((brook.series.includes("Anilist")) ? (providerEnum.Anilist) : (providerEnum.MANUAL)));
+                    createDetails(brook, provider);
+                });
+                const element = document.getElementById("ContainerExplorer");
+                const divrating = document.createElement("div");
+                carddiv.appendChild(divrating);
+                element.appendChild(carddiv);
+        }
+            document.getElementById("overlay2").style.display = "none";
+            document.getElementById("overlay").style.display = "none";
+            document.getElementById("ContainerExplorer").style.display = "flex";
+            });
+
+    });
+}
+
 theSearchList = [];
 getFromDB("Books", "NOM,PATH,URLCover,Series FROM Books").then(async (resa) => {
     resa = JSON.parse(resa);
@@ -2536,10 +2682,150 @@ async function refreshMeta(id, provider, type) {
         Toastifycation("Metadata updated");
     })
 }
-
+async function TrueDeleteFromDB(dbName, id, option="") {
+    return fetch("http://" + domain + ":" + port + '/DB/truedelete/' + userToken + "/" + dbName + "/" + id);
+}
 document.getElementById("rematch").setAttribute("data-bs-toggle", "modal");
 document.getElementById("rematch").setAttribute("data-bs-target", "#rematchModal");
+document.getElementById("id_addTrackedBook").addEventListener("click", () => {
 
+        let apiselectorModal = new bootstrap.Modal(document.getElementById("APISelector"));
+        apiselectorModal.show();
+        document.getElementById("RproviderID").onchange= async () => {
+            await apiselectorModal.toggle();
+            let provider = document.getElementById("RproviderID").value;
+            await InsertIntoDB("Books", "", `(?,${null},'REPLACE THIS BY A VALUE',null,${0},${0},${1},${0},${0},${0},'${null}','${null}','${null}','${null}','${null}',${null},'${null}','${null}','${null}','${null}','${null}','${null}','${null}','${null}','${null}',false)`)
+            try{
+                let TheBook = await getFromDB("Books", "* FROM Books WHERE NOM = 'REPLACE THIS BY A VALUE'");
+                TheBook = JSON.parse(TheBook)[0];
+                document.getElementById('bookEdit').style.display = "block";
+                document.getElementById('seriesEdit').style.display = "none";
+                document.querySelectorAll("#commonEdit>label>input").forEach((e) => {
+                    e.value = TheBook[e.id.replaceAll("edit_", "")];
+                })
+                document.querySelectorAll("#bookEdit>label>input").forEach((e) => {
+                    e.value = TheBook[e.id.replaceAll("edit_", "")];
+                })
+                let isLocked = () => {
+                    return TheBook.lock === 1 || TheBook.lock === true;
+                }
+
+                document.getElementById("lockCheck").checked = isLocked();
+
+                if (provider === "0") {
+                    document.getElementById("RproviderID").value = "";
+                    let modifyModal = new bootstrap.Modal("#editmodal");
+                    modifyModal.show();
+                    document.getElementById("sendEdit").onclick = async () => {
+                        modifyModal.hide();
+                        let values = [];
+                        let columns = [];
+                        document.querySelectorAll("#commonEdit>label>input").forEach((e) => {
+                            values.push(e.value.replaceAll("'", "''").replaceAll('"', "'"));
+                            columns.push(e.id.replaceAll("edit_", ""))
+                        })
+                        document.querySelectorAll("#bookEdit>label>input").forEach((e) => {
+                            values.push(e.value.replaceAll("'", "''").replaceAll('"', "'"))
+                            columns.push(e.id.replaceAll("edit_", ""))
+                        })
+                        values.push(document.getElementById("lockCheck").checked);
+                        columns.push("lock");
+                        await fetch("http://" + domain + ":" + port + "/DB/update", {
+                            method: "POST", headers: {
+                                "Content-Type": "application/json"
+                            }, body: JSON.stringify({
+                                "token": userToken,
+                                "table": "Books",
+                                "type": "edit",
+                                "column": columns,
+                                "whereEl": "REPLACE THIS BY A VALUE",
+                                "value": values,
+                                "where": "NOM"
+                            }, null, 2)
+                        })
+                    }
+                    document.getElementById("close_edit").onclick = async () => {
+                        TrueDeleteFromDB("Books", TheBook.ID_book);
+                        console.log("Deleted");
+                    }
+                } else if (provider === "1") {
+                    document.getElementById("RproviderID").value = "";
+
+                    let rematcherModal = new bootstrap.Modal(document.getElementById("rematchModal"));
+                    rematcherModal.show();
+
+                    document.getElementById("rematchSearchSender").onclick = () => {
+                        let rematchResult = document.getElementById("resultRematch")
+                        let search = document.getElementById("rematchSearch");
+                        let year = document.getElementById('rematchYearSearch')
+                            GETMARVELAPI_Comics(search.value, year.value).then((cdata) => {
+                                if (cdata["data"]["total"] > 0) {
+                                    for (let i = 0; i < cdata["data"]["total"]; i++) {
+                                        let cdataI = cdata["data"]["results"][i];
+                                        let l = createCard(null, null, null, cdataI["id"], cdataI["thumbnail"].path + "/detail." + cdataI["thumbnail"].extension, cdataI['title'])
+                                        l.addEventListener("click", () => {
+                                            rematch(cdataI.id + "_" + provider, provider, "book", TheBook.ID_book, false)
+                                            rematcherModal.hide();
+                                        })
+                                        rematchResult.appendChild(l);
+                                    }
+                                }
+                            })
+
+                    }
+                    document.getElementById("close_rematchModal").onclick = async () => {
+                        TrueDeleteFromDB("Books", TheBook.ID_book);
+                        document.getElementById("close_rematchModal").onclick = null;
+                    }
+                } else if (provider === "2") {
+                    document.getElementById("RproviderID").value = "";
+
+                    let modifyModal = new bootstrap.Modal(document.getElementById("editmodal"));
+                    modifyModal.show();
+                    document.getElementById("sendEdit").onclick = async () => {
+                        modifyModal.hide();
+                        let values = [];
+                        let columns = [];
+                        document.querySelectorAll("#commonEdit>label>input").forEach((e) => {
+                            values.push(e.value.replaceAll("'", "''").replaceAll('"', "'"));
+                            columns.push(e.id.replaceAll("edit_", ""))
+                        })
+                        document.querySelectorAll("#bookEdit>label>input").forEach((e) => {
+                            values.push(e.value.replaceAll("'", "''").replaceAll('"', "'"))
+                            columns.push(e.id.replaceAll("edit_", ""))
+                        })
+                        values.push(document.getElementById("lockCheck").checked);
+                        columns.push("lock");
+                        await fetch("http://" + domain + ":" + port + "/DB/update", {
+                            method: "POST", headers: {
+                                "Content-Type": "application/json"
+                            }, body: JSON.stringify({
+                                "token": userToken,
+                                "table": "Books",
+                                "type": "edit",
+                                "column": columns,
+                                "whereEl": "REPLACE THIS BY A VALUE",
+                                "value": values,
+                                "where": "NOM"
+                            }, null, 2)
+                        })
+                    }
+                    document.getElementById("close_edit").onclick = async () => {
+                        TrueDeleteFromDB("Books", TheBook.ID_book);
+                        document.getElementById("close_edit").onclick = null;
+                    }
+                } else if (provider === "3") {
+                } else if (provider === "4") {
+                } else {
+                    alert("Please select a valid provider");
+                }
+            } catch (e) {
+                TrueDeleteFromDB("Books", TheBook.ID_book);
+            }
+
+        }
+
+})
 /**
  *
  * @param {{}} TheBook
@@ -2580,7 +2866,8 @@ async function createDetails(TheBook, provider) {
                 }
             })
         } else if (provider === providerEnum.Anilist) {
-            //TODO : Anilist
+            //Anilist cannot update the book from the API
+            alert("Anilist cannot update the book from the API");
         } else if (provider === providerEnum.MANUAL) {
             alert("You can't rematch a manual entry")
         } else {

@@ -91,6 +91,10 @@ along with Cosmic-Comics.  If not, see <https://www.gnu.org/licenses/>.--->
                     id="id_opnfile">
                 <i class="material-icons">note_add</i>
             </button>
+            <button class="btn btn-primary" style="height: 40px;"
+                    id="id_addTrackedBook">
+                <i class="material-icons">local_library</i>
+            </button>
         </div>
         <div>
             <button class="btn btns libbtn" id="libHome" onclick="returnToHome()"><i class="material-icons"
@@ -226,6 +230,37 @@ along with Cosmic-Comics.  If not, see <https://www.gnu.org/licenses/>.--->
         </div>
     </div>
 </div>
+
+<div class="modal  animate__animated animate__zoomIn animate__faster" id="APISelector" tabindex="-1"
+     aria-labelledby="APISelector"
+     aria-hidden="true" data-bs-backdrop="static" data-bs-keyboard="false" style="overflow: hidden">
+    <div class="modal-dialog modal-xl modal-dialog-scrollable modal-dialog-centered">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">API Selector : </h5>
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body" style="text-align: center">
+                <label>
+                    <select class="form-select" id="RproviderID" name="providerID">
+                        <option id="Ropt0" value="" disabled selected>Select a provider</option>
+                        <option id="Ropt1" value="1">Marvel API (Comics Marvel & Star Wars)</option>
+                        <option id="Ropt2" value="2">Anilist (Manga)</option>
+                        <option id="Ropt3" value="3">League Of Comics Geek (Comics & Manga)</option>
+                        <option id="Ropt4" value="4">Open Library (ALL)</option>
+                        <option id="Ropt5" value="0">MANUAL (YOU HAVE THE CONTROL)</option>
+                    </select>
+                </label>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal" id="close_apiselector">
+                    Close
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+
 <!-- Modal navigation -->
 <div class="modal animate__animated animate__zoomIn animate__faster" id="buttonp" tabindex="-1"
      aria-labelledby="id_nav" aria-hidden="true">
@@ -565,7 +600,7 @@ along with Cosmic-Comics.  If not, see <https://www.gnu.org/licenses/>.--->
     </div>
 </div>
 <div class="modal animate__animated animate__zoomIn animate__faster" id="editmodal" tabindex="-1"
-     aria-labelledby="id_editmodal" aria-hidden="true" style="overflow: hidden">
+     aria-labelledby="id_editmodal" data-bs-backdrop="static" aria-hidden="true" data-bs-keyboard="false" style="overflow: hidden">
     <div class="modal-dialog modal-dialog-centered modal-dialog-scrollable">
         <div class="modal-content">
             <div class="modal-header">
