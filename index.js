@@ -15,7 +15,7 @@ along with Cosmic-Comics.  If not, see <https://www.gnu.org/licenses/>.*/
 //Variables declaration
 //All required nodes modules
 //All other variables and constants
-const ValidatedExtension = ["cbr", "cbz", "pdf", "zip", "7z", "cb7", "tar", "cbt", "rar",'epub'];
+const ValidatedExtension = ["cbr", "cbz", "pdf", "zip", "7z", "cb7", "tar", "cbt", "rar", 'epub'];
 let coolanimations = ["zoomInDown", "rollIn", "zoomIn", "jackInTheBox", "fadeInUp", "fadeInDown", "fadeIn", "bounceInUp", "bounceInDown", "backInDown"];
 let imagelink = "null";
 let listOfImages = [];
@@ -31,8 +31,8 @@ let providerEnum = {
     "Marvel": 1,
     "Anilist": 2,
     "MANUAL": 0,
-    "LOCG": 3,
-    "OL": 4
+    "LOCG": 4,
+    "OL": 3
 }
 let sidebarMini = false;
 let searchtoggle = true;
@@ -532,7 +532,7 @@ async function discoverLibraries() {
         addToBreadCrumb("TRACKER", () => {
             return AllBooks("PATH IS NULL OR PATH = '' OR PATH = 'null'");
         });
-         AllBooks("PATH IS NULL OR PATH = '' OR PATH = 'null'");
+        AllBooks("PATH IS NULL OR PATH = '' OR PATH = 'null'");
 
     });
     const logo3 = document.createElement("i");
@@ -574,19 +574,23 @@ async function discoverLibraries() {
                 document.getElementById("overlay").style.display = "none";
                 document.getElementById("overlay2").style.display = "none";
                 document.getElementById("contentViewer").style.display = "none";
+
                 addToBreadCrumb(el["NAME"], function () {
                     return openLibrary(el["PATH"], el["API_ID"]);
                 });
                 openLibrary(el["PATH"], el["API_ID"]);
+
             });
             const logo = document.createElement("img");
             if (el["API_ID"] === providerEnum.Marvel) {
                 logo.src = "./Images/marvel-logo-png-10.png";
             } else if (el["API_ID"] === providerEnum.Anilist) {
                 logo.src = "./Images/android-chrome-512x512.png";
-            }
-            else if (el["API_ID"] === providerEnum.MANUAL) {
+            } else if (el["API_ID"] === providerEnum.MANUAL) {
                 logo.src = "./Images/manual.svg";
+                logo.style.filter = "invert(100%)";
+            } else if (el["API_ID"] === providerEnum.OL) {
+                logo.src = "./Images/OL.svg";
                 logo.style.filter = "invert(100%)";
             }
             logo.className = "libLogo";
@@ -826,7 +830,18 @@ function openLibrary(folder, provider = 0) {
                 console.log(data);
                 if (data.length <= 0) throw new Error("Folder empty or not found");
                 //Ajouter a la DB les dossiers trouvés en tant que Collection
-                loadContent(provider, data, result);
+                if (provider === providerEnum.OL) {
+                    //inserer une series OL
+                    //aller directement dedans
+                    document.getElementById("ContainerExplorer").style.display = "flex";
+                    document.getElementById("overlay").style.display = "none";
+                    resetOverlay();
+
+                    loadView(result, result, "", provider)
+                } else {
+
+                    loadContent(provider, data, result);
+                }
             });
         } else {
             document
@@ -1017,12 +1032,30 @@ function loadView(FolderRes, libraryPath, date = "", provider = providerEnum.MAN
                             })
                         })
                         TheBook = generateBookTemplate(realname, null, null, 0, 0, 1, 0, 0, 0, path, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null)
-                    }
-                    else if (provider === providerEnum.MANUAL) {
+                    } else if (provider === providerEnum.MANUAL) {
                         console.log("manual");
-                        InsertIntoDB("Books", "",`(?,'${null}','${realname}',null,${0},${0},${1},${0},${0},${0},'${path}','${null}','${null}','${null}','${null}',${null},'${null}','${null}','${null}','${null}','${null}','${null}','${null}','${null}','${null}',false)`)
+                        InsertIntoDB("Books", "", `(?,'${null}','${realname}',null,${0},${0},${1},${0},${0},${0},'${path}','${null}','${null}','${null}','${null}',${null},'${null}','${null}','${null}','${null}','${null}','${null}','${null}','${null}','${null}',false)`)
 
                         TheBook = generateBookTemplate(realname, null, null, 0, 0, 1, 0, 0, 0, path, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null)
+                    } else if (provider === providerEnum.OL) {
+                        await GETOLAPI_INSERT(realname, path).then(async (cdata) => {
+                            console.log(cdata);
+                            if (cdata === undefined) {
+                                throw new Error("no data");
+                            }
+                            //if cdata contains a key "num_found"
+                            if (cdata.hasOwnProperty("num_found")) {
+                                TheBook = generateBookTemplate(realname, null, null, 0, 0, 1, 0, 0, 0, path, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null)
+
+                            } else {
+                                let cdataD = cdata["details"]
+                                TheBook = generateBookTemplate(realname, cdata["bib_key"], null, 0, 0, 1, 0, 0, 0, path,
+                                    cdataD["thumbnail_url"], null, cdataD["description"], cdataD["physical_format"],
+                                    cdataD["number_of_pages"], cdataD["info_url"], null, cdataD["authors"], null, null, cdata["publish_date"],
+                                    null, null, null, false);
+                            }
+
+                        })
                     }
                     //TODO implement API HERE
                 }
@@ -1052,7 +1085,14 @@ function loadView(FolderRes, libraryPath, date = "", provider = providerEnum.MAN
                     await createDetails(TheBook, provider);
                 });
                 n++;
-                const element = document.getElementById("ContentView");
+                let element;
+                if (provider === providerEnum.OL) {
+                 element = document.getElementById("ContainerExplorer");
+
+                }else{
+
+                 element = document.getElementById("ContentView");
+                }
                 divlist.appendChild(carddiv);
                 element.appendChild(divlist);
             });
@@ -1128,9 +1168,12 @@ async function loadContent(provider, FolderRes, libraryPath) {
                 } else if (provider === providerEnum.Marvel) {
                     console.log("Provider: Marvel Comics");
                     GETMARVELAPI(name, path);
-                }else if (provider === providerEnum.MANUAL){
-                    let randID = Math.floor(Math.random()*1000000);
-                    InsertIntoDB("Series", "(ID_Series,title,note,statut,start_date,end_date,description,Score,genres,cover,BG,CHARACTERS,TRENDING,STAFF,SOURCE,volumes,chapters,favorite,PATH,lock)", "('" + randID + "U_0" + "','" + JSON.stringify(name.replaceAll("'", "''")) + "',null,null,null,null,null,'0',null,null,null,null,null,null,null,null,null,0,'" + path + "',false)");
+                } else if (provider === providerEnum.MANUAL) {
+                    let randID = Math.floor(Math.random() * 1000000);
+                    await InsertIntoDB("Series", "(ID_Series,title,note,statut,start_date,end_date,description,Score,genres,cover,BG,CHARACTERS,TRENDING,STAFF,SOURCE,volumes,chapters,favorite,PATH,lock)", "('" + randID + "U_0" + "','" + JSON.stringify(name.replaceAll("'", "''")) + "',null,null,null,null,null,'0',null,null,null,null,null,null,null,null,null,0,'" + path + "',false)");
+                } else if (provider === providerEnum.OL) {
+                    let randID = Math.floor(Math.random() * 1000000);
+                    await InsertIntoDB("Series", "(ID_Series,title,note,statut,start_date,end_date,description,Score,genres,cover,BG,CHARACTERS,TRENDING,STAFF,SOURCE,volumes,chapters,favorite,PATH,lock)", "('" + randID + "U_0" + "','" + JSON.stringify(name.replaceAll("'", "''")) + "',null,null,null,null,null,'0',null,null,null,null,null,null,null,null,null,0,'" + path + "',false)");
                 }
                 //TODO implement API HERE
             } else {
@@ -1150,7 +1193,9 @@ async function loadContent(provider, FolderRes, libraryPath) {
                             } else {
                                 node = JSON.parse(res[0].title);
                             }
-                        }else if (provider == providerEnum.MANUAL) {
+                        } else if (provider == providerEnum.MANUAL) {
+                            node = res[0].title;
+                        } else if (provider == providerEnum.OL) {
                             node = res[0].title;
                         }
                     } else {
@@ -1311,13 +1356,12 @@ function openInViewer() {
 }
 
 //Open a book in the bookmarks
-function openBOOKM(path,page) {
-    window.location.href = "viewer.html?" + encodeURIComponent(path.replaceAll("/", "%C3%B9"))+"&page="+page;
+function openBOOKM(path, page) {
+    window.location.href = "viewer.html?" + encodeURIComponent(path.replaceAll("/", "%C3%B9")) + "&page=" + page;
 }
 
 //List of Bookmarked folder
 function listBM() {
-    // TODO bookmark
     const option = {
         method: 'GET', headers: {
             'Content-Type': 'application/json', "token": userToken,
@@ -1540,7 +1584,7 @@ function HomeRoutine() {
             let brook = TheBook;
             carddiv.addEventListener("click", function () {
                 //TODO implement API HERE
-                let provider = ((brook.series.includes("marvel")) ? (providerEnum.Marvel) : ((brook.series.includes("Anilist")) ? (providerEnum.Anilist) : (providerEnum.MANUAL)));
+                let provider = ((brook.series.includes("marvel")) ? (providerEnum.Marvel) : ((brook.series.includes("Anilist")) ? (providerEnum.Anilist) : ((brook.series.includes("OL")) ? (providerEnum.OL) : (providerEnum.MANUAL))));
                 createDetails(brook, provider);
             });
             const element = document.getElementById("continueReadingHome");
@@ -1585,7 +1629,7 @@ function HomeRoutine() {
             let brook = TheBook;
             carddiv.addEventListener("click", function () {
                 //TODO Implement API HERE
-                let provider = ((brook.series.includes("marvel")) ? (providerEnum.Marvel) : ((brook.series.includes("Anilist")) ? (providerEnum.Anilist) : (providerEnum.MANUAL)));
+                let provider = ((brook.series.includes("marvel")) ? (providerEnum.Marvel) : ((brook.series.includes("Anilist")) ? (providerEnum.Anilist) : ((brook.series.includes("OL")) ? (providerEnum.OL) : (providerEnum.MANUAL))));
                 createDetails(brook, provider);
             });
             element.appendChild(carddiv);
@@ -1625,7 +1669,7 @@ function HomeRoutine() {
             let brook = TheBook;
             carddiv.addEventListener("click", function () {
                 //TODO Implement API HERE
-                let provider = ((brook.series.includes("marvel")) ? (providerEnum.Marvel) : ((brook.series.includes("Anilist")) ? (providerEnum.Anilist) : (providerEnum.MANUAL)));
+                let provider = ((brook.series.includes("marvel")) ? (providerEnum.Marvel) : ((brook.series.includes("Anilist")) ? (providerEnum.Anilist) : ((brook.series.includes("OL")) ? (providerEnum.OL) : (providerEnum.MANUAL))));
                 createDetails(brook, provider);
             });
             const element = document.getElementById("toRead");
@@ -1670,8 +1714,8 @@ function HomeRoutine() {
             let brook = TheBook;
             carddiv.addEventListener("click", function () {
                 //TODO Implement API HERE
-                let provider = ((brook.series.includes("marvel")) ? (providerEnum.Marvel) : ((brook.series.includes("Anilist")) ? (providerEnum.Anilist) : (providerEnum.MANUAL)));
-                 createDetails(brook, provider);
+                let provider = ((brook.series.includes("marvel")) ? (providerEnum.Marvel) : ((brook.series.includes("Anilist")) ? (providerEnum.Anilist) : ((brook.series.includes("OL")) ? (providerEnum.OL) : (providerEnum.MANUAL))));
+                createDetails(brook, provider);
             });
             const element = document.getElementById("myfavoriteHome");
             const divrating = document.createElement("div");
@@ -1712,12 +1756,14 @@ function returnToHome() {
 }
 
 async function AllBooks(filters = "") {
+    resetOverlay();
+
     document.getElementById("home").style.display = "none";
     document.getElementById("overlay").style.display = "block";
     let request;
     if (filters === "") {
         request = "* FROM Books";
-    }else{
+    } else {
         request = "* FROM Books WHERE " + filters;
     }
     await getFromDB("Books", request).then(async (res) => {
@@ -1762,18 +1808,18 @@ async function AllBooks(filters = "") {
                 });
                 let brook = TheBook;
                 carddiv.addEventListener("click", function () {
-                    let provider = ((brook.series.includes("marvel")) ? (providerEnum.Marvel) : ((brook.series.includes("Anilist")) ? (providerEnum.Anilist) : (providerEnum.MANUAL)));
+                    let provider = ((brook.series.includes("marvel")) ? (providerEnum.Marvel) : ((brook.series.includes("Anilist")) ? (providerEnum.Anilist) : ((brook.series.includes("OL")) ? (providerEnum.OL) : (providerEnum.MANUAL))));
                     createDetails(brook, provider);
                 });
                 const element = document.getElementById("ContainerExplorer");
                 const divrating = document.createElement("div");
                 carddiv.appendChild(divrating);
                 element.appendChild(carddiv);
-        }
+            }
             document.getElementById("overlay2").style.display = "none";
             document.getElementById("overlay").style.display = "none";
             document.getElementById("ContainerExplorer").style.display = "flex";
-            });
+        });
 
     });
 }
@@ -1855,8 +1901,8 @@ async function setSearch(res) {
                     let bookList = JSON.parse(resa);
                     let TheBook = bookList[0];
                     //TODO Implement API HERE
-                    let provider = ((brook.series.includes("marvel")) ? (providerEnum.Marvel) : ((brook.series.includes("Anilist")) ? (providerEnum.Anilist) : (((brook.series.includes("manual")) ? (providerEnum.MANUAL) : (-1)))));
-                    if (provider === -1){
+                    let provider = ((brook.series.includes("marvel")) ? (providerEnum.Marvel) : ((brook.series.includes("Anilist")) ? (providerEnum.Anilist) : ((brook.series.includes("OL")) ? (providerEnum.OL) : (providerEnum.MANUAL))));
+                    if (provider === -1) {
                         return;
                     }
                     await createDetails(TheBook, provider);
@@ -1867,7 +1913,7 @@ async function setSearch(res) {
                     let bookList = JSON.parse(resa);
                     let TheBook = bookList[0];
                     //TODO Implement API HERE
-                    let provider = ((TheBook.ID_Series.includes("_1")) ? (providerEnum.Marvel) : ((TheBook.ID_Series.includes("_2")) ? (providerEnum.Anilist) : (-1)));
+                    let provider = ((TheBook.ID_Series.includes("_1")) ? (providerEnum.Marvel) : ((TheBook.ID_Series.includes("_2")) ? (providerEnum.Anilist) : (TheBook.ID_Series.includes("_3")) ? (providerEnum.OL) : ((TheBook.ID_Series.includes("_4")) ? (providerEnum.LOCG) : (providerEnum.MANUAL))));
                     let result = res[key].PATH;
                     console.log(result);
                     let libPath = result.replaceAll("\\", "/");
@@ -1881,6 +1927,20 @@ async function setSearch(res) {
                         } catch (e) {
                             console.log(e);
                         }
+                    } else if (provider === providerEnum.OL) {
+                        try {
+                            await createSeries(provider, result, libPath, bookList);
+                        } catch (e) {
+                            console.log(e);
+                        }
+                    } else if (provider === providerEnum.LOCG) {
+                        try {
+                            await createSeries(provider, result, libPath, bookList);
+                        } catch (e) {
+                            console.log(e);
+                        }
+                    } else if (provider === providerEnum.MANUAL) {
+                        await createSeries(provider, result, libPath, bookList);
                     }
                 });
             }
@@ -1951,6 +2011,26 @@ async function GETMARVELAPI_Comics_INSERT(name = "", date = "", path) {
             'Content-Type': 'application/json',
             "name": name,
             "datea": date,
+            "path": path,
+            "token": userToken
+        }
+    }).then(function (response) {
+        return response.text();
+    }).then(function (data) {
+        console.log(data);
+        data = JSON.parse(data);
+        return data;
+    }).catch(function (error) {
+        console.log(error);
+    });
+}
+
+async function GETOLAPI_INSERT(name = "", path) {
+    return fetch("http://" + domain + ":" + port + "/insert/ol/book/", {
+        method: "GET",
+        headers: {
+            'Content-Type': 'application/json',
+            "name": name,
             "path": path,
             "token": userToken
         }
@@ -2043,6 +2123,8 @@ async function createSeries(provider, path, libraryPath, res) {
             })
         } else if (provider === providerEnum.MANUAL) {
             alert("Manual Provider can't be rematched")
+        } else if (provider === providerEnum.OL) {
+            alert("OL Provider can't be rematched")
         } else {
         }
         //fetch API
@@ -2058,7 +2140,7 @@ async function createSeries(provider, path, libraryPath, res) {
         }
     }
     if (!APINOTFOUND) {
-        document.getElementById("provider_text").innerHTML = ((provider === providerEnum.Marvel) ? ("Data provided by Marvel. © 2014 Marvel") : ((provider === providerEnum.Anilist) ? ("Data provided by Anilist.") : ("The Data are not provided by an API.")));
+        document.getElementById("provider_text").innerHTML = ((provider === providerEnum.Marvel) ? ("Data provided by Marvel. © 2014 Marvel") : ((provider === providerEnum.Anilist) ? ("Data provided by Anilist.") : ((provider === providerEnum.MANUAL) ? ("The Data are not provided by an API.") : ((provider === providerEnum.OL) ? ("Data provided by OpenLibrary.") : ((provider === providerEnum.LOCG) ? ("Data provided by League Of Comics Geek.") : "")))));
     } else {
         document.getElementById("provider_text").innerHTML = "The data are not from the API";
     }
@@ -2137,6 +2219,8 @@ async function createSeries(provider, path, libraryPath, res) {
             JSON.parse(res[0].CHARACTERS).forEach((el) => {
                 NameToFetchList.push("'" + el.name.replaceAll("'", "''") + "'");
             });
+        } else if (provider === providerEnum.OL) {
+            alert("Open Library cannot be used to fetch characters");
         }
         let NameToFetch = NameToFetchList.join(",");
         let container = document.createElement("div");
@@ -2162,7 +2246,7 @@ async function createSeries(provider, path, libraryPath, res) {
                         } else {
                             document.getElementById("moreinfo_txt").innerHTML = name + "<br/>" + desc;
                         }
-                    } else if (provider === providerEnum.Anilist || provider === providerEnum.MANUAL) {
+                    } else if (provider === providerEnum.Anilist || provider === providerEnum.MANUAL || provider === providerEnum.OL) {
                         document.getElementById("moreinfo_img").src = image.replaceAll('"', "");
                         document.getElementById("moreinfo_btn").href = urlo;
                         if (desc == null) {
@@ -2180,7 +2264,7 @@ async function createSeries(provider, path, libraryPath, res) {
                 });
                 if (provider === providerEnum.Marvel) {
                     divs2.innerHTML += "<img src='" + JSON.parse(el.image).path + "/detail." + JSON.parse(el.image).extension + "' class='img-charac'/><br><span>" + el.name + "</span>";
-                } else if (provider === providerEnum.Anilist || provider === providerEnum.MANUAL) {
+                } else if (provider === providerEnum.Anilist || provider === providerEnum.MANUAL || provider === providerEnum.OL) {
                     divs2.innerHTML += "<img src='" + el.image.replaceAll('"', '') + "' class='img-charac'/><br><span>" + el.name + "</span>";
                 }
                 divs.appendChild(divs2);
@@ -2251,7 +2335,7 @@ async function createSeries(provider, path, libraryPath, res) {
                         } else {
                             document.getElementById("moreinfo_txt").innerHTML = name + "<br/>" + desc;
                         }
-                    } else if (provider === providerEnum.Anilist || provider === providerEnum.MANUAL) {
+                    } else if (provider === providerEnum.Anilist || provider === providerEnum.MANUAL || provider === providerEnum.OL) {
                         document.getElementById("moreinfo_img").src = image.replaceAll('"', "");
                         document.getElementById("moreinfo_btn").href = urlo;
                         if (desc == null) {
@@ -2290,7 +2374,7 @@ async function createSeries(provider, path, libraryPath, res) {
             JSON.parse(res[0].STAFF)["items"].forEach((el) => {
                 StaffToFetchList.push("'" + el.name.replaceAll("'", "''") + "'");
             });
-        } else if (provider === providerEnum.Anilist || provider === providerEnum.MANUAL) {
+        } else if (provider === providerEnum.Anilist || provider === providerEnum.MANUAL || provider === providerEnum.OL) {
             JSON.parse(res[0].STAFF).forEach((el) => {
                 StaffToFetchList.push("'" + el.name.replaceAll("'", "''") + "'");
             });
@@ -2320,7 +2404,7 @@ async function createSeries(provider, path, libraryPath, res) {
                         } else {
                             document.getElementById("moreinfo_txt").innerHTML = name + "<br/>" + desc;
                         }
-                    } else if (provider === providerEnum.Anilist || provider === providerEnum.MANUAL) {
+                    } else if (provider === providerEnum.Anilist || provider === providerEnum.MANUAL || provider === providerEnum.OL) {
                         document.getElementById("moreinfo_img").src = image.replaceAll('"', "");
                         document.getElementById("moreinfo_btn").href = urlo;
                         if (desc == null) {
@@ -2341,7 +2425,7 @@ async function createSeries(provider, path, libraryPath, res) {
                         if (el.name === JSON.parse(res[0]["STAFF"])["items"][j].name) {
                             divs2.innerHTML += "<img src='" + JSON.parse(el.image).path + "/detail." + JSON.parse(el.image).extension + "' class='img-charac'/><br><span>" + el.name + "</span><br/><span style='font-size: 14px;color: #a8a8a8a8'>" + JSON.parse(res[0]["STAFF"])["items"][j]["role"] + "</span>";
                         }
-                    } else if (provider === providerEnum.Anilist || provider === providerEnum.MANUAL) {
+                    } else if (provider === providerEnum.Anilist || provider === providerEnum.MANUAL || provider === providerEnum.OL) {
                         if (el.name === JSON.parse(res[0]["STAFF"])[j].name) {
                             divs2.innerHTML += "<img src='" + el.image.replaceAll('"', "") + "' class='img-charac'/><br><span>" + el.name + "</span>";
                         }
@@ -2502,7 +2586,7 @@ async function createSeries(provider, path, libraryPath, res) {
                 document.getElementById("Status").innerHTML = "UNKNOWN";
                 document.getElementById("Status").className = "NotYet";
             }
-        } else if (provider === providerEnum.Anilist || provider === providerEnum.MANUAL) {
+        } else if (provider === providerEnum.Anilist || provider === providerEnum.MANUAL || provider === providerEnum.OL) {
             loadView(path, libraryPath, "", provider);
             document.getElementById("description").innerHTML = res[0].description;
             document.getElementById("genres").innerHTML = "Genres " + ":";
@@ -2559,7 +2643,7 @@ async function createSeries(provider, path, libraryPath, res) {
                     document.getElementById("Status").className = "NotYet";
                 }
             }
-        } else if (provider === providerEnum.Anilist || provider === providerEnum.MANUAL) {
+        } else if (provider === providerEnum.Anilist || provider === providerEnum.MANUAL || provider === providerEnum.OL) {
             loadView(path, libraryPath, "", provider);
             document.getElementById("description").innerHTML = res[0].description;
             if (res[0]["TRENDING"] != null && res[0]["TRENDING"] !== "null") {
@@ -2682,150 +2766,153 @@ async function refreshMeta(id, provider, type) {
         Toastifycation("Metadata updated");
     })
 }
-async function TrueDeleteFromDB(dbName, id, option="") {
+
+async function TrueDeleteFromDB(dbName, id, option = "") {
     return fetch("http://" + domain + ":" + port + '/DB/truedelete/' + userToken + "/" + dbName + "/" + id);
 }
+
 document.getElementById("rematch").setAttribute("data-bs-toggle", "modal");
 document.getElementById("rematch").setAttribute("data-bs-target", "#rematchModal");
 document.getElementById("id_addTrackedBook").addEventListener("click", () => {
 
-        let apiselectorModal = new bootstrap.Modal(document.getElementById("APISelector"));
-        apiselectorModal.show();
-        document.getElementById("RproviderID").onchange= async () => {
-            await apiselectorModal.toggle();
-            let provider = document.getElementById("RproviderID").value;
-            await InsertIntoDB("Books", "", `(?,${null},'REPLACE THIS BY A VALUE',null,${0},${0},${1},${0},${0},${0},'${null}','${null}','${null}','${null}','${null}',${null},'${null}','${null}','${null}','${null}','${null}','${null}','${null}','${null}','${null}',false)`)
-            try{
-                let TheBook = await getFromDB("Books", "* FROM Books WHERE NOM = 'REPLACE THIS BY A VALUE'");
-                TheBook = JSON.parse(TheBook)[0];
-                document.getElementById('bookEdit').style.display = "block";
-                document.getElementById('seriesEdit').style.display = "none";
-                document.querySelectorAll("#commonEdit>label>input").forEach((e) => {
-                    e.value = TheBook[e.id.replaceAll("edit_", "")];
-                })
-                document.querySelectorAll("#bookEdit>label>input").forEach((e) => {
-                    e.value = TheBook[e.id.replaceAll("edit_", "")];
-                })
-                let isLocked = () => {
-                    return TheBook.lock === 1 || TheBook.lock === true;
-                }
-
-                document.getElementById("lockCheck").checked = isLocked();
-
-                if (provider === "0") {
-                    document.getElementById("RproviderID").value = "";
-                    let modifyModal = new bootstrap.Modal("#editmodal");
-                    modifyModal.show();
-                    document.getElementById("sendEdit").onclick = async () => {
-                        modifyModal.hide();
-                        let values = [];
-                        let columns = [];
-                        document.querySelectorAll("#commonEdit>label>input").forEach((e) => {
-                            values.push(e.value.replaceAll("'", "''").replaceAll('"', "'"));
-                            columns.push(e.id.replaceAll("edit_", ""))
-                        })
-                        document.querySelectorAll("#bookEdit>label>input").forEach((e) => {
-                            values.push(e.value.replaceAll("'", "''").replaceAll('"', "'"))
-                            columns.push(e.id.replaceAll("edit_", ""))
-                        })
-                        values.push(document.getElementById("lockCheck").checked);
-                        columns.push("lock");
-                        await fetch("http://" + domain + ":" + port + "/DB/update", {
-                            method: "POST", headers: {
-                                "Content-Type": "application/json"
-                            }, body: JSON.stringify({
-                                "token": userToken,
-                                "table": "Books",
-                                "type": "edit",
-                                "column": columns,
-                                "whereEl": "REPLACE THIS BY A VALUE",
-                                "value": values,
-                                "where": "NOM"
-                            }, null, 2)
-                        })
-                    }
-                    document.getElementById("close_edit").onclick = async () => {
-                        TrueDeleteFromDB("Books", TheBook.ID_book);
-                        console.log("Deleted");
-                    }
-                } else if (provider === "1") {
-                    document.getElementById("RproviderID").value = "";
-
-                    let rematcherModal = new bootstrap.Modal(document.getElementById("rematchModal"));
-                    rematcherModal.show();
-
-                    document.getElementById("rematchSearchSender").onclick = () => {
-                        let rematchResult = document.getElementById("resultRematch")
-                        let search = document.getElementById("rematchSearch");
-                        let year = document.getElementById('rematchYearSearch')
-                            GETMARVELAPI_Comics(search.value, year.value).then((cdata) => {
-                                if (cdata["data"]["total"] > 0) {
-                                    for (let i = 0; i < cdata["data"]["total"]; i++) {
-                                        let cdataI = cdata["data"]["results"][i];
-                                        let l = createCard(null, null, null, cdataI["id"], cdataI["thumbnail"].path + "/detail." + cdataI["thumbnail"].extension, cdataI['title'])
-                                        l.addEventListener("click", () => {
-                                            rematch(cdataI.id + "_" + provider, provider, "book", TheBook.ID_book, false)
-                                            rematcherModal.hide();
-                                        })
-                                        rematchResult.appendChild(l);
-                                    }
-                                }
-                            })
-
-                    }
-                    document.getElementById("close_rematchModal").onclick = async () => {
-                        TrueDeleteFromDB("Books", TheBook.ID_book);
-                        document.getElementById("close_rematchModal").onclick = null;
-                    }
-                } else if (provider === "2") {
-                    document.getElementById("RproviderID").value = "";
-
-                    let modifyModal = new bootstrap.Modal(document.getElementById("editmodal"));
-                    modifyModal.show();
-                    document.getElementById("sendEdit").onclick = async () => {
-                        modifyModal.hide();
-                        let values = [];
-                        let columns = [];
-                        document.querySelectorAll("#commonEdit>label>input").forEach((e) => {
-                            values.push(e.value.replaceAll("'", "''").replaceAll('"', "'"));
-                            columns.push(e.id.replaceAll("edit_", ""))
-                        })
-                        document.querySelectorAll("#bookEdit>label>input").forEach((e) => {
-                            values.push(e.value.replaceAll("'", "''").replaceAll('"', "'"))
-                            columns.push(e.id.replaceAll("edit_", ""))
-                        })
-                        values.push(document.getElementById("lockCheck").checked);
-                        columns.push("lock");
-                        await fetch("http://" + domain + ":" + port + "/DB/update", {
-                            method: "POST", headers: {
-                                "Content-Type": "application/json"
-                            }, body: JSON.stringify({
-                                "token": userToken,
-                                "table": "Books",
-                                "type": "edit",
-                                "column": columns,
-                                "whereEl": "REPLACE THIS BY A VALUE",
-                                "value": values,
-                                "where": "NOM"
-                            }, null, 2)
-                        })
-                    }
-                    document.getElementById("close_edit").onclick = async () => {
-                        TrueDeleteFromDB("Books", TheBook.ID_book);
-                        document.getElementById("close_edit").onclick = null;
-                    }
-                } else if (provider === "3") {
-                } else if (provider === "4") {
-                } else {
-                    alert("Please select a valid provider");
-                }
-            } catch (e) {
-                TrueDeleteFromDB("Books", TheBook.ID_book);
+    let apiselectorModal = new bootstrap.Modal(document.getElementById("APISelector"));
+    apiselectorModal.show();
+    document.getElementById("RproviderID").onchange = async () => {
+        await apiselectorModal.toggle();
+        let provider = document.getElementById("RproviderID").value;
+        await InsertIntoDB("Books", "", `(?,${null},'REPLACE THIS BY A VALUE',null,${0},${0},${1},${0},${0},${0},'${null}','${null}','${null}','${null}','${null}',${null},'${null}','${null}','${null}','${null}','${null}','${null}','${null}','${null}','${null}',false)`)
+        try {
+            let TheBook = await getFromDB("Books", "* FROM Books WHERE NOM = 'REPLACE THIS BY A VALUE'");
+            TheBook = JSON.parse(TheBook)[0];
+            document.getElementById('bookEdit').style.display = "block";
+            document.getElementById('seriesEdit').style.display = "none";
+            document.querySelectorAll("#commonEdit>label>input").forEach((e) => {
+                e.value = TheBook[e.id.replaceAll("edit_", "")];
+            })
+            document.querySelectorAll("#bookEdit>label>input").forEach((e) => {
+                e.value = TheBook[e.id.replaceAll("edit_", "")];
+            })
+            let isLocked = () => {
+                return TheBook.lock === 1 || TheBook.lock === true;
             }
 
+            document.getElementById("lockCheck").checked = isLocked();
+
+            if (provider === "0") {
+                document.getElementById("RproviderID").value = "";
+                let modifyModal = new bootstrap.Modal("#editmodal");
+                modifyModal.show();
+                document.getElementById("sendEdit").onclick = async () => {
+                    modifyModal.hide();
+                    let values = [];
+                    let columns = [];
+                    document.querySelectorAll("#commonEdit>label>input").forEach((e) => {
+                        values.push(e.value.replaceAll("'", "''").replaceAll('"', "'"));
+                        columns.push(e.id.replaceAll("edit_", ""))
+                    })
+                    document.querySelectorAll("#bookEdit>label>input").forEach((e) => {
+                        values.push(e.value.replaceAll("'", "''").replaceAll('"', "'"))
+                        columns.push(e.id.replaceAll("edit_", ""))
+                    })
+                    values.push(document.getElementById("lockCheck").checked);
+                    columns.push("lock");
+                    await fetch("http://" + domain + ":" + port + "/DB/update", {
+                        method: "POST", headers: {
+                            "Content-Type": "application/json"
+                        }, body: JSON.stringify({
+                            "token": userToken,
+                            "table": "Books",
+                            "type": "edit",
+                            "column": columns,
+                            "whereEl": "REPLACE THIS BY A VALUE",
+                            "value": values,
+                            "where": "NOM"
+                        }, null, 2)
+                    })
+                }
+                document.getElementById("close_edit").onclick = async () => {
+                    TrueDeleteFromDB("Books", TheBook.ID_book);
+                    console.log("Deleted");
+                }
+            } else if (provider === "1") {
+                document.getElementById("RproviderID").value = "";
+
+                let rematcherModal = new bootstrap.Modal(document.getElementById("rematchModal"));
+                rematcherModal.show();
+
+                document.getElementById("rematchSearchSender").onclick = () => {
+                    let rematchResult = document.getElementById("resultRematch")
+                    let search = document.getElementById("rematchSearch");
+                    let year = document.getElementById('rematchYearSearch')
+                    GETMARVELAPI_Comics(search.value, year.value).then((cdata) => {
+                        if (cdata["data"]["total"] > 0) {
+                            for (let i = 0; i < cdata["data"]["total"]; i++) {
+                                let cdataI = cdata["data"]["results"][i];
+                                let l = createCard(null, null, null, cdataI["id"], cdataI["thumbnail"].path + "/detail." + cdataI["thumbnail"].extension, cdataI['title'])
+                                l.addEventListener("click", () => {
+                                    rematch(cdataI.id + "_" + provider, provider, "book", TheBook.ID_book, false)
+                                    rematcherModal.hide();
+                                })
+                                rematchResult.appendChild(l);
+                            }
+                        }
+                    })
+
+                }
+                document.getElementById("close_rematchModal").onclick = async () => {
+                    TrueDeleteFromDB("Books", TheBook.ID_book);
+                    document.getElementById("close_rematchModal").onclick = null;
+                }
+            } else if (provider === "2") {
+                document.getElementById("RproviderID").value = "";
+
+                let modifyModal = new bootstrap.Modal(document.getElementById("editmodal"));
+                modifyModal.show();
+                document.getElementById("sendEdit").onclick = async () => {
+                    modifyModal.hide();
+                    let values = [];
+                    let columns = [];
+                    document.querySelectorAll("#commonEdit>label>input").forEach((e) => {
+                        values.push(e.value.replaceAll("'", "''").replaceAll('"', "'"));
+                        columns.push(e.id.replaceAll("edit_", ""))
+                    })
+                    document.querySelectorAll("#bookEdit>label>input").forEach((e) => {
+                        values.push(e.value.replaceAll("'", "''").replaceAll('"', "'"))
+                        columns.push(e.id.replaceAll("edit_", ""))
+                    })
+                    values.push(document.getElementById("lockCheck").checked);
+                    columns.push("lock");
+                    await fetch("http://" + domain + ":" + port + "/DB/update", {
+                        method: "POST", headers: {
+                            "Content-Type": "application/json"
+                        }, body: JSON.stringify({
+                            "token": userToken,
+                            "table": "Books",
+                            "type": "edit",
+                            "column": columns,
+                            "whereEl": "REPLACE THIS BY A VALUE",
+                            "value": values,
+                            "where": "NOM"
+                        }, null, 2)
+                    })
+                }
+                document.getElementById("close_edit").onclick = async () => {
+                    TrueDeleteFromDB("Books", TheBook.ID_book);
+                    document.getElementById("close_edit").onclick = null;
+                }
+            } else if (provider === "3") {
+            } else if (provider === "4") {
+            } else {
+                alert("Please select a valid provider");
+            }
+        } catch (e) {
+            TrueDeleteFromDB("Books", TheBook.ID_book);
         }
 
+    }
+
 })
+
 /**
  *
  * @param {{}} TheBook
@@ -2870,6 +2957,8 @@ async function createDetails(TheBook, provider) {
             alert("Anilist cannot update the book from the API");
         } else if (provider === providerEnum.MANUAL) {
             alert("You can't rematch a manual entry")
+        } else if (provider === providerEnum.OL) {
+            //TODO OL REMATCH BOOK
         } else {
         }
         //fetch API
@@ -2918,7 +3007,7 @@ async function createDetails(TheBook, provider) {
     addToBreadCrumb(TheBook.NOM, () => {
         return createDetails(TheBook, provider);
     });
-    document.getElementById("provider_text").innerHTML = ((provider === providerEnum.Marvel) ? ("Data provided by Marvel. © 2014 Marvel") : ((provider === providerEnum.Anilist) ? ("Data provided by Anilist.") : ("The Data are not provided by an API.")));
+    document.getElementById("provider_text").innerHTML = ((provider === providerEnum.Marvel) ? ("Data provided by Marvel. © 2014 Marvel") : ((provider === providerEnum.Anilist) ? ("Data provided by Anilist.") : ((provider === providerEnum.MANUAL) ? ("The Data are not provided by an API.") : ((provider === providerEnum.OL) ? ("Data provided by OpenLibrary.") : ((provider === providerEnum.LOCG) ? ("Data provided by League Of Comics Geek.") : "")))));
     document.getElementById("contentViewer").style.display = "block";
     document.getElementById("DLBOOK").addEventListener("click", function (e) {
         let path = TheBook.PATH;
@@ -2954,11 +3043,13 @@ async function createDetails(TheBook, provider) {
             document.getElementById("id").innerHTML = "This is part of the '" + TheBook.series.split("_")[2].replaceAll("$", " ") + "' series.";
         } else if (provider === providerEnum.Marvel) {
             document.getElementById("id").innerHTML = "This is part of the '" + JSON.parse(TheBook.series).name + "' series.";
-        }
-        else if (provider === providerEnum.MANUAL) {
+        } else if (provider === providerEnum.MANUAL) {
+            document.getElementById("id").innerHTML = "This is part of the '" + TheBook.series + "' series.";
+        } else if (provider === providerEnum.OL) {
             document.getElementById("id").innerHTML = "This is part of the '" + TheBook.series + "' series.";
         }
     }
+
     document.getElementById("averageProgress").style.display = "none";
     document.getElementById("ContentView").innerHTML = "";
     try {
@@ -3067,7 +3158,7 @@ async function createDetails(TheBook, provider) {
             JSON.parse(TheBook.characters)["items"].forEach((el) => {
                 NameToFetchList.push("'" + el.name + "'");
             });
-        } else if (provider === providerEnum.Anilist || provider === providerEnum.MANUAL) {
+        } else if (provider === providerEnum.Anilist || provider === providerEnum.MANUAL || provider === providerEnum.OL) {
             JSON.parse(TheBook.characters).forEach((el) => {
                 NameToFetchList.push("'" + el.name + "'");
             });
@@ -3096,7 +3187,7 @@ async function createDetails(TheBook, provider) {
                         } else {
                             document.getElementById("moreinfo_txt").innerHTML = name + "<br/>" + desc;
                         }
-                    } else if (provider === providerEnum.Anilist || provider === providerEnum.MANUAL) {
+                    } else if (provider === providerEnum.Anilist || provider === providerEnum.MANUAL || provider === providerEnum.OL) {
                         document.getElementById("moreinfo_img").src = image.replaceAll('"', "");
                         document.getElementById("moreinfo_btn").href = urlo;
                         if (desc == null) {
@@ -3114,7 +3205,7 @@ async function createDetails(TheBook, provider) {
                 });
                 if (provider === providerEnum.Marvel) {
                     divs2.innerHTML = "<img alt='a character' src='" + JSON.parse(el.image).path + "/detail." + JSON.parse(el.image).extension + "' class='img-charac'/><br><span>" + el.name + "</span>";
-                } else if (provider === providerEnum.Anilist || provider === providerEnum.MANUAL) {
+                } else if (provider === providerEnum.Anilist || provider === providerEnum.MANUAL || provider === providerEnum.OL) {
                     divs2.innerHTML = "<img alt='a character' src='" + el.image.replaceAll('"', '') + "' class='img-charac'/><br><span>" + el.name + "</span>";
                 }
                 divs.appendChild(divs2);
@@ -3188,7 +3279,7 @@ async function createDetails(TheBook, provider) {
             JSON.parse(TheBook.creators)["items"].forEach((el) => {
                 StaffToFetchList.push("'" + el.name.replaceAll("'", "''") + "'");
             });
-        } else if (provider === providerEnum.Anilist || provider === providerEnum.MANUAL) {
+        } else if (provider === providerEnum.Anilist || provider === providerEnum.MANUAL || provider === providerEnum.OL) {
             JSON.parse(TheBook.creators).forEach((el) => {
                 StaffToFetchList.push("'" + el.name.replaceAll("'", "''") + "'");
             });
@@ -3207,7 +3298,7 @@ async function createDetails(TheBook, provider) {
                         if (el.name === JSON.parse(TheBook.creators)["items"][j].name) {
                             divs2.innerHTML = "<img src='" + JSON.parse(el.image).path + "/detail." + JSON.parse(el.image).extension + "' class='img-charac'/><br><span>" + el.name + "</span><br/><span style='font-size: 14px;color: #a8a8a8a8'>" + JSON.parse(TheBook.creators)["items"][j]["role"] + "</span>";
                         }
-                    } else if (provider === providerEnum.Anilist || provider === providerEnum.MANUAL) {
+                    } else if (provider === providerEnum.Anilist || provider === providerEnum.MANUAL || provider === providerEnum.OL) {
                         if (el.name === JSON.parse(TheBook.creators)[j].name) {
                             divs2.innerHTML = "<img src='" + el.image.replaceAll('"', "") + "' class='img-charac'/><br><span>" + el.name + "</span>";
                         }
@@ -3227,7 +3318,7 @@ async function createDetails(TheBook, provider) {
                             } else {
                                 document.getElementById("moreinfo_txt").innerHTML = name + "<br/>" + desc;
                             }
-                        } else if (provider === providerEnum.Anilist || provider === providerEnum.MANUAL) {
+                        } else if (provider === providerEnum.Anilist || provider === providerEnum.MANUAL || provider === providerEnum.OL) {
                             document.getElementById("moreinfo_img").src = image.replaceAll('"', "");
                             document.getElementById("moreinfo_btn").href = urlo;
                             if (desc == null) {
@@ -3299,8 +3390,14 @@ async function createDetails(TheBook, provider) {
     }
     if (TheBook.dates !== "null") {
         document.getElementById("startDate").innerHTML = "Dates : <br/>";
-        for (let b = 0; b < JSON.parse(TheBook.dates).length; b++) {
-            document.getElementById("startDate").innerHTML += JSON.parse(TheBook.dates)[b].type.replace(/([A-Z])/g, ' $1').trim() + " : " + convertDate(JSON.parse(TheBook.dates)[b].date) + "<br/>";
+        try {
+
+            for (let b = 0; b < JSON.parse(TheBook.dates).length; b++) {
+                document.getElementById("startDate").innerHTML += JSON.parse(TheBook.dates)[b].type.replace(/([A-Z])/g, ' $1').trim() + " : " + convertDate(JSON.parse(TheBook.dates)[b].date) + "<br/>";
+            }
+        } catch (e) {
+            document.getElementById("startDate").innerHTML += TheBook.dates + "<br/>";
+
         }
     }
     if (TheBook.variants !== "null" && TheBook.variants !== "" && TheBook.variants != null) {
@@ -3309,6 +3406,7 @@ async function createDetails(TheBook, provider) {
         }
     }
 }
+
 
 /* TODO ↑ CODE VERIFICATION ↑ */
 /**

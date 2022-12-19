@@ -164,7 +164,7 @@ function makeDB(forwho) {
     db.run('CREATE TABLE IF NOT EXISTS Books (ID_book INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, API_ID VARCHAR(255), NOM VARCHAR(255) NOT NULL,note INTEGER,read boolean NOT NULL,reading boolean NOT NULL,unread boolean NOT NULL,favorite boolean NOT NULL,last_page INTEGER NOT NULL,folder boolean NOT NULL,PATH VARCHAR(255) NOT NULL,URLCover VARCHAR(255), issueNumber INTEGER,description VARCHAR(255),format VARCHAR(255),pageCount INTEGER,URLs VARCHAR(255),series VARCHAR(255),creators VARCHAR(255),characters VARCHAR(255),prices VARCHAR(255),dates VARCHAR(255),collectedIssues VARCHAR(255),collections VARCHAR(255),variants VARCHAR(255),lock boolean DEFAULT false NOT NULL)');
     db.run("CREATE TABLE IF NOT EXISTS Bookmarks (ID_BOOKMARK INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL,BOOK_ID VARCHAR(255) NOT NULL,PATH VARCHAR(4096) NOT NULL,page INTEGER NOT NULL,FOREIGN KEY (BOOK_ID) REFERENCES Book (ID_book));");
     db.run("CREATE TABLE IF NOT EXISTS API (ID_API INTEGER PRIMARY KEY NOT NULL, NOM VARCHAR(255) NOT NULL);", () => {
-        db.run("REPLACE INTO API (ID_API,NOM) VALUES (1,'Marvel'), (2,'Anilist'),(3,'LeagueOfComicsGeeks'),(4,'OpenLibrary'),(0,'MANUAL')");
+        db.run("REPLACE INTO API (ID_API,NOM) VALUES (1,'Marvel'), (2,'Anilist'),(4,'LeagueOfComicsGeeks'),(3,'OpenLibrary'),(0,'MANUAL')");
     });
     db.run("CREATE TABLE IF NOT EXISTS Series (ID_Series VARCHAR(255) PRIMARY KEY NOT NULL UNIQUE,title VARCHAR(255) NOT NULL,note INTEGER,statut VARCHAR(255),start_date VARCHAR(255),end_date VARCHAR(255),description VARCHAR(255),Score INTEGER,genres VARCHAR(255),cover VARCHAR(255),BG VARCHAR(255),CHARACTERS VARCHAR(255),TRENDING INTEGER,STAFF VARCHAR(255),SOURCE VARCHAR(255),volumes INTEGER,chapters INTEGER,favorite boolean NOT NULL,PATH VARCHAR(255) NOT NULL,lock boolean DEFAULT false NOT NULL );");
     db.run("CREATE TABLE IF NOT EXISTS Creators (ID_CREATOR VARCHAR(255) PRIMARY KEY NOT NULL UNIQUE,name VARCHAR(255),image varchar(255),description VARCHAR(255),url VARCHAR(255))");
@@ -1309,6 +1309,40 @@ app.get("/insert/marvel/book/", async function (req, res) {
         }
     })
 })
+app.get("/insert/ol/book/", async function (req, res) {
+    let token = req.headers.token;
+    let realname = req.headers.name;
+    let path = req.headers.path;
+    GETOLAPI_search(realname).then(async function (cdata) {
+        if (cdata === undefined) {
+            throw new Error("no data");
+        }
+        if (cdata["num_found"] > 0) {
+            let key = cdata["docs"][0];
+            key = key["seed"][0];
+            key = key.split("/")[2];
+            console.log(key);
+            await GETOLAPI_book(key).then(async (book) => {
+                res.send(book);
+                //get the first child of an object
+                let firstChild = Object.keys(book)[0];
+                book = book[firstChild];
+                console.log(book);
+                let bookD = book["details"];
+                console.log(bookD);
+                await insertIntoDB("", `(?,'${book["bib_key"]}','${realname}',null,${0},${0},${1},${0},${0},${0},'${path}','${book.hasOwnProperty("thumbnail_url") ? book["thumbnail_url"].replace("-S","-L"):null}','${null}','${bookD["description"] !== undefined ? bookD["description"].replaceAll("'", "''"):null}','${bookD["physical_format"] !== undefined ? bookD["physical_format"] : null}',${bookD["number_of_pages"] !== undefined ? bookD["number_of_pages"] : null},'${bookD["info_url"]  !== undefined ? JSON.stringify(bookD["info_url"]) : null}','${null}','${bookD["authors"]  !== undefined ? JSON.stringify(bookD["authors"]) : null}','${null}','${null}','${bookD["publish_date"]  !== undefined ? JSON.stringify(bookD["publish_date"]) : null}','${null}','${null}','${null}',false)`, token, "Books")
+                let bookauthors = bookD["authors"];
+                for (let i = 0; i < bookauthors.length; i++) {
+                    await insertIntoDB("", `('${bookauthors[i]["key"] + "_3"}','${bookauthors[i]["name"].replaceAll("'", "''")}','${null}',${null},'${null}')`, token, "Creators")
+                }
+
+            })
+        } else {
+            res.send(cdata)
+            await insertIntoDB("", `(?,'${null}','${realname}',null,${0},${0},${1},${0},${0},${0},'${path}','${null}','${null}','${null}','${null}',${null},'${null}','${null}','${null}','${null}','${null}','${null}','${null}','${null}','${null}',false)`, token, "Books")
+        }
+    })
+})
 app.post("/insert/anilist/book", async function (req, res) {
     let token = req.body.token;
     let path = req.body.path;
@@ -1381,6 +1415,37 @@ async function GETMARVELAPI_Comics(name = "", seriesStartDate = "") {
     let response = await fetch(url);
     let data = await response.json();
     console.log(data);
+    return data;
+}
+
+async function GETOLAPI_search(name = "") {
+    if (name === "") {
+        console.log("OL API : name is empty");
+        return;
+    }
+
+    name = name.replaceAll(/[(].+[)]/g, "");
+    name = name.replaceAll(/[\[].+[\]]/g, "");
+    name = name.replaceAll(/[\{].+[\}]/g, "");
+    name = name.replaceAll(/[#][0-9]{1,}/g, "");
+    name = name.replace(/\s+$/, "");
+    console.log("OL API : name : " + name);
+    let url = "http://openlibrary.org/search.json?q=" + encodeURIComponent(name)
+    let response = await fetch(url);
+    let data = await response.json();
+    return data;
+}
+
+async function GETOLAPI_book(key = "") {
+    if (key === "") {
+        console.log("OL API : key is empty");
+        return;
+    }
+    console.log("OL API : book : " + key);
+    // let url = "https://openlibrary.org/works/" + key + ".json"
+    let url = "https://openlibrary.org/api/books?bibkeys=OLID:" + key + "&jscmd=details&format=json"
+    let response = await fetch(url);
+    let data = await response.json();
     return data;
 }
 
@@ -1658,14 +1723,14 @@ function UnZip(zipPath, ExtractDir, name, ext, token) {
                         n = parseInt(name) + 1;
                         name = Array(5 - String(n).length + 1).join("0") + n;
                         await page.screenshot({path: ExtractDir + "/" + name + ".png", fullPage: true});
-                    bignb++;
+                        bignb++;
                     }
                 }
                 await browser.close();
                 let allFiles = fs.readdirSync(ExtractDir);
                 allFiles.forEach((el) => {
                     if (!el.includes(".png")) {
-                        fs.rmSync(ExtractDir + "/" + el, { recursive: true });
+                        fs.rmSync(ExtractDir + "/" + el, {recursive: true});
                     }
                 });
                 listOfElements = GetListOfImg(CosmicComicsTemp + "/profiles/" + resolveToken(token) + "/current_book");
