@@ -31,7 +31,7 @@ let providerEnum = {
     "Marvel": 1,
     "Anilist": 2,
     "MANUAL": 0,
-    "LOCG": 4,
+    "GBooks": 4,
     "OL": 3
 }
 let sidebarMini = false;
@@ -1913,7 +1913,7 @@ async function setSearch(res) {
                     let bookList = JSON.parse(resa);
                     let TheBook = bookList[0];
                     //TODO Implement API HERE
-                    let provider = ((TheBook.ID_Series.includes("_1")) ? (providerEnum.Marvel) : ((TheBook.ID_Series.includes("_2")) ? (providerEnum.Anilist) : (TheBook.ID_Series.includes("_3")) ? (providerEnum.OL) : ((TheBook.ID_Series.includes("_4")) ? (providerEnum.LOCG) : (providerEnum.MANUAL))));
+                    let provider = ((TheBook.ID_Series.includes("_1")) ? (providerEnum.Marvel) : ((TheBook.ID_Series.includes("_2")) ? (providerEnum.Anilist) : (TheBook.ID_Series.includes("_3")) ? (providerEnum.OL) : ((TheBook.ID_Series.includes("_4")) ? (providerEnum.GBooks) : (providerEnum.MANUAL))));
                     let result = res[key].PATH;
                     console.log(result);
                     let libPath = result.replaceAll("\\", "/");
@@ -1933,7 +1933,7 @@ async function setSearch(res) {
                         } catch (e) {
                             console.log(e);
                         }
-                    } else if (provider === providerEnum.LOCG) {
+                    } else if (provider === providerEnum.GBooks) {
                         try {
                             await createSeries(provider, result, libPath, bookList);
                         } catch (e) {
@@ -2140,7 +2140,7 @@ async function createSeries(provider, path, libraryPath, res) {
         }
     }
     if (!APINOTFOUND) {
-        document.getElementById("provider_text").innerHTML = ((provider === providerEnum.Marvel) ? ("Data provided by Marvel. © 2014 Marvel") : ((provider === providerEnum.Anilist) ? ("Data provided by Anilist.") : ((provider === providerEnum.MANUAL) ? ("The Data are not provided by an API.") : ((provider === providerEnum.OL) ? ("Data provided by OpenLibrary.") : ((provider === providerEnum.LOCG) ? ("Data provided by League Of Comics Geek.") : "")))));
+        document.getElementById("provider_text").innerHTML = ((provider === providerEnum.Marvel) ? ("Data provided by Marvel. © 2014 Marvel") : ((provider === providerEnum.Anilist) ? ("Data provided by Anilist.") : ((provider === providerEnum.MANUAL) ? ("The Data are not provided by an API.") : ((provider === providerEnum.OL) ? ("Data provided by OpenLibrary.") : ((provider === providerEnum.GBooks) ? ("Data provided by League Of Comics Geek.") : "")))));
     } else {
         document.getElementById("provider_text").innerHTML = "The data are not from the API";
     }
@@ -3007,7 +3007,7 @@ async function createDetails(TheBook, provider) {
     addToBreadCrumb(TheBook.NOM, () => {
         return createDetails(TheBook, provider);
     });
-    document.getElementById("provider_text").innerHTML = ((provider === providerEnum.Marvel) ? ("Data provided by Marvel. © 2014 Marvel") : ((provider === providerEnum.Anilist) ? ("Data provided by Anilist.") : ((provider === providerEnum.MANUAL) ? ("The Data are not provided by an API.") : ((provider === providerEnum.OL) ? ("Data provided by OpenLibrary.") : ((provider === providerEnum.LOCG) ? ("Data provided by League Of Comics Geek.") : "")))));
+    document.getElementById("provider_text").innerHTML = ((provider === providerEnum.Marvel) ? ("Data provided by Marvel. © 2014 Marvel") : ((provider === providerEnum.Anilist) ? ("Data provided by Anilist.") : ((provider === providerEnum.MANUAL) ? ("The Data are not provided by an API.") : ((provider === providerEnum.OL) ? ("Data provided by OpenLibrary.") : ((provider === providerEnum.GBooks) ? ("Data provided by League Of Comics Geek.") : "")))));
     document.getElementById("contentViewer").style.display = "block";
     document.getElementById("DLBOOK").addEventListener("click", function (e) {
         let path = TheBook.PATH;
