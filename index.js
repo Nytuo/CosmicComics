@@ -592,6 +592,8 @@ async function discoverLibraries() {
             } else if (el["API_ID"] === providerEnum.OL) {
                 logo.src = "./Images/OL.svg";
                 logo.style.filter = "invert(100%)";
+            } else if (el["API_ID"] === providerEnum.GBooks) {
+                logo.src = "./Images/Gbooks.svg";
             }
             logo.className = "libLogo";
             btn.appendChild(logo);
@@ -830,16 +832,14 @@ function openLibrary(folder, provider = 0) {
                 console.log(data);
                 if (data.length <= 0) throw new Error("Folder empty or not found");
                 //Ajouter a la DB les dossiers trouvés en tant que Collection
-                if (provider === providerEnum.OL) {
+                if (provider === providerEnum.OL || provider === providerEnum.GBooks) {
                     //inserer une series OL
                     //aller directement dedans
                     document.getElementById("ContainerExplorer").style.display = "flex";
                     document.getElementById("overlay").style.display = "none";
                     resetOverlay();
-
                     loadView(result, result, "", provider)
                 } else {
-
                     loadContent(provider, data, result);
                 }
             });
@@ -1043,7 +1043,6 @@ function loadView(FolderRes, libraryPath, date = "", provider = providerEnum.MAN
                             if (cdata === undefined) {
                                 throw new Error("no data");
                             }
-                            //if cdata contains a key "num_found"
                             if (cdata.hasOwnProperty("num_found")) {
                                 TheBook = generateBookTemplate(realname, null, null, 0, 0, 1, 0, 0, 0, path, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null)
 
@@ -1053,6 +1052,44 @@ function loadView(FolderRes, libraryPath, date = "", provider = providerEnum.MAN
                                     cdataD["thumbnail_url"], null, cdataD["description"], cdataD["physical_format"],
                                     cdataD["number_of_pages"], cdataD["info_url"], null, cdataD["authors"], null, null, cdata["publish_date"],
                                     null, null, null, false);
+                            }
+
+                        })
+                    } else if (provider === providerEnum.GBooks) {
+                        await GETGBAPI_INSERT(realname, path).then(async (cdata) => {
+                            console.log(cdata);
+                            if (cdata === undefined) {
+                                throw new Error("no data");
+                            }
+                            if (cdata["totalItems"] > 0) {
+                                cdata = cdata["items"][0];
+                                let cover;
+                                if (cdata["volumeInfo"]["imageLinks"] !== undefined) {
+
+                                    cover = cdata["volumeInfo"]["imageLinks"]
+                                    if (cover["large"] !== undefined) {
+                                        cover = cover["large"]
+                                    } else if (cover["thumbnail"] !== undefined) {
+                                        cover = cover["thumbnail"]
+                                    } else {
+                                        cover = null
+                                    }
+                                } else {
+                                    cover = null;
+                                }
+                                let price;
+                                if (cdata["saleInfo"]["retailPrice"] !== undefined) {
+                                    price = cdata["saleInfo"]["retailPrice"]["amount"]
+                                }else{
+                                    price = null;
+                                }
+                                TheBook = generateBookTemplate(realname, cdata["id"], null, 0, 0, 1, 0, 0, 0, path,
+                                    cover, null, cdata["volumeInfo"]["description"], cdata["volumeInfo"]["printType"],
+                                    cdata["volumeInfo"]["pageCount"], cdata["volumeInfo"]["infoLink"], null, cdata["volumeInfo"]["authors"], null, price, cdata["volumeInfo"]["publishedDate"],
+                                    null, null, null, false);
+
+                            } else {
+                                TheBook = generateBookTemplate(realname, null, null, 0, 0, 1, 0, 0, 0, path, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null)
                             }
 
                         })
@@ -1086,12 +1123,12 @@ function loadView(FolderRes, libraryPath, date = "", provider = providerEnum.MAN
                 });
                 n++;
                 let element;
-                if (provider === providerEnum.OL) {
-                 element = document.getElementById("ContainerExplorer");
+                if (provider === providerEnum.OL || provider === providerEnum.GBooks) {
+                    element = document.getElementById("ContainerExplorer");
 
-                }else{
+                } else {
 
-                 element = document.getElementById("ContentView");
+                    element = document.getElementById("ContentView");
                 }
                 divlist.appendChild(carddiv);
                 element.appendChild(divlist);
@@ -1168,10 +1205,7 @@ async function loadContent(provider, FolderRes, libraryPath) {
                 } else if (provider === providerEnum.Marvel) {
                     console.log("Provider: Marvel Comics");
                     GETMARVELAPI(name, path);
-                } else if (provider === providerEnum.MANUAL) {
-                    let randID = Math.floor(Math.random() * 1000000);
-                    await InsertIntoDB("Series", "(ID_Series,title,note,statut,start_date,end_date,description,Score,genres,cover,BG,CHARACTERS,TRENDING,STAFF,SOURCE,volumes,chapters,favorite,PATH,lock)", "('" + randID + "U_0" + "','" + JSON.stringify(name.replaceAll("'", "''")) + "',null,null,null,null,null,'0',null,null,null,null,null,null,null,null,null,0,'" + path + "',false)");
-                } else if (provider === providerEnum.OL) {
+                } else if (provider === providerEnum.MANUAL || provider === providerEnum.OL || provider === providerEnum.GBooks) {
                     let randID = Math.floor(Math.random() * 1000000);
                     await InsertIntoDB("Series", "(ID_Series,title,note,statut,start_date,end_date,description,Score,genres,cover,BG,CHARACTERS,TRENDING,STAFF,SOURCE,volumes,chapters,favorite,PATH,lock)", "('" + randID + "U_0" + "','" + JSON.stringify(name.replaceAll("'", "''")) + "',null,null,null,null,null,'0',null,null,null,null,null,null,null,null,null,0,'" + path + "',false)");
                 }
@@ -1193,9 +1227,7 @@ async function loadContent(provider, FolderRes, libraryPath) {
                             } else {
                                 node = JSON.parse(res[0].title);
                             }
-                        } else if (provider == providerEnum.MANUAL) {
-                            node = res[0].title;
-                        } else if (provider == providerEnum.OL) {
+                        } else if (provider == providerEnum.MANUAL || provider === providerEnum.OL || provider === providerEnum.GBooks) {
                             node = res[0].title;
                         }
                     } else {
@@ -1584,7 +1616,7 @@ function HomeRoutine() {
             let brook = TheBook;
             carddiv.addEventListener("click", function () {
                 //TODO implement API HERE
-                let provider = ((brook.series.includes("marvel")) ? (providerEnum.Marvel) : ((brook.series.includes("Anilist")) ? (providerEnum.Anilist) : ((brook.series.includes("OL")) ? (providerEnum.OL) : (providerEnum.MANUAL))));
+                let provider = ((brook.series.includes("marvel")) ? (providerEnum.Marvel) : ((brook.series.includes("Anilist")) ? (providerEnum.Anilist) : ((brook.series.includes("OL")) ? (providerEnum.OL) : ((brook.URLs.includes("google")) ? (providerEnum.GBooks) : (providerEnum.MANUAL)))));
                 createDetails(brook, provider);
             });
             const element = document.getElementById("continueReadingHome");
@@ -1629,7 +1661,7 @@ function HomeRoutine() {
             let brook = TheBook;
             carddiv.addEventListener("click", function () {
                 //TODO Implement API HERE
-                let provider = ((brook.series.includes("marvel")) ? (providerEnum.Marvel) : ((brook.series.includes("Anilist")) ? (providerEnum.Anilist) : ((brook.series.includes("OL")) ? (providerEnum.OL) : (providerEnum.MANUAL))));
+                let provider = ((brook.series.includes("marvel")) ? (providerEnum.Marvel) : ((brook.series.includes("Anilist")) ? (providerEnum.Anilist) : ((brook.series.includes("OL")) ? (providerEnum.OL) : ((brook.URLs.includes("google")) ? (providerEnum.GBooks) : (providerEnum.MANUAL)))));
                 createDetails(brook, provider);
             });
             element.appendChild(carddiv);
@@ -1669,7 +1701,7 @@ function HomeRoutine() {
             let brook = TheBook;
             carddiv.addEventListener("click", function () {
                 //TODO Implement API HERE
-                let provider = ((brook.series.includes("marvel")) ? (providerEnum.Marvel) : ((brook.series.includes("Anilist")) ? (providerEnum.Anilist) : ((brook.series.includes("OL")) ? (providerEnum.OL) : (providerEnum.MANUAL))));
+                let provider = ((brook.series.includes("marvel")) ? (providerEnum.Marvel) : ((brook.series.includes("Anilist")) ? (providerEnum.Anilist) : ((brook.series.includes("OL")) ? (providerEnum.OL) : ((brook.URLs.includes("google")) ? (providerEnum.GBooks) : (providerEnum.MANUAL)))));
                 createDetails(brook, provider);
             });
             const element = document.getElementById("toRead");
@@ -1714,7 +1746,7 @@ function HomeRoutine() {
             let brook = TheBook;
             carddiv.addEventListener("click", function () {
                 //TODO Implement API HERE
-                let provider = ((brook.series.includes("marvel")) ? (providerEnum.Marvel) : ((brook.series.includes("Anilist")) ? (providerEnum.Anilist) : ((brook.series.includes("OL")) ? (providerEnum.OL) : (providerEnum.MANUAL))));
+                let provider = ((brook.series.includes("marvel")) ? (providerEnum.Marvel) : ((brook.series.includes("Anilist")) ? (providerEnum.Anilist) : ((brook.series.includes("OL")) ? (providerEnum.OL) : ((brook.URLs.includes("google")) ? (providerEnum.GBooks) : (providerEnum.MANUAL)))));
                 createDetails(brook, provider);
             });
             const element = document.getElementById("myfavoriteHome");
@@ -1808,7 +1840,7 @@ async function AllBooks(filters = "") {
                 });
                 let brook = TheBook;
                 carddiv.addEventListener("click", function () {
-                    let provider = ((brook.series.includes("marvel")) ? (providerEnum.Marvel) : ((brook.series.includes("Anilist")) ? (providerEnum.Anilist) : ((brook.series.includes("OL")) ? (providerEnum.OL) : (providerEnum.MANUAL))));
+                    let provider = ((brook.series.includes("marvel")) ? (providerEnum.Marvel) : ((brook.series.includes("Anilist")) ? (providerEnum.Anilist) : ((brook.series.includes("OL")) ? (providerEnum.OL) : ((brook.URLs.includes("google")) ? (providerEnum.GBooks) : (providerEnum.MANUAL)))));
                     createDetails(brook, provider);
                 });
                 const element = document.getElementById("ContainerExplorer");
@@ -1901,7 +1933,7 @@ async function setSearch(res) {
                     let bookList = JSON.parse(resa);
                     let TheBook = bookList[0];
                     //TODO Implement API HERE
-                    let provider = ((brook.series.includes("marvel")) ? (providerEnum.Marvel) : ((brook.series.includes("Anilist")) ? (providerEnum.Anilist) : ((brook.series.includes("OL")) ? (providerEnum.OL) : (providerEnum.MANUAL))));
+                    let provider = ((brook.series.includes("marvel")) ? (providerEnum.Marvel) : ((brook.series.includes("Anilist")) ? (providerEnum.Anilist) : ((brook.series.includes("OL")) ? (providerEnum.OL) : ((brook.URLs.includes("google")) ? (providerEnum.GBooks) : (providerEnum.MANUAL)))));
                     if (provider === -1) {
                         return;
                     }
@@ -2025,6 +2057,26 @@ async function GETMARVELAPI_Comics_INSERT(name = "", date = "", path) {
     });
 }
 
+async function GETGBAPI_INSERT(name = "", path) {
+    return fetch("http://" + domain + ":" + port + "/insert/googlebooks/book/", {
+        method: "GET",
+        headers: {
+            'Content-Type': 'application/json',
+            "name": name,
+            "path": path,
+            "token": userToken
+        }
+    }).then(function (response) {
+        return response.text();
+    }).then(function (data) {
+        console.log(data);
+        data = JSON.parse(data);
+        return data;
+    }).catch(function (error) {
+        console.log(error);
+    });
+}
+
 async function GETOLAPI_INSERT(name = "", path) {
     return fetch("http://" + domain + ":" + port + "/insert/ol/book/", {
         method: "GET",
@@ -2125,6 +2177,8 @@ async function createSeries(provider, path, libraryPath, res) {
             alert("Manual Provider can't be rematched")
         } else if (provider === providerEnum.OL) {
             alert("OL Provider can't be rematched")
+        } else if (provider === providerEnum.GBooks) {
+            alert("GBooks Provider can't be rematched")
         } else {
         }
         //fetch API
@@ -2140,7 +2194,7 @@ async function createSeries(provider, path, libraryPath, res) {
         }
     }
     if (!APINOTFOUND) {
-        document.getElementById("provider_text").innerHTML = ((provider === providerEnum.Marvel) ? ("Data provided by Marvel. © 2014 Marvel") : ((provider === providerEnum.Anilist) ? ("Data provided by Anilist.") : ((provider === providerEnum.MANUAL) ? ("The Data are not provided by an API.") : ((provider === providerEnum.OL) ? ("Data provided by OpenLibrary.") : ((provider === providerEnum.GBooks) ? ("Data provided by League Of Comics Geek.") : "")))));
+        document.getElementById("provider_text").innerHTML = ((provider === providerEnum.Marvel) ? ("Data provided by Marvel. © 2014 Marvel") : ((provider === providerEnum.Anilist) ? ("Data provided by Anilist.") : ((provider === providerEnum.MANUAL) ? ("The Data are not provided by an API.") : ((provider === providerEnum.OL) ? ("Data provided by OpenLibrary.") : ((provider === providerEnum.GBooks) ? ("Data provided by Google Books.") : "")))));
     } else {
         document.getElementById("provider_text").innerHTML = "The data are not from the API";
     }
@@ -2221,6 +2275,8 @@ async function createSeries(provider, path, libraryPath, res) {
             });
         } else if (provider === providerEnum.OL) {
             alert("Open Library cannot be used to fetch characters");
+        } else if (provider === providerEnum.GBooks) {
+            alert("Google Books cannot be used to fetch characters");
         }
         let NameToFetch = NameToFetchList.join(",");
         let container = document.createElement("div");
@@ -2246,7 +2302,7 @@ async function createSeries(provider, path, libraryPath, res) {
                         } else {
                             document.getElementById("moreinfo_txt").innerHTML = name + "<br/>" + desc;
                         }
-                    } else if (provider === providerEnum.Anilist || provider === providerEnum.MANUAL || provider === providerEnum.OL) {
+                    } else if (provider === providerEnum.Anilist || provider === providerEnum.MANUAL || provider === providerEnum.OL || provider === providerEnum.GBooks) {
                         document.getElementById("moreinfo_img").src = image.replaceAll('"', "");
                         document.getElementById("moreinfo_btn").href = urlo;
                         if (desc == null) {
@@ -2264,7 +2320,7 @@ async function createSeries(provider, path, libraryPath, res) {
                 });
                 if (provider === providerEnum.Marvel) {
                     divs2.innerHTML += "<img src='" + JSON.parse(el.image).path + "/detail." + JSON.parse(el.image).extension + "' class='img-charac'/><br><span>" + el.name + "</span>";
-                } else if (provider === providerEnum.Anilist || provider === providerEnum.MANUAL || provider === providerEnum.OL) {
+                } else if (provider === providerEnum.Anilist || provider === providerEnum.MANUAL || provider === providerEnum.OL || provider === providerEnum.GBooks) {
                     divs2.innerHTML += "<img src='" + el.image.replaceAll('"', '') + "' class='img-charac'/><br><span>" + el.name + "</span>";
                 }
                 divs.appendChild(divs2);
@@ -2335,7 +2391,7 @@ async function createSeries(provider, path, libraryPath, res) {
                         } else {
                             document.getElementById("moreinfo_txt").innerHTML = name + "<br/>" + desc;
                         }
-                    } else if (provider === providerEnum.Anilist || provider === providerEnum.MANUAL || provider === providerEnum.OL) {
+                    } else if (provider === providerEnum.Anilist || provider === providerEnum.MANUAL || provider === providerEnum.OL || provider === providerEnum.GBooks) {
                         document.getElementById("moreinfo_img").src = image.replaceAll('"', "");
                         document.getElementById("moreinfo_btn").href = urlo;
                         if (desc == null) {
@@ -2374,7 +2430,7 @@ async function createSeries(provider, path, libraryPath, res) {
             JSON.parse(res[0].STAFF)["items"].forEach((el) => {
                 StaffToFetchList.push("'" + el.name.replaceAll("'", "''") + "'");
             });
-        } else if (provider === providerEnum.Anilist || provider === providerEnum.MANUAL || provider === providerEnum.OL) {
+        } else if (provider === providerEnum.Anilist || provider === providerEnum.MANUAL || provider === providerEnum.OL || provider === providerEnum.GBooks) {
             JSON.parse(res[0].STAFF).forEach((el) => {
                 StaffToFetchList.push("'" + el.name.replaceAll("'", "''") + "'");
             });
@@ -2404,7 +2460,7 @@ async function createSeries(provider, path, libraryPath, res) {
                         } else {
                             document.getElementById("moreinfo_txt").innerHTML = name + "<br/>" + desc;
                         }
-                    } else if (provider === providerEnum.Anilist || provider === providerEnum.MANUAL || provider === providerEnum.OL) {
+                    } else if (provider === providerEnum.Anilist || provider === providerEnum.MANUAL || provider === providerEnum.OL || provider === providerEnum.GBooks) {
                         document.getElementById("moreinfo_img").src = image.replaceAll('"', "");
                         document.getElementById("moreinfo_btn").href = urlo;
                         if (desc == null) {
@@ -2425,7 +2481,7 @@ async function createSeries(provider, path, libraryPath, res) {
                         if (el.name === JSON.parse(res[0]["STAFF"])["items"][j].name) {
                             divs2.innerHTML += "<img src='" + JSON.parse(el.image).path + "/detail." + JSON.parse(el.image).extension + "' class='img-charac'/><br><span>" + el.name + "</span><br/><span style='font-size: 14px;color: #a8a8a8a8'>" + JSON.parse(res[0]["STAFF"])["items"][j]["role"] + "</span>";
                         }
-                    } else if (provider === providerEnum.Anilist || provider === providerEnum.MANUAL || provider === providerEnum.OL) {
+                    } else if (provider === providerEnum.Anilist || provider === providerEnum.MANUAL || provider === providerEnum.OL || provider === providerEnum.GBooks) {
                         if (el.name === JSON.parse(res[0]["STAFF"])[j].name) {
                             divs2.innerHTML += "<img src='" + el.image.replaceAll('"', "") + "' class='img-charac'/><br><span>" + el.name + "</span>";
                         }
@@ -2586,7 +2642,7 @@ async function createSeries(provider, path, libraryPath, res) {
                 document.getElementById("Status").innerHTML = "UNKNOWN";
                 document.getElementById("Status").className = "NotYet";
             }
-        } else if (provider === providerEnum.Anilist || provider === providerEnum.MANUAL || provider === providerEnum.OL) {
+        } else if (provider === providerEnum.Anilist || provider === providerEnum.MANUAL || provider === providerEnum.OL || provider === providerEnum.GBooks) {
             loadView(path, libraryPath, "", provider);
             document.getElementById("description").innerHTML = res[0].description;
             document.getElementById("genres").innerHTML = "Genres " + ":";
@@ -2643,7 +2699,7 @@ async function createSeries(provider, path, libraryPath, res) {
                     document.getElementById("Status").className = "NotYet";
                 }
             }
-        } else if (provider === providerEnum.Anilist || provider === providerEnum.MANUAL || provider === providerEnum.OL) {
+        } else if (provider === providerEnum.Anilist || provider === providerEnum.MANUAL || provider === providerEnum.OL || provider === providerEnum.GBooks) {
             loadView(path, libraryPath, "", provider);
             document.getElementById("description").innerHTML = res[0].description;
             if (res[0]["TRENDING"] != null && res[0]["TRENDING"] !== "null") {
@@ -2959,6 +3015,8 @@ async function createDetails(TheBook, provider) {
             alert("You can't rematch a manual entry")
         } else if (provider === providerEnum.OL) {
             //TODO OL REMATCH BOOK
+        } else if (provider === providerEnum.GBooks) {
+            //TODO GBOOKS REMATCH BOOK
         } else {
         }
         //fetch API
@@ -3007,7 +3065,7 @@ async function createDetails(TheBook, provider) {
     addToBreadCrumb(TheBook.NOM, () => {
         return createDetails(TheBook, provider);
     });
-    document.getElementById("provider_text").innerHTML = ((provider === providerEnum.Marvel) ? ("Data provided by Marvel. © 2014 Marvel") : ((provider === providerEnum.Anilist) ? ("Data provided by Anilist.") : ((provider === providerEnum.MANUAL) ? ("The Data are not provided by an API.") : ((provider === providerEnum.OL) ? ("Data provided by OpenLibrary.") : ((provider === providerEnum.GBooks) ? ("Data provided by League Of Comics Geek.") : "")))));
+    document.getElementById("provider_text").innerHTML = ((provider === providerEnum.Marvel) ? ("Data provided by Marvel. © 2014 Marvel") : ((provider === providerEnum.Anilist) ? ("Data provided by Anilist.") : ((provider === providerEnum.MANUAL) ? ("The Data are not provided by an API.") : ((provider === providerEnum.OL) ? ("Data provided by OpenLibrary.") : ((provider === providerEnum.GBooks) ? ("Data provided by Google Books.") : "")))));
     document.getElementById("contentViewer").style.display = "block";
     document.getElementById("DLBOOK").addEventListener("click", function (e) {
         let path = TheBook.PATH;
@@ -3036,7 +3094,7 @@ async function createDetails(TheBook, provider) {
     document.getElementById("readingbtndetails").style.display = "inline";
     document.getElementById("OtherTitles").innerHTML = "";
     document.getElementById("relations").innerHTML = "";
-    if (TheBook.characters !== "null") {
+    if (TheBook.characters !== "null" && providerEnum.Marvel)    {
         document.getElementById("id").innerHTML = "This is a " + TheBook.format + " of " + TheBook.pageCount + " pages. <br/> This is part of the '" + JSON.parse(TheBook.series).name + "' series.";
     } else {
         if (provider === providerEnum.Anilist) {
@@ -3047,6 +3105,9 @@ async function createDetails(TheBook, provider) {
             document.getElementById("id").innerHTML = "This is part of the '" + TheBook.series + "' series.";
         } else if (provider === providerEnum.OL) {
             document.getElementById("id").innerHTML = "This is part of the '" + TheBook.series + "' series.";
+        }else if (provider === providerEnum.GBooks) {
+            document.getElementById("id").innerHTML = "This is a " + TheBook.format + " of " + TheBook.pageCount + " pages. <br/> This is part of the '" + TheBook.series + "' series.";
+
         }
     }
 
@@ -3158,7 +3219,7 @@ async function createDetails(TheBook, provider) {
             JSON.parse(TheBook.characters)["items"].forEach((el) => {
                 NameToFetchList.push("'" + el.name + "'");
             });
-        } else if (provider === providerEnum.Anilist || provider === providerEnum.MANUAL || provider === providerEnum.OL) {
+        } else if (provider === providerEnum.Anilist || provider === providerEnum.MANUAL || provider === providerEnum.OL || provider === providerEnum.GBooks) {
             JSON.parse(TheBook.characters).forEach((el) => {
                 NameToFetchList.push("'" + el.name + "'");
             });
@@ -3187,7 +3248,7 @@ async function createDetails(TheBook, provider) {
                         } else {
                             document.getElementById("moreinfo_txt").innerHTML = name + "<br/>" + desc;
                         }
-                    } else if (provider === providerEnum.Anilist || provider === providerEnum.MANUAL || provider === providerEnum.OL) {
+                    } else if (provider === providerEnum.Anilist || provider === providerEnum.MANUAL || provider === providerEnum.OL || provider === providerEnum.GBooks) {
                         document.getElementById("moreinfo_img").src = image.replaceAll('"', "");
                         document.getElementById("moreinfo_btn").href = urlo;
                         if (desc == null) {
@@ -3205,7 +3266,7 @@ async function createDetails(TheBook, provider) {
                 });
                 if (provider === providerEnum.Marvel) {
                     divs2.innerHTML = "<img alt='a character' src='" + JSON.parse(el.image).path + "/detail." + JSON.parse(el.image).extension + "' class='img-charac'/><br><span>" + el.name + "</span>";
-                } else if (provider === providerEnum.Anilist || provider === providerEnum.MANUAL || provider === providerEnum.OL) {
+                } else if (provider === providerEnum.Anilist || provider === providerEnum.MANUAL || provider === providerEnum.OL || provider === providerEnum.GBooks) {
                     divs2.innerHTML = "<img alt='a character' src='" + el.image.replaceAll('"', '') + "' class='img-charac'/><br><span>" + el.name + "</span>";
                 }
                 divs.appendChild(divs2);
@@ -3283,6 +3344,10 @@ async function createDetails(TheBook, provider) {
             JSON.parse(TheBook.creators).forEach((el) => {
                 StaffToFetchList.push("'" + el.name.replaceAll("'", "''") + "'");
             });
+        }else if (provider === providerEnum.GBooks) {
+            JSON.parse(TheBook.creators).forEach((el) => {
+                StaffToFetchList.push("'" + el.replaceAll("'", "''") + "'");
+            });
         }
         let StaffToFetch = StaffToFetchList.join(",");
         let container2 = document.createElement("div");
@@ -3298,7 +3363,7 @@ async function createDetails(TheBook, provider) {
                         if (el.name === JSON.parse(TheBook.creators)["items"][j].name) {
                             divs2.innerHTML = "<img src='" + JSON.parse(el.image).path + "/detail." + JSON.parse(el.image).extension + "' class='img-charac'/><br><span>" + el.name + "</span><br/><span style='font-size: 14px;color: #a8a8a8a8'>" + JSON.parse(TheBook.creators)["items"][j]["role"] + "</span>";
                         }
-                    } else if (provider === providerEnum.Anilist || provider === providerEnum.MANUAL || provider === providerEnum.OL) {
+                    } else if (provider === providerEnum.Anilist || provider === providerEnum.MANUAL || provider === providerEnum.OL || provider === providerEnum.GBooks) {
                         if (el.name === JSON.parse(TheBook.creators)[j].name) {
                             divs2.innerHTML = "<img src='" + el.image.replaceAll('"', "") + "' class='img-charac'/><br><span>" + el.name + "</span>";
                         }
@@ -3318,7 +3383,7 @@ async function createDetails(TheBook, provider) {
                             } else {
                                 document.getElementById("moreinfo_txt").innerHTML = name + "<br/>" + desc;
                             }
-                        } else if (provider === providerEnum.Anilist || provider === providerEnum.MANUAL || provider === providerEnum.OL) {
+                        } else if (provider === providerEnum.Anilist || provider === providerEnum.MANUAL || provider === providerEnum.OL || provider === providerEnum.GBooks) {
                             document.getElementById("moreinfo_img").src = image.replaceAll('"', "");
                             document.getElementById("moreinfo_btn").href = urlo;
                             if (desc == null) {

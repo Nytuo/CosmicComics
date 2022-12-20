@@ -1343,6 +1343,28 @@ app.get("/insert/ol/book/", async function (req, res) {
         }
     })
 })
+app.get("/insert/googlebooks/book/", async function (req, res) {
+    let token = req.headers.token;
+    let realname = req.headers.name;
+    let path = req.headers.path;
+    GETGOOGLEAPI_book(realname).then(async function (cdata) {
+        res.send(cdata);
+        console.log(cdata);
+        if (cdata === undefined) {
+            throw new Error("no data");
+        }
+        if (cdata["totalItems"] > 0) {
+            cdata = cdata["items"][0];
+            await insertIntoDB("", `(?,'${cdata["id"]}','${realname}',null,${0},${0},${1},${0},${0},${0},'${path}','${cdata["volumeInfo"]["imageLinks"] !== undefined ? (cdata["volumeInfo"]["imageLinks"]["large"] !== undefined ? (cdata["volumeInfo"]["imageLinks"]["large"]):(cdata["volumeInfo"]["imageLinks"]["thumbnail"])):null }','${null}','${cdata["volumeInfo"]["description"] !== undefined ? cdata["volumeInfo"]["description"].replaceAll("'", "''"):null}','${cdata["volumeInfo"]["printType"]}',${cdata["volumeInfo"]["pageCount"]},'${JSON.stringify(cdata["volumeInfo"]["infoLink"])}','${null}','${JSON.stringify(cdata["volumeInfo"]["authors"])}','${null}','${cdata["saleInfo"]["retailPrice"] !== undefined ? (JSON.stringify(cdata["saleInfo"]["retailPrice"]["amount"])):null}','${JSON.stringify(cdata["volumeInfo"]["publishedDate"])}','${null}','${null}','${null}',false)`, token, "Books")
+                let authorsccdata = cdata["volumeInfo"]["authors"];
+                for (let i = 0; i < authorsccdata.length; i++) {
+                    await insertIntoDB("", `('${Math.floor(Math.random()*100000) + "_4"}','${authorsccdata[i].replaceAll("'", "''")}','${null}',${null},'${null}')`, token, "Creators")
+                }
+        } else {
+            await insertIntoDB("", `(?,'${null}','${realname}',null,${0},${0},${1},${0},${0},${0},'${path}','${null}','${null}','${null}','${null}',${null},'${null}','${null}','${null}','${null}','${null}','${null}','${null}','${null}','${null}',false)`, token, "Books")
+        }
+    })
+})
 app.post("/insert/anilist/book", async function (req, res) {
     let token = req.body.token;
     let path = req.body.path;
@@ -1417,7 +1439,24 @@ async function GETMARVELAPI_Comics(name = "", seriesStartDate = "") {
     console.log(data);
     return data;
 }
+async function GETGOOGLEAPI_book(name = "") {
+    if (name === "") {
+        console.log("GETGOOGLEAPI_book : name is empty");
+        return;
+    }
 
+    name = name.replaceAll(/[(].+[)]/g, "");
+    name = name.replaceAll(/[\[].+[\]]/g, "");
+    name = name.replaceAll(/[\{].+[\}]/g, "");
+    name = name.replaceAll(/[#][0-9]{1,}/g, "");
+    name = name.replace(/\s+$/, "");
+    console.log("GETGOOGLEAPI_book : name : " + name);
+    let url = "https://www.googleapis.com/books/v1/volumes?q=" + encodeURIComponent(name)+"&maxResults=1&key=" + process.env.GBOOKSAPIKEY;
+    let response = await fetch(url);
+    let data = await response.json();
+    console.log(data);
+    return data;
+}
 async function GETOLAPI_search(name = "") {
     if (name === "") {
         console.log("OL API : name is empty");
