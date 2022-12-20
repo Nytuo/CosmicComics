@@ -13,7 +13,6 @@ GNU General Public License for more details.
 You should have received a copy of the GNU General Public License
 along with Cosmic-Comics.  If not, see <https://www.gnu.org/licenses/>.*/
 //Variables declaration
-//All required nodes modules
 //All other variables and constants
 const ValidatedExtension = ["cbr", "cbz", "pdf", "zip", "7z", "cb7", "tar", "cbt", "rar", 'epub'];
 let coolanimations = ["zoomInDown", "rollIn", "zoomIn", "jackInTheBox", "fadeInUp", "fadeInDown", "fadeIn", "bounceInUp", "bounceInDown", "backInDown"];
@@ -25,8 +24,7 @@ const url = document.createElement("a");
 url.setAttribute("href", window.location.href);
 let domain = url.hostname;
 let port = url.port;
-let currentUser = "";
-let userToken = getCookie("selectedProfile");
+let currentProfile = new Profile(getCookie("selectedProfile"));
 let providerEnum = {
     "Marvel": 1,
     "Anilist": 2,
@@ -36,18 +34,18 @@ let providerEnum = {
 }
 let sidebarMini = false;
 let searchtoggle = true;
-if (userToken == null) {
+if (currentProfile.getToken == null) {
     window.location.href = "login";
 } else {
-    fetch("http://" + domain + ":" + port + "/profile/logcheck/" + userToken).then(function (response) {
+    fetch("http://" + domain + ":" + port + "/profile/logcheck/" + currentProfile.getToken).then(function (response) {
         return response.text();
     }).then(function (data) {
         if (data === "false") {
             window.location.href = "login";
         } else {
-            currentUser = data;
-            document.getElementById("icon_id_accountSystem").src = "http://" + domain + ":" + port + "/profile/getPP/" + userToken;
-            fetch("http://" + domain + ":" + port + "/config/getConfig/" + userToken).then(function (response) {
+            currentProfile.setName = data;
+            document.getElementById("icon_id_accountSystem").src = currentProfile.getPP;
+            fetch("http://" + domain + ":" + port + "/config/getConfig/" + currentProfile.getToken).then(function (response) {
                 return response.text();
             }).then(function (data) {
                 let d = SearchInJSON("display_style", JSON.parse(data));
@@ -55,7 +53,7 @@ if (userToken == null) {
             }).catch(function (error) {
                 console.log(error);
             });
-            fetch("http://" + domain + ":" + port + "/config/getConfig/" + userToken).then(function (response) {
+            fetch("http://" + domain + ":" + port + "/config/getConfig/" + currentProfile.getToken).then(function (response) {
                 return response.text();
             }).then(function (data) {
                 currenttheme = SearchInJSON("theme", JSON.parse(data));
@@ -64,7 +62,7 @@ if (userToken == null) {
             }).catch(function (error) {
                 console.log(error);
             });
-            fetch("http://" + domain + ":" + port + "/config/getConfig/" + userToken).then(function (response) {
+            fetch("http://" + domain + ":" + port + "/config/getConfig/" + currentProfile.getToken).then(function (response) {
                 return response.text();
             }).then(function (data) {
                 let currenttheme = SearchInJSON("theme", JSON.parse(data));
@@ -80,7 +78,6 @@ if (userToken == null) {
     });
 }
 let cardMode = true;
-
 //Search element on the JSON
 function SearchInJSON(search, info) {
     for (let i in info) {
@@ -142,7 +139,7 @@ function setTheme(theme) {
  */
 async function getResponse() {
     console.log("begin Request");
-    const response = await fetch("http://" + domain + ":" + port + "/config/getConfig/" + userToken);
+    const response = await fetch("http://" + domain + ":" + port + "/config/getConfig/" + currentProfile.getToken);
     console.log("Requested");
     const dataa = await response.json().then((data) => {
         console.log(data);
@@ -185,7 +182,7 @@ async function rematch(new_id, provider, type, old_id, isSeries = false) {
             method: "POST", headers: {
                 "Content-Type": "application/json"
             }, body: JSON.stringify({
-                "token": userToken,
+                "token": currentProfile.getToken,
                 "table": "Series",
                 "type": "noedit",
                 "column": "ID_Series",
@@ -199,7 +196,7 @@ async function rematch(new_id, provider, type, old_id, isSeries = false) {
             method: "POST", headers: {
                 "Content-Type": "application/json"
             }, body: JSON.stringify({
-                "token": userToken,
+                "token": currentProfile.getToken,
                 "table": "Books",
                 "type": "noedit",
                 "column": "ID_book",
@@ -245,7 +242,7 @@ async function getFromDB(dbname, request) {
             "request": request
         }, null, 2)
     };
-    return fetch('http://' + domain + ":" + port + '/DB/get/' + userToken + "/" + dbname, option).then(function (response) {
+    return fetch('http://' + domain + ":" + port + '/DB/get/' + currentProfile.getToken + "/" + dbname, option).then(function (response) {
         return response.text();
     }).then(function (data) {
         return data;
@@ -266,7 +263,7 @@ async function InsertIntoDB(dbname, dbinfo, values) {
             "into": dbinfo, "val": values
         }, null, 2)
     };
-    return fetch('http://' + domain + ":" + port + '/DB/insert/' + userToken + "/" + dbname, option);
+    return fetch('http://' + domain + ":" + port + '/DB/insert/' + currentProfile.getToken + "/" + dbname, option);
 }
 
 /**
@@ -277,7 +274,7 @@ async function InsertIntoDB(dbname, dbinfo, values) {
 async function deleteLib(elElement) {
     let confirmDelete = confirm("Would you like to delete " + elElement["NAME"] + " ?");
     if (confirmDelete) {
-        await fetch('http://' + domain + ":" + port + '/DB/lib/delete/' + userToken + "/" + elElement["ID_LIBRARY"]).then(() => {
+        await fetch('http://' + domain + ":" + port + '/DB/lib/delete/' + currentProfile.getToken + "/" + elElement["ID_LIBRARY"]).then(() => {
             alert("The library has been deleted");
             location.reload();
         });
@@ -663,7 +660,7 @@ discoverLibraries().then(r => {
  */
 function modifyConfigJson(tomod, mod) {
     //check si obj exist pour remplacer valeur
-    fetch("http://" + domain + ":" + port + "/config/getConfig/" + userToken).then(function (response) {
+    fetch("http://" + domain + ":" + port + "/config/getConfig/" + currentProfile.getToken).then(function (response) {
         return response.text();
     }).then(function (data) {
         let config = JSON.parse(data);
@@ -673,24 +670,10 @@ function modifyConfigJson(tomod, mod) {
         const option = {
             method: 'POST', headers: {'Content-Type': 'application/json'}, body: JSON.stringify(config, null, 2)
         };
-        fetch('/config/writeConfig/' + userToken, option);
+        fetch('/config/writeConfig/' + currentProfile.getToken, option);
     }).catch(function (error) {
         console.log(error);
     });
-}
-
-/**
- * Search a value in a JSON file by the key
- * @param {string} what_you_want The key to search
- * @param {*} data The JSON file
- */
-function Get_From_Config(what_you_want, data) {
-    for (let i in data[0]) {
-        if (i === what_you_want) {
-            return data[0][i];
-        }
-    }
-    return null;
 }
 
 /**
@@ -856,58 +839,6 @@ function openLibrary(folder, provider = 0) {
     }, 500);
 }
 
-/**
- * Get from ANILIST API the data of the manga by ID
- * @param {number|string} id The ID of the manga
- * @return {Promise<*>} The data of the manga
- */
-async function API_ANILIST_GET_ID(id) {
-    return fetch("http://" + domain + ":" + port + "/api/anilist/searchByID/" + id).then(function (response) {
-        return response.text();
-    }).then(function (data) {
-        data = JSON.parse(data);
-        console.log(data);
-        return data;
-    }).catch(function (error) {
-        console.log(error);
-    });
-}
-
-/**
- * Search on ANILIST API by the manga name
- * @param {string} name The name of the manga
- * @return {Promise<*>} The list of mangas
- */
-async function API_ANILIST_GET_SEARCH(name) {
-    return fetch("http://" + domain + ":" + port + "/api/anilist/searchOnly/" + name).then(function (response) {
-        return response.text();
-    }).then(function (data) {
-        data = JSON.parse(data);
-        console.log(data);
-        return data;
-    }).catch(function (error) {
-        console.log(error);
-    });
-}
-
-/**
- * Add the manga and all related information to the database
- * @param {string} name The name of the manga
- * @param {string} path The path to the manga
- */
-function API_ANILIST_POST_SEARCH(name, path) {
-    fetch("http://" + domain + ":" + port + "/api/anilist", {
-        method: "POST",
-        headers: {
-            "Content-Type": "application/json",
-            "name": name,
-            "token": userToken,
-            "path": path
-        }
-    }).then(() => {
-        Toastifycation("Manga added to the database");
-    })
-}
 
 /**
  * Generation of the Book Object for not yet DB inserted items
@@ -1001,22 +932,20 @@ function loadView(FolderRes, libraryPath, date = "", provider = providerEnum.MAN
             document.getElementById("readstat").innerHTML = JSON.parse(readBookNB)[0]["COUNT(*)"] + " / " + data.length + " volumes read";
             await getFromDB("Books", "* FROM Books WHERE PATH = '" + path + "'").then(async (resa) => {
                 let bookList = JSON.parse(resa);
-                let TheBook = bookList[0];
+                let bookFromDB = bookList[0];
+                let TheBook = new Book(bookFromDB["ID_book"], bookFromDB["NOM"], bookFromDB["URLCover"], bookFromDB["description"], bookFromDB["creators"], bookFromDB["characters"], bookFromDB["URLs"], bookFromDB["note"], bookFromDB["read"], bookFromDB["reading"], bookFromDB["unread"], bookFromDB["favorite"], bookFromDB["last_page"], bookFromDB["folder"], bookFromDB["PATH"], bookFromDB["issueNumber"], bookFromDB["format"], bookFromDB["pageCount"], bookFromDB["series"], bookFromDB["prices"], bookFromDB["dates"], bookFromDB["collectedIssues"], bookFromDB["collections"], bookFromDB["variants"], bookFromDB["lock"]);
                 if (bookList.length === 0) {
                     if (provider === providerEnum.Marvel) {
-                        await GETMARVELAPI_Comics_INSERT(realname, date, path).then(async (cdata) => {
+                        await new Marvel().InsertBook(realname, date, path).then(async (cdata) => {
                             console.log(cdata);
                             if (cdata === undefined) {
                                 throw new Error("no data");
                             }
                             if (cdata["data"]["total"] > 0) {
                                 cdata = cdata["data"]["results"][0];
-                                TheBook = generateBookTemplate(realname, cdata["id"], null, 0, 0, 1, 0, 0, 0, path,
-                                    cdata["thumbnail"].path + "/detail." + cdata["thumbnail"].extension, cdata["issueNumber"], cdata["description"], cdata["format"],
-                                    cdata["pageCount"], cdata["urls"], cdata["series"], cdata["creators"], cdata["characters"], cdata["prices"], cdata["dates"],
-                                    cdata["collectedIssues"], cdata["collections"], cdata["variants"], false);
+                                TheBook = new Book(cdata["id"],realname,cdata["thumbnail"].path + "/detail." + cdata["thumbnail"].extension,cdata["description"],cdata["creators"],cdata["characters"],cdata["urls"],null,0,0,1,0,0,0,path,cdata["issueNumber"],cdata["format"],cdata["pageCount"],cdata["series"],cdata["prices"],cdata["dates"],cdata["collectedIssues"], cdata["collections"], cdata["variants"], false)
                             } else {
-                                TheBook = generateBookTemplate(realname, null, null, 0, 0, 1, 0, 0, 0, path, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null)
+                                TheBook = new Book(null,realname,null,null,null,null,null,null,0,0,1,0,0,0,path,null,null,null,null,null,null,null,null, null, false)
                             }
                         });
                     } else if (provider === providerEnum.Anilist) {
@@ -1026,37 +955,32 @@ function loadView(FolderRes, libraryPath, date = "", provider = providerEnum.MAN
                                 'Content-Type': 'application/json',
                             },
                             body: JSON.stringify({
-                                "token": userToken,
+                                "token": currentProfile.getToken,
                                 "path": path,
                                 "realname": realname,
                             })
                         })
-                        TheBook = generateBookTemplate(realname, null, null, 0, 0, 1, 0, 0, 0, path, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null)
+                        TheBook = new Book(null,realname,null,null,null,null,null,null,0,0,1,0,0,0,path,null,null,null,null,null,null,null,null, null, false)
                     } else if (provider === providerEnum.MANUAL) {
                         console.log("manual");
                         InsertIntoDB("Books", "", `(?,'${null}','${realname}',null,${0},${0},${1},${0},${0},${0},'${path}','${null}','${null}','${null}','${null}',${null},'${null}','${null}','${null}','${null}','${null}','${null}','${null}','${null}','${null}',false)`)
-
-                        TheBook = generateBookTemplate(realname, null, null, 0, 0, 1, 0, 0, 0, path, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null)
+                        TheBook = new Book(null,realname,null,null,null,null,null,null,0,0,1,0,0,0,path,null,null,null,null,null,null,null,null, null, false)
                     } else if (provider === providerEnum.OL) {
-                        await GETOLAPI_INSERT(realname, path).then(async (cdata) => {
+                        await new OpenLibrary().InsertBook(realname, path).then(async (cdata) => {
                             console.log(cdata);
                             if (cdata === undefined) {
                                 throw new Error("no data");
                             }
                             if (cdata.hasOwnProperty("num_found")) {
-                                TheBook = generateBookTemplate(realname, null, null, 0, 0, 1, 0, 0, 0, path, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null)
-
+                                TheBook = new Book(null,realname,null,null,null,null,null,null,0,0,1,0,0,0,path,null,null,null,null,null,null,null,null, null, false)
                             } else {
                                 let cdataD = cdata["details"]
-                                TheBook = generateBookTemplate(realname, cdata["bib_key"], null, 0, 0, 1, 0, 0, 0, path,
-                                    cdataD["thumbnail_url"], null, cdataD["description"], cdataD["physical_format"],
-                                    cdataD["number_of_pages"], cdataD["info_url"], null, cdataD["authors"], null, null, cdata["publish_date"],
-                                    null, null, null, false);
+                                TheBook = new Book(cdata["bib_key"],realname,cdataD["thumbnail_url"],cdataD["description"],cdataD["authors"],null,cdataD["info_url"],null,0,0,1,0,0,0,path,null,cdataD["physical_format"],cdataD["number_of_pages"],null,null,cdata["publish_date"],null,null,null, false)
                             }
 
                         })
                     } else if (provider === providerEnum.GBooks) {
-                        await GETGBAPI_INSERT(realname, path).then(async (cdata) => {
+                        await new GoogleBooks().InsertBook(realname, path).then(async (cdata) => {
                             console.log(cdata);
                             if (cdata === undefined) {
                                 throw new Error("no data");
@@ -1080,44 +1004,26 @@ function loadView(FolderRes, libraryPath, date = "", provider = providerEnum.MAN
                                 let price;
                                 if (cdata["saleInfo"]["retailPrice"] !== undefined) {
                                     price = cdata["saleInfo"]["retailPrice"]["amount"]
-                                }else{
+                                } else {
                                     price = null;
                                 }
                                 TheBook = generateBookTemplate(realname, cdata["id"], null, 0, 0, 1, 0, 0, 0, path,
                                     cover, null, cdata["volumeInfo"]["description"], cdata["volumeInfo"]["printType"],
                                     cdata["volumeInfo"]["pageCount"], cdata["volumeInfo"]["infoLink"], null, cdata["volumeInfo"]["authors"], null, price, cdata["volumeInfo"]["publishedDate"],
                                     null, null, null, false);
+                                TheBook = new Book(cdata["id"],realname,cover,cdata["volumeInfo"]["description"],cdata["volumeInfo"]["authors"],null,cdata["volumeInfo"]["infoLink"],null,0,0,1,0,0,0,path,null,cdata["volumeInfo"]["printType"],cdata["volumeInfo"]["pageCount"],null,price,cdata["volumeInfo"]["publishedDate"],null,null, null,false)
 
                             } else {
-                                TheBook = generateBookTemplate(realname, null, null, 0, 0, 1, 0, 0, 0, path, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null)
+                                TheBook = new Book(null,realname,null,null,null,null,null,null,0,0,1,0,0,0,path,null,null,null,null,null,null,null,null, null, false)
                             }
 
                         })
                     }
                     //TODO implement API HERE
                 }
-                let carddiv = createCard(TheBook["unread"], TheBook["read"], TheBook["reading"], TheBook["ID_book"] + "_" + n, TheBook["URLCover"], TheBook["NOM"], TheBook["favorite"])
-                carddiv.querySelector(".card__play").addEventListener("click", function () {
-                    /*            ModifyJSONFile(
-                                    CosmicComicsData + "/ListOfComics.json",
-                                    "reading",
-                                    true,
-
-                                );
-                                ModifyJSONFile(
-                                    CosmicComicsData + "/ListOfComics.json",
-                                    "unread",
-                                    false,
-                                );
-                                Modify_JSON_For_Config(
-                                    CosmicComicsData + "/config.json",
-                                    "last_opened",
-                                    path
-                                );*/
-                    AllForOne("unread", "read", "reading", TheBook.ID_book);
-                    let encoded = encodeURIComponent(path.replaceAll("/", "%C3%B9"));
-                    window.location.href = "viewer.html?" + encoded;
-                });
+                let card = new Card(TheBook.unread, TheBook.read, TheBook.reading, TheBook.ID + "_" + n, TheBook.cover, TheBook.title, TheBook.favorite)
+                let carddiv = card.card;
+                card.addPlayButtonListener();
                 carddiv.addEventListener("click", async function () {
                     await createDetails(TheBook, provider);
                 });
@@ -1149,23 +1055,6 @@ function convertDate(inputFormat) {
 
     let d = new Date(inputFormat);
     return [pad(d.getDate()), pad(d.getMonth() + 1), d.getFullYear()].join('/');
-}
-
-/* TODO CODE VERIFICATION */
-function GETMARVELAPI(name = "", path) {
-    fetch('http://' + domain + ":" + port + '/api/marvel/', {
-        method: 'POST',
-        headers: {
-            'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({
-            "token": userToken,
-            "name": name,
-            "path": path,
-        })
-    }).then(function (response) {
-        Toastifycation("Marvel API : " + response.status);
-    })
 }
 
 async function loadContent(provider, FolderRes, libraryPath) {
@@ -1201,10 +1090,10 @@ async function loadContent(provider, FolderRes, libraryPath) {
             if (found === false) {
                 if (provider === providerEnum.Anilist) {
                     console.log("provider Anilist");
-                    API_ANILIST_POST_SEARCH(name, path)
+                    new Anilist().POST_SEARCH(name, path)
                 } else if (provider === providerEnum.Marvel) {
                     console.log("Provider: Marvel Comics");
-                    GETMARVELAPI(name, path);
+                    new Marvel().InsertSeries(name, path);
                 } else if (provider === providerEnum.MANUAL || provider === providerEnum.OL || provider === providerEnum.GBooks) {
                     let randID = Math.floor(Math.random() * 1000000);
                     await InsertIntoDB("Series", "(ID_Series,title,note,statut,start_date,end_date,description,Score,genres,cover,BG,CHARACTERS,TRENDING,STAFF,SOURCE,volumes,chapters,favorite,PATH,lock)", "('" + randID + "U_0" + "','" + JSON.stringify(name.replaceAll("'", "''")) + "',null,null,null,null,null,'0',null,null,null,null,null,null,null,null,null,0,'" + path + "',false)");
@@ -1245,12 +1134,9 @@ async function loadContent(provider, FolderRes, libraryPath) {
                     }
                     listOfImages.push(imagelink);
                     //Setting Card Div
-                    let carddiv = createCard(null, null, null, n, imagelink, node, res[0]["favorite"])
-                    carddiv.querySelector(".card__play").addEventListener("click", function () {
-                        AllForOne("unread", "read", "reading", TheBook.ID_book);
-
-                        window.location.href = "viewer.html?" + encodeURIComponent(path.replaceAll("/", "%C3%B9"));
-                    });
+                    let card = new Card(null, null, null, n, imagelink, node, res[0]["favorite"])
+                    let carddiv = card.card;
+                    card.addPlayButtonListener();
                     carddiv.addEventListener("click", async function () {
                         await createSeries(provider, path, libraryPath, res);
                     });
@@ -1363,18 +1249,6 @@ function LoadImages(numberOf) {
     }
 }
 
-/* TODO CODE VERIFICATION */
-//Sorting number in a string
-let SortingNumInStr = function (a, b) {
-    return Number(a.match(/(\d+)/g)[0]) - Number(b.match(/(\d+)/g)[0]);
-};
-
-//Check if the passed element contains numbers
-function hasNumbers(t) {
-    let regex = /\d/g;
-    return regex.test(t);
-}
-
 //Open a single file
 function openInViewer() {
     let file = document.getElementById("fileUp").files[0];
@@ -1396,7 +1270,7 @@ function openBOOKM(path, page) {
 function listBM() {
     const option = {
         method: 'GET', headers: {
-            'Content-Type': 'application/json', "token": userToken,
+            'Content-Type': 'application/json', "token": currentProfile.getToken,
         }
     };
     fetch('http://' + domain + ":" + port + "/BM/getBM", option).then((response) => {
@@ -1543,31 +1417,7 @@ async function addLibrary(forma) {
     });
 }
 
-/**
- * Modify the account
- * @param {{form: (*|HTMLElement)[]}} forma The form to get the data (The HTML element)
- */
-async function modifyAccount(forma) {
-    let form = forma.form;
-    let nuser = form[0];
-    let npass = form[1];
-    let npp = form[2];
-    if (forma.form[0] === "") {
-        nuser = null;
-    }
-    if (forma.form[1] === "") {
-        npass = null;
-    }
-    if (forma.form[2].length === 0 && forma.form[3] == null) {
-        npp = null;
-    }
-    const options = {
-        method: 'POST', headers: {'Content-Type': 'application/json'}, body: JSON.stringify({
-            "nuser": nuser, "npass": npass, "npp": npp.src, "token": userToken
-        }, null, 2)
-    };
-    await fetch("/profile/modification", options);
-}
+
 
 /**
  * Update the library
@@ -1580,7 +1430,7 @@ async function updateLibrary(forma, id) {
             "name": forma.form[0].value, "path": forma.form[1].value, "api_id": forma.form[2].value
         }, null, 2)
     };
-    await fetch('http://' + domain + ":" + port + '/DB/lib/update/' + userToken + "/" + id, option).then(() => {
+    await fetch('http://' + domain + ":" + port + '/DB/lib/update/' + currentProfile.getToken + "/" + id, option).then(() => {
         window.location.href = window.location.href.split("?")[0];
     });
 }
@@ -1591,28 +1441,10 @@ function HomeRoutine() {
         console.log(TheBookun);
         for (let i = 0; i < TheBookun.length; i++) {
             let TheBook = TheBookun[i];
-            let carddiv = createCard(TheBook["unread"], TheBook["read"], TheBook["reading"], TheBook["ID_book"], TheBook["URLCover"], TheBook["NOM"], TheBook["favorite"])
-            carddiv.querySelector(".card__play").addEventListener("click", function () {
-                /*            ModifyJSONFile(
-                                CosmicComicsData + "/ListOfComics.json",
-                                "reading",
-                                true,
+            let card = new Card(TheBook["unread"], TheBook["read"], TheBook["reading"], TheBook["ID_book"], TheBook["URLCover"], TheBook["NOM"], TheBook["favorite"])
+            let carddiv = card.card
+            card.addPlayButtonListener();
 
-                            );
-                            ModifyJSONFile(
-                                CosmicComicsData + "/ListOfComics.json",
-                                "unread",
-                                false,
-                            );
-                            Modify_JSON_For_Config(
-                                CosmicComicsData + "/config.json",
-                                "last_opened",
-                                path
-                            );*/
-                AllForOne("unread", "read", "reading", TheBook.ID_book);
-                let encoded = encodeURIComponent(path.replaceAll("/", "%C3%B9"));
-                window.location.href = "viewer.html?" + encoded;
-            });
             let brook = TheBook;
             carddiv.addEventListener("click", function () {
                 //TODO implement API HERE
@@ -1631,33 +1463,16 @@ function HomeRoutine() {
             element.appendChild(node);
         }
     });
-    getFromDB("Books", "* FROM Books ORDER BY ID_book DESC LIMIT 10").then((resa) => {
+    getFromDB("Books", "* FROM Books ORDER BY ID_book DESC LIMIT 10").then(async (resa) => {
         let TheBookun = JSON.parse(resa);
         console.log(TheBookun);
         const element = document.getElementById("recentlyAdded");
         for (let i = 0; i < TheBookun.length; i++) {
             let TheBook = TheBookun[i];
-            let carddiv = createCard(TheBook["unread"], TheBook["read"], TheBook["reading"], TheBook["ID_book"], TheBook["URLCover"], TheBook["NOM"], TheBook["favorite"])
-            carddiv.querySelector(".card__play").addEventListener("click", function () {
-                /*            ModifyJSONFile(
-                                CosmicComicsData + "/ListOfComics.json",
-                                "reading",
-                                true,
-                            );
-                            ModifyJSONFile(
-                                CosmicComicsData + "/ListOfComics.json",
-                                "unread",
-                                false,
-                            );
-                            Modify_JSON_For_Config(
-                                CosmicComicsData + "/config.json",
-                                "last_opened",
-                                path
-                            );*/
-                AllForOne("unread", "read", "reading", TheBook.ID_book);
-                let encoded = encodeURIComponent(path.replaceAll("/", "%C3%B9"));
-                window.location.href = "viewer.html?" + encoded;
-            });
+            let card = new Card(TheBook["unread"], TheBook["read"], TheBook["reading"], TheBook["ID_book"], TheBook["URLCover"], TheBook["NOM"], TheBook["favorite"])
+            let carddiv = card.card
+            card.addPlayButtonListener();
+
             let brook = TheBook;
             carddiv.addEventListener("click", function () {
                 //TODO Implement API HERE
@@ -1677,27 +1492,10 @@ function HomeRoutine() {
         let TheBookun = JSON.parse(resa);
         for (let i = 0; i < TheBookun.length; i++) {
             let TheBook = TheBookun[i];
-            let carddiv = createCard(TheBook["unread"], TheBook["read"], TheBook["reading"], TheBook["ID_book"], TheBook["URLCover"], TheBook["NOM"], TheBook["favorite"])
-            carddiv.querySelector(".card__play").addEventListener("click", function () {
-                /*            ModifyJSONFile(
-                                CosmicComicsData + "/ListOfComics.json",
-                                "reading",
-                                true,
-                            );
-                            ModifyJSONFile(
-                                CosmicComicsData + "/ListOfComics.json",
-                                "unread",
-                                false,
-                            );
-                            Modify_JSON_For_Config(
-                                CosmicComicsData + "/config.json",
-                                "last_opened",
-                                path
-                            );*/
-                AllForOne("unread", "read", "reading", TheBook.ID_book);
-                let encoded = encodeURIComponent(path.replaceAll("/", "%C3%B9"));
-                window.location.href = "viewer.html?" + encoded;
-            });
+            let card = new Card(TheBook["unread"], TheBook["read"], TheBook["reading"], TheBook["ID_book"], TheBook["URLCover"], TheBook["NOM"], TheBook["favorite"])
+            let carddiv = card.card
+            card.addPlayButtonListener();
+
             let brook = TheBook;
             carddiv.addEventListener("click", function () {
                 //TODO Implement API HERE
@@ -1721,28 +1519,10 @@ function HomeRoutine() {
         console.log(TheBookun);
         for (let i = 0; i < TheBookun.length; i++) {
             let TheBook = TheBookun[i];
-            let carddiv = createCard(TheBook["unread"], TheBook["read"], TheBook["reading"], TheBook["ID_book"], TheBook["URLCover"], TheBook["NOM"], TheBook["favorite"])
-            carddiv.querySelector(".card__play").addEventListener("click", function () {
-                /*            ModifyJSONFile(
-                                CosmicComicsData + "/ListOfComics.json",
-                                "reading",
-                                true,
-                            );
-                            ModifyJSONFile(
-                                CosmicComicsData + "/ListOfComics.json",
-                                "unread",
-                                false,
-                            );
-                            Modify_JSON_For_Config(
-                                CosmicComicsData + "/config.json",
-                                "last_opened",
-                                path
-                            );*/
-                AllForOne("unread", "read", "reading", TheBook.ID_book);
+            let card = new Card(TheBook["unread"], TheBook["read"], TheBook["reading"], TheBook["ID_book"], TheBook["URLCover"], TheBook["NOM"], TheBook["favorite"])
+            let carddiv = card.card
+            card.addPlayButtonListener();
 
-                let encoded = encodeURIComponent(path.replaceAll("/", "%C3%B9"));
-                window.location.href = "viewer.html?" + encoded;
-            });
             let brook = TheBook;
             carddiv.addEventListener("click", function () {
                 //TODO Implement API HERE
@@ -1817,27 +1597,10 @@ async function AllBooks(filters = "") {
 
             for (let i = 0; i < TheBookun.length; i++) {
                 let TheBook = TheBookun[i];
-                let carddiv = createCard(TheBook["unread"], TheBook["read"], TheBook["reading"], TheBook["ID_book"], TheBook["URLCover"], TheBook["NOM"], TheBook["favorite"])
-                carddiv.querySelector(".card__play").addEventListener("click", function () {
-                    /*            ModifyJSONFile(
-                                    CosmicComicsData + "/ListOfComics.json",
-                                    "reading",
-                                    true,
-                                );
-                                ModifyJSONFile(
-                                    CosmicComicsData + "/ListOfComics.json",
-                                    "unread",
-                                    false,
-                                );
-                                Modify_JSON_For_Config(
-                                    CosmicComicsData + "/config.json",
-                                    "last_opened",
-                                    path
-                                );*/
-                    AllForOne("unread", "read", "reading", TheBook.ID_book);
-                    let encoded = encodeURIComponent(path.replaceAll("/", "%C3%B9"));
-                    window.location.href = "viewer.html?" + encoded;
-                });
+                let card = new Card(TheBook["unread"], TheBook["read"], TheBook["reading"], TheBook["ID_book"], TheBook["URLCover"], TheBook["NOM"], TheBook["favorite"])
+                let carddiv = card.card;
+                card.addPlayButtonListener();
+
                 let brook = TheBook;
                 carddiv.addEventListener("click", function () {
                     let provider = ((brook.series.includes("marvel")) ? (providerEnum.Marvel) : ((brook.series.includes("Anilist")) ? (providerEnum.Anilist) : ((brook.series.includes("OL")) ? (providerEnum.OL) : ((brook.URLs.includes("google")) ? (providerEnum.GBooks) : (providerEnum.MANUAL)))));
@@ -2011,91 +1774,6 @@ function resolveTitle(title) {
     }
 }
 
-async function GETMARVELAPI_SEARCH(name = "", date = "") {
-    return fetch("http://" + domain + ":" + port + "/api/marvel/searchonly/" + name + "/" + date).then(function (response) {
-        return response.text();
-    }).then(function (data) {
-        console.log(data);
-        data = JSON.parse(data);
-        return data;
-    }).catch(function (error) {
-        console.log(error);
-    });
-}
-
-async function GETMARVELAPI_Comics(name = "", date = "") {
-    name = encodeURIComponent(name);
-    date = encodeURIComponent(date);
-    return fetch("http://" + domain + ":" + port + "/api/marvel/getComics/" + name + "/" + date).then(function (response) {
-        return response.text();
-    }).then(function (data) {
-        data = JSON.parse(data);
-        return data;
-    }).catch(function (error) {
-        console.log(error);
-    });
-}
-
-async function GETMARVELAPI_Comics_INSERT(name = "", date = "", path) {
-    return fetch("http://" + domain + ":" + port + "/insert/marvel/book/", {
-        method: "GET",
-        headers: {
-            'Content-Type': 'application/json',
-            "name": name,
-            "datea": date,
-            "path": path,
-            "token": userToken
-        }
-    }).then(function (response) {
-        return response.text();
-    }).then(function (data) {
-        console.log(data);
-        data = JSON.parse(data);
-        return data;
-    }).catch(function (error) {
-        console.log(error);
-    });
-}
-
-async function GETGBAPI_INSERT(name = "", path) {
-    return fetch("http://" + domain + ":" + port + "/insert/googlebooks/book/", {
-        method: "GET",
-        headers: {
-            'Content-Type': 'application/json',
-            "name": name,
-            "path": path,
-            "token": userToken
-        }
-    }).then(function (response) {
-        return response.text();
-    }).then(function (data) {
-        console.log(data);
-        data = JSON.parse(data);
-        return data;
-    }).catch(function (error) {
-        console.log(error);
-    });
-}
-
-async function GETOLAPI_INSERT(name = "", path) {
-    return fetch("http://" + domain + ":" + port + "/insert/ol/book/", {
-        method: "GET",
-        headers: {
-            'Content-Type': 'application/json',
-            "name": name,
-            "path": path,
-            "token": userToken
-        }
-    }).then(function (response) {
-        return response.text();
-    }).then(function (data) {
-        console.log(data);
-        data = JSON.parse(data);
-        return data;
-    }).catch(function (error) {
-        console.log(error);
-    });
-}
 
 async function createSeries(provider, path, libraryPath, res) {
     resetOverlay();
@@ -2130,7 +1808,7 @@ async function createSeries(provider, path, libraryPath, res) {
             method: "POST", headers: {
                 "Content-Type": "application/json"
             }, body: JSON.stringify({
-                "token": userToken,
+                "token": currentProfile.getToken,
                 "table": "Series",
                 "type": "edit",
                 "column": columns,
@@ -2148,11 +1826,11 @@ async function createSeries(provider, path, libraryPath, res) {
         let search = document.getElementById("rematchSearch")
         let year = document.getElementById('rematchYearSearch')
         if (provider === providerEnum.Marvel) {
-            GETMARVELAPI_SEARCH(search.value, year.value).then((cdata) => {
+            new Marvel().SearchComic(search.value, year.value).then((cdata) => {
                 if (cdata["data"]["total"] > 0) {
                     for (let i = 0; i < cdata["data"]["total"]; i++) {
                         let cdataI = cdata["data"]["results"][i];
-                        let l = createCard(null, null, null, cdataI["id"], cdataI["thumbnail"].path + "/detail." + cdataI["thumbnail"].extension, cdataI['title'])
+                        let l = new Card(null, null, null, cdataI["id"], cdataI["thumbnail"].path + "/detail." + cdataI["thumbnail"].extension, cdataI['title']).card;
                         l.addEventListener("click", () => {
                             rematch(cdataI.id + "_" + provider, provider, "Series", res[0].ID_Series, true)
                         })
@@ -2161,11 +1839,11 @@ async function createSeries(provider, path, libraryPath, res) {
                 }
             })
         } else if (provider === providerEnum.Anilist) {
-            API_ANILIST_GET_SEARCH(search.value).then((el) => {
+            new Anilist().GET_SEARCH(search.value).then((el) => {
                 if (el != null) {
                     el = el.base;
                     for (let o = 0; o < el.length; o++) {
-                        let l = createCard(null, null, null, el[o].id, el[o].coverImage.large, el[o].title.english + " / " + el[o].title.romaji + " / " + el[o].title.native)
+                        let l = new Card(null, null, null, el[o].id, el[o].coverImage.large, el[o].title.english + " / " + el[o].title.romaji + " / " + el[o].title.native).card;
                         l.addEventListener("click", () => {
                             rematch(el[o].id + "_" + provider, provider, "Series", res[0].ID_Series, true)
                         })
@@ -2223,7 +1901,7 @@ async function createSeries(provider, path, libraryPath, res) {
                     "img": ((provider === providerEnum.Marvel) ? (JSON.parse(res[0].BG).path + "/detail." + JSON.parse(res[0].BG).extension) : (res[0].BG))
                 }
             };
-            await fetch("http://" + domain + ":" + port + "/img/getPalette/" + userToken, options).then(function (response) {
+            await fetch("http://" + domain + ":" + port + "/img/getPalette/" + currentProfile.getToken, options).then(function (response) {
                 return response.text();
             }).then(function (data) {
                 let Blurcolors = data;
@@ -2240,7 +1918,7 @@ async function createSeries(provider, path, libraryPath, res) {
                     "Content-Type": "application/json", "img": res[0].BG
                 }
             };
-            await fetch("http://" + domain + ":" + port + "/img/getPalette/" + userToken, options).then(function (response) {
+            await fetch("http://" + domain + ":" + port + "/img/getPalette/" + currentProfile.getToken, options).then(function (response) {
                 return response.text();
             }).then(function (data) {
                 let Blurcolors = data;
@@ -2578,7 +2256,7 @@ async function createSeries(provider, path, libraryPath, res) {
                             method: "POST", headers: {
                                 "Content-Type": "application/json"
                             }, body: JSON.stringify({
-                                "token": userToken,
+                                "token": currentProfile.getToken,
                                 "table": "Series",
                                 "column": "favorite",
                                 "whereEl": bookList[i].ID_Series,
@@ -2602,7 +2280,7 @@ async function createSeries(provider, path, libraryPath, res) {
                             method: "POST", headers: {
                                 "Content-Type": "application/json"
                             }, body: JSON.stringify({
-                                "token": userToken,
+                                "token": currentProfile.getToken,
                                 "table": "Series",
                                 "column": "favorite",
                                 "whereEl": bookList[i].ID_Series,
@@ -2754,7 +2432,7 @@ function OneForAll(W1, W2, A, title) {
             "W2": W2,
             "A": A,
             "title": title,
-            "token": userToken,
+            "token": currentProfile.getToken,
         })
     })
 }
@@ -2782,7 +2460,7 @@ function AllForOne(W1, W2, A, ID) {
         method: "POST", headers: {
             "Content-Type": "application/json"
         }, body: JSON.stringify({
-            "token": userToken,
+            "token": currentProfile.getToken,
             "table": "Books",
             "type": "edit",
             "column": columns,
@@ -2816,7 +2494,7 @@ async function refreshMeta(id, provider, type) {
             "id": id,
             "provider": provider,
             "type": type,
-            "token": userToken
+            "token": currentProfile.getToken
         })
     }).then((res) => {
         Toastifycation("Metadata updated");
@@ -2824,7 +2502,7 @@ async function refreshMeta(id, provider, type) {
 }
 
 async function TrueDeleteFromDB(dbName, id, option = "") {
-    return fetch("http://" + domain + ":" + port + '/DB/truedelete/' + userToken + "/" + dbName + "/" + id);
+    return fetch("http://" + domain + ":" + port + '/DB/truedelete/' + currentProfile.getToken + "/" + dbName + "/" + id);
 }
 
 document.getElementById("rematch").setAttribute("data-bs-toggle", "modal");
@@ -2876,7 +2554,7 @@ document.getElementById("id_addTrackedBook").addEventListener("click", () => {
                         method: "POST", headers: {
                             "Content-Type": "application/json"
                         }, body: JSON.stringify({
-                            "token": userToken,
+                            "token": currentProfile.getToken,
                             "table": "Books",
                             "type": "edit",
                             "column": columns,
@@ -2900,11 +2578,11 @@ document.getElementById("id_addTrackedBook").addEventListener("click", () => {
                     let rematchResult = document.getElementById("resultRematch")
                     let search = document.getElementById("rematchSearch");
                     let year = document.getElementById('rematchYearSearch')
-                    GETMARVELAPI_Comics(search.value, year.value).then((cdata) => {
+                    new Marvel().GetComics(search.value, year.value).then((cdata) => {
                         if (cdata["data"]["total"] > 0) {
                             for (let i = 0; i < cdata["data"]["total"]; i++) {
                                 let cdataI = cdata["data"]["results"][i];
-                                let l = createCard(null, null, null, cdataI["id"], cdataI["thumbnail"].path + "/detail." + cdataI["thumbnail"].extension, cdataI['title'])
+                                let l = new Card(null, null, null, cdataI["id"], cdataI["thumbnail"].path + "/detail." + cdataI["thumbnail"].extension, cdataI['title']).card
                                 l.addEventListener("click", () => {
                                     rematch(cdataI.id + "_" + provider, provider, "book", TheBook.ID_book, false)
                                     rematcherModal.hide();
@@ -2942,7 +2620,7 @@ document.getElementById("id_addTrackedBook").addEventListener("click", () => {
                         method: "POST", headers: {
                             "Content-Type": "application/json"
                         }, body: JSON.stringify({
-                            "token": userToken,
+                            "token": currentProfile.getToken,
                             "table": "Books",
                             "type": "edit",
                             "column": columns,
@@ -2979,7 +2657,6 @@ async function createDetails(TheBook, provider) {
     resetOverlay();
     document.documentElement.style.overflow = "hidden";
     console.log(provider);
-    console.log(TheBook);
     document.getElementById('bookEdit').style.display = "block";
     document.getElementById('seriesEdit').style.display = "none";
     document.querySelectorAll("#commonEdit>label>input").forEach((e) => {
@@ -2996,11 +2673,11 @@ async function createDetails(TheBook, provider) {
         let search = document.getElementById("rematchSearch");
         let year = document.getElementById('rematchYearSearch')
         if (provider === providerEnum.Marvel) {
-            GETMARVELAPI_Comics(search.value, year.value).then((cdata) => {
+            new Marvel().GetComics(search.value, year.value).then((cdata) => {
                 if (cdata["data"]["total"] > 0) {
                     for (let i = 0; i < cdata["data"]["total"]; i++) {
                         let cdataI = cdata["data"]["results"][i];
-                        let l = createCard(null, null, null, cdataI["id"], cdataI["thumbnail"].path + "/detail." + cdataI["thumbnail"].extension, cdataI['title'])
+                        let l = new Card(null, null, null, cdataI["id"], cdataI["thumbnail"].path + "/detail." + cdataI["thumbnail"].extension, cdataI['title']).card;
                         l.addEventListener("click", () => {
                             rematch(cdataI.id + "_" + provider, provider, "book", TheBook.ID_book, false)
                         })
@@ -3052,7 +2729,7 @@ async function createDetails(TheBook, provider) {
             method: "POST", headers: {
                 "Content-Type": "application/json"
             }, body: JSON.stringify({
-                "token": userToken,
+                "token": currentProfile.getToken,
                 "table": "Books",
                 "type": "edit",
                 "column": columns,
@@ -3094,7 +2771,7 @@ async function createDetails(TheBook, provider) {
     document.getElementById("readingbtndetails").style.display = "inline";
     document.getElementById("OtherTitles").innerHTML = "";
     document.getElementById("relations").innerHTML = "";
-    if (TheBook.characters !== "null" && providerEnum.Marvel)    {
+    if (TheBook.characters !== "null" && providerEnum.Marvel) {
         document.getElementById("id").innerHTML = "This is a " + TheBook.format + " of " + TheBook.pageCount + " pages. <br/> This is part of the '" + JSON.parse(TheBook.series).name + "' series.";
     } else {
         if (provider === providerEnum.Anilist) {
@@ -3105,7 +2782,7 @@ async function createDetails(TheBook, provider) {
             document.getElementById("id").innerHTML = "This is part of the '" + TheBook.series + "' series.";
         } else if (provider === providerEnum.OL) {
             document.getElementById("id").innerHTML = "This is part of the '" + TheBook.series + "' series.";
-        }else if (provider === providerEnum.GBooks) {
+        } else if (provider === providerEnum.GBooks) {
             document.getElementById("id").innerHTML = "This is a " + TheBook.format + " of " + TheBook.pageCount + " pages. <br/> This is part of the '" + TheBook.series + "' series.";
 
         }
@@ -3153,7 +2830,7 @@ async function createDetails(TheBook, provider) {
                 "Content-Type": "application/json", "img": TheBook.URLCover
             }
         };
-        await fetch("http://" + domain + ":" + port + "/img/getPalette/" + userToken, options).then(function (response) {
+        await fetch("http://" + domain + ":" + port + "/img/getPalette/" + currentProfile.getToken, options).then(function (response) {
             return response.text();
         }).then(function (data) {
             let Blurcolors = data;
@@ -3175,7 +2852,7 @@ async function createDetails(TheBook, provider) {
                             method: "POST", headers: {
                                 "Content-Type": "application/json"
                             }, body: JSON.stringify({
-                                "token": userToken,
+                                "token": currentProfile.getToken,
                                 "table": "Books",
                                 "column": "favorite",
                                 "whereEl": bookList[i].PATH,
@@ -3199,7 +2876,7 @@ async function createDetails(TheBook, provider) {
                             method: "POST", headers: {
                                 "Content-Type": "application/json"
                             }, body: JSON.stringify({
-                                "token": userToken,
+                                "token": currentProfile.getToken,
                                 "table": "Books",
                                 "column": "favorite",
                                 "whereEl": bookList[i].PATH,
@@ -3297,7 +2974,7 @@ async function createDetails(TheBook, provider) {
                 method: "POST", headers: {
                     "Content-Type": "application/json"
                 }, body: JSON.stringify({
-                    "token": userToken,
+                    "token": currentProfile.getToken,
                     "table": "Books",
                     "column": "last_page",
                     "whereEl": TheBook.ID_book,
@@ -3344,7 +3021,7 @@ async function createDetails(TheBook, provider) {
             JSON.parse(TheBook.creators).forEach((el) => {
                 StaffToFetchList.push("'" + el.name.replaceAll("'", "''") + "'");
             });
-        }else if (provider === providerEnum.GBooks) {
+        } else if (provider === providerEnum.GBooks) {
             JSON.parse(TheBook.creators).forEach((el) => {
                 StaffToFetchList.push("'" + el.replaceAll("'", "''") + "'");
             });
@@ -3489,136 +3166,6 @@ function createVariants(TheBook) {
     });
 }
 
-/**
- * Create a card HTML element
- * @param {int | null} unread - 0 if read, 1 if unread
- * @param {int|null} read - 0 if unread, 1 if read
- * @param {int|null} reading - 0 if not reading, 1 if reading
- * @param {string|int} ID - ID of the book
- * @param {string} URLCover - URL of the cover
- * @param {string} NOM - Name of the book
- * @param {int|null} favorite  - 0 if not favorite, 1 if favorite
- * @return {HTMLDivElement} The card generated
- */
-function createCard(unread, read, reading, ID, URLCover, NOM, favorite = 0) {
-    /*document.getElementById("relations").appendChild(createCard(TheBook.unread,TheBook.read,TheBook.reading,TheBook.ID,TheBook.URLCover,TheBook.NOM));*/
-    const carddiv = document.createElement("div");
-    carddiv.style.cursor = "pointer";
-    const rib = document.createElement("div");
-    imagelink = URLCover;
-    if (imagelink === "null" || imagelink === "" || imagelink == null) {
-        imagelink = "Images/fileDefault.png";
-    } else if (URLCover.includes("public/FirstImagesOfAll")) {
-        imagelink = URLCover.split("public/")[1];
-    }
-    let node = document.createTextNode(NOM);
-    if (unread !== null && read !== null && reading !== null) {
-        if (unread === 1 || unread === "true") {
-            rib.className = "pointR";
-        }
-        if (reading === 1 || reading === "true") {
-            rib.className = "pointY";
-        }
-        if (favorite === 1 || favorite === "true") {
-            rib.innerHTML = "<i class='material-icons' style='font-size: 16px;position: relative;left: -17px;'>favorite</i>";
-        }
-    }
-    carddiv.className = "cardcusto";
-    carddiv.setAttribute("data-effect", "zoom");
-    //button card_save
-    const buttonfav = document.createElement("button");
-    buttonfav.className = "card__save js-fav";
-    buttonfav.type = "button";
-    buttonfav.addEventListener("click", function () {
-        favorite();
-    });
-    buttonfav.id = "btn_id_fav_" + ID + "_" + Math.random() * 8000;
-    //icon
-    const favicon = document.createElement("i");
-    favicon.className = "material-icons";
-    favicon.innerHTML = "favorite";
-    if (currenttheme > 1) buttonfav.className = "js-fav card__save" + theme_button_card;
-    buttonfav.appendChild(favicon);
-    carddiv.appendChild(buttonfav);
-    //button card__close
-    const button_unread = document.createElement("button");
-    button_unread.className = "card__close js-unread";
-    button_unread.type = "button";
-    button_unread.addEventListener("click", function () {
-        markasunread();
-    });
-    button_unread.id = "btn_id_unread_" + ID + "_" + Math.random() * 8000;
-    //icon
-    const unread_icon = document.createElement("i");
-    unread_icon.className = "material-icons";
-    unread_icon.innerHTML = "close";
-    if (currenttheme > 1) button_unread.className = "js-unread card__close" + theme_button_card;
-    button_unread.appendChild(unread_icon);
-    carddiv.appendChild(button_unread);
-    //button card__reading
-    const button_reading = document.createElement("button");
-    button_reading.className = "card__reading js-reading";
-    button_reading.type = "button";
-    button_reading.addEventListener("click", function () {
-        AllForOne("unread", "read", "reading", TheBook.ID_book);
-    });
-    button_reading.id = "btn_id_reading_" + ID + "_" + Math.random() * 8000;
-    //icon
-    const reading_icon = document.createElement("i");
-    reading_icon.className = "material-icons";
-    reading_icon.innerHTML = "auto_stories";
-    if (currenttheme > 1) button_reading.className = "js-reading card__reading" + theme_button_card;
-    button_reading.appendChild(reading_icon);
-    carddiv.appendChild(button_reading);
-    //button card__read
-    const button_read = document.createElement("button");
-    button_read.className = "card__read js-read";
-    button_read.type = "button";
-    button_read.addEventListener("click", function () {
-        markasread();
-    });
-    button_read.id = "btn_id_read_" + ID + "_" + Math.random() * 8000;
-    //ico
-    const read_ion = document.createElement("i");
-    read_ion.className = "material-icons";
-    read_ion.innerHTML = "done";
-    if (currenttheme > 1) button_read.className = "js-read card__read" + theme_button_card;
-    button_read.appendChild(read_ion);
-    carddiv.appendChild(button_read);
-    //figure card__image
-    const cardimage = document.createElement("div");
-    cardimage.className = "card__image";
-    cardimage.style.backgroundColor = theme_BG_CI;
-    const imgcard = document.createElement("img");
-    imgcard.style.width = "100%";
-    imgcard.id = "card_img_id_" + ID;
-    imgcard.src = imagelink;
-    cardimage.appendChild(imgcard);
-    carddiv.appendChild(cardimage);
-    //card__body
-    const bodycard = document.createElement("div");
-    bodycard.className = "card__body";
-    //button play
-    const playbtn = document.createElement("button");
-    playbtn.className = "card__play js-play";
-    playbtn.type = "button";
-    const playarr = document.createElement("i");
-    playarr.className = "material-icons";
-    playarr.innerHTML = "play_arrow";
-    playarr.style.color = theme_button_card;
-    playbtn.appendChild(playarr);
-    bodycard.appendChild(playbtn);
-    const pcard_bio = document.createElement("p");
-    pcard_bio.className = "card__bio";
-    pcard_bio.style.textAlign = "center";
-    pcard_bio.style.color = theme_FG;
-    pcard_bio.innerHTML = node.textContent;
-    bodycard.appendChild(pcard_bio);
-    carddiv.appendChild(bodycard);
-    carddiv.id = "id_vol" + ID + "_" + Math.random() * 8000;
-    carddiv.appendChild(rib);
-    return carddiv;
-}
 
 /**
  * Clear the list of results
@@ -3695,7 +3242,7 @@ async function logout() {
     const option = {
         method: 'POST', headers: {'Content-Type': 'application/json'}
     };
-    await fetch('http://' + domain + ":" + port + '/profile/logout/' + userToken, option).then(() => {
+    await fetch('http://' + domain + ":" + port + '/profile/logout/' + currentProfile.getToken, option).then(() => {
         window.location.href = 'login';
     });
 }
@@ -3752,7 +3299,7 @@ function AccountMenu() {
                         document.getElementById("sendbdd").style.display = "none";
                         document.getElementById("sendaccount").onclick = async function () {
                             console.log("sendaccount");
-                            await createAccount();
+                            await currentProfile.createAccount();
                         };
                     }
                 }
@@ -3799,63 +3346,12 @@ fetch("/profile/custo/getNumber").then((res) => {
     }
 });
 
-/**
- * Download the database
- */
-function DownloadBDD() {
-    window.open('http://' + domain + ":" + port + "/profile/DLBDD/" + userToken);
-}
 
-/**
- * Delete the account
- */
-async function DeleteAccount() {
-    const option = {
-        method: 'POST', headers: {'Content-Type': 'application/json'}, body: JSON.stringify({
-            "token": userToken
-        }, null, 2)
-    };
-    fetch('http://' + domain + ":" + port + "/profile/deleteAccount", option).then(() => {
-        Toastifycation("Account deleted", "#00C33C");
-        console.log("account deleted !");
-    }).catch((err) => {
-        Toastifycation("Account not deleted", "#ff0000");
-    });
-    window.location.href = 'login';
-}
 
-let accountsNames = [];
-fetch("http://" + domain + ":" + port + "/profile/discover").then(function (response) {
-    return response.text();
-}).then(async function (data) {
-    data = JSON.parse(data);
-    data.forEach(function (item) {
-        accountsNames.push(item.name.toLowerCase());
-    });
-});
+document.getElementById("delaccount").onclick = ()=>{currentProfile.DeleteAccount()};
+document.getElementById("sendbdd").onclick = ()=>{currentProfile.DownloadBDD()};
+document.getElementById("sendaccount").onclick = ()=>{currentProfile.modifyAccount({'form':[document.getElementById('usernameManager').value,document.getElementById('passwordManager').value,document.getElementById('newImage')]});};
 
-/**
- * Create an account on the server
- */
-async function createAccount() {
-    if (!accountsNames.includes(document.getElementById("usernameManager").value.toLowerCase())) {
-        const option = {
-            method: 'POST', headers: {'Content-Type': 'application/json'}, body: JSON.stringify({
-                "token": userToken,
-                "name": document.getElementById("usernameManager").value,
-                "password": document.getElementById("passwordManager").value,
-                "pp": document.getElementById("newImage").src
-            }, null, 2)
-        };
-        fetch('http://' + domain + ":" + port + "/createUser", option).then(() => {
-            console.log("account created !");
-        });
-        Toastifycation("The user is created", "#00C33C");
-        document.getElementById("close_mna").click();
-    } else {
-        Toastifycation("This username is already used. User creation aborted", "#ff0000");
-    }
-}
 
 /**
  * Change the element rating
@@ -3870,7 +3366,7 @@ function changeRating(table, where, value) {
             method: "POST", headers: {
                 "Content-Type": "application/json"
             }, body: JSON.stringify({
-                "token": userToken,
+                "token": currentProfile.getToken,
                 "table": table,
                 "column": "note",
                 "whereEl": where,
@@ -3885,7 +3381,7 @@ function changeRating(table, where, value) {
             method: "POST", headers: {
                 "Content-Type": "application/json"
             }, body: JSON.stringify({
-                "token": userToken,
+                "token": currentProfile.getToken,
                 "table": table,
                 "column": "note",
                 "where": "ID_Series",
@@ -3904,7 +3400,7 @@ document.getElementById("id_firstOfAll").addEventListener("click", function (e) 
             "Content-Type": "application/json"
         },
         body: JSON.stringify({
-            "token": userToken
+            "token": currentProfile.getToken
         }, null, 2)
     }).then((res) => {
         Toastifycation("empty image ressources will be filled up", "#00C33C");
