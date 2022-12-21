@@ -1,4 +1,19 @@
-class Anilist{
+class Anilist {
+
+    async InsertBook(realname,path){
+        fetch("http://" + domain + ":" + port + "/insert/anilist/book", {
+            method: "POST",
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({
+                "token": currentProfile.getToken,
+                "path": path,
+                "realname": realname,
+            })
+        })
+    }
+
     /**
      * Search on ANILIST API by the manga name
      * @param {string} name The name of the manga

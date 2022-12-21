@@ -84,7 +84,7 @@ html {
     -moz-animation: AnimationName 14s ease infinite;
     -o-animation: AnimationName 14s ease infinite;
     animation: AnimationName 14s ease infinite;*/
-    background-color: var(--background);
+    background: var(--background);
     background-size: var(--HTMLBGSize);
     background-attachment: fixed;
     color: var(--text);
@@ -1007,7 +1007,7 @@ body {
     cursor: initial;
     /* Add a pointer on hover */
     overflow-y: scroll;
-    background-color: var(--background);
+    background: var(--background);
     transition: background-color 1.5s linear;
     transition-delay: 1s;
 }

@@ -168,46 +168,7 @@ fetch("http://" + domain + ":" + port + "/getVersion").then(function (response) 
     console.log(error);
 });
 
-/**
- * Rematch the element of old_id by the new_id
- * @param {string} new_id New id
- * @param {int} provider The API provider
- * @param {string} type The type of the element
- * @param {string} old_id The old id
- * @param {boolean} isSeries Is the element a series
- */
-async function rematch(new_id, provider, type, old_id, isSeries = false) {
-    if (isSeries) {
-        await fetch("http://" + domain + ":" + port + "/DB/update", {
-            method: "POST", headers: {
-                "Content-Type": "application/json"
-            }, body: JSON.stringify({
-                "token": currentProfile.getToken,
-                "table": "Series",
-                "type": "noedit",
-                "column": "ID_Series",
-                "whereEl": old_id,
-                "value": `'${new_id}'`,
-                "where": "ID_Series"
-            }, null, 2)
-        })
-    } else {
-        await fetch("http://" + domain + ":" + port + "/DB/update", {
-            method: "POST", headers: {
-                "Content-Type": "application/json"
-            }, body: JSON.stringify({
-                "token": currentProfile.getToken,
-                "table": "Books",
-                "type": "noedit",
-                "column": "ID_book",
-                "whereEl": old_id,
-                "value": `'${new_id}'`,
-                "where": "ID_book"
-            }, null, 2)
-        })
-    }
-    await refreshMeta(new_id, provider, type);
-}
+
 
 /**
  * Add or remove AnimateCSS animation
@@ -376,28 +337,7 @@ function resetLibModal() {
     };
 }
 
-/**
- * Trigger the metadata refresh for the selected library
- * @param elElement The library to refresh
- */
-function refreshMetadata(elElement) {
-    let path = elElement["PATH"];
-    DetectFolderInLibrary(path).then(async function (data) {
-        data = JSON.parse(data);
-        await getFromDB("Series", "ID_Series,PATH FROM Series").then(async (res) => {
-            res = JSON.parse(res);
-            for (let index = 0; index < res.length; index++) {
-                let el = res[index]["PATH"];
-                for (let i = 0; i < data.length; i++) {
-                    if (el === data[i]) {
-                        await refreshMeta(res[index]["ID_Series"], elElement["API_ID"], "Series");
-                        break;
-                    }
-                }
-            }
-        });
-    })
-}
+
 
 /**
  * Adding a step to the breadcrumb
@@ -619,7 +559,7 @@ async function discoverLibraries() {
                 modifyLib(el);
             });
             li3.addEventListener("click", function () {
-                refreshMetadata(el);
+                new API().refreshMetadata(el);
             });
             ul.appendChild(li);
             ul.appendChild(li2);
@@ -949,17 +889,7 @@ function loadView(FolderRes, libraryPath, date = "", provider = providerEnum.MAN
                             }
                         });
                     } else if (provider === providerEnum.Anilist) {
-                        fetch("http://" + domain + ":" + port + "/insert/anilist/book", {
-                            method: "POST",
-                            headers: {
-                                'Content-Type': 'application/json',
-                            },
-                            body: JSON.stringify({
-                                "token": currentProfile.getToken,
-                                "path": path,
-                                "realname": realname,
-                            })
-                        })
+                        await new Anilist().InsertBook(realname, path);
                         TheBook = new Book(null,realname,null,null,null,null,null,null,0,0,1,0,0,0,path,null,null,null,null,null,null,null,null, null, false)
                     } else if (provider === providerEnum.MANUAL) {
                         console.log("manual");
@@ -1007,10 +937,6 @@ function loadView(FolderRes, libraryPath, date = "", provider = providerEnum.MAN
                                 } else {
                                     price = null;
                                 }
-                                TheBook = generateBookTemplate(realname, cdata["id"], null, 0, 0, 1, 0, 0, 0, path,
-                                    cover, null, cdata["volumeInfo"]["description"], cdata["volumeInfo"]["printType"],
-                                    cdata["volumeInfo"]["pageCount"], cdata["volumeInfo"]["infoLink"], null, cdata["volumeInfo"]["authors"], null, price, cdata["volumeInfo"]["publishedDate"],
-                                    null, null, null, false);
                                 TheBook = new Book(cdata["id"],realname,cover,cdata["volumeInfo"]["description"],cdata["volumeInfo"]["authors"],null,cdata["volumeInfo"]["infoLink"],null,0,0,1,0,0,0,path,null,cdata["volumeInfo"]["printType"],cdata["volumeInfo"]["pageCount"],null,price,cdata["volumeInfo"]["publishedDate"],null,null, null,false)
 
                             } else {
@@ -1025,7 +951,7 @@ function loadView(FolderRes, libraryPath, date = "", provider = providerEnum.MAN
                 let carddiv = card.card;
                 card.addPlayButtonListener();
                 carddiv.addEventListener("click", async function () {
-                    await createDetails(TheBook, provider);
+                    await createDetails(TheBook.book, provider);
                 });
                 n++;
                 let element;
@@ -1832,7 +1758,7 @@ async function createSeries(provider, path, libraryPath, res) {
                         let cdataI = cdata["data"]["results"][i];
                         let l = new Card(null, null, null, cdataI["id"], cdataI["thumbnail"].path + "/detail." + cdataI["thumbnail"].extension, cdataI['title']).card;
                         l.addEventListener("click", () => {
-                            rematch(cdataI.id + "_" + provider, provider, "Series", res[0].ID_Series, true)
+                            new API().rematch(cdataI.id + "_" + provider, provider, "Series", res[0].ID_Series, true)
                         })
                         rematchResult.appendChild(l);
                     }
@@ -1845,7 +1771,7 @@ async function createSeries(provider, path, libraryPath, res) {
                     for (let o = 0; o < el.length; o++) {
                         let l = new Card(null, null, null, el[o].id, el[o].coverImage.large, el[o].title.english + " / " + el[o].title.romaji + " / " + el[o].title.native).card;
                         l.addEventListener("click", () => {
-                            rematch(el[o].id + "_" + provider, provider, "Series", res[0].ID_Series, true)
+                           new API().rematch(el[o].id + "_" + provider, provider, "Series", res[0].ID_Series, true)
                         })
                         rematchResult.appendChild(l);
                     }
@@ -2476,30 +2402,7 @@ addToBreadCrumb("Home", () => {
     returnToHome();
 });
 
-/**
- * Launch the metadata refresh
- * @param {*} id The ID in the DB of the element to refresh
- * @param {int} provider The provider of the element to refresh
- * @param {string} type The type of the element to refresh
- */
-async function refreshMeta(id, provider, type) {
-    console.log("Refreshing metadata for " + id + " from " + provider + " (" + type + ")");
-    Toastifycation("Refreshing metadata...");
-    fetch("http://" + domain + ":" + port + "/refreshMeta", {
-        method: "POST",
-        headers: {
-            "Content-Type": "application/json",
-        },
-        body: JSON.stringify({
-            "id": id,
-            "provider": provider,
-            "type": type,
-            "token": currentProfile.getToken
-        })
-    }).then((res) => {
-        Toastifycation("Metadata updated");
-    })
-}
+
 
 async function TrueDeleteFromDB(dbName, id, option = "") {
     return fetch("http://" + domain + ":" + port + '/DB/truedelete/' + currentProfile.getToken + "/" + dbName + "/" + id);
@@ -2584,7 +2487,7 @@ document.getElementById("id_addTrackedBook").addEventListener("click", () => {
                                 let cdataI = cdata["data"]["results"][i];
                                 let l = new Card(null, null, null, cdataI["id"], cdataI["thumbnail"].path + "/detail." + cdataI["thumbnail"].extension, cdataI['title']).card
                                 l.addEventListener("click", () => {
-                                    rematch(cdataI.id + "_" + provider, provider, "book", TheBook.ID_book, false)
+                                    new API().rematch(cdataI.id + "_" + provider, provider, "book", TheBook.ID_book, false)
                                     rematcherModal.hide();
                                 })
                                 rematchResult.appendChild(l);
@@ -2679,7 +2582,7 @@ async function createDetails(TheBook, provider) {
                         let cdataI = cdata["data"]["results"][i];
                         let l = new Card(null, null, null, cdataI["id"], cdataI["thumbnail"].path + "/detail." + cdataI["thumbnail"].extension, cdataI['title']).card;
                         l.addEventListener("click", () => {
-                            rematch(cdataI.id + "_" + provider, provider, "book", TheBook.ID_book, false)
+                            new API().rematch(cdataI.id + "_" + provider, provider, "book", TheBook.ID_book, false)
                         })
                         rematchResult.appendChild(l);
                     }
