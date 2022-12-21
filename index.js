@@ -1220,7 +1220,7 @@ function listBM() {
                 btn.addEventListener("click", function () {
                     openBOOKM(file["PATH"], file["page"]);
                 });
-                btn.className = "btn btn-primary";
+                btn.className = "btn pure-material-button-contained";
                 btn.style = "margin:5px";
                 btn.innerHTML = "See the page " + file["page"];
                 let image = document.createElement("img");

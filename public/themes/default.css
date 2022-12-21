@@ -57,4 +57,7 @@ along with Cosmic-Comics.  If not, see <https://www.gnu.org/licenses/>.*/
     --cardImageColor : rgba(0,0,0,0.753);
     --BGDetails : #1a1e21;
     --blurpx : 20px;
+    --pure-material-onprimary-rgb: 255,255,255;
+    --pure-material-primary-rgb: 46, 83, 237;
+    --pure-material-onsurface-rgb: 27, 47, 191;
 }

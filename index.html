@@ -40,7 +40,7 @@ along with Cosmic-Comics.  If not, see <https://www.gnu.org/licenses/>.--->
 
                     <button class="btn" style="z-index: 10;" onclick="toggleSideBar()"
                             id="sidemenu">
-                        <i class="material-icons" style="line-height: 1;height: 31px">menu</i>
+                        <i class="material-icons" style="line-height: 1;height: 24px">menu</i>
                     </button>
                     <a class="brand-logo">
                         <img src="Images/Logo.png" alt="" width="auto" height="50px" id="logo_id"
@@ -55,12 +55,12 @@ along with Cosmic-Comics.  If not, see <https://www.gnu.org/licenses/>.--->
 
                 <div>
                     <button class="btn" onclick="summonSearch()" id="search">
-                        <i class="material-icons" style="line-height: 1; height: 40px">search</i>
+                        <i class="material-icons" style="line-height: 1; height: 25px">search</i>
                     </button>
                     <button class="btn" data-bs-toggle="modal" data-bs-target="#buttonp" id="menuid">
-                        <i class="material-icons" style="line-height: 1; height: 40px">more_horiz</i>
+                        <i class="material-icons" style="line-height: 1; height: 25px">more_horiz</i>
                     </button>
-                    <button class="btn" style="margin: 0px 5px -1px;" onclick="AccountMenu()" id="id_accountSystem">
+                    <button class="btn" style="margin: 0px 5px 0px;" onclick="AccountMenu()" id="id_accountSystem">
                         <img id="icon_id_accountSystem" alt="#">
                     </button>
 
@@ -116,7 +116,7 @@ along with Cosmic-Comics.  If not, see <https://www.gnu.org/licenses/>.--->
                 <form action="/uploadComic" target="dummyUpload" onsubmit="openInViewer();" method="post" enctype="multipart/form-data">
 
                 <input type="file" name="ComicTemp" id="fileUp">
-                <button class="btn btn-primary" style="margin-top: 10px;" type="submit">Upload</button>
+                <button class="btn pure-material-button-contained" style="margin-top: 10px;" type="submit">Upload</button>
                 <button class="btn btn-secondary" style="margin-top: 10px;"  type="reset">Reset</button>
                 </form>
 
@@ -159,7 +159,7 @@ along with Cosmic-Comics.  If not, see <https://www.gnu.org/licenses/>.--->
                     </select>
                 </label>
                 <br>
-                <button id="sendlib" class="btn btns btn-primary"
+                <button id="sendlib" class="btn btns pure-material-button-contained"
                         onclick="return addLibrary({'form':[document.getElementById('namelocation'),document.getElementById('locationa'),document.getElementById('providerID')]});">
                     Add Library
                 </button>
@@ -189,7 +189,7 @@ along with Cosmic-Comics.  If not, see <https://www.gnu.org/licenses/>.--->
             <div class="modal-body" style="text-align: center">
                 <img id="moreinfo_img" class="img-charac" src="#" alt=""/>
                 <p id="moreinfo_txt"></p>
-                <a class="btn btn-primary" style="cursor: pointer" id="moreinfo_btn"></a>
+                <a class="btn pure-material-button-contained" style="cursor: pointer" id="moreinfo_btn"></a>
             </div>
             <div class="modal-footer">
                 <button type="button" class="btn btn-secondary" data-bs-dismiss="modal" id="close_moreinfo"
@@ -212,7 +212,7 @@ along with Cosmic-Comics.  If not, see <https://www.gnu.org/licenses/>.--->
             <div class="modal-body" style="text-align: center">
                 <input type="text" id="rematchSearch" placeholder="Search title in the library's API">
                 <input type="text" id="rematchYearSearch" placeholder="Year (optional)">
-                <button class="btn btn-primary" id="rematchSearchSender">Search</button>
+                <button class="btn pure-material-button-contained" id="rematchSearchSender">Search</button>
                 <div id="resultRematch">
 
                 </div>
@@ -371,12 +371,12 @@ along with Cosmic-Comics.  If not, see <https://www.gnu.org/licenses/>.--->
                     <label for="id_URLDL"></label><input class="form-control" type="text" placeholder="URL"
                                                          id="id_URLDL">
                 </div>
-                <button class="btn btn-primary" onclick="downloader();" id="id_btnDLStart">Start Download</button>
+                <button class="btn pure-material-button-contained" onclick="downloader();" id="id_btnDLStart">Start Download</button>
                 <div class="progress" id="progressbarDL">
                     <div id="prgsDL" class="determinate"></div>
                 </div>
                 <p id="DLtxt"></p>
-                <button class="btn btn-primary invisible" id="id_btnDLOpen"
+                <button class="btn pure-material-button-contained invisible" id="id_btnDLOpen"
                         onclick="OpenDownloadDir();">Open
                 </button>
             </div>
@@ -447,7 +447,7 @@ along with Cosmic-Comics.  If not, see <https://www.gnu.org/licenses/>.--->
             </div>
             <div class="modal-body" style="text-align: center">
 
-                <button id="id_btn_CTN" class="btn btn-primary" style="width: 100%" onclick="clearTN()">
+                <button id="id_btn_CTN" class="btn pure-material-button-contained" style="width: 100%" onclick="clearTN()">
                     Clear the thumbnails
                 </button>
                 <div style="margin: 10px">
@@ -456,7 +456,7 @@ along with Cosmic-Comics.  If not, see <https://www.gnu.org/licenses/>.--->
                         <option value="" id="selectTheme_id">Select a theme</option>
                     </select>
                 </div>
-                <button id="id_btn_TE" class="btn btn-primary" style="width: 100%" onclick="ToggleTBY()">
+                <button id="id_btn_TE" class="btn pure-material-button-contained" style="width: 100%" onclick="ToggleTBY()">
                     No theme by event
                 </button>
             </div>
@@ -491,7 +491,7 @@ along with Cosmic-Comics.  If not, see <https://www.gnu.org/licenses/>.--->
                 <p id="overlay_background_txt">Overlay Background</p>
                 <input type="text" class="form-control" id="O2BG_id" aria-describedby="basic-addon3"
                        onchange="saveToTheme(this,'O2')"/>
-                <button class="btn btn-primary" id="browseFileTheme_txt"
+                <button class="btn pure-material-button-contained" id="browseFileTheme_txt"
                         onclick="openFileImageTheme('O2BG_id','O2')">
                     browse
                 </button>
@@ -576,7 +576,7 @@ along with Cosmic-Comics.  If not, see <https://www.gnu.org/licenses/>.--->
                 <p id="LBG_txt">Link BG</p>
                 <input type="text" class="form-control" id="LBG_id" aria-describedby="basic-addon3"
                        onchange="saveToTheme(this,'linkBG')"/>
-                <button class="btn btn-primary" onclick="openFileImageTheme('LBG_id','linkBG')"
+                <button class="btn pure-material-button-contained" onclick="openFileImageTheme('LBG_id','linkBG')"
                         id="browse_fileImageTheme_txt">
                     browse
                 </button>
@@ -711,7 +711,7 @@ along with Cosmic-Comics.  If not, see <https://www.gnu.org/licenses/>.--->
                 </div>
             </div>
             <div class="modal-footer">
-                <button class="btn btn-primary" id="sendEdit">SEND</button>
+                <button class="btn pure-material-button-contained" id="sendEdit">SEND</button>
                 <button type="button" class="btn btn-secondary" data-bs-dismiss="modal" id="close_edit">
                     Close
                 </button>
@@ -731,15 +731,18 @@ along with Cosmic-Comics.  If not, see <https://www.gnu.org/licenses/>.--->
                         aria-label="Close"></button>
             </div>
             <div class="modal-body" style="text-align: center">
-
-                <label class="input-group-text" for="usernameManager">Username : </label>
-                <input class="form-control" type="text" id="usernameManager" name="usernameManager"
-                       autocomplete="off"/>
+                <div class="input-field col s6">
+                    <input class="form-control" type="text" id="usernameManager" name="usernameManager"
+                                                       autocomplete="off"/>
+                    <label class="input-group-text" for="usernameManager">Username : </label>
+                </div>
                 <br>
-                <label class="input-group-text" for="passwordManager">Password : </label>
+                <div class="input-field col s6">
+
                 <input class="form-control" type="text" id="passwordManager" name="passwordManager"
                        autocomplete="off"/>
-
+                <label class="input-group-text" for="passwordManager">Password : </label>
+                </div>
                 <br>
                 <div id="AMImages">
                     <template id="template_AMI">
@@ -748,13 +751,13 @@ along with Cosmic-Comics.  If not, see <https://www.gnu.org/licenses/>.--->
 
                 </div>
                 <br>
-                <button id="delaccount" class="btn btns btn-primary">
+                <button id="delaccount" class="btn btns pure-material-button-contained">
                     Delete the Account (THERE IS NO GOING BACK)
                 </button>
-                <button id="sendbdd" class="btn btns btn-primary">
+                <button id="sendbdd" class="btn btns pure-material-button-contained">
                     Download a copy of your database
                 </button>
-                <button id="sendaccount" class="btn btns btn-primary">
+                <button id="sendaccount" class="btn btns pure-material-button-contained">
                     Apply changes (You will need to reconnect)
                 </button>
 
