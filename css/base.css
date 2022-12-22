@@ -1376,7 +1376,6 @@ a[href^="http://marvel.com"] {
     border-radius: 10px;
     margin: 0;
     width: 200px;
-    padding: 8px;
     background-color: var(--color-bg-secondary);
     box-shadow: 0 10px 20px var(--cardCustoShadow);
 }
@@ -1387,7 +1386,6 @@ a[href^="http://marvel.com"] {
     border: 0;
     padding: 8px 36px 8px 8px;
     width: 100%;
-    border-radius: 8px;
     text-align: left;
     display: flex;
     align-items: center;
@@ -1427,6 +1425,8 @@ a[href^="http://marvel.com"] {
     z-index: 10;
     position: fixed;
 }
+
+
 
 #searchField {
     backdrop-filter: blur(20px);
@@ -1663,7 +1663,7 @@ background-color: rgb(var(--pure-material-onsurface-rgb));
 .pure-material-button-contained-secondary:disabled::after {
     opacity: 0;
 }
-@media (max-width: 1250px) {
+@media (max-width: 1200px) {
 
     /* TODO PHONE */
     #logo_id_txt {
@@ -1682,8 +1682,20 @@ background-color: rgb(var(--pure-material-onsurface-rgb));
         left:103px;
         top:-319px;
     }
+    .breadcrumb{
+        display: none;
+    }
+    #ColCover > img {
+        width: 55vw;
+        height: auto;
+        margin-left: 20vw;
+        transition: margin-left .5s ease;
+    }
 
-
+    #ColCover {
+        position: relative;
+        top: 15vh;
+    }
 }
 
 #searchResults {

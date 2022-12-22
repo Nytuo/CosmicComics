@@ -610,15 +610,14 @@ along with Cosmic-Comics.  If not, see <https://www.gnu.org/licenses/>.--->
                 <p>Warning : Be careful when you modify those fields, DO NOT change the way they are written. If an item have '"', {} or [] at the beginning and at the end DO NOT remove them change only the
                     content. The fields marked with a red * <span style="color: red">*</span> have to be in the same</p>
                 <div id="commonEdit">
-                    <label for="lockCheck">
-                        <input type="checkbox" id="lockCheck">
-                        <span>Lock this item ? (That prevent the metadata to be overwritten when refresh and disable
-                        rematch)</span>
-                    </label>
+                    <label for="lockCheck">Lock this item ? (That prevent the metadata to be overwritten when refresh and disable
+                        rematch)</label>
+                        <input type="checkbox" id="lockCheck"/>
+
 
                     <label>
                         Path
-                        <input type="text" id="edit_PATH">
+                        <input type="text" id="edit_PATH"/>
                     </label>
                     <label>
                         Description
@@ -828,6 +827,9 @@ along with Cosmic-Comics.  If not, see <https://www.gnu.org/licenses/>.--->
 <div class="contentViewer contentFade" id="contentViewer">
     <img id="imageBGOV2" class="" src="#" alt="#" style="width: 100vw;height: auto">
     <div class="onContentViewer">
+        <div id="ColCover">
+            <img src="" id="ImgColCover" alt="#">
+        </div>
         <div id="ColTitle"></div>
         <div id="ColContent">
             <p id="Status"></p>
@@ -1075,9 +1077,7 @@ along with Cosmic-Comics.  If not, see <https://www.gnu.org/licenses/>.--->
 
 
         </div>
-        <div id="ColCover">
-            <img src="" id="ImgColCover" alt="#">
-        </div>
+
     </div>
 </div>
 <!--Loading scripts-->

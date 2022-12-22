@@ -682,6 +682,7 @@ function toggleSideBar() {
         document.querySelector(".cards-list").style.marginLeft = "100px";
         document.querySelector("#ContentView").style.marginLeft = "100px";
         document.querySelector("#ColTitle").style.marginLeft = "550px";
+
         document.querySelector("#overlay").style.left = "10%";
         try {
             document.querySelector(".releasing").style.left = "550px";
@@ -693,6 +694,27 @@ function toggleSideBar() {
                     document.querySelector(".NotYet").style.left = "550px";
                 } catch (e) {
                     console.log(e);
+                }
+            }
+        }
+        if (window.screen.width <= 1200) {
+
+
+            list.forEach((el) => {
+                document.querySelector(el).style.marginLeft = "100px";
+            });
+            document.querySelector("#ColTitle").style.marginLeft = "100px";
+            try {
+                document.querySelector(".releasing").style.left = "100px";
+            } catch (e) {
+                try {
+                    document.querySelector(".released").style.left = "100px";
+                } catch (e) {
+                    try {
+                        document.querySelector(".NotYet").style.left = "100px";
+                    } catch (e) {
+                        console.log(e);
+                    }
                 }
             }
         }
@@ -2452,6 +2474,8 @@ document.getElementById("id_addTrackedBook").addEventListener("click", () => {
                         columns.push(e.id.replaceAll("edit_", ""))
                     })
                     values.push(document.getElementById("lockCheck").checked);
+                    console.log(values);
+
                     columns.push("lock");
                     await fetch("http://" + domain + ":" + port + "/DB/update", {
                         method: "POST", headers: {
@@ -2518,6 +2542,8 @@ document.getElementById("id_addTrackedBook").addEventListener("click", () => {
                         columns.push(e.id.replaceAll("edit_", ""))
                     })
                     values.push(document.getElementById("lockCheck").checked);
+                    console.log(values);
+
                     columns.push("lock");
                     await fetch("http://" + domain + ":" + port + "/DB/update", {
                         method: "POST", headers: {
@@ -2627,6 +2653,8 @@ async function createDetails(TheBook, provider) {
             columns.push(e.id.replaceAll("edit_", ""))
         })
         values.push(document.getElementById("lockCheck").checked);
+        console.log(values);
+
         columns.push("lock");
         await fetch("http://" + domain + ":" + port + "/DB/update", {
             method: "POST", headers: {
