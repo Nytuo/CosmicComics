@@ -21,8 +21,8 @@ along with Cosmic-Comics.  If not, see <https://www.gnu.org/licenses/>.--->
     <!--Declaring the stylesheets-->
     <link rel="stylesheet" href="css/animate"/>
     <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet"/>
-    <link href="css/materialize.css" rel="stylesheet"/>
     <link rel="stylesheet" href="css/bootstrap.css"/>
+    <link href="css/materialize.css" rel="stylesheet"/>
     <link rel="stylesheet" href="css/base.css"/>
     <link rel="stylesheet" href="themes/default.css">
     <link rel="icon" type="image/x-icon" href="Images/Logo.ico">
@@ -103,7 +103,7 @@ along with Cosmic-Comics.  If not, see <https://www.gnu.org/licenses/>.--->
 <body>
 <iframe width="854" height="480" style="display: none" id="iframe_yt_music" src="" allowfullscreen></iframe>
 
-<div class="modal animate__animated animate__zoomIn animate__faster" id="libUpload" tabindex="-1" aria-labelledby="libUpload"
+<div class="modal animate__animated animate__fadeInDown animate__faster" id="libUpload" tabindex="-1" aria-labelledby="libUpload"
      aria-hidden="true" data-bs-backdrop="static" data-bs-keyboard="false" style="overflow: hidden">
     <div class="modal-dialog modal-dialog-centered">
         <div class="modal-content">
@@ -117,12 +117,12 @@ along with Cosmic-Comics.  If not, see <https://www.gnu.org/licenses/>.--->
 
                 <input type="file" name="ComicTemp" id="fileUp">
                 <button class="btn pure-material-button-contained" style="margin-top: 10px;" type="submit">Upload</button>
-                <button class="btn btn-secondary" style="margin-top: 10px;"  type="reset">Reset</button>
+                <button class="btn pure-material-button-contained-secondary" style="margin-top: 10px;"  type="reset">Reset</button>
                 </form>
 
             </div>
             <div class="modal-footer">
-                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal" id="close_libUpload">
+                <button type="button" class="btn pure-material-button-contained-secondary" data-bs-dismiss="modal" id="close_libUpload">
                     Close
                 </button>
             </div>
@@ -130,7 +130,7 @@ along with Cosmic-Comics.  If not, see <https://www.gnu.org/licenses/>.--->
     </div>
 </div>
 <!-- Modal Tips-->
-<div class="modal animate__animated animate__zoomIn animate__faster" id="lib" tabindex="-1" aria-labelledby="id_lib"
+<div class="modal animate__animated animate__fadeInDown animate__faster" id="lib" tabindex="-1" aria-labelledby="id_lib"
      aria-hidden="true" data-bs-backdrop="static" data-bs-keyboard="false" style="overflow: hidden">
     <div class="modal-dialog modal-dialog-centered">
         <div class="modal-content">
@@ -140,13 +140,16 @@ along with Cosmic-Comics.  If not, see <https://www.gnu.org/licenses/>.--->
                         onclick="resetLibModal()"></button>
             </div>
             <div class="modal-body" style="text-align: center">
-
-                <label class="input-group-text" for="namelocation">Name of the library : </label>
+                <div class="input-field">
                 <input class="form-control" type="text" id="namelocation" name="namelocation" autocomplete="off"/>
+                <label  for="namelocation">Name of the library</label>
+                </div>
                 <br>
-                <label class="input-group-text" for="locationa">Location on the server : </label>
-                <input class="form-control" type="text" id="locationa" name="locationa" autocomplete="off"/>
+                <div class="input-field">
 
+                <input class="form-control" type="text" id="locationa" name="locationa" autocomplete="off"/>
+                <label for="locationa">Location on the server</label>
+                </div>
                 <br>
                 <label>
                     <select class="form-select" id="providerID" name="providerID">
@@ -166,7 +169,7 @@ along with Cosmic-Comics.  If not, see <https://www.gnu.org/licenses/>.--->
 
             </div>
             <div class="modal-footer">
-                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal" id="close_lib"
+                <button type="button" class="btn pure-material-button-contained-secondary" data-bs-dismiss="modal" id="close_lib"
                         onclick="resetLibModal()">
                     Close
                 </button>
@@ -176,7 +179,7 @@ along with Cosmic-Comics.  If not, see <https://www.gnu.org/licenses/>.--->
 </div>
 
 <!-- Modal moreinfo-->
-<div class="modal animate__animated animate__zoomIn animate__faster" id="moreinfo" tabindex="-1"
+<div class="modal animate__animated animate__fadeInDown animate__faster" id="moreinfo" tabindex="-1"
      aria-labelledby="id_moreinfo"
      aria-hidden="true" data-bs-backdrop="static" data-bs-keyboard="false" style="overflow: hidden">
     <div class="modal-dialog modal-dialog-scrollable modal-dialog-centered">
@@ -192,7 +195,7 @@ along with Cosmic-Comics.  If not, see <https://www.gnu.org/licenses/>.--->
                 <a class="btn pure-material-button-contained" style="cursor: pointer" id="moreinfo_btn"></a>
             </div>
             <div class="modal-footer">
-                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal" id="close_moreinfo"
+                <button type="button" class="btn pure-material-button-contained-secondary" data-bs-dismiss="modal" id="close_moreinfo"
                         onclick="resetLibModal()">
                     Close
                 </button>
@@ -200,7 +203,7 @@ along with Cosmic-Comics.  If not, see <https://www.gnu.org/licenses/>.--->
         </div>
     </div>
 </div>
-<div class="modal  animate__animated animate__zoomIn animate__faster" id="rematchModal" tabindex="-1"
+<div class="modal  animate__animated animate__fadeInDown animate__faster" id="rematchModal" tabindex="-1"
      aria-labelledby="rematchModal"
      aria-hidden="true" data-bs-backdrop="static" data-bs-keyboard="false" style="overflow: hidden">
     <div class="modal-dialog modal-xl modal-dialog-scrollable modal-dialog-centered">
@@ -218,7 +221,7 @@ along with Cosmic-Comics.  If not, see <https://www.gnu.org/licenses/>.--->
                 </div>
             </div>
             <div class="modal-footer">
-                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal" id="close_rematchModal">
+                <button type="button" class="btn pure-material-button-contained-secondary" data-bs-dismiss="modal" id="close_rematchModal">
                     Close
                 </button>
             </div>
@@ -226,7 +229,7 @@ along with Cosmic-Comics.  If not, see <https://www.gnu.org/licenses/>.--->
     </div>
 </div>
 
-<div class="modal  animate__animated animate__zoomIn animate__faster" id="APISelector" tabindex="-1"
+<div class="modal  animate__animated animate__fadeInDown animate__faster" id="APISelector" tabindex="-1"
      aria-labelledby="APISelector"
      aria-hidden="true" data-bs-backdrop="static" data-bs-keyboard="false" style="overflow: hidden">
     <div class="modal-dialog modal-xl modal-dialog-scrollable modal-dialog-centered">
@@ -248,7 +251,7 @@ along with Cosmic-Comics.  If not, see <https://www.gnu.org/licenses/>.--->
                 </label>
             </div>
             <div class="modal-footer">
-                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal" id="close_apiselector">
+                <button type="button" class="btn pure-material-button-contained-secondary" data-bs-dismiss="modal" id="close_apiselector">
                     Close
                 </button>
             </div>
@@ -257,7 +260,7 @@ along with Cosmic-Comics.  If not, see <https://www.gnu.org/licenses/>.--->
 </div>
 
 <!-- Modal navigation -->
-<div class="modal animate__animated animate__zoomIn animate__faster" id="buttonp" tabindex="-1"
+<div class="modal animate__animated animate__fadeInDown animate__faster" id="buttonp" tabindex="-1"
      aria-labelledby="id_nav" aria-hidden="true">
     <div class="modal-dialog modal-dialog-centered">
         <div class="modal-content">
@@ -299,7 +302,7 @@ along with Cosmic-Comics.  If not, see <https://www.gnu.org/licenses/>.--->
                 </div>
             </div>
             <div class="modal-footer">
-                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal" id="close_nav">
+                <button type="button" class="btn pure-material-button-contained-secondary" data-bs-dismiss="modal" id="close_nav">
                     Close
                 </button>
             </div>
@@ -307,7 +310,7 @@ along with Cosmic-Comics.  If not, see <https://www.gnu.org/licenses/>.--->
     </div>
 </div>
 <!-- Modal about-->
-<div class="modal animate__animated animate__zoomIn animate__faster" id="about" tabindex="-1"
+<div class="modal animate__animated animate__fadeInDown animate__faster" id="about" tabindex="-1"
      aria-labelledby="id_about" aria-hidden="true" style="overflow: hidden">
     <div class="modal-dialog modal-dialog-centered">
         <div class="modal-content">
@@ -340,7 +343,7 @@ along with Cosmic-Comics.  If not, see <https://www.gnu.org/licenses/>.--->
                                                                                       height="80px"/></a>
             </div>
             <div class="modal-footer">
-                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal" id="close_about">
+                <button type="button" class="btn pure-material-button-contained-secondary" data-bs-dismiss="modal" id="close_about">
                     Close
                 </button>
             </div>
@@ -348,7 +351,7 @@ along with Cosmic-Comics.  If not, see <https://www.gnu.org/licenses/>.--->
     </div>
 </div>
 <!-- Modal DL-->
-<div class="modal animate__animated animate__zoomIn animate__faster" id="dlmodal" tabindex="-1"
+<div class="modal animate__animated animate__fadeInDown animate__faster" id="dlmodal" tabindex="-1"
      aria-labelledby="id_openDLtxt" aria-hidden="true" style="overflow: hidden">
     <div class="modal-dialog modal-dialog-centered">
         <div class="modal-content">
@@ -381,7 +384,7 @@ along with Cosmic-Comics.  If not, see <https://www.gnu.org/licenses/>.--->
                 </button>
             </div>
             <div class="modal-footer">
-                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal" id="close_openDL">
+                <button type="button" class="btn pure-material-button-contained-secondary" data-bs-dismiss="modal" id="close_openDL">
                     Close
                 </button>
             </div>
@@ -389,7 +392,7 @@ along with Cosmic-Comics.  If not, see <https://www.gnu.org/licenses/>.--->
     </div>
 </div>
 <!-- Modal Tips-->
-<div class="modal animate__animated animate__zoomIn animate__faster" id="tips" tabindex="-1"
+<div class="modal animate__animated animate__fadeInDown animate__faster" id="tips" tabindex="-1"
      aria-labelledby="id_tips" aria-hidden="true" style="overflow: hidden">
     <div class="modal-dialog modal-dialog-centered">
         <div class="modal-content">
@@ -407,7 +410,7 @@ along with Cosmic-Comics.  If not, see <https://www.gnu.org/licenses/>.--->
                 </ul>
             </div>
             <div class="modal-footer">
-                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal" id="close_tips">
+                <button type="button" class="btn pure-material-button-contained-secondary" data-bs-dismiss="modal" id="close_tips">
                     Close
                 </button>
             </div>
@@ -415,7 +418,7 @@ along with Cosmic-Comics.  If not, see <https://www.gnu.org/licenses/>.--->
     </div>
 </div>
 <!-- Modal Bookmarks-->
-<div class="modal animate__animated animate__zoomIn animate__faster" id="bm" tabindex="-1" aria-labelledby="id_bmm"
+<div class="modal animate__animated animate__fadeInDown animate__faster" id="bm" tabindex="-1" aria-labelledby="id_bmm"
      aria-hidden="true" style="overflow: hidden">
     <div class="modal-dialog modal-dialog-centered modal-dialog-scrollable">
         <div class="modal-content">
@@ -428,7 +431,7 @@ along with Cosmic-Comics.  If not, see <https://www.gnu.org/licenses/>.--->
                 <div id="bookmarkContainer" style="text-align: center"></div>
             </div>
             <div class="modal-footer">
-                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal" id="close_bm">
+                <button type="button" class="btn pure-material-button-contained-secondary" data-bs-dismiss="modal" id="close_bm">
                     Close
                 </button>
             </div>
@@ -436,7 +439,7 @@ along with Cosmic-Comics.  If not, see <https://www.gnu.org/licenses/>.--->
     </div>
 </div>
 <!-- Modal settings -->
-<div class="modal animate__animated animate__zoomIn animate__faster" id="settingsmodal" tabindex="-1"
+<div class="modal animate__animated animate__fadeInDown animate__faster" id="settingsmodal" tabindex="-1"
      aria-labelledby="id_settingsmod" aria-hidden="true" style="overflow: hidden">
     <div class="modal-dialog modal-dialog-centered">
         <div class="modal-content">
@@ -461,7 +464,7 @@ along with Cosmic-Comics.  If not, see <https://www.gnu.org/licenses/>.--->
                 </button>
             </div>
             <div class="modal-footer">
-                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal" id="close_settings">
+                <button type="button" class="btn pure-material-button-contained-secondary" data-bs-dismiss="modal" id="close_settings">
                     Close
                 </button>
             </div>
@@ -469,7 +472,7 @@ along with Cosmic-Comics.  If not, see <https://www.gnu.org/licenses/>.--->
     </div>
 </div>
 <!-- Modal Theme -->
-<div class="modal animate__animated animate__zoomIn animate__faster" id="thememodal" tabindex="-1"
+<div class="modal animate__animated animate__fadeInDown animate__faster" id="thememodal" tabindex="-1"
      aria-labelledby="id_thememod" aria-hidden="true" style="overflow: hidden">
     <div class="modal-dialog modal-dialog-centered modal-dialog-scrollable">
         <div class="modal-content">
@@ -587,14 +590,14 @@ along with Cosmic-Comics.  If not, see <https://www.gnu.org/licenses/>.--->
                        title="Choose your color" onchange="saveToTheme(this,'progress_color')"/>
             </div>
             <div class="modal-footer">
-                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal" id="close_theme">
+                <button type="button" class="btn pure-material-button-contained-secondary" data-bs-dismiss="modal" id="close_theme">
                     Close
                 </button>
             </div>
         </div>
     </div>
 </div>
-<div class="modal animate__animated animate__zoomIn animate__faster" id="editmodal" tabindex="-1"
+<div class="modal animate__animated animate__fadeInDown animate__faster" id="editmodal" tabindex="-1"
      aria-labelledby="id_editmodal" data-bs-backdrop="static" aria-hidden="true" data-bs-keyboard="false" style="overflow: hidden">
     <div class="modal-dialog modal-dialog-centered modal-dialog-scrollable">
         <div class="modal-content">
@@ -607,9 +610,12 @@ along with Cosmic-Comics.  If not, see <https://www.gnu.org/licenses/>.--->
                 <p>Warning : Be careful when you modify those fields, DO NOT change the way they are written. If an item have '"', {} or [] at the beginning and at the end DO NOT remove them change only the
                     content. The fields marked with a red * <span style="color: red">*</span> have to be in the same</p>
                 <div id="commonEdit">
-                    <label for="lockCheck">Lock this item ? (That prevent the metadata to be overwritten when refresh and disable
-                        rematch)</label>
-                    <input type="checkbox" id="lockCheck">
+                    <label for="lockCheck">
+                        <input type="checkbox" id="lockCheck">
+                        <span>Lock this item ? (That prevent the metadata to be overwritten when refresh and disable
+                        rematch)</span>
+                    </label>
+
                     <label>
                         Path
                         <input type="text" id="edit_PATH">
@@ -712,7 +718,7 @@ along with Cosmic-Comics.  If not, see <https://www.gnu.org/licenses/>.--->
             </div>
             <div class="modal-footer">
                 <button class="btn pure-material-button-contained" id="sendEdit">SEND</button>
-                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal" id="close_edit">
+                <button type="button" class="btn pure-material-button-contained-secondary" data-bs-dismiss="modal" id="close_edit">
                     Close
                 </button>
             </div>
@@ -720,7 +726,7 @@ along with Cosmic-Comics.  If not, see <https://www.gnu.org/licenses/>.--->
     </div>
 </div>
 <!-- Modal Tips-->
-<div class="modal animate__animated animate__zoomIn animate__faster" id="modifAccount" tabindex="-1"
+<div class="modal animate__animated animate__fadeInDown animate__faster" id="modifAccount" tabindex="-1"
      aria-labelledby="id_modifAccount" aria-hidden="true" data-bs-backdrop="static" data-bs-keyboard="false"
      style="overflow: hidden">
     <div class="modal-dialog modal-dialog-centered">
@@ -734,14 +740,14 @@ along with Cosmic-Comics.  If not, see <https://www.gnu.org/licenses/>.--->
                 <div class="input-field col s6">
                     <input class="form-control" type="text" id="usernameManager" name="usernameManager"
                                                        autocomplete="off"/>
-                    <label class="input-group-text" for="usernameManager">Username : </label>
+                    <label for="usernameManager">Username : </label>
                 </div>
                 <br>
                 <div class="input-field col s6">
 
                 <input class="form-control" type="text" id="passwordManager" name="passwordManager"
                        autocomplete="off"/>
-                <label class="input-group-text" for="passwordManager">Password : </label>
+                <label for="passwordManager">Password : </label>
                 </div>
                 <br>
                 <div id="AMImages">
@@ -763,7 +769,7 @@ along with Cosmic-Comics.  If not, see <https://www.gnu.org/licenses/>.--->
 
             </div>
             <div class="modal-footer">
-                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal" id="close_mna">
+                <button type="button" class="btn pure-material-button-contained-secondary" data-bs-dismiss="modal" id="close_mna">
                     Close
                 </button>
             </div>
@@ -1085,6 +1091,7 @@ along with Cosmic-Comics.  If not, see <https://www.gnu.org/licenses/>.--->
 <script type="text/javascript" src="js/api/OpenLibrary.js"></script>
 
 <script type="text/javascript" src="index.js"></script>
+<script type="text/javascript" src="/js/materialize.js"></script>
 <script type="text/javascript" src="/modules/bootstrapJS"></script>
 </body>
 

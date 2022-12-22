@@ -291,7 +291,6 @@ button:focus:not(:focus-visible) {
   outline: 0;
 }
 
-input,
 button,
 select,
 optgroup,

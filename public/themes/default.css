@@ -60,4 +60,8 @@ along with Cosmic-Comics.  If not, see <https://www.gnu.org/licenses/>.*/
     --pure-material-onprimary-rgb: 255,255,255;
     --pure-material-primary-rgb: 46, 83, 237;
     --pure-material-onsurface-rgb: 27, 47, 191;
+    --pure-material-onprimary-rgb-secondary: 255,255,255;
+    --pure-material-primary-rgb-secondary: 86, 86, 86;
+    --pure-material-onsurface-rgb-secondary: 66, 66, 66;
+
 }
