@@ -894,8 +894,7 @@ function loadView(FolderRes, libraryPath, date = "", provider = providerEnum.MAN
             document.getElementById("readstat").innerHTML = JSON.parse(readBookNB)[0]["COUNT(*)"] + " / " + data.length + " volumes read";
             await getFromDB("Books", "* FROM Books WHERE PATH = '" + path + "'").then(async (resa) => {
                 let bookList = JSON.parse(resa);
-                let bookFromDB = bookList[0];
-                let TheBook = new Book(bookFromDB["ID_book"], bookFromDB["NOM"], bookFromDB["URLCover"], bookFromDB["description"], bookFromDB["creators"], bookFromDB["characters"], bookFromDB["URLs"], bookFromDB["note"], bookFromDB["read"], bookFromDB["reading"], bookFromDB["unread"], bookFromDB["favorite"], bookFromDB["last_page"], bookFromDB["folder"], bookFromDB["PATH"], bookFromDB["issueNumber"], bookFromDB["format"], bookFromDB["pageCount"], bookFromDB["series"], bookFromDB["prices"], bookFromDB["dates"], bookFromDB["collectedIssues"], bookFromDB["collections"], bookFromDB["variants"], bookFromDB["lock"]);
+               let TheBook;
                 if (bookList.length === 0) {
                     if (provider === providerEnum.Marvel) {
                         await new Marvel().InsertBook(realname, date, path).then(async (cdata) => {
@@ -968,6 +967,9 @@ function loadView(FolderRes, libraryPath, date = "", provider = providerEnum.MAN
                         })
                     }
                     //TODO implement API HERE
+                }else{
+                    let bookFromDB = bookList[0];
+                    TheBook = new Book(bookFromDB["ID_book"], bookFromDB["NOM"], bookFromDB["URLCover"], bookFromDB["description"], bookFromDB["creators"], bookFromDB["characters"], bookFromDB["URLs"], bookFromDB["note"], bookFromDB["read"], bookFromDB["reading"], bookFromDB["unread"], bookFromDB["favorite"], bookFromDB["last_page"], bookFromDB["folder"], bookFromDB["PATH"], bookFromDB["issueNumber"], bookFromDB["format"], bookFromDB["pageCount"], bookFromDB["series"], bookFromDB["prices"], bookFromDB["dates"], bookFromDB["collectedIssues"], bookFromDB["collections"], bookFromDB["variants"], bookFromDB["lock"]);
                 }
                 let card = new Card(TheBook.unread, TheBook.read, TheBook.reading, TheBook.ID + "_" + n, TheBook.cover, TheBook.title, TheBook.favorite)
                 let carddiv = card.card;
@@ -1187,7 +1189,7 @@ function LoadImages(numberOf) {
         try {
             document.getElementById("card_img_id_" + i).src = listOfImages[i];
         } catch (error) {
-            document.getElementById("card_img_id_" + i).src = CosmicComicsTemp + "/Images/fileDefault.png";
+            document.getElementById("card_img_id_" + i).src = CosmicComicsTemp + "/Images/fileDefault.webp";
         }
         document.getElementById("overlay2").style.display = "none";
         animateCSS(document.getElementById("overlay"), "fadeOut").then((message) => {

@@ -303,7 +303,7 @@ app.post("/createUser", function (req, res) {
     res.sendStatus(200);
 });
 app.get("/null", function (req, res) {
-    res.sendFile(__dirname + "/public/Images/fileDefault.png");
+    res.sendFile(__dirname + "/public/Images/fileDefault.webp");
 });
 app.post("/DL", function (req, res) {
     console.log(req.body);
@@ -1673,7 +1673,7 @@ function SendTo(val) {
 }
 
 //UnZip the archive
-function UnZip(zipPath, ExtractDir, name, ext, token) {
+async function UnZip(zipPath, ExtractDir, name, ext, token) {
     var listOfElements;
     try {
         var n = 0;
@@ -1694,16 +1694,7 @@ function UnZip(zipPath, ExtractDir, name, ext, token) {
             });
             var resEnd;
             Stream.on("end", async () => {
-                //for each file in the folder
                 listOfElements = fs.readdirSync(ExtractDir);
-                let pdfExtractor = new PdfExtractor(ExtractDir, {
-                    viewportScale: (width, height) => {
-                        if (width > height) {
-                            return 1100 / width;
-                        }
-                        return 800 / width;
-                    },
-                })
                 const browser = await puppeteer.launch({headless: true, args: ['--no-sandbox']});
                 const page = await browser.newPage();
                 let bignb = 0;
@@ -1786,7 +1777,8 @@ function UnZip(zipPath, ExtractDir, name, ext, token) {
                 } catch (error) {
                     console.log(error);
                 }
-            })
+            });
+
         } else if (
             ext == "zip" ||
             ext == "cbz" ||

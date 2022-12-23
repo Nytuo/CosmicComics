@@ -12,7 +12,7 @@ class Card {
         carddiv.style.cursor = "pointer";
         const rib = document.createElement("div");
         if (this._URLCover === "null" || this._URLCover === "" || this._URLCover == null) {
-            this._URLCover = "Images/fileDefault.png";
+            this._URLCover = "Images/fileDefault.webp";
         } else if (this._URLCover.includes("public/FirstImagesOfAll")) {
             this._URLCover = this._URLCover.split("public/")[1];
         }

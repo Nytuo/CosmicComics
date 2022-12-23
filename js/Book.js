@@ -231,13 +231,13 @@ class Book {
 
   get book() {
     return {
-        ID: this._ID,
-        title: this._title,
-        cover: this._cover,
+        ID_book: this._ID,
+        NOM: this._title,
+        URLCover: this._cover,
         description: this._description,
         staff: this._staff,
         characters: this._characters,
-        urls: this._urls,
+        URLs: this._urls,
         note: this._note,
         read: this._read,
         reading: this._reading,
@@ -245,7 +245,7 @@ class Book {
         favorite: this._favorite,
         last_page: this._last_page,
         folder: this._folder,
-        path: this._path,
+        PATH: this._path,
         issueNumber: this._issueNumber,
         format: this._format,
         pageCount: this._pageCount,

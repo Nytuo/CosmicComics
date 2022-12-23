@@ -2001,11 +2001,11 @@ function preloadImage(listImages) {
 //Error When loading images
 document.getElementById("imgViewer_0").onerror = function () {
 	Toastifycation(language[0]["error"], "#ff0000");
-	document.getElementById("imgViewer_0").src = "Images/fileDefault.png";
+	document.getElementById("imgViewer_0").src = "Images/fileDefault.webp";
 };
 document.getElementById("imgViewer_1").onerror = function () {
 	Toastifycation(language[0]["error"], "#ff0000");
-	document.getElementById("imgViewer_1").src = "Images/fileDefault.png";
+	document.getElementById("imgViewer_1").src = "Images/fileDefault.webp";
 };
 document.getElementById("imgViewer_0").addEventListener("load", () => {
 	document.getElementById("overlay").style.display = "none";
