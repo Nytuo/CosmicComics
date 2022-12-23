@@ -131,11 +131,12 @@
   },
   "devDependencies": {
     "electron": "^23.0.0-alpha.3",
-    "electron-builder": "^23.3.3"
+    "electron-builder": "^24.0.0-alpha.8"
   },
   "dependencies": {
-    "@popperjs/core": "^2.9.2",
     "7zip-bin": "^5.1.1",
+    "@electron/remote": "^2.0.9",
+    "@popperjs/core": "^2.9.2",
     "anilist-node": "^1.13.1",
     "bootstrap": "^5.0.2",
     "canvas": "^2.11.0",
@@ -146,13 +147,13 @@
     "download": "^8.0.0",
     "electron-updater": "^5.2.1",
     "express": "^4.17.2",
-    "github-content": "^1.0.1",
     "html-magnifier": "^2.0.2",
     "multer": "^1.4.5-lts.1",
     "node-7z": "^3.0.0",
     "nodemon": "^2.0.15",
     "pdf-extractor": "^2.2.0",
     "puppeteer": "^19.4.0",
+    "simple-git": "^3.15.1",
     "sqlite3": "^5.0.11",
     "tinycolor2": "^1.4.2",
     "unrar": "^0.2.0",
@@ -162,7 +163,7 @@
   "overrides": {
     "pdf-extractor": {
       "dependencies": {
-        "canvas": "2.11.0"
+        "canvas": "^2.10.2"
       }
     }
   }
