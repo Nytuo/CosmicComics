@@ -136,8 +136,7 @@
   "dependencies": {
     "7zip-bin": "^5.1.1",
     "@popperjs/core": "^2.9.2",
-    "anilist-node": "^1.12.1",
-    "anilist.js": "^1.2.1",
+    "anilist-node": "^1.13.1",
     "bootstrap": "^5.0.2",
     "color-extr-thief": "^2.3.4",
     "cors": "^2.8.5",

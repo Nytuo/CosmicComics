@@ -42,8 +42,6 @@ let CosmicComicsTemp = path2Data;
 let sqlite3 = require("sqlite3");
 const anilist = require("anilist-node");
 const AniList = new anilist();
-const {Client} = require("anilist.js");
-const AniList2 = new Client();
 const ValidatedExtension = [
     "cbr",
     "cbz",
@@ -1632,59 +1630,13 @@ app.post("/api/anilist", async (req, res) => {
     })
     res.sendStatus(200)
 });
-app.get("/api/anilist/searchByID/:id", (req, res) => {
-    try {
-        AniList.media.manga(parseInt(req.params.id)).then(function (data2) {
-            res.send(data2);
-        });
-    } catch (e) {
-        res.sendStatus(500);
-    }
-});
+
 app.get("/api/anilist/searchOnly/:name", (req, res) => {
     let name = req.params.name;
     API_ANILIST_GET_SEARCH(name).then(async function (dataa) {
         res.send(dataa);
     })
 });
-
-async function API_ANILIST_GET_CREATORS(id) {
-    try {
-        await AniList.people.staff(parseInt(id)).then(function (data) {
-            return data;
-        });
-    } catch (e) {
-        console.log(e);
-    }
-    return null;
-}
-
-async function API_ANILIST_GET_CHARACTERS(id) {
-    try {
-        await AniList.people.character(parseInt(id)).then(function (data) {
-            return data;
-        });
-    } catch (e) {
-        console.log(e);
-    }
-    return null
-}
-
-async function API_ANILIST_GET_RELATIONS(name) {
-    try {
-        await AniList2.searchMedia({
-            search: name,
-            format: "MANGA",
-            perPage: 25
-        })
-            .then(function (data) {
-                return (data["Results"][0]["info"]["relations"]["edges"]);
-            });
-    } catch (e) {
-        console.log(e);
-    }
-    return null;
-}
 
 app.get("/getThemes", (req, res) => {
     var oi = fs.readdirSync(__dirname + "/public/themes");
