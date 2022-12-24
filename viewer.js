@@ -226,47 +226,47 @@ async function getResponse() {
 						title: language[0]["Bookmark"],
 						placement: "bottom"
 					});
-					(document.getElementById("id_magnifiermod").innerHTML =
+					(document.getElementById("id_magnifiermod").innerText =
 						language[0]["magnifier_mod"]),
-						(document.getElementById("zoomlvl").innerHTML = language[0]["zoom"]);
-					document.getElementById("widthlvl").innerHTML = language[0]["width"];
-					document.getElementById("heightlvl").innerHTML = language[0]["height"];
-					document.getElementById("BGBTTXT").innerHTML =
+						(document.getElementById("zoomlvl").innerText = language[0]["zoom"]);
+					document.getElementById("widthlvl").innerText = language[0]["width"];
+					document.getElementById("heightlvl").innerText = language[0]["height"];
+					document.getElementById("BGBTTXT").innerText =
 						language[0]["background_by_theme"];
-					document.getElementById("Radiuslvl").innerHTML = language[0]["radius"];
+					document.getElementById("Radiuslvl").innerText = language[0]["radius"];
 					new bootstrap.Tooltip(document.getElementById("magnifier_note"), {
 						title: language[0]["magnifier_note"],
 						placement: "bottom"
 					});
-					document.getElementById("id_spawnmagnifier").innerHTML =
+					document.getElementById("id_spawnmagnifier").innerText =
 						language[0]["spawn_magnifier"];
-					document.getElementById("id_destroymagnifier").innerHTML =
+					document.getElementById("id_destroymagnifier").innerText =
 						language[0]["destroy_magnifier"];
-					document.getElementById("id_booksettings").innerHTML =
+					document.getElementById("id_booksettings").innerText =
 						language[0]["book_settings"];
 					console.log(language[0]["book_settings"]);
-					document.getElementById("DPMTXT").innerHTML = language[0]["double_page_mode"];
-					document.getElementById("BPABTXT").innerHTML =
+					document.getElementById("DPMTXT").innerText = language[0]["double_page_mode"];
+					document.getElementById("BPABTXT").innerText =
 						language[0]["blank_at_beggining"];
-					document.getElementById("NDPFHTXT").innerHTML =
+					document.getElementById("NDPFHTXT").innerText =
 						language[0]["no_dpm_horizontal"];
-					document.getElementById("MMTXT").innerHTML = language[0]["manga_mode"];
-					document.getElementById("SSTXT").innerHTML = language[0]["Slideshow"];
-					document.getElementById("NBARTXT").innerHTML = language[0]["nobar"];
-					document.getElementById("SSBTXT").innerHTML = language[0]["sideBar"];
-					document.getElementById("PCTXT").innerHTML = language[0]["PageCount"];
-					document.getElementById("VIVTXT").innerHTML = language[0]["vertical_reader"];
-					document.getElementById("WTMTXT").innerHTML = language[0]["Webtoon_Mode"];
-					document.getElementById("RZPSTXT").innerHTML = language[0]["reset_zoom"];
-					document.getElementById("SBVSTXT").innerHTML = language[0]["scrollBar_visible"];
-					document.getElementById("marginlvl").innerHTML = language[0]["margin"];
-					document.getElementById("rotlvl").innerHTML = language[0]["rotation"];
-					document.getElementById("zlvll").innerHTML = language[0]["zoomlvl"];
-					document.getElementById("sstxt").innerHTML = language[0]["slideshow_interval"];
-					document.getElementById("lsps").innerHTML = language[0]["page_slider"];
-					document.getElementById("colorpicker_txt_id").innerHTML =
+					document.getElementById("MMTXT").innerText = language[0]["manga_mode"];
+					document.getElementById("SSTXT").innerText = language[0]["Slideshow"];
+					document.getElementById("NBARTXT").innerText = language[0]["nobar"];
+					document.getElementById("SSBTXT").innerText = language[0]["sideBar"];
+					document.getElementById("PCTXT").innerText = language[0]["PageCount"];
+					document.getElementById("VIVTXT").innerText = language[0]["vertical_reader"];
+					document.getElementById("WTMTXT").innerText = language[0]["Webtoon_Mode"];
+					document.getElementById("RZPSTXT").innerText = language[0]["reset_zoom"];
+					document.getElementById("SBVSTXT").innerText = language[0]["scrollBar_visible"];
+					document.getElementById("marginlvl").innerText = language[0]["margin"];
+					document.getElementById("rotlvl").innerText = language[0]["rotation"];
+					document.getElementById("zlvll").innerText = language[0]["zoomlvl"];
+					document.getElementById("sstxt").innerText = language[0]["slideshow_interval"];
+					document.getElementById("lsps").innerText = language[0]["page_slider"];
+					document.getElementById("colorpicker_txt_id").innerText =
 						language[0]["color_picker"];
-					document.getElementById("close_id_books").innerHTML = language[0]["close"];
+					document.getElementById("close_id_books").innerText = language[0]["close"];
 					new bootstrap.Tooltip(document.getElementById("id_rotateright"), {
 						title: language[0]["rotate_right"],
 						placement: "bottom"
@@ -360,7 +360,7 @@ function GetTheName(CommonName = "") {
 function Toastifycation(message, BGColor = "#333", FrontColor = "#ffffff") {
 	let x = document.getElementById("snackbar");
 	x.className = "show";
-	x.innerHTML = message;
+	x.innerText = message;
 	x.style.backgroundColor = BGColor;
 	x.style.color = FrontColor;
 	setTimeout(function () {
@@ -874,14 +874,14 @@ function Reader(listOfImg, page) {
 						images[1];
 					document.getElementById("imgViewer_1").src =
 						images[0];
-					document.getElementById("currentpage").innerHTML =
+					document.getElementById("currentpage").innerText =
 						page + 2 + " / " + listOfImg.length;
 				} else {
 					document.getElementById("imgViewer_0").src =
 						images[0];
 					document.getElementById("imgViewer_1").src =
 						images[1];
-					document.getElementById("currentpage").innerHTML =
+					document.getElementById("currentpage").innerText =
 						page + 2 + " / " + listOfImg.length;
 				}
 				DPageActu = page + 1;
@@ -892,12 +892,12 @@ function Reader(listOfImg, page) {
 					if (page === 2) {
 						document.getElementById("imgViewer_0").src =
 							images[1];
-						document.getElementById("currentpage").innerHTML =
+						document.getElementById("currentpage").innerText =
 							page + 1 + " / " + listOfImg.length;
 					} else {
 						document.getElementById("imgViewer_0").src =
 							images[0];
-						document.getElementById("currentpage").innerHTML =
+						document.getElementById("currentpage").innerText =
 							page + 1 + " / " + listOfImg.length;
 					}
 					DPageActu = page + 1;
@@ -909,14 +909,14 @@ function Reader(listOfImg, page) {
 							images[1];
 						document.getElementById("imgViewer_1").src =
 							images[0];
-						document.getElementById("currentpage").innerHTML =
+						document.getElementById("currentpage").innerText =
 							page + 2 + " / " + listOfImg.length;
 					} else {
 						document.getElementById("imgViewer_0").src =
 							images[0];
 						document.getElementById("imgViewer_1").src =
 							images[1];
-						document.getElementById("currentpage").innerHTML =
+						document.getElementById("currentpage").innerText =
 							page + 2 + " / " + listOfImg.length;
 					}
 					DPageActu = page + 1;
@@ -925,7 +925,7 @@ function Reader(listOfImg, page) {
 				document.getElementById("imgViewer_0").style.display = "";
 				document.getElementById("imgViewer_1").style.display = "none";
 				document.getElementById("imgViewer_0").src = images[0];
-				document.getElementById("currentpage").innerHTML =
+				document.getElementById("currentpage").innerText =
 					page + 1 + " / " + listOfImg.length;
 				DPageActu = page + 1;
 			}
@@ -973,7 +973,7 @@ function Reader(listOfImg, page) {
 			FixHeight();
 		}
 	}
-	document.getElementById("inputonwhat").innerHTML = " / " + listOfImg.length;
+	document.getElementById("inputonwhat").innerText = " / " + listOfImg.length;
 	document.getElementById("input_text").value = page + 1;
 	try {
 		for (let i = 0; i < listOfImg.length; i++) {
@@ -1442,7 +1442,7 @@ function ToogleFav() {
 		console.log(res);
 		if (res === true) {
 			Toastifycation(language[0]["remove_fav"], "#00C33C");
-			document.getElementById("favoicon").innerHTML = "favorite_border";
+			document.getElementById("favoicon").innerText = "favorite_border";
 			ModifyDB(
 				"Books",
 				"favorite",
@@ -1451,7 +1451,7 @@ function ToogleFav() {
 			);
 		} else if (res === false) {
 			Toastifycation(language[0]["add_fav"], "#00C33C");
-			document.getElementById("favoicon").innerHTML = "favorite";
+			document.getElementById("favoicon").innerText = "favorite";
 			ModifyDB(
 				"Books",
 				"favorite",
@@ -1595,7 +1595,7 @@ let ZoomLVL = 20;
 function changeZoomLVL() {
 	let val = document.getElementById("zlvls").value;
 	ZoomLVL = parseInt(val);
-	document.getElementById("zlvll").innerHTML =
+	document.getElementById("zlvll").innerText =
 		language[0]["zoomlvl"] + " (" + ZoomLVL + "px):";
 	modifyConfigJson(CosmicComicsData + "/config.json", "ZoomLVL", ZoomLVL);
 }
@@ -1757,7 +1757,7 @@ function TBM() {
 					bookID,
 					"AND page=" + GetCurrentPage()
 				);
-				document.getElementById("BMI").innerHTML = "bookmark_border";
+				document.getElementById("BMI").innerText = "bookmark_border";
 			}
 		} else {
 			console.log("Bookmarks doesn't exist yet!");
@@ -1766,7 +1766,7 @@ function TBM() {
 				"(BOOK_ID,PATH,page)",
 				"('" + bookID + "','" + GetFilePath() + "','" + GetCurrentPage() + "')"
 			);
-			document.getElementById("BMI").innerHTML = "bookmark";
+			document.getElementById("BMI").innerText = "bookmark";
 		}
 	});
 }
@@ -1779,9 +1779,9 @@ function LoadBMI(pagec = 0) {
 			res = JSON.parse(res);
 			console.log(res);
 			if (res.length !== 0) {
-				document.getElementById("BMI").innerHTML = "bookmark";
+				document.getElementById("BMI").innerText = "bookmark";
 			} else {
-				document.getElementById("BMI").innerHTML = "bookmark_border";
+				document.getElementById("BMI").innerText = "bookmark_border";
 			}
 		});
 	} catch (error) {
@@ -1864,7 +1864,7 @@ function MarginSlider() {
 		for (let i = 0; i < VIV_Count; i++) {
 			document.getElementById("imgViewer_" + i).style.marginBottom =
 				document.getElementById("MarginValue").value;
-			document.getElementById("marginlvl").innerHTML =
+			document.getElementById("marginlvl").innerText =
 				language[0]["margin"] +
 				" (" +
 				document.getElementById("MarginValue").value +
@@ -1878,7 +1878,7 @@ function MarginSlider() {
 	} else {
 		document.getElementById("imgViewer_1").style.marginLeft =
 			document.getElementById("MarginValue").value;
-		document.getElementById("marginlvl").innerHTML =
+		document.getElementById("marginlvl").innerText =
 			language[0]["margin"] +
 			" (" +
 			document.getElementById("MarginValue").value +
@@ -2094,7 +2094,7 @@ function AlwaysRotate() {
 			"rotate(" + AlwaysRotateV + "deg)";
 		document.getElementById("imgViewer_1").style.transform =
 			"rotate(" + AlwaysRotateV + "deg)";
-		document.getElementById("rotlvl").innerHTML =
+		document.getElementById("rotlvl").innerText =
 			language[0]["rotation"] + " (" + rotateval + " degrees):";
 	}
 	modifyConfigJson(
@@ -2132,7 +2132,7 @@ function TSS() {
 
 //Text of the Slide Show slider
 function ShowOnChangeSlideShow() {
-	document.getElementById("sstxt").innerHTML =
+	document.getElementById("sstxt").innerText =
 		language[0]["slideshow_interval"] +
 		" (" +
 		document.getElementById("SSValue").value +
@@ -2148,11 +2148,11 @@ function fullscreen() {
 	if (fsOn === true) {
 		fsOn = false;
 		document.exitFullscreen();
-		document.getElementById("fullscreen_i_id").innerHTML = "fullscreen";
+		document.getElementById("fullscreen_i_id").innerText = "fullscreen";
 	} else {
 		fsOn = true;
 		document.documentElement.requestFullscreen();
-		document.getElementById("fullscreen_i_id").innerHTML = "fullscreen_exit";
+		document.getElementById("fullscreen_i_id").innerText = "fullscreen_exit";
 	}
 }
 
@@ -2229,7 +2229,7 @@ function ConstructSideBar() {
 				img.src = URL.createObjectURL(await response.blob());
 			});
 			img.height = "120";
-			pel.innerHTML = index + 1;
+			pel.innerText = index + 1;
 			acontainer.appendChild(img);
 			acontainer.appendChild(pel);
 			divcontainer.id = "id_img_" + index;
@@ -2341,7 +2341,7 @@ function CreateAllVIV() {
 let observer = new IntersectionObserver(
 	function (entries) {
 		if (entries[0].isIntersecting === true)
-			document.getElementById("currentpage").innerHTML =
+			document.getElementById("currentpage").innerText =
 				parseInt(entries[0].target.id.split("div_imgViewer_")[1]) +
 				1 +
 				" / " +
@@ -2375,7 +2375,7 @@ let observer = new IntersectionObserver(
 //Can move direclty to a page by using a slider
 function pageslide() {
 	let pageto = document.getElementById("sps").value - 1;
-	document.getElementById("lsps").innerHTML =
+	document.getElementById("lsps").innerText =
 		language[0]["page_slider"] +
 		" (" +
 		document.getElementById("sps").value +
@@ -2575,7 +2575,7 @@ function loadParameters() {
 				}, intervalTime);
 			}
 		}
-		document.getElementById("sstxt").innerHTML =
+		document.getElementById("sstxt").innerText =
 			language[0]["slideshow_interval"] +
 			" (" +
 			configSST +
@@ -2587,12 +2587,12 @@ function loadParameters() {
 		if (VIV_On === true) {
 			for (let i = 0; i < VIV_Count; i++) {
 				document.getElementById("imgViewer_" + i).style.marginBottom = configM;
-				document.getElementById("marginlvl").innerHTML =
+				document.getElementById("marginlvl").innerText =
 					language[0]["margin"] + " (" + configM + " px):";
 			}
 		} else {
 			document.getElementById("imgViewer_1").style.marginLeft = configM;
-			document.getElementById("marginlvl").innerHTML =
+			document.getElementById("marginlvl").innerText =
 				language[0]["margin"] + " (" + configM + " px):";
 		}
 		if (configMM === true) {

@@ -581,7 +581,7 @@ function UpdateDB(type, column, value, token, table, where, whereEl) {
         let what = [];
         for (let i = 0; i < listOfColumns.length; i++) {
             if (listOfColumns[i] === "description") {
-                what.push(listOfColumns[i] + " = '" + listOfValues[i].toString().replaceAll("'", "''").replaceAll('"', '\"') + "'");
+                what.push(listOfColumns[i] + " = '" + listOfValues[i].toString().replaceAll("'", "''").replaceAll('"', '\\"') + "'");
             } else {
                 what.push(listOfColumns[i] + " = '" + listOfValues[i] + "'");
             }
