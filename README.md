@@ -2,7 +2,7 @@
 
 # Cosmic Comics 
 
-## Notice that CosmicComics is in active reconstruction, some features are not available yet or may not work. 
+## Notice that CosmicComics has been reconstructed, some features may have been deleted or are not yet available.
 
 [![cosmiccomics](https://snapcraft.io/cosmiccomics/badge.svg)](https://snapcraft.io/cosmiccomics)
 [![cosmiccomics](https://snapcraft.io/cosmiccomics/trending.svg?name=0)](https://snapcraft.io/cosmiccomics)
