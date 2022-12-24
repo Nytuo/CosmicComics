@@ -199,7 +199,8 @@ async function checkForDBUpdate(forwho) {
         }
         if (DBVersion <= 20001) {
         }
-        getDB(forwho).run("PRAGMA user_version = " + process.env.npm_package_version.split(".").join("") + ";");
+        var pjson = require('./package.json');
+        getDB(forwho).run("PRAGMA user_version = " + pjson.version.split(".").join("") + ";");
     })
 }
 
