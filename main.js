@@ -40,7 +40,7 @@ function createServer() {
 
 autoUpdater.checkForUpdatesAndNotify();
 let url = "https://github.com/Nytuo/CosmicComics";
-let branch = "develop";
+let branch = "master";
 let gitOptions = {
 	repo: url,
 	branch: branch,
