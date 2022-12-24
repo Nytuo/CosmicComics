@@ -16,6 +16,32 @@ const PdfExtractor = require("pdf-extractor").PdfExtractor;
 let CryptoJS = require("crypto-js");
 app.use("", express.static(__dirname + "/public"));
 app.use("/js", express.static(__dirname + "/js"));
+var RateLimit = require('express-rate-limit');
+var apiAnilistLimiter = RateLimit({
+    windowMs: 1*60*1000, // 1 minute
+    max: 90
+});
+var apiMarvelLimiter = RateLimit({
+    //for a day
+    windowMs: 1*60*1000*60*24,
+    max: 3000
+});
+var limiterDefault = RateLimit({
+    windowMs: 1*60*1000, // 1 minute
+    max: 100
+});
+var apiGoogleLimiter = RateLimit({
+    windowMs: 1*100*1000,
+    max: 100
+})
+var viewerLimiter = RateLimit({
+    windowMs: 1*60*1000,
+    max: 100
+})
+var accountLimiter = RateLimit({
+    windowMs: 1*60*1000*60, // 1 minute
+    max: 5,
+})
 const isPortable = fs.existsSync(path.join(__dirname, "portable.txt"));
 const isElectron = fs.existsSync(path.join(__dirname, 'portable.txt')) && fs.readFileSync(path.join(__dirname, "portable.txt"), "utf8") === "electron";
 const dotenv = require('dotenv');
@@ -220,13 +246,14 @@ function getDB(forwho) {
 app.use(cors());
 app.use(express.json({limit: "50mb"}));
 app.use(express.urlencoded({extended: true}));
+app.use(limiterDefault)
 let host, port;
 const server = app.listen(JSON.parse(fs.readFileSync(CosmicComicsTemp + "/serverconfig.json").toString()).port, "0.0.0.0", function () {
     host = this.address().address;
     port = this.address().port;
     console.log("Listening on port %s:%s!", host, port);
 });
-app.post("/downloadBook", function (req, res) {
+app.post("/downloadBook",limiterDefault, function (req, res) {
     if (fs.existsSync(CosmicComicsTemp + "/downloads") === false) {
         fs.mkdirSync(CosmicComicsTemp + "/downloads");
     }
@@ -246,7 +273,7 @@ app.post("/uploadComic", upload.single("ComicTemp"), function (req, res) {
     fs.renameSync(file.path, CosmicComicsTemp + "/uploads/" + file.originalname);
     res.sendStatus(200);
 })
-app.post("/createUser", function (req, res) {
+app.post("/createUser", limiterDefault,function (req, res) {
     const name = req.body.name;
     const passcode = req.body.password;
     fs.mkdirSync(CosmicComicsTemp + "/profiles/" + name, {recursive: true});
@@ -306,12 +333,12 @@ app.post("/createUser", function (req, res) {
 app.get("/null", function (req, res) {
     res.sendFile(__dirname + "/public/Images/fileDefault.webp");
 });
-app.post("/DL", function (req, res) {
+app.post("/DL", limiterDefault,function (req, res) {
     console.log(req.body);
     DLBOOKPATH = req.body.path;
     res.sendStatus(200);
 });
-app.get("/getDLBook", function (req, res) {
+app.get("/getDLBook",limiterDefault, function (req, res) {
     if (DLBOOKPATH === "") {
         res.sendStatus(404);
     } else if (fs.existsSync(DLBOOKPATH) && !fs.statSync(DLBOOKPATH).isDirectory()) {
@@ -332,32 +359,32 @@ app.get("/getDLBook", function (req, res) {
         res.sendStatus(404);
     }
 });
-app.get("/", function (req, res) {
+app.get("/",limiterDefault, function (req, res) {
     res.sendFile(__dirname + "/launchPage.html");
 });
-app.get("/index", function (req, res) {
+app.get("/index",limiterDefault, function (req, res) {
     res.sendFile(__dirname + "/index.html");
 });
-app.get("/css/base.css", (req, res) => {
+app.get("/css/base.css",limiterDefault, (req, res) => {
     res.sendFile(__dirname + "/css/base.css");
 });
-app.get("/css/bootstrap.css", (req, res) => {
+app.get("/css/bootstrap.css",limiterDefault, (req, res) => {
     res.sendFile(__dirname + "/css/bootstrap.css");
 });
-app.get("/modules/bootstrapJS", (req, res) => {
+app.get("/modules/bootstrapJS",limiterDefault, (req, res) => {
     res.sendFile(__dirname + "/node_modules/bootstrap/dist/js/bootstrap.bundle.js", {
         headers: {
             "Content-Type": "text/javascript"
         }
     });
 });
-app.get("/img/getColor/:img/:token", async (req, res) => {
+app.get("/img/getColor/:img/:token",limiterDefault, async (req, res) => {
     const token = resolveToken(req.params.token);
     var img = CosmicComicsTemp + "/profiles/" + token + "/current_book/" + req.params.img;
     const dominantColor = await getColor(img);
     res.send(dominantColor);
 });
-app.get("/img/getPalette/:token", async (req, res) => {
+app.get("/img/getPalette/:token",limiterDefault, async (req, res) => {
     const token = resolveToken(req.params.token);
     await getPalette(req.headers.img).then(function (palette) {
         let rgb = "rgb(" + palette[0][0] + "," + palette[0][1] + "," + palette[0][2] + ")";
@@ -368,34 +395,34 @@ app.get("/img/getPalette/:token", async (req, res) => {
         }
     });
 });
-app.get("/css/materialize.css", (req, res) => {
+app.get("/css/materialize.css",limiterDefault, (req, res) => {
     res.sendFile(__dirname + "/css/materialize.css");
 });
-app.get("/js/materialize.js", (req, res) => {
+app.get("/js/materialize.js",limiterDefault, (req, res) => {
     res.sendFile(__dirname + "/js/materialize.js");
 });
-app.get("/index.js", (req, res) => {
+app.get("/index.js",limiterDefault, (req, res) => {
     res.sendFile(__dirname + "/index.js");
 });
-app.get("/viewer.js", (req, res) => {
+app.get("/viewer.js", limiterDefault,(req, res) => {
     res.sendFile(__dirname + "/viewer.js");
 });
-app.get("/viewer.html", (req, res) => {
+app.get("/viewer.html", limiterDefault,(req, res) => {
     res.sendFile(__dirname + "/viewer.html");
 });
-app.get("/css/animate", (req, res) => {
+app.get("/css/animate",limiterDefault, (req, res) => {
     res.sendFile(__dirname + "/css/animate.css");
 });
-app.get("/js/html-magnifier.js", (req, res) => {
+app.get("/js/html-magnifier.js", limiterDefault,(req, res) => {
     res.sendFile(__dirname + "/js/html-magnifier.js");
 });
-app.get("/login", (req, res) => {
+app.get("/login", limiterDefault,(req, res) => {
     res.sendFile(__dirname + "/login.html");
 });
-app.get("/js/login", (req, res) => {
+app.get("/js/login",limiterDefault, (req, res) => {
     res.sendFile(__dirname + "/login.js");
 });
-app.get("/profile/DLBDD/:token", (req, res) => {
+app.get("/profile/DLBDD/:token", limiterDefault,(req, res) => {
     const token = resolveToken(req.params.token);
     res.download(CosmicComicsTemp + "/profiles/" + token + "/CosmicComics.db", (err) => {
         if (err) console.log(err);
@@ -403,7 +430,7 @@ app.get("/profile/DLBDD/:token", (req, res) => {
 });
 var currentBookPath = "";
 var SendToUnZip = "";
-app.get("/Unzip/:path/:token", (req, res) => {
+app.get("/Unzip/:path/:token", limiterDefault,(req, res) => {
     const token = req.params.token;
     var currentPath = replaceHTMLAdressPath(req.params.path);
     currentBookPath = currentPath.split("&page=")[1];
@@ -420,32 +447,32 @@ app.get("/Unzip/:path/:token", (req, res) => {
         }
     }, 1000);
 });
-app.get("/viewer/view/current/:token", (req, res) => {
+app.get("/viewer/view/current/:token",viewerLimiter, (req, res) => {
     res.send(GetListOfImg(CosmicComicsTemp + "/profiles/" + resolveToken(req.params.token) + "/current_book/"));
 });
-app.get("/viewer/view/", (req, res) => {
+app.get("/viewer/view/", viewerLimiter,(req, res) => {
     let param = replaceHTMLAdressPath(req.headers.path);
     let tosend = GetListOfImg(param);
     console.log(tosend);
     console.log(param);
     res.send(tosend);
 });
-app.get("/dirname", (req, res) => {
+app.get("/dirname",limiterDefault, (req, res) => {
     res.send(path2Data);
 });
-app.get("/CosmicDataLoc", (req, res) => {
+app.get("/CosmicDataLoc", limiterDefault,(req, res) => {
     res.send(CosmicComicsTemp);
 });
-app.get("/viewer/view/current/:page/:token", (req, res) => {
+app.get("/viewer/view/current/:page/:token",limiterDefault, (req, res) => {
     var page = req.params.page;
     var listOfImg = GetListOfImg(CosmicComicsTemp + "/profiles/" + resolveToken(req.params.token) + "/current_book/");
     res.send(CosmicComicsTemp + "/profiles/" + resolveToken(req.params.token) + "/current_book/" + listOfImg[page]);
 });
-app.get("/config/getConfig/:token", (req, res) => {
+app.get("/config/getConfig/:token",limiterDefault, (req, res) => {
     const token = resolveToken(req.params.token);
     res.send(fs.readFileSync(CosmicComicsTemp + "/profiles/" + token + "/config.json"));
 });
-app.get("/BM/getBM", (req, res) => {
+app.get("/BM/getBM",limiterDefault, (req, res) => {
     try {
         var result = [];
         const token = resolveToken(req.headers.token);
@@ -460,25 +487,25 @@ app.get("/BM/getBM", (req, res) => {
         console.log(e);
     }
 });
-app.get("/lang/:lang", (req, res) => {
+app.get("/lang/:lang", limiterDefault,(req, res) => {
     res.send(fs.readFileSync(__dirname + "/languages/" + req.params.lang + ".json"));
 });
-app.get("/view/isDir/:path", (req, res) => {
+app.get("/view/isDir/:path",viewerLimiter, (req, res) => {
     var isDir = fs.statSync(replaceHTMLAdressPath(req.params.path)).isDirectory();
     console.log(isDir);
     res.send(isDir);
 });
-app.get("/view/exist/:path", (req, res) => {
+app.get("/view/exist/:path",viewerLimiter, (req, res) => {
     var exist = fs.existsSync(replaceHTMLAdressPath(req.params.path));
     console.log(exist);
     res.send(exist);
 });
-app.get("/view/readFile/:path", (req, res) => {
+app.get("/view/readFile/:path",viewerLimiter, (req, res) => {
     var o = replaceHTMLAdressPath(req.params.path);
     var p = fs.readFileSync(o, "utf8");
     res.send(JSON.stringify(p));
 });
-app.get("/view/readImage", (req, res) => {
+app.get("/view/readImage",viewerLimiter, (req, res) => {
     if (req.headers.met == "DL") {
         res.sendFile(req.headers.path + "/" + req.headers.page);
     } else if (req.headers.met == "CLASSIC") {
@@ -486,23 +513,23 @@ app.get("/view/readImage", (req, res) => {
         res.sendFile(CosmicComicsTemp + "/profiles/" + token + "/current_book/" + req.headers.page);
     }
 });
-app.post('/config/writeConfig/:token', (req, res) => {
+app.post('/config/writeConfig/:token', limiterDefault,(req, res) => {
     console.log(req.body);
     const token = resolveToken(req.params.token);
     fs.writeFileSync(CosmicComicsTemp + "/profiles/" + token + "/config.json", JSON.stringify(req.body, null, 2));
     res.sendStatus(200);
 });
-app.post('/DB/write/:jsonFile', (req, res) => {
+app.post('/DB/write/:jsonFile', limiterDefault,(req, res) => {
     fs.writeFileSync(CosmicComicsTemp + "/" + req.params.jsonFile + ".json", JSON.stringify(req.body, null, 2));
     res.sendStatus(200);
 });
-app.get("/DB/read/:jsonFile", (req, res) => {
+app.get("/DB/read/:jsonFile", limiterDefault,(req, res) => {
     res.send(fs.readFileSync(CosmicComicsTemp + "/" + req.params.jsonFile + ".json"));
 });
-app.get("/themes/read/:jsonFile", (req, res) => {
+app.get("/themes/read/:jsonFile",limiterDefault, (req, res) => {
     res.send(fs.readFileSync(__dirname + "/themes/" + req.params.jsonFile));
 });
-app.get("/DB/update/:token/:dbName/:colName/:value/:id", (req, res) => {
+app.get("/DB/update/:token/:dbName/:colName/:value/:id",limiterDefault, (req, res) => {
     try {
         getDB(resolveToken(req.params.token)).run("UPDATE " + req.params.dbName + " SET " + req.params.colName + " = " + req.params.value + " WHERE ID_book='" + req.params.id + "';");
     } catch (e) {
@@ -510,7 +537,7 @@ app.get("/DB/update/:token/:dbName/:colName/:value/:id", (req, res) => {
     }
     res.sendStatus(200);
 });
-app.post("/DB/update/OneForAll", (req, res) => {
+app.post("/DB/update/OneForAll", limiterDefault,(req, res) => {
     let token = resolveToken(req.body.token);
     let W1 = req.body.W1;
     let W2 = req.body.W2;
@@ -574,11 +601,11 @@ function UpdateDB(type, column, value, token, table, where, whereEl) {
     }
 }
 
-app.post("/DB/update/", (req, res) => {
+app.post("/DB/update/", limiterDefault,(req, res) => {
     UpdateDB(req.body.type, req.body.column, req.body.value, req.body.token, req.body.table, req.body.where, req.body.whereEl);
     res.sendStatus(200);
 });
-app.post("/DB/lib/update/:token/:id", (req, res) => {
+app.post("/DB/lib/update/:token/:id",limiterDefault, (req, res) => {
     console.log(req.body);
     const name = req.body.name;
     const path = req.body.path;
@@ -606,7 +633,7 @@ function insertIntoDB(into, val, tokenu, dbName) {
     }
 }
 
-app.post("/DB/insert/:token/:dbName", (req, res) => {
+app.post("/DB/insert/:token/:dbName",limiterDefault, (req, res) => {
     try {
         const dbinfo = req.body.into;
         const values = req.body.val;
@@ -618,7 +645,7 @@ app.post("/DB/insert/:token/:dbName", (req, res) => {
     }
     res.sendStatus(200);
 });
-app.get("/DB/delete/:token/:dbName/:id/:option", (req, res) => {
+app.get("/DB/delete/:token/:dbName/:id/:option", limiterDefault,(req, res) => {
     try {
         const token = resolveToken(req.params.token);
         getDB(token).run("DELETE FROM " + req.params.dbName + " WHERE BOOK_ID='" + req.params.id + "' " + req.params.option + ";");
@@ -627,7 +654,7 @@ app.get("/DB/delete/:token/:dbName/:id/:option", (req, res) => {
     }
     res.sendStatus(200);
 });
-app.get("/DB/truedelete/:token/:dbName/:id", (req, res) => {
+app.get("/DB/truedelete/:token/:dbName/:id",limiterDefault, (req, res) => {
     try {
         const token = resolveToken(req.params.token);
         getDB(token).run("DELETE FROM " + req.params.dbName + " WHERE ID_book='" + req.params.id + "';");
@@ -636,7 +663,7 @@ app.get("/DB/truedelete/:token/:dbName/:id", (req, res) => {
     }
     res.sendStatus(200);
 });
-app.get("/DB/lib/delete/:token/:id", (req, res) => {
+app.get("/DB/lib/delete/:token/:id", limiterDefault,(req, res) => {
     try {
         const token = resolveToken(req.params.token);
         getDB(token).run("DELETE FROM Libraries WHERE ID_LIBRARY=" + req.params.id + ";");
@@ -645,7 +672,7 @@ app.get("/DB/lib/delete/:token/:id", (req, res) => {
     }
     res.sendStatus(200);
 });
-app.post("/DB/get/:token/:dbName", (req, res) => {
+app.post("/DB/get/:token/:dbName", limiterDefault,(req, res) => {
     try {
         var result = [];
         const token = resolveToken(req.params.token);
@@ -661,10 +688,10 @@ app.post("/DB/get/:token/:dbName", (req, res) => {
         console.log(e);
     }
 });
-app.get("/getVersion", (req, res) => {
+app.get("/getVersion",limiterDefault, (req, res) => {
     res.send(process.env.npm_package_version);
 });
-app.get("/getListOfFolder/:path", (req, res) => {
+app.get("/getListOfFolder/:path",limiterDefault, (req, res) => {
     var dir = req.params.path;
     dir = replaceHTMLAdressPath(dir);
     var listOfFolder = [];
@@ -680,7 +707,7 @@ app.get("/getListOfFolder/:path", (req, res) => {
     }
     res.send(listOfFolder);
 });
-app.get("/profile/discover", (req, res) => {
+app.get("/profile/discover", limiterDefault,(req, res) => {
     let result = [];
     try {
         fs.readdirSync(CosmicComicsTemp + "/profiles").forEach(function (file) {
@@ -720,7 +747,7 @@ setInterval(() => {
         fs.rmSync(__dirname + "/public/TODL", {recursive: true, force: true});
     }
 }, 2 * 60 * 60 * 1000);
-app.get("/profile/login/:name/:passcode", (req, res) => {
+app.get("/profile/login/:name/:passcode", accountLimiter,(req, res) => {
     if (fs.existsSync(CosmicComicsTemp + "/profiles/" + req.params.name + "/passcode.txt")) {
         var passcode = fs.readFileSync(CosmicComicsTemp + "/profiles/" + req.params.name + "/passcode.txt", "utf8");
         if (passcode == req.params.passcode) {
@@ -739,7 +766,7 @@ app.get("/profile/login/:name/:passcode", (req, res) => {
         res.send(false);
     }
 });
-app.get("/profile/logcheck/:token", (req, res) => {
+app.get("/profile/logcheck/:token", limiterDefault,(req, res) => {
     var configFile = fs.readFileSync(CosmicComicsTemp + "/serverconfig.json", "utf8");
     var config = JSON.parse(configFile);
     for (var i in config) {
@@ -752,7 +779,7 @@ app.get("/profile/logcheck/:token", (req, res) => {
     }
     res.send(false);
 });
-app.post("/profile/logout/:token", (req, res) => {
+app.post("/profile/logout/:token", limiterDefault,(req, res) => {
     var configFile = fs.readFileSync(CosmicComicsTemp + "/serverconfig.json", "utf8");
     var config = JSON.parse(configFile);
     for (var i in config) {
@@ -767,7 +794,7 @@ app.post("/profile/logout/:token", (req, res) => {
     }
     res.sendStatus(402);
 });
-app.get("/getListOfFilesAndFolders/:path", (req, res) => {
+app.get("/getListOfFilesAndFolders/:path",limiterDefault, (req, res) => {
     var dir = req.params.path;
     dir = replaceHTMLAdressPath(dir);
     var result = [];
@@ -1114,7 +1141,7 @@ async function GETMARVELAPI_Creators(id, type) {
  * @param {string} id - The id of the comic
  * @return {string} The list of comics
  */
-app.post("/refreshMeta", async function (req, res) {
+app.post("/refreshMeta", limiterDefault,async function (req, res) {
     let id = req.body.id;
     let type = req.body.type;
     let provider = req.body.provider;
@@ -1271,14 +1298,14 @@ async function GETMARVELAPI_Comics_ByID(id) {
     return data;
 }
 
-app.get("/api/marvel/getComics/:name/:date", async function (req, res) {
+app.get("/api/marvel/getComics/:name/:date", apiMarvelLimiter, async function (req, res) {
     let name = decodeURIComponent(req.params.name);
     let date = decodeURIComponent(req.params.date);
     GETMARVELAPI_Comics(req.params.name, req.params.date).then(function (data) {
         res.send(data);
     })
 })
-app.get("/insert/marvel/book/", async function (req, res) {
+app.get("/insert/marvel/book/",apiMarvelLimiter, async function (req, res) {
     let token = req.headers.token;
     let realname = req.headers.name;
     let date = req.headers.datea;
@@ -1309,7 +1336,7 @@ app.get("/insert/marvel/book/", async function (req, res) {
         }
     })
 })
-app.get("/insert/ol/book/", async function (req, res) {
+app.get("/insert/ol/book/",limiterDefault, async function (req, res) {
     let token = req.headers.token;
     let realname = req.headers.name;
     let path = req.headers.path;
@@ -1343,7 +1370,7 @@ app.get("/insert/ol/book/", async function (req, res) {
         }
     })
 })
-app.get("/insert/googlebooks/book/", async function (req, res) {
+app.get("/insert/googlebooks/book/",apiGoogleLimiter, async function (req, res) {
     let token = req.headers.token;
     let realname = req.headers.name;
     let path = req.headers.path;
@@ -1365,7 +1392,7 @@ app.get("/insert/googlebooks/book/", async function (req, res) {
         }
     })
 })
-app.post("/insert/anilist/book", async function (req, res) {
+app.post("/insert/anilist/book", apiAnilistLimiter, function (req, res) {
     let token = req.body.token;
     let path = req.body.path;
     let realname = req.body.realname;
@@ -1497,12 +1524,12 @@ async function GETMARVELAPI_Series_ByID(id) {
     return data;
 }
 
-app.get("/api/marvel/searchonly/:name/", async (req, res) => {
+app.get("/api/marvel/searchonly/:name/",apiMarvelLimiter, async (req, res) => {
     GETMARVELAPI_SEARCH(req.params.name).then(function (data) {
         res.send(data);
     })
 })
-app.get("/api/marvel/searchonly/:name/:date", async (req, res) => {
+app.get("/api/marvel/searchonly/:name/:date",apiMarvelLimiter, async (req, res) => {
     GETMARVELAPI_SEARCH(req.params.name, req.params.date).then(function (data) {
         res.send(data);
     })
@@ -1526,7 +1553,7 @@ async function GETMARVELAPI_SEARCH(name = "", date = "") {
     return await response.json();
 }
 
-app.post("/api/marvel", (req, res) => {
+app.post("/api/marvel",apiMarvelLimiter, (req, res) => {
     let token = req.body.token;
     let name = req.body.name;
     let path = req.body.path;
@@ -1579,7 +1606,7 @@ app.post("/api/marvel", (req, res) => {
         console.log(err);
     })
 })
-app.post("/api/anilist", async (req, res) => {
+app.post("/api/anilist", apiAnilistLimiter, async(req, res) => {
     let name = req.headers.name;
     let token = req.headers.token;
     let path = req.headers.path;
@@ -1632,14 +1659,14 @@ app.post("/api/anilist", async (req, res) => {
     res.sendStatus(200)
 });
 
-app.get("/api/anilist/searchOnly/:name", (req, res) => {
+app.get("/api/anilist/searchOnly/:name",apiAnilistLimiter, (req, res) => {
     let name = req.params.name;
     API_ANILIST_GET_SEARCH(name).then(async function (dataa) {
         res.send(dataa);
     })
 });
 
-app.get("/getThemes", (req, res) => {
+app.get("/getThemes", limiterDefault,(req, res) => {
     var oi = fs.readdirSync(__dirname + "/public/themes");
     let result = [];
     oi.forEach((el) => {
@@ -2058,7 +2085,7 @@ async function changePermissionForFilesInFolder(folderPath) {
     });
 }
 
-app.post("/fillBlankImage", (req, res) => {
+app.post("/fillBlankImage",limiterDefault, (req, res) => {
     let token = req.body.token;
     fillBlankImages(token);
     res.sendStatus(200);
@@ -2111,7 +2138,7 @@ process.on('SIGINT', () => {
         process.exit(0);
     });
 });
-app.post("/configServ/:name/:passcode/:port", (req, res) => {
+app.post("/configServ/:name/:passcode/:port",limiterDefault, (req, res) => {
     console.log("creating user");
     const name = req.params.name;
     const passcode = req.params.passcode;
@@ -2165,14 +2192,14 @@ app.post("/configServ/:name/:passcode/:port", (req, res) => {
     console.log("User created");
     res.sendStatus(200);
 });
-app.get("/profile/getPP/:token", (req, res) => {
+app.get("/profile/getPP/:token",accountLimiter, (req, res) => {
     const token = resolveToken(req.params.token);
     res.sendFile(CosmicComicsTemp + "/profiles/" + token + "/pp.png");
 });
-app.get("/profile/getPPBN/:name", (req, res) => {
+app.get("/profile/getPPBN/:name",accountLimiter, (req, res) => {
     res.sendFile(CosmicComicsTemp + "/profiles/" + req.params.name + "/pp.png");
 });
-app.get("/profile/custo/getNumber", (req, res) => {
+app.get("/profile/custo/getNumber", accountLimiter,(req, res) => {
     res.send({"length": fs.readdirSync(__dirname + "/public/Images/account_default").length});
 });
 /*app.get("/api/marvel", (req, res) => {
@@ -2182,7 +2209,7 @@ app.get("/profile/custo/getNumber", (req, res) => {
 	})
 })*/
 //Modifications of the profile
-app.post("/profile/modification", (req, res) => {
+app.post("/profile/modification", accountLimiter,(req, res) => {
     const token = resolveToken(req.body.token);
     console.log(req.body.npp);
     if (req.body.npass != null) {
@@ -2198,7 +2225,7 @@ app.post("/profile/modification", (req, res) => {
     res.sendStatus(200);
 });
 //Deleting an account
-app.post("/profile/deleteAccount", (req, res) => {
+app.post("/profile/deleteAccount",accountLimiter, (req, res) => {
     const token = resolveToken(req.body.token);
     getDB(token).close();
     openedDB.delete(token);
