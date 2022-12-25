@@ -1146,6 +1146,10 @@ app.post("/refreshMeta", limiterDefault,async function (req, res) {
     let type = req.body.type;
     let provider = req.body.provider;
     let token = req.body.token;
+    console.log(id);
+    console.log(type);
+    console.log(provider);
+
     if (provider === 1) {
         if (type === "book") {
             getDB(resolveToken(token)).all("SELECT * FROM Books WHERE ID_book=" + id + ";", async function (err, resD) {
@@ -1286,6 +1290,115 @@ app.post("/refreshMeta", limiterDefault,async function (req, res) {
                 });
             })
         }
+    }else if (provider === 3) {
+        getDB(resolveToken(token)).all("SELECT * FROM Books WHERE API_ID='" + id + "';", async function (err, resD) {
+            let result = [];
+            if (err) return console.log("Error getting element", err);
+            resD.forEach((row) => {
+                result.push(row);
+            });
+            let book = result[0];
+            await GETOLAPI_Comics_ByID(id).then(async (res2) => {
+                let firstChild = Object.keys(res2)[0];
+                res2 = res2[firstChild];
+                console.log(res2)
+                let blacklisted = ["note", "read", "reading", "unread", "favorite", "last_page", "folder", "PATH", "lock", "ID_book","API_ID"]
+                let asso = {}
+                for (let i = 0; i < book.length; i++) {
+                    for (let key in book[i]) {
+                        if (!blacklisted.includes(key)) {
+                            asso[key] = book[i][key];
+                        }
+                    }
+                }
+                asso["NOM"] = res2.details.title;
+                asso["URLCover"] = res2.thumbnail_url.replace("-S","-L");
+                asso["issueNumber"] = "null";
+                asso["description"] = res2.details.description !== undefined ? res2.details.description.replaceAll("'", "''") : "null";
+                asso["format"] = res2.details.physical_format
+                asso["pageCount"] = JSON.stringify(res2.details.number_of_pages);
+                asso["URLs"] = JSON.stringify(res2.details.info_url);
+                asso["dates"] = JSON.stringify(res2.details.publish_date);
+                asso["prices"] = "null";
+                asso["creators"] = JSON.stringify(res2.details.authors);
+                asso["characters"] = "null";
+                asso["series"] = "null";
+                asso["collectedIssues"] = "null";
+                asso["variants"] = "null";
+                asso["collections"] = "null";
+                let columns = [];
+                let values = [];
+                for (let key in asso) {
+                    columns.push(key);
+                    values.push(asso[key]);
+                }
+                console.log(columns, values)
+                UpdateDB("edit", columns, values, token, "Books", "PATH", book.PATH);
+            });
+        })
+    }else if (provider === 4) {
+        getDB(resolveToken(token)).all("SELECT * FROM Books WHERE API_ID=" + id + ";", async function (err, resD) {
+            let result = [];
+            if (err) return console.log("Error getting element", err);
+            resD.forEach((row) => {
+                result.push(row);
+            });
+            let book = result[0];
+            await GETGBAPI_Comics_ByID(id).then(async (res2) => {
+                res2 = res2[0];
+                let blacklisted = ["note", "read", "reading", "unread", "favorite", "last_page", "folder", "PATH", "lock", "ID_book"]
+                let asso = {}
+                for (let i = 0; i < book.length; i++) {
+                    for (let key in book[i]) {
+                        if (!blacklisted.includes(key)) {
+                            asso[key] = book[i][key];
+                        }
+                    }
+                }
+                let price;
+                if (res2["saleInfo"]["retailPrice"] !== undefined) {
+                    price = res2["saleInfo"]["retailPrice"]["amount"]
+                } else {
+                    price = null;
+                }
+                let cover;
+                if (res2["volumeInfo"]["imageLinks"] !== undefined) {
+
+                    cover = res2["volumeInfo"]["imageLinks"]
+                    if (cover["large"] !== undefined) {
+                        cover = cover["large"]
+                    } else if (cover["thumbnail"] !== undefined) {
+                        cover = cover["thumbnail"]
+                    } else {
+                        cover = null
+                    }
+                } else {
+                    cover = null;
+                }
+                asso["NOM"] = res2.volumeInfo.title;
+                asso["URLCover"] = cover;
+                asso["issueNumber"] = "null";
+                asso["description"] = res2.volumeInfo.description.replaceAll("'", "''");
+                asso["format"] = res2.volumeInfo.printType;
+                asso["pageCount"] = res2.volumeInfo.pageCount;
+                asso["URLs"] = JSON.stringify(res2.volumeInfo.infoLink);
+                asso["dates"] = JSON.stringify(res2.volumeInfo.publishedDate);
+                asso["prices"] = JSON.stringify(res2.price);
+                asso["creators"] = JSON.stringify(res2.volumeInfo.authors);
+                asso["characters"] = "null";
+                asso["series"] = "null";
+                asso["collectedIssues"] = "null";
+                asso["variants"] = "null";
+                asso["collections"] = "null";
+                let columns = [];
+                let values = [];
+                for (let key in asso) {
+                    columns.push(key);
+                    values.push(asso[key]);
+                }
+                UpdateDB("edit", columns, values, token, "Books", "PATH", book.PATH);
+            });
+        })
     }
     res.sendStatus(200);
 })
@@ -1298,10 +1411,39 @@ async function GETMARVELAPI_Comics_ByID(id) {
     return data;
 }
 
+async function GETOLAPI_Comics_ByID(id) {
+    let url = "https://openlibrary.org/api/books?bibkeys=OLID:" + id.replace("_3","") + "&jscmd=details&format=json";
+    console.log(url)
+    let response = await fetch(url);
+    let data = await response.json();
+    console.log(data);
+    return data;
+}
+
+async function GETGBAPI_Comics_ByID(id) {
+    let url = "https://www.googleapis.com/books/v1/volumes/" + id;
+    let response = await fetch(url);
+    let data = await response.json();
+    console.log(data);
+    return data;
+}
+
 app.get("/api/marvel/getComics/:name/:date", apiMarvelLimiter, async function (req, res) {
     let name = decodeURIComponent(req.params.name);
     let date = decodeURIComponent(req.params.date);
     GETMARVELAPI_Comics(req.params.name, req.params.date).then(function (data) {
+        res.send(data);
+    })
+})
+app.get("/api/ol/getComics/:name", limiterDefault, async function (req, res) {
+    let name = decodeURIComponent(req.params.name);
+    GETOLAPI_search(name).then(function (data) {
+        res.send(data);
+    })
+})
+app.get("/api/googlebooks/getComics/:name", apiGoogleLimiter, async function (req, res) {
+    let name = decodeURIComponent(req.params.name);
+    GETGOOGLEAPI_book(name).then(function (data) {
         res.send(data);
     })
 })

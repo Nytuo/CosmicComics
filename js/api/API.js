@@ -52,7 +52,7 @@ class API {
                     "token": currentProfile.getToken,
                     "table": "Books",
                     "type": "noedit",
-                    "column": "ID_book",
+                    "column": "API_ID",
                     "whereEl": old_id,
                     "value": `'${new_id}'`,
                     "where": "ID_book"
@@ -62,7 +62,7 @@ class API {
         await this.refreshMeta(new_id, provider, type);
     }
 
-    /**
+    /**API_ID
      * Launch the metadata refresh
      * @param {*} id The ID in the DB of the element to refresh
      * @param {int} provider The provider of the element to refresh

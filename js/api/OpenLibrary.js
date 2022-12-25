@@ -18,4 +18,16 @@ class OpenLibrary {
             console.log(error);
         });
     }
+
+    async GetComics(name = "") {
+        name = encodeURIComponent(name);
+        return fetch("http://" + domain + ":" + port + "/api/ol/getComics/" + name).then(function (response) {
+            return response.text();
+        }).then(function (data) {
+            data = JSON.parse(data);
+            return data;
+        }).catch(function (error) {
+            console.log(error);
+        });
+    }
 }

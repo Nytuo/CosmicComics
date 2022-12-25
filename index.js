@@ -163,7 +163,7 @@ async function getResponse() {
 fetch("http://" + domain + ":" + port + "/getVersion").then(function (response) {
     return response.text();
 }).then(function (data) {
-    document.getElementById("version").innerHTML = "Version : " + data;
+    document.getElementById("version").innerText = "Version : " + data;
 }).catch(function (error) {
     console.log(error);
 });
@@ -262,12 +262,12 @@ function getCookie(cName) {
  * @param elElement The element to modify
  */
 function modifyLib(elElement) {
-    document.getElementById("id_lib").innerHTML = "Modify a library";
+    document.getElementById("id_lib").innerText = "Modify a library";
     document.getElementById("namelocation").value = elElement["NAME"];
     document.getElementById("locationa").value = elElement["PATH"];
     document.getElementById("opt" + elElement["API_ID"]).setAttribute("selected", "true");
     document.getElementById("opt" + elElement["API_ID"]).selected = true;
-    document.getElementById("sendlib").innerHTML = "Modify library";
+    document.getElementById("sendlib").innerText = "Modify library";
     document.getElementById("sendlib").onclick = function () {
         return updateLibrary({'form': [document.getElementById('namelocation'), document.getElementById('locationa'), document.getElementById('providerID')]}, elElement["ID_LIBRARY"]);
     };
@@ -280,26 +280,26 @@ let defaultBG = document.documentElement.style.getPropertyValue('--background');
  */
 function resetOverlay() {
     document.documentElement.style.overflow = "auto";
-    document.getElementById("ColTitle").innerHTML = "";
-    document.getElementById("startDate").innerHTML = "";
-    document.getElementById("Status").innerHTML = "";
-    document.getElementById("price").innerHTML = "";
-    document.getElementById("genres").innerHTML = "";
-    document.getElementById("chapters").innerHTML = "";
-    document.getElementById("id").innerHTML = "";
-    document.getElementById("characters").innerHTML = "";
-    document.getElementById("colissue").innerHTML = "";
-    document.getElementById("col").innerHTML = "";
-    document.getElementById("Volumes").innerHTML = "";
-    document.getElementById("Trending").innerHTML = "";
-    document.getElementById("Staff").innerHTML = "";
-    document.getElementById("SiteURL").innerHTML = "";
-    document.getElementById("OtherTitles").innerHTML = "";
-    document.getElementById("relations").innerHTML = "";
-    document.getElementById("provider_text").innerHTML = "";
-    document.getElementById("description").innerHTML = "";
+    document.getElementById("ColTitle").innerText = "";
+    document.getElementById("startDate").innerText = "";
+    document.getElementById("Status").innerText = "";
+    document.getElementById("price").innerText = "";
+    document.getElementById("genres").innerText = "";
+    document.getElementById("chapters").innerText = "";
+    document.getElementById("id").innerText = "";
+    document.getElementById("characters").innerText = "";
+    document.getElementById("colissue").innerText = "";
+    document.getElementById("col").innerText = "";
+    document.getElementById("Volumes").innerText = "";
+    document.getElementById("Trending").innerText = "";
+    document.getElementById("Staff").innerText = "";
+    document.getElementById("SiteURL").innerText = "";
+    document.getElementById("OtherTitles").innerText = "";
+    document.getElementById("relations").innerText = "";
+    document.getElementById("provider_text").innerText = "";
+    document.getElementById("description").innerText = "";
     document.getElementById("ImgColCover").src = "null";
-    document.getElementById("readstat").innerHTML = "";
+    document.getElementById("readstat").innerText = "";
     document.documentElement.style.setProperty('--background', defaultBG);
     for (let childrenKey in document.querySelector("#btnsActions").children) {
         document.querySelector("#btnsActions").children[childrenKey].outerHTML = document.querySelector("#btnsActions").children[childrenKey].outerHTML;
@@ -319,7 +319,7 @@ function resetOverlay() {
  * Reset the lib modal to default (adding a library)
  */
 function resetLibModal() {
-    document.getElementById("id_lib").innerHTML = "Adding a library";
+    document.getElementById("id_lib").innerText = "Adding a library";
     document.getElementById("namelocation").removeAttribute('value');
     document.getElementById("locationa").removeAttribute("value");
     document.getElementById("namelocation").value = "";
@@ -349,14 +349,14 @@ function addToBreadCrumb(title, ListenerF) {
     let newElement = document.createElement("li");
     newElement.addEventListener('click', (e) => {
         removeBreadCrumb(breadCrumb, newElement);
-        document.getElementById("ContainerExplorer").innerHTML = "";
+        document.getElementById("ContainerExplorer").innerText = "";
         document.getElementById("overlay").style.display = "none";
         document.getElementById("overlay2").style.display = "none";
         document.getElementById("contentViewer").style.display = "none";
         resetOverlay();
         ListenerF();
     });
-    newElement.innerHTML = title;
+    newElement.innerText = title;
     newElement.setAttribute("class", "breadcrumb-item");
     newElement.setAttribute("aria-current", "page");
     breadCrumb.appendChild(newElement);
@@ -388,7 +388,7 @@ async function discoverLibraries() {
             el.classList.remove("selectLib");
         });
         btn.classList.add("selectLib");
-        document.getElementById("ContainerExplorer").innerHTML = "";
+        document.getElementById("ContainerExplorer").innerText = "";
         document.getElementById("overlay").style.display = "none";
         document.getElementById("overlay2").style.display = "none";
         document.getElementById("contentViewer").style.display = "none";
@@ -399,7 +399,7 @@ async function discoverLibraries() {
     });
     const logo = document.createElement("i");
     logo.className = "material-icons";
-    logo.innerHTML = "download_file";
+    logo.innerText = "download_file";
     logo.style.color = "white";
     logo.style.lineHeight = "1";
     logo.style.float = "left";
@@ -408,7 +408,7 @@ async function discoverLibraries() {
     logo.style.lineHeight = "1";
     btn.appendChild(logo);
     let naming = document.createElement("span");
-    naming.innerHTML = "Downloads";
+    naming.innerText = "Downloads";
     btn.appendChild(naming);
     btn.className = "btn btns libbtn";
     div.style.display = "flex";
@@ -425,7 +425,7 @@ async function discoverLibraries() {
             el.classList.remove("selectLib");
         });
         btn2.classList.add("selectLib");
-        document.getElementById("ContainerExplorer").innerHTML = "";
+        document.getElementById("ContainerExplorer").innerText = "";
         document.getElementById("overlay").style.display = "none";
         document.getElementById("overlay2").style.display = "none";
         document.getElementById("contentViewer").style.display = "none";
@@ -436,7 +436,7 @@ async function discoverLibraries() {
     });
     const logo2 = document.createElement("i");
     logo2.className = "material-icons";
-    logo2.innerHTML = "library_books";
+    logo2.innerText = "library_books";
     logo2.style.color = "white";
     logo2.style.lineHeight = "1";
     logo2.style.float = "left";
@@ -445,7 +445,7 @@ async function discoverLibraries() {
     logo2.style.lineHeight = "1";
     btn2.appendChild(logo2);
     let naming2 = document.createElement("span");
-    naming2.innerHTML = "ALL";
+    naming2.innerText = "ALL";
     btn2.appendChild(naming2);
     btn2.className = "btn btns libbtn";
     div2.style.display = "flex";
@@ -462,7 +462,7 @@ async function discoverLibraries() {
             el.classList.remove("selectLib");
         });
         btn3.classList.add("selectLib");
-        document.getElementById("ContainerExplorer").innerHTML = "";
+        document.getElementById("ContainerExplorer").innerText = "";
         document.getElementById("overlay").style.display = "none";
         document.getElementById("overlay2").style.display = "none";
         document.getElementById("contentViewer").style.display = "none";
@@ -474,7 +474,7 @@ async function discoverLibraries() {
     });
     const logo3 = document.createElement("i");
     logo3.className = "material-icons";
-    logo3.innerHTML = "my_location";
+    logo3.innerText = "my_location";
     logo3.style.color = "white";
     logo3.style.lineHeight = "1";
     logo3.style.float = "left";
@@ -483,7 +483,7 @@ async function discoverLibraries() {
     logo3.style.lineHeight = "1";
     btn3.appendChild(logo3);
     let naming3 = document.createElement("span");
-    naming3.innerHTML = "TRACKER";
+    naming3.innerText = "TRACKER";
     btn3.appendChild(naming3);
     btn3.className = "btn btns libbtn";
     div3.style.display = "flex";
@@ -507,7 +507,7 @@ async function discoverLibraries() {
                     el.classList.remove("selectLib");
                 });
                 btn.classList.add("selectLib");
-                document.getElementById("ContainerExplorer").innerHTML = "";
+                document.getElementById("ContainerExplorer").innerText = "";
                 document.getElementById("overlay").style.display = "none";
                 document.getElementById("overlay2").style.display = "none";
                 document.getElementById("contentViewer").style.display = "none";
@@ -535,7 +535,7 @@ async function discoverLibraries() {
             logo.className = "libLogo";
             btn.appendChild(logo);
             let naming = document.createElement("span");
-            naming.innerHTML = el["NAME"];
+            naming.innerText = el["NAME"];
             btn.appendChild(naming);
             btn.className = "btn btns libbtn";
             div.style.display = "flex";
@@ -547,11 +547,11 @@ async function discoverLibraries() {
             const li = document.createElement("li");
             const li2 = document.createElement("li");
             const li3 = document.createElement("li");
-            li.innerHTML = "Delete";
-            li2.innerHTML = "Modify";
+            li.innerText = "Delete";
+            li2.innerText = "Modify";
             li2.setAttribute("data-bs-toggle", "modal");
             li2.setAttribute("data-bs-target", "#lib");
-            li3.innerHTML = "Refresh metadata";
+            li3.innerText = "Refresh metadata";
             li.addEventListener("click", function () {
                 deleteLib(el);
             });
@@ -891,7 +891,7 @@ function loadView(FolderRes, libraryPath, date = "", provider = providerEnum.MAN
             let name = path.replaceAll(libraryPath.replaceAll("\\", "/"), "")
             let realname = /[^\\\/]+(?=\.[\w]+$)|[^\\\/]+$/.exec(name)[0];
             let readBookNB = await getFromDB("Books", "COUNT(*) FROM Books WHERE READ = 1 AND PATH = '" + path + "'");
-            document.getElementById("readstat").innerHTML = JSON.parse(readBookNB)[0]["COUNT(*)"] + " / " + data.length + " volumes read";
+            document.getElementById("readstat").innerText = JSON.parse(readBookNB)[0]["COUNT(*)"] + " / " + data.length + " volumes read";
             await getFromDB("Books", "* FROM Books WHERE PATH = '" + path + "'").then(async (resa) => {
                 let bookList = JSON.parse(resa);
                let TheBook;
@@ -926,7 +926,7 @@ function loadView(FolderRes, libraryPath, date = "", provider = providerEnum.MAN
                                 TheBook = new Book(null,realname,null,null,null,null,null,null,0,0,1,0,0,0,path,null,null,null,null,null,null,null,null, null, false)
                             } else {
                                 let cdataD = cdata["details"]
-                                TheBook = new Book(cdata["bib_key"],realname,cdataD["thumbnail_url"],cdataD["description"],cdataD["authors"],null,cdataD["info_url"],null,0,0,1,0,0,0,path,null,cdataD["physical_format"],cdataD["number_of_pages"],null,null,cdata["publish_date"],null,null,null, false)
+                                TheBook = new Book(cdata["bib_key"],realname,cdata["thumbnail_url"],cdataD["description"],cdataD["authors"],null,cdataD["info_url"],null,0,0,1,0,0,0,path,null,cdataD["physical_format"],cdataD["number_of_pages"],null,null,cdata["publish_date"],null,null,null, false)
                             }
 
                         })
@@ -1131,7 +1131,7 @@ async function loadContent(provider, FolderRes, libraryPath) {
         console.log("DEBUG 5");
         if (n === 0) {
             Toastifycation(language["empty_notSupported"], "#ff0000");
-            document.getElementById("home").innerHTML = language["empty_notSupported2"] + ValidatedExtension + language["empty_notSupported3"];
+            document.getElementById("home").innerText = language["empty_notSupported2"] + ValidatedExtension + language["empty_notSupported3"];
             document.getElementById("home").style.display = "block";
             document.getElementById("home").style.fontSize = "24px";
         } else {
@@ -1176,7 +1176,7 @@ function LoadImages(numberOf) {
             document.getElementById("overlay2").style.display = "none";
             document.getElementById("overlay").style.display = "none";
             document.getElementById("ContainerExplorer").style.display = "flex";
-            document.getElementById("home").innerHTML = "This library is empty. If you think this is an error, please refresh the page and try again.";
+            document.getElementById("home").innerText = "This library is empty. If you think this is an error, please refresh the page and try again.";
             document.getElementById("home").style.display = "block";
             document.getElementById("home").style.fontSize = "24px";
         });
@@ -1229,7 +1229,7 @@ function listBM() {
         console.log(info);
         if (info.length === 0) {
             let iblock = document.createElement("i");
-            iblock.innerHTML = "block";
+            iblock.innerText = "block";
             iblock.className = "material-icons";
             if (currenttheme > 1) iblock.style.color = theme_FG;
             document.getElementById("bookmarkContainer").appendChild(iblock);
@@ -1246,7 +1246,7 @@ function listBM() {
                 });
                 btn.className = "btn pure-material-button-contained";
                 btn.style = "margin:5px";
-                btn.innerHTML = "See the page " + file["page"];
+                btn.innerText = "See the page " + file["page"];
                 let image = document.createElement("img");
                 image.src = res;
                 image.style = "width:100%;height:100%;";
@@ -1281,7 +1281,7 @@ function Toastifycation(message, BGColor = "#333", FrontColor = "#ffffff") {
     document.querySelector(".snack_rectangle").style.bottom = "15vh";
     document.querySelector(".snack_rectangle").style.right = "-99vw";
     document.querySelector(".snack_container").style.zIndex = "10";
-    x.innerHTML = message;
+    x.innerText = message;
     document.querySelector(".snack_rectangle").style.backgroundColor = BGColor;
     x.style.color = FrontColor;
     setTimeout(function () {
@@ -1327,7 +1327,7 @@ fetch('http://' + domain + ":" + port + "/getThemes").then((response) => {
     for (let i = 0; i < res.length; i += 2) {
         let opt = document.createElement("option");
         opt.value = res[i];
-        opt.innerHTML = res[i + 1];
+        opt.innerText = res[i + 1];
         document.getElementById("themeselector").appendChild(opt);
     }
 }).catch(function (error) {
@@ -1434,7 +1434,7 @@ function HomeRoutine() {
         if (TheBookun.length === 0) {
             const element = document.getElementById("recentlyAdded");
             let node = document.createElement("p");
-            node.innerHTML = "Nothing to display here !";
+            node.innerText = "Nothing to display here !";
             element.appendChild(node);
         }
     });
@@ -1501,7 +1501,7 @@ function returnToHome() {
         el.classList.remove("selectLib");
     });
     e.classList.add("selectLib");
-    document.getElementById("ContainerExplorer").innerHTML = "";
+    document.getElementById("ContainerExplorer").innerText = "";
     document.getElementById("overlay").style.display = "none";
     document.getElementById("overlay2").style.display = "none";
     document.getElementById("contentViewer").style.display = "none";
@@ -1537,7 +1537,7 @@ async function AllBooks(filters = "") {
                 document.getElementById("overlay2").style.display = "none";
                 document.getElementById("overlay").style.display = "none";
                 document.getElementById("ContainerExplorer").style.display = "flex";
-                document.getElementById("home").innerHTML = "This library is empty. If you think this is an error, please refresh the page and try again.";
+                document.getElementById("home").innerText = "This library is empty. If you think this is an error, please refresh the page and try again.";
                 document.getElementById("home").style.display = "block";
                 document.getElementById("home").style.fontSize = "24px";
             });
@@ -1592,31 +1592,31 @@ async function setSearch(res) {
         let series = document.createElement("span");
         let isBook = res[key].NOM !== undefined;
         if (isBook) {
-            text.innerHTML = res[key].NOM;
+            text.innerText = res[key].NOM;
             try {
-                series.innerHTML = JSON.parse(res[key].series).name;
+                series.innerText = JSON.parse(res[key].series).name;
             } catch (e) {
                 try {
-                    series.innerHTML = res[key].series.split("_")[2].replaceAll("$", " ");
+                    series.innerText = res[key].series.split("_")[2].replaceAll("$", " ");
                 } catch (e) {
                     if (res[key].series != null && res[key].series !== "null") {
-                        series.innerHTML = res[key].series;
+                        series.innerText = res[key].series;
                     } else {
-                        series.innerHTML = "No series linked";
+                        series.innerText = "No series linked";
                     }
                 }
             }
             img.src = res[key].URLCover;
         } else {
-            text.innerHTML = JSON.parse(res[key].title);
+            text.innerText = JSON.parse(res[key].title);
             if (typeof JSON.parse(res[key].title) == "object") {
                 try {
-                    text.innerHTML = JSON.parse(res[key].title).english;
+                    text.innerText = JSON.parse(res[key].title).english;
                 } catch (e) {
                     try {
-                        text.innerHTML = JSON.parse(res[key].title).romaji;
+                        text.innerText = JSON.parse(res[key].title).romaji;
                     } catch (e) {
-                        text.innerHTML = JSON.parse(res[key].title).native;
+                        text.innerText = JSON.parse(res[key].title).native;
                     }
                 }
             }
@@ -1635,7 +1635,7 @@ async function setSearch(res) {
         resItem.appendChild(img);
         resItem.appendChild(text);
         let separator = document.createElement("span")
-        separator.innerHTML = " in "
+        separator.innerText = " in "
         if (series.innerHTML !== "") resItem.appendChild(separator)
         resItem.appendChild(series);
         resItem.addEventListener("click", async (e) => {
@@ -1816,15 +1816,15 @@ async function createSeries(provider, path, libraryPath, res) {
     document.getElementById("lockCheck").checked = res[0].lock;
     document.getElementById('refresh').onclick = async () => {
         if (!isLocked()) {
-            await refreshMeta(res[0].ID_Series, provider, "series");
+            await new API().refreshMeta(res[0].ID_Series, provider, "series");
         } else {
             Toastifycation("This series is locked", "#ff0000");
         }
     }
     if (!APINOTFOUND) {
-        document.getElementById("provider_text").innerHTML = ((provider === providerEnum.Marvel) ? ("Data provided by Marvel. © 2014 Marvel") : ((provider === providerEnum.Anilist) ? ("Data provided by Anilist.") : ((provider === providerEnum.MANUAL) ? ("The Data are not provided by an API.") : ((provider === providerEnum.OL) ? ("Data provided by OpenLibrary.") : ((provider === providerEnum.GBooks) ? ("Data provided by Google Books.") : "")))));
+        document.getElementById("provider_text").innerText = ((provider === providerEnum.Marvel) ? ("Data provided by Marvel. © 2014 Marvel") : ((provider === providerEnum.Anilist) ? ("Data provided by Anilist.") : ((provider === providerEnum.MANUAL) ? ("The Data are not provided by an API.") : ((provider === providerEnum.OL) ? ("Data provided by OpenLibrary.") : ((provider === providerEnum.GBooks) ? ("Data provided by Google Books.") : "")))));
     } else {
-        document.getElementById("provider_text").innerHTML = "The data are not from the API";
+        document.getElementById("provider_text").innerText = "The data are not from the API";
     }
     for (let i = 1; i <= 5; i++) {
         document.getElementById("rating-" + i).onclick = function () {
@@ -1883,14 +1883,14 @@ async function createSeries(provider, path, libraryPath, res) {
         document.getElementById("ColTitle").innerHTML = "<a target='_blank' href='" + ((provider === providerEnum.Marvel) ? (JSON.parse(res[0].SOURCE).url) : (res[0].SOURCE)) + "' style='color:white'>" + ((provider === providerEnum.Marvel) ? (JSON.parse(res[0].title)) : (JSON.parse(res[0].title).english + " / " + JSON.parse(res[0].title).romaji + " / " + JSON.parse(res[0].title).native)) + "<i style='font-size: 18px;top: -10px;position: relative' class='material-icons'>open_in_new</i></a>";
         document.getElementById("ImgColCover").src = ((provider === providerEnum.Marvel) ? (JSON.parse(res[0].cover).path + "/detail." + JSON.parse(res[0].cover).extension) : (res[0].cover));
         if (((provider === providerEnum.Marvel) ? (JSON.parse(res[0].start_date)) : (JSON.parse(res[0].start_date).year)) == null) {
-            document.getElementById("startDate").innerHTML = "?";
+            document.getElementById("startDate").innerText = "?";
         } else {
-            document.getElementById("startDate").innerHTML = ((provider === providerEnum.Marvel) ? (JSON.parse(res[0].start_date)) : (JSON.parse(res[0].start_date).year));
+            document.getElementById("startDate").innerText = ((provider === providerEnum.Marvel) ? (JSON.parse(res[0].start_date)) : (JSON.parse(res[0].start_date).year));
         }
         if (((provider === providerEnum.Marvel) ? (JSON.parse(res[0].end_date)) : (JSON.parse(res[0].end_date).year)) == null || JSON.parse(res[0].end_date) > new Date().getFullYear()) {
-            document.getElementById("startDate").innerHTML += " - ?";
+            document.getElementById("startDate").innerText += " - ?";
         } else {
-            document.getElementById("startDate").innerHTML += " - " + ((provider === providerEnum.Marvel) ? (JSON.parse(res[0].end_date)) : (JSON.parse(res[0].end_date).year));
+            document.getElementById("startDate").innerText += " - " + ((provider === providerEnum.Marvel) ? (JSON.parse(res[0].end_date)) : (JSON.parse(res[0].end_date).year));
         }
         let NameToFetchList = [];
         if (provider === providerEnum.Marvel) {
@@ -1926,7 +1926,7 @@ async function createSeries(provider, path, libraryPath, res) {
                         document.getElementById("moreinfo_img").src = JSON.parse(image).path + "/detail." + JSON.parse(image).extension;
                         document.getElementById("moreinfo_btn").href = JSON.parse(urlo)[0].url;
                         if (desc == null) {
-                            document.getElementById("moreinfo_txt").innerHTML = name;
+                            document.getElementById("moreinfo_txt").innerText = name;
                         } else {
                             document.getElementById("moreinfo_txt").innerHTML = name + "<br/>" + desc;
                         }
@@ -1934,7 +1934,7 @@ async function createSeries(provider, path, libraryPath, res) {
                         document.getElementById("moreinfo_img").src = image.replaceAll('"', "");
                         document.getElementById("moreinfo_btn").href = urlo;
                         if (desc == null) {
-                            document.getElementById("moreinfo_txt").innerHTML = name;
+                            document.getElementById("moreinfo_txt").innerText = name;
                         } else {
                             try {
                                 document.getElementById("moreinfo_txt").innerHTML = name + "<br/>" + JSON.parse(desc);
@@ -1944,7 +1944,7 @@ async function createSeries(provider, path, libraryPath, res) {
                         }
                     }
                     document.getElementById("moreinfo_btn").target = "_blank";
-                    document.getElementById("moreinfo_btn").innerHTML = "See more";
+                    document.getElementById("moreinfo_btn").innerText = "See more";
                 });
                 if (provider === providerEnum.Marvel) {
                     divs2.innerHTML += "<img src='" + JSON.parse(el.image).path + "/detail." + JSON.parse(el.image).extension + "' class='img-charac'/><br><span>" + el.name + "</span>";
@@ -1999,7 +1999,7 @@ async function createSeries(provider, path, libraryPath, res) {
                 const reltxt = document.createElement("div");
                 const relbody = document.createElement("div");
                 const relbio = document.createElement("p");
-                relbio.innerHTML = el.name;
+                relbio.innerText = el.name;
                 relbio.className = "card__bio";
                 relbio.style.textAlign = "center";
                 relbio.style.color = "white";
@@ -2015,7 +2015,7 @@ async function createSeries(provider, path, libraryPath, res) {
                         document.getElementById("moreinfo_img").src = JSON.parse(image).path + "/detail." + JSON.parse(image).extension;
                         document.getElementById("moreinfo_btn").href = JSON.parse(urlo)[0].url;
                         if (desc == null) {
-                            document.getElementById("moreinfo_txt").innerHTML = name;
+                            document.getElementById("moreinfo_txt").innerText = name;
                         } else {
                             document.getElementById("moreinfo_txt").innerHTML = name + "<br/>" + desc;
                         }
@@ -2023,7 +2023,7 @@ async function createSeries(provider, path, libraryPath, res) {
                         document.getElementById("moreinfo_img").src = image.replaceAll('"', "");
                         document.getElementById("moreinfo_btn").href = urlo;
                         if (desc == null) {
-                            document.getElementById("moreinfo_txt").innerHTML = name;
+                            document.getElementById("moreinfo_txt").innerText = name;
                         } else {
                             try {
                                 document.getElementById("moreinfo_txt").innerHTML = name + "<br/>" + JSON.parse(desc);
@@ -2033,7 +2033,7 @@ async function createSeries(provider, path, libraryPath, res) {
                         }
                     }
                     document.getElementById("moreinfo_btn").target = "_blank";
-                    document.getElementById("moreinfo_btn").innerHTML = "See more";
+                    document.getElementById("moreinfo_btn").innerText = "See more";
                 };
                 reltxt.className = "cardcusto";
                 reltxt.style.cursor = "pointer";
@@ -2084,7 +2084,7 @@ async function createSeries(provider, path, libraryPath, res) {
                         document.getElementById("moreinfo_img").src = JSON.parse(image).path + "/detail." + JSON.parse(image).extension;
                         document.getElementById("moreinfo_btn").href = JSON.parse(urlo)[0].url;
                         if (desc == null) {
-                            document.getElementById("moreinfo_txt").innerHTML = name;
+                            document.getElementById("moreinfo_txt").innerText = name;
                         } else {
                             document.getElementById("moreinfo_txt").innerHTML = name + "<br/>" + desc;
                         }
@@ -2092,7 +2092,7 @@ async function createSeries(provider, path, libraryPath, res) {
                         document.getElementById("moreinfo_img").src = image.replaceAll('"', "");
                         document.getElementById("moreinfo_btn").href = urlo;
                         if (desc == null) {
-                            document.getElementById("moreinfo_txt").innerHTML = name;
+                            document.getElementById("moreinfo_txt").innerText = name;
                         } else {
                             try {
                                 document.getElementById("moreinfo_txt").innerHTML = name + "<br/>" + JSON.parse(desc);
@@ -2102,7 +2102,7 @@ async function createSeries(provider, path, libraryPath, res) {
                         }
                     }
                     document.getElementById("moreinfo_btn").target = "_blank";
-                    document.getElementById("moreinfo_btn").innerHTML = "See more";
+                    document.getElementById("moreinfo_btn").innerText = "See more";
                 });
                 for (let j = 0; j < clres.length; j++) {
                     if (provider === providerEnum.Marvel) {
@@ -2147,18 +2147,18 @@ async function createSeries(provider, path, libraryPath, res) {
         document.getElementById("ColTitle").innerHTML = "<a target='_blank' href='" + res[0].SOURCE + "' style='color:white'>" + JSON.parse(res[0].title) + "<i style='font-size: 18px;top: -10px;position: relative' class='material-icons'>open_in_new</i></a>";
         document.getElementById("ImgColCover").src = res[0].cover;
         if (JSON.parse(res[0].start_date) == null) {
-            document.getElementById("startDate").innerHTML = "?";
+            document.getElementById("startDate").innerText = "?";
         } else {
-            document.getElementById("startDate").innerHTML = (JSON.parse(res[0].start_date));
+            document.getElementById("startDate").innerText = (JSON.parse(res[0].start_date));
         }
         if (JSON.parse(res[0].end_date) == null || JSON.parse(res[0].end_date) > new Date().getFullYear()) {
-            document.getElementById("startDate").innerHTML += " - ?";
+            document.getElementById("startDate").innerText += " - ?";
         } else {
-            document.getElementById("startDate").innerHTML += " - " + (JSON.parse(res[0].end_date));
+            document.getElementById("startDate").innerText += " - " + (JSON.parse(res[0].end_date));
         }
     }
     if (res[0]["chapters"] != null) {
-        document.getElementById("chapters").innerHTML = ((provider === providerEnum.Marvel) ? ("Number of Comics in this series : ") : ("Number of chapter in this series : ")) + res[0]["chapters"];
+        document.getElementById("chapters").innerText = ((provider === providerEnum.Marvel) ? ("Number of Comics in this series : ") : ("Number of chapter in this series : ")) + res[0]["chapters"];
     }
     document.getElementById("contentViewer").style.display = "block";
     animateCSS(document.getElementById("onContentViewer"), "fadeIn").then((message) => {
@@ -2249,46 +2249,46 @@ async function createSeries(provider, path, libraryPath, res) {
             loadView(path, libraryPath, JSON.parse(res[0].start_date), provider);
             document.getElementById("id").innerText = "This series ID from Marvel : " + parseInt(res[0].ID_Series);
             if (res[0].description != null && res[0].description !== "null") {
-                document.getElementById("description").innerHTML = res[0].description;
+                document.getElementById("description").innerText = res[0].description;
             } else {
-                document.getElementById("description").innerHTML = "";
+                document.getElementById("description").innerText = "";
             }
             document.getElementById("averageProgress").style.display = "none";
             if (JSON.parse(res[0].end_date) > new Date().getFullYear()) {
-                document.getElementById("Status").innerHTML = "RELEASING";
+                document.getElementById("Status").innerText = "RELEASING";
                 document.getElementById("Status").className = "releasing";
             } else if (JSON.parse(res[0].end_date) < new Date().getFullYear()) {
-                document.getElementById("Status").innerHTML = "FINISHED";
+                document.getElementById("Status").innerText = "FINISHED";
                 document.getElementById("Status").className = "released";
             } else if (JSON.parse(res[0].start_date) > new Date().getFullYear()) {
-                document.getElementById("Status").innerHTML = "NOT YET RELEASED";
+                document.getElementById("Status").innerText = "NOT YET RELEASED";
                 document.getElementById("Status").className = "NotYet";
             } else if (JSON.parse(res[0].start_date) === new Date().getFullYear()) {
-                document.getElementById("Status").innerHTML = "END SOON";
+                document.getElementById("Status").innerText = "END SOON";
                 document.getElementById("Status").className = "releasing";
             } else {
-                document.getElementById("Status").innerHTML = "UNKNOWN";
+                document.getElementById("Status").innerText = "UNKNOWN";
                 document.getElementById("Status").className = "NotYet";
             }
         } else if (provider === providerEnum.Anilist || provider === providerEnum.MANUAL || provider === providerEnum.OL || provider === providerEnum.GBooks) {
             loadView(path, libraryPath, "", provider);
-            document.getElementById("description").innerHTML = res[0].description;
-            document.getElementById("genres").innerHTML = "Genres " + ":";
+            document.getElementById("description").innerText = res[0].description;
+            document.getElementById("genres").innerText = "Genres " + ":";
             JSON.parse(res[0].genres).forEach((el, index) => {
                 if (index !== JSON.parse(res[0].genres).length - 1) {
-                    document.getElementById("genres").innerHTML += " " + el + ", ";
+                    document.getElementById("genres").innerText += " " + el + ", ";
                 } else {
-                    document.getElementById("genres").innerHTML += " " + el;
+                    document.getElementById("genres").innerText += " " + el;
                 }
             });
-            document.getElementById("Trending").innerHTML = "Trending : " + res[0]["TRENDING"];
-            document.getElementById("Volumes").innerHTML = "Number of Volumes : " + res[0]["volumes"];
-            document.getElementById("averageScore").innerHTML = res[0]["Score"];
+            document.getElementById("Trending").innerText = "Trending : " + res[0]["TRENDING"];
+            document.getElementById("Volumes").innerText = "Number of Volumes : " + res[0]["volumes"];
+            document.getElementById("averageScore").innerText = res[0]["Score"];
             document.querySelectorAll(".circle-small .progress.one").forEach((el) => {
                 el.style.strokeDashoffset = Math.abs(100 - res[0]["Score"]);
             });
             document.documentElement.style.setProperty('--averageScore', Math.abs(100 - res[0]["Score"]));
-            document.getElementById("Status").innerHTML = res[0]["statut"];
+            document.getElementById("Status").innerText = res[0]["statut"];
             if (res[0]["statut"] === "RELEASING") {
                 document.getElementById("Status").className = "releasing";
             } else if (res[0]["statut"] === "FINISHED") {
@@ -2301,59 +2301,59 @@ async function createSeries(provider, path, libraryPath, res) {
         if (provider === providerEnum.Marvel) {
             loadView(path, libraryPath, JSON.parse(res[0].start_date), provider);
             if (res[0].description != null && res[0].description !== "null") {
-                document.getElementById("description").innerHTML = res[0].description;
+                document.getElementById("description").innerText = res[0].description;
             } else {
-                document.getElementById("description").innerHTML = "";
+                document.getElementById("description").innerText = "";
             }
             document.getElementById("averageProgress").style.display = "none";
             if (JSON.parse(res[0].end_date) == null && JSON.parse(res[0].start_date) == null) {
-                document.getElementById("Status").innerHTML = "UNKNOWN";
+                document.getElementById("Status").innerText = "UNKNOWN";
                 document.getElementById("Status").className = "NotYet";
             } else {
                 if (JSON.parse(res[0].end_date) > new Date().getFullYear()) {
-                    document.getElementById("Status").innerHTML = "RELEASING";
+                    document.getElementById("Status").innerText = "RELEASING";
                     document.getElementById("Status").className = "releasing";
                 } else if (JSON.parse(res[0].end_date) < new Date().getFullYear()) {
-                    document.getElementById("Status").innerHTML = "FINISHED";
+                    document.getElementById("Status").innerText = "FINISHED";
                     document.getElementById("Status").className = "released";
                 } else if (JSON.parse(res[0].start_date) > new Date().getFullYear()) {
-                    document.getElementById("Status").innerHTML = "NOT YET RELEASED";
+                    document.getElementById("Status").innerText = "NOT YET RELEASED";
                     document.getElementById("Status").className = "NotYet";
                 } else if (JSON.parse(res[0].start_date) === new Date().getFullYear()) {
-                    document.getElementById("Status").innerHTML = "END SOON";
+                    document.getElementById("Status").innerText = "END SOON";
                     document.getElementById("Status").className = "releasing";
                 } else {
-                    document.getElementById("Status").innerHTML = "UNKNOWN";
+                    document.getElementById("Status").innerText = "UNKNOWN";
                     document.getElementById("Status").className = "NotYet";
                 }
             }
         } else if (provider === providerEnum.Anilist || provider === providerEnum.MANUAL || provider === providerEnum.OL || provider === providerEnum.GBooks) {
             loadView(path, libraryPath, "", provider);
-            document.getElementById("description").innerHTML = res[0].description;
+            document.getElementById("description").innerText = res[0].description;
             if (res[0]["TRENDING"] != null && res[0]["TRENDING"] !== "null") {
-                document.getElementById("Trending").innerHTML = "Trending : " + res[0]["TRENDING"];
+                document.getElementById("Trending").innerText = "Trending : " + res[0]["TRENDING"];
             } else {
-                document.getElementById("Trending").innerHTML = "";
+                document.getElementById("Trending").innerText = "";
             }
             if (res[0]["volumes"] != null && res[0]["volumes"] !== "null") {
-                document.getElementById("Volumes").innerHTML = "Number of Volumes : " + res[0]["volumes"];
+                document.getElementById("Volumes").innerText = "Number of Volumes : " + res[0]["volumes"];
             } else {
-                document.getElementById("Volumes").innerHTML = "";
+                document.getElementById("Volumes").innerText = "";
             }
             if (res[0]["Score"] != null && res[0]["Score"] !== "null" && res[0]["Score"] !== 0) {
-                document.getElementById("averageScore").innerHTML = res[0]["Score"];
+                document.getElementById("averageScore").innerText = res[0]["Score"];
                 document.querySelectorAll(".circle-small .progress.one").forEach((el) => {
                     el.style.strokeDashoffset = Math.abs(100 - res[0]["Score"]);
                 });
                 document.documentElement.style.setProperty('--averageScore', Math.abs(100 - res[0]["Score"]));
             } else {
-                document.getElementById("averageScore").innerHTML = "";
+                document.getElementById("averageScore").innerText = "";
                 document.querySelectorAll(".circle-small .progress.one").forEach((el) => {
                     el.style.strokeDashoffset = Math.abs(100);
                 });
                 document.documentElement.style.setProperty('--averageScore', Math.abs(100));
             }
-            document.getElementById("Status").innerHTML = ((res[0]["statut"] == null) ? "UNKNOWN" : res[0]["statut"]);
+            document.getElementById("Status").innerText = ((res[0]["statut"] == null) ? "UNKNOWN" : res[0]["statut"]);
             if (res[0]["statut"] === "RELEASING") {
                 document.getElementById("Status").className = "releasing";
             } else if (res[0]["statut"] === "FINISHED") {
@@ -2366,7 +2366,7 @@ async function createSeries(provider, path, libraryPath, res) {
         }
     }
     if (res[0].favorite === 1) {
-        document.getElementById("Status").innerHTML += " (Favorite)";
+        document.getElementById("Status").innerText += " (Favorite)";
         document.getElementById("Status").classList.add("favorite");
     }
 }
@@ -2622,9 +2622,57 @@ async function createDetails(TheBook, provider) {
         } else if (provider === providerEnum.MANUAL) {
             alert("You can't rematch a manual entry")
         } else if (provider === providerEnum.OL) {
-            //TODO OL REMATCH BOOK
+            new OpenLibrary().GetComics(search.value).then((cdata) => {
+                if (cdata.hasOwnProperty("num_found")) {
+                    for (let i = 0; i < cdata["num_found"]; i++) {
+                        let cdataI = cdata["docs"][i];
+                        let l = new Card(null, null, null, cdataI["seed"][0], cdataI["cover_i"] !== undefined ? "https://covers.openlibrary.org/b/id/"+cdataI["cover_i"]+"-L.jpg":null, cdataI['title']).card;
+                        l.addEventListener("click", () => {
+                            new API().rematch(cdataI.seed[0].split("/")[2] + "_" + provider, provider, "book", TheBook.ID_book, false)
+                        })
+                        rematchResult.appendChild(l);
+                    }
+                }
+
+
+            })
         } else if (provider === providerEnum.GBooks) {
-            //TODO GBOOKS REMATCH BOOK
+            new GoogleBooks().GetComics(search.value).then((cdata) => {
+                console.log(cdata);
+                if (cdata === undefined) {
+                    throw new Error("no data");
+                }
+                if (cdata["totalItems"] > 0) {
+                    for (let i = 0; i < cdata["totalItems"]; i++) {
+                        let cdata = cdata["items"][i];
+                        let cover;
+                        if (cdata["volumeInfo"]["imageLinks"] !== undefined) {
+
+                            cover = cdata["volumeInfo"]["imageLinks"]
+                            if (cover["large"] !== undefined) {
+                                cover = cover["large"]
+                            } else if (cover["thumbnail"] !== undefined) {
+                                cover = cover["thumbnail"]
+                            } else {
+                                cover = null
+                            }
+                        } else {
+                            cover = null;
+                        }
+                        let price;
+                        if (cdata["saleInfo"]["retailPrice"] !== undefined) {
+                            price = cdata["saleInfo"]["retailPrice"]["amount"]
+                        } else {
+                            price = null;
+                        }
+                        let l = new Card(null, null, null, cdata["id"], cover, cdata['title']).card;
+                        l.addEventListener("click", () => {
+                            new API().rematch(cdata.id + "_" + provider, provider, "book", TheBook.ID_book, false)
+                        })
+                        rematchResult.appendChild(l);
+                    }
+                }
+            })
         } else {
         }
         //fetch API
@@ -2637,7 +2685,7 @@ async function createDetails(TheBook, provider) {
             Toastifycation("Provider is not compatible for this feature", "#ff0000")
         } else {
             if (!isLocked()) {
-                await refreshMeta(TheBook.ID_book, provider, "book");
+                await new API().refreshMeta(TheBook.ID_book, provider, "book");
             } else {
                 Toastifycation("This book is locked", "#ff0000");
             }
@@ -2675,7 +2723,7 @@ async function createDetails(TheBook, provider) {
     addToBreadCrumb(TheBook.NOM, () => {
         return createDetails(TheBook, provider);
     });
-    document.getElementById("provider_text").innerHTML = ((provider === providerEnum.Marvel) ? ("Data provided by Marvel. © 2014 Marvel") : ((provider === providerEnum.Anilist) ? ("Data provided by Anilist.") : ((provider === providerEnum.MANUAL) ? ("The Data are not provided by an API.") : ((provider === providerEnum.OL) ? ("Data provided by OpenLibrary.") : ((provider === providerEnum.GBooks) ? ("Data provided by Google Books.") : "")))));
+    document.getElementById("provider_text").innerText = ((provider === providerEnum.Marvel) ? ("Data provided by Marvel. © 2014 Marvel") : ((provider === providerEnum.Anilist) ? ("Data provided by Anilist.") : ((provider === providerEnum.MANUAL) ? ("The Data are not provided by an API.") : ((provider === providerEnum.OL) ? ("Data provided by OpenLibrary.") : ((provider === providerEnum.GBooks) ? ("Data provided by Google Books.") : "")))));
     document.getElementById("contentViewer").style.display = "block";
     document.getElementById("DLBOOK").addEventListener("click", function (e) {
         let path = TheBook.PATH;
@@ -2702,27 +2750,27 @@ async function createDetails(TheBook, provider) {
         document.getElementById("rating-" + TheBook.note).setAttribute("checked", "true");
     }
     document.getElementById("readingbtndetails").style.display = "inline";
-    document.getElementById("OtherTitles").innerHTML = "";
-    document.getElementById("relations").innerHTML = "";
+    document.getElementById("OtherTitles").innerText = "";
+    document.getElementById("relations").innerText = "";
     if (TheBook.characters !== "null" && providerEnum.Marvel) {
-        document.getElementById("id").innerHTML = "This is a " + TheBook.format + " of " + TheBook.pageCount + " pages. <br/> This is part of the '" + JSON.parse(TheBook.series).name + "' series.";
+        document.getElementById("id").innerText = "This is a " + TheBook.format + " of " + TheBook.pageCount + " pages. <br/> This is part of the '" + JSON.parse(TheBook.series).name + "' series.";
     } else {
         if (provider === providerEnum.Anilist) {
-            document.getElementById("id").innerHTML = "This is part of the '" + TheBook.series.split("_")[2].replaceAll("$", " ") + "' series.";
+            document.getElementById("id").innerText = "This is part of the '" + TheBook.series.split("_")[2].replaceAll("$", " ") + "' series.";
         } else if (provider === providerEnum.Marvel) {
-            document.getElementById("id").innerHTML = "This is part of the '" + JSON.parse(TheBook.series).name + "' series.";
+            document.getElementById("id").innerText = "This is part of the '" + JSON.parse(TheBook.series).name + "' series.";
         } else if (provider === providerEnum.MANUAL) {
-            document.getElementById("id").innerHTML = "This is part of the '" + TheBook.series + "' series.";
+            document.getElementById("id").innerText = "This is part of the '" + TheBook.series + "' series.";
         } else if (provider === providerEnum.OL) {
-            document.getElementById("id").innerHTML = "This is part of the '" + TheBook.series + "' series.";
+            document.getElementById("id").innerText = "This is part of the '" + TheBook.series + "' series.";
         } else if (provider === providerEnum.GBooks) {
-            document.getElementById("id").innerHTML = "This is a " + TheBook.format + " of " + TheBook.pageCount + " pages. <br/> This is part of the '" + TheBook.series + "' series.";
+            document.getElementById("id").innerText = "This is a " + TheBook.format + " of " + TheBook.pageCount + " pages. <br/> This is part of the '" + TheBook.series + "' series.";
 
         }
     }
 
     document.getElementById("averageProgress").style.display = "none";
-    document.getElementById("ContentView").innerHTML = "";
+    document.getElementById("ContentView").innerText = "";
     try {
         if (provider === providerEnum.Marvel) {
             document.getElementById("ColTitle").innerHTML = "<a target='_blank' href='" + ((TheBook.URLs == null) ? ("#") : (JSON.parse(TheBook.URLs)[0].url)) + "' style='color:white'>" + TheBook.NOM + "<i style='font-size: 18px;top: -10px;position: relative' class='material-icons'>open_in_new</i></a>";
@@ -2739,11 +2787,11 @@ async function createDetails(TheBook, provider) {
     } else {
         document.getElementById("ImgColCover").src = TheBook.URLCover;
     }
-    document.getElementById("Status").innerHTML = "";
+    document.getElementById("Status").innerText = "";
     if (TheBook.description != null && TheBook.description !== "null") {
-        document.getElementById("description").innerHTML = TheBook.description;
+        document.getElementById("description").innerText = TheBook.description;
     } else {
-        document.getElementById("description").innerHTML = "";
+        document.getElementById("description").innerText = "";
     }
     document.getElementById("checkbtn").addEventListener("click", function (e) {
         AllForOne("unread", "reading", "read", TheBook.ID_book);
@@ -2854,7 +2902,7 @@ async function createDetails(TheBook, provider) {
                         document.getElementById("moreinfo_img").src = JSON.parse(image).path + "/detail." + JSON.parse(image).extension;
                         document.getElementById("moreinfo_btn").href = JSON.parse(urlo)[0].url;
                         if (desc == null) {
-                            document.getElementById("moreinfo_txt").innerHTML = name;
+                            document.getElementById("moreinfo_txt").innerText = name;
                         } else {
                             document.getElementById("moreinfo_txt").innerHTML = name + "<br/>" + desc;
                         }
@@ -2862,7 +2910,7 @@ async function createDetails(TheBook, provider) {
                         document.getElementById("moreinfo_img").src = image.replaceAll('"', "");
                         document.getElementById("moreinfo_btn").href = urlo;
                         if (desc == null) {
-                            document.getElementById("moreinfo_txt").innerHTML = name;
+                            document.getElementById("moreinfo_txt").innerText = name;
                         } else {
                             try {
                                 document.getElementById("moreinfo_txt").innerHTML = name + "<br/>" + JSON.parse(desc);
@@ -2872,7 +2920,7 @@ async function createDetails(TheBook, provider) {
                         }
                     }
                     document.getElementById("moreinfo_btn").target = "_blank";
-                    document.getElementById("moreinfo_btn").innerHTML = "See more";
+                    document.getElementById("moreinfo_btn").innerText = "See more";
                 });
                 if (provider === providerEnum.Marvel) {
                     divs2.innerHTML = "<img alt='a character' src='" + JSON.parse(el.image).path + "/detail." + JSON.parse(el.image).extension + "' class='img-charac'/><br><span>" + el.name + "</span>";
@@ -2887,17 +2935,17 @@ async function createDetails(TheBook, provider) {
             });
         });
         if (TheBook.read === 1 || TheBook.read === "true") {
-            document.getElementById("Status").innerHTML = "READ";
+            document.getElementById("Status").innerText = "READ";
             document.getElementById("Status").className = "released";
         } else if (TheBook.unread === 1 || TheBook.unread === "true") {
-            document.getElementById("Status").innerHTML = "UNREAD";
+            document.getElementById("Status").innerText = "UNREAD";
             document.getElementById("Status").className = "NotYet";
         } else if (TheBook.reading === 1 || TheBook.reading === "true") {
-            document.getElementById("Status").innerHTML = "READING";
+            document.getElementById("Status").innerText = "READING";
             document.getElementById("Status").className = "releasing";
         }
         if (TheBook.favorite === 1) {
-            document.getElementById("Status").innerHTML += "(Favorite)";
+            document.getElementById("Status").innerText += "(Favorite)";
         }
         document.getElementById("readstat").innerHTML = "<input type=\"number\" step=\"1\" min=\"0\" id=\"readAddInput\">" + " / " + TheBook.pageCount + " pages read";
         document.getElementById("readAddInput").value = TheBook.last_page;
@@ -2943,7 +2991,7 @@ async function createDetails(TheBook, provider) {
         document.getElementById("characters").appendChild(container);
     }
     //Genres
-    if (TheBook.creators !== "null") {
+    if (TheBook.creators !== "null" && TheBook.creators !== null && TheBook.creators !== undefined && TheBook.creators !== "") {
         let tmpstaff = "Number of people : " + ((provider === providerEnum.Marvel) ? (JSON.parse(TheBook["creators"])["available"]) : ((TheBook["creators"] !== "null") ? (JSON.parse(TheBook["creators"]).length) : ("0"))) + "<br/>";
         let StaffToFetchList = [];
         if (provider === providerEnum.Marvel) {
@@ -2989,7 +3037,7 @@ async function createDetails(TheBook, provider) {
                             document.getElementById("moreinfo_img").src = JSON.parse(image).path + "/detail." + JSON.parse(image).extension;
                             document.getElementById("moreinfo_btn").href = JSON.parse(urlo)[0].url;
                             if (desc == null) {
-                                document.getElementById("moreinfo_txt").innerHTML = name;
+                                document.getElementById("moreinfo_txt").innerText = name;
                             } else {
                                 document.getElementById("moreinfo_txt").innerHTML = name + "<br/>" + desc;
                             }
@@ -2997,7 +3045,7 @@ async function createDetails(TheBook, provider) {
                             document.getElementById("moreinfo_img").src = image.replaceAll('"', "");
                             document.getElementById("moreinfo_btn").href = urlo;
                             if (desc == null) {
-                                document.getElementById("moreinfo_txt").innerHTML = name;
+                                document.getElementById("moreinfo_txt").innerText = name;
                             } else {
                                 try {
                                     document.getElementById("moreinfo_txt").innerHTML = name + "<br/>" + JSON.parse(desc);
@@ -3007,7 +3055,7 @@ async function createDetails(TheBook, provider) {
                             }
                         }
                         document.getElementById("moreinfo_btn").target = "_blank";
-                        document.getElementById("moreinfo_btn").innerHTML = "See more";
+                        document.getElementById("moreinfo_btn").innerText = "See more";
                     });
                     divs.appendChild(divs2);
                     divs2.style.marginTop = "10px";
@@ -3050,9 +3098,9 @@ async function createDetails(TheBook, provider) {
         }
     }
     if (TheBook.issueNumber !== "null" && TheBook.issueNumber !== "" && TheBook.issueNumber != null) {
-        document.getElementById("chapters").innerHTML = "Number of this volume within the series : " + TheBook.issueNumber;
+        document.getElementById("chapters").innerText = "Number of this volume within the series : " + TheBook.issueNumber;
     } else {
-        document.getElementById("chapters").innerHTML = "";
+        document.getElementById("chapters").innerText = "";
     }
     if (TheBook.prices !== "null" && TheBook.prices !== "" && TheBook.prices != null) {
         if (provider === providerEnum.Marvel) {
@@ -3190,7 +3238,7 @@ function createContextMenu(elements = [{}]) {
     for (let i = 0; i < elements.length; i++) {
         let el = elements[i];
         let liTemp = document.createElement("li")
-        liTemp.innerHTML = el.nom;
+        liTemp.innerText = el.nom;
         for (let elo in el.attribs) {
             liTemp.setAttribute(elo, el.attribs[elo]);
         }
@@ -3227,7 +3275,7 @@ function AccountMenu() {
                 },
                 "listeners": {
                     "click": function () {
-                        document.getElementById("id_modifAccount").innerHTML = "Create a new user";
+                        document.getElementById("id_modifAccount").innerText = "Create a new user";
                         document.getElementById("delaccount").style.display = "none";
                         document.getElementById("sendbdd").style.display = "none";
                         document.getElementById("sendaccount").onclick = async function () {
