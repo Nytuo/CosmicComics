@@ -28,7 +28,7 @@ var apiMarvelLimiter = RateLimit({
 });
 var limiterDefault = RateLimit({
     windowMs: 1*60*1000, // 1 minute
-    max: 100
+    max: 1000
 });
 var apiGoogleLimiter = RateLimit({
     windowMs: 1*100*1000,
@@ -40,7 +40,7 @@ var viewerLimiter = RateLimit({
 })
 var accountLimiter = RateLimit({
     windowMs: 1*60*1000*60, // 1 minute
-    max: 5,
+    max: 100,
 })
 const isPortable = fs.existsSync(path.join(__dirname, "portable.txt"));
 const isElectron = fs.existsSync(path.join(__dirname, 'portable.txt')) && fs.readFileSync(path.join(__dirname, "portable.txt"), "utf8") === "electron";
@@ -1421,8 +1421,7 @@ async function GETOLAPI_Comics_ByID(id) {
 }
 
 async function GETGBAPI_Comics_ByID(id) {
-    let url = "https://www.googleapis.com/books/v1/volumes/" + id;
-    let response = await fetch(url);
+    let response = await fetch("https://www.googleapis.com/books/v1/volumes/" + id.toString());
     let data = await response.json();
     console.log(data);
     return data;
