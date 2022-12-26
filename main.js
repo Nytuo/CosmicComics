@@ -17,8 +17,6 @@ if (!fs.existsSync(serverConfig)) {
 const serverConfigPort = JSON.parse(fs.readFileSync(serverConfig))["port"];
 
 
-require('@electron/remote/main').initialize();
-
 function createWindow() {
 	const win = new BrowserWindow({
 		width: 1280,
@@ -30,7 +28,6 @@ function createWindow() {
 		}
 	});
 	win.removeMenu();
-	require('@electron/remote/main').enable(win.webContents)
 	win.loadURL('http://localhost:' + serverConfigPort);
 }
 

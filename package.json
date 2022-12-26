@@ -16,6 +16,9 @@
       "!languages/dev.json",
       "!CosmicData${/*}"
     ],
+    "buildDependenciesFromSource":false,
+    "nodeGypRebuild":false,
+    "npmRebuild":false,
     "asar": false,
     "appId": "com.Nytuo.CosmicComics",
     "nsis": {
@@ -26,6 +29,10 @@
     },
     "snap": {
       "confinement": "strict"
+    },
+    "flatpak":{
+    "runtimeVersion":22.08,
+    "baseVersion":22.08
     },
     "publish": [
       {
@@ -68,7 +75,6 @@
           "target": "AppImage",
           "arch": [
             "x64",
-            "ia32",
             "arm64"
           ]
         },
@@ -76,7 +82,6 @@
           "target": "zip",
           "arch": [
             "x64",
-            "ia32",
             "arm64"
           ]
         },
@@ -84,7 +89,6 @@
           "target": "deb",
           "arch": [
             "x64",
-            "ia32",
             "arm64"
           ]
         },
@@ -92,7 +96,6 @@
           "target": "rpm",
           "arch": [
             "x64",
-            "ia32",
             "arm64"
           ]
         },
@@ -135,7 +138,6 @@
   },
   "dependencies": {
     "7zip-bin": "^5.1.1",
-    "@electron/remote": "^2.0.9",
     "@popperjs/core": "^2.9.2",
     "anilist-node": "^1.13.1",
     "bootstrap": "^5.0.2",
