@@ -46,7 +46,7 @@ let gitOptions = {
 }
 let git = require("simple-git")(gitOptions);
 app.whenReady().then(() => {
-
+try{
 	if (fs.existsSync(path.join(__dirname, '.git'))) {
 		updateAndLaunch();
 	} else {
@@ -61,6 +61,17 @@ app.whenReady().then(() => {
 
 
 	}
+}catch (e){
+	console.log("Update via Git not possible, this may be due to no write access or contained app such as AppX or Snap/flatpak");
+	createServer();
+						createWindow();
+						app.on('activate', () => {
+							if (BrowserWindow.getAllWindows().length === 0) {
+								createWindow();
+							}
+						});
+}
+	
 });
 
 function updateAndLaunch() {
