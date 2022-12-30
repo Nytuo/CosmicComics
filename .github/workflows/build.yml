@@ -1,0 +1,60 @@
+name: Build/release
+on:
+  push:
+    tags:
+      - "v*"
+  workflow_dispatch:
+jobs:
+  release_linux_win:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Check out Git repository
+        uses: actions/checkout@v2.2.0
+
+      - name: Install Node.js, NPM and Yarn
+        uses: actions/setup-node@v2.1.5
+        with:
+          node-version: 14
+      - name: Get Package Version
+        uses: nyaa8/package-version@v1
+        with:
+          path: 'package.json'
+          
+      - uses: actions/checkout@v2.2.0
+        with:
+          fetch-depth: 0
+      - name: Building the Project
+        working-directory: ./
+        run: |
+            sudo dpkg --add-architecture i386
+            sudo apt update
+            sudo apt install wine64
+            sudo apt install wine32
+            sudo apt install rpm
+            sudo apt install build-essential
+            yarn install
+            yarn dist
+            yarn electron-builder --win -p never
+        env:
+          PKGVER: v${{env.PACKAGE_VERSION}}
+      
+      - name: Publishing...
+        uses: "marvinpinto/action-automatic-releases@latest"
+        with:
+          repo_token: "${{ secrets.GITHUB_TOKEN }}"
+          prerelease: false
+          automatic_release_tag: ${{env.PKGVER}}
+          files: |
+            ${{github.workspace}}/dist/*.zip
+            ${{github.workspace}}/dist/*.snap
+            ${{github.workspace}}/dist/*.exe
+            ${{github.workspace}}/dist/*.blockmap
+            ${{github.workspace}}/dist/latest.yml
+            ${{github.workspace}}/dist/*.deb
+            ${{github.workspace}}/dist/*.AppImage
+            ${{github.workspace}}/dist/*.rpm
+            ${{github.workspace}}/dist/latest-linux.yml
+            ${{github.workspace}}/dist/latest-linux-arm64.yml
+        env:
+          PKGVER: v${{env.PACKAGE_VERSION}}
