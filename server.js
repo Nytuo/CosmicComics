@@ -39,13 +39,23 @@ var viewerLimiter = RateLimit({
     max: 100
 })
 var accountLimiter = RateLimit({
-    windowMs: 1*60*1000*60, // 1 minute
+    windowMs: 1*60*1000*60,
     max: 100,
 })
 const isPortable = fs.existsSync(path.join(__dirname, "portable.txt"));
 const isElectron = fs.existsSync(path.join(__dirname, 'portable.txt')) && fs.readFileSync(path.join(__dirname, "portable.txt"), "utf8") === "electron";
+let devMode = false;
+if (devMode) {
+    CosmicComicsTemp = path.join(__dirname, "CosmicData");
+}
+if (!fs.existsSync(CosmicComicsTemp+"/.env")){
+	let envTemplate = "MARVEL_PUBLIC_KEY=\nMARVEL_PRIVATE_KEY=\nGBOOKSAPIKEY=\n"
+    fs.writeFileSync(CosmicComicsTemp + "/.env", envTemplate, {encoding: 'utf8'});
+}
 const dotenv = require('dotenv');
-dotenv.config();
+dotenv.config({
+path: CosmicComicsTemp+"/.env"
+});
 let MarvelPublicKey = process.env.MARVEL_PUBLIC_KEY;
 let MarvelPrivateKey = process.env.MARVEL_PRIVATE_KEY;
 let path2Data;
@@ -65,6 +75,7 @@ if (isPortable) {
     }
 }
 let CosmicComicsTemp = path2Data;
+
 let sqlite3 = require("sqlite3");
 const anilist = require("anilist-node");
 const AniList = new anilist();
@@ -94,10 +105,7 @@ const ValidatedExtensionImage = [
     "tiff",
 ];
 let mangaMode = false;
-let devMode = true;
-if (devMode) {
-    CosmicComicsTemp = path.join(__dirname, "CosmicData");
-}
+
 //Creating the folders to the CosmicData's path
 fs.mkdirSync(CosmicComicsTemp, {recursive: true});
 //If the serverconfig.json doesn't exist, create it
