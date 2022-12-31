@@ -107,7 +107,7 @@
 <div id='stars'></div>
 <div id='stars2'></div>
 <div id='stars3'></div>
-<h1 style="margin-top:100px;margin-left:40vw">Who's reading ?</h1>
+<h1 style="margin-top:100px;margin-left:40vw" id="whosreading"></h1>
 <div id="login_discover"></div>
 <div
         class="modal"
@@ -119,7 +119,7 @@
     <div class="modal-dialog modal-dialog-centered">
         <div class="modal-content">
             <div class="modal-header">
-                <h5 class="modal-title" id="id_log">Login</h5>
+                <h5 class="modal-title" id="id_log"></h5>
                 <button
                         type="button"
                         class="btn-close btn-close-white"
@@ -131,7 +131,7 @@
                 <label>
                     <input type="password" id="ThePassToWord">
                 </label><br>
-                <button class="btn btn-primary" style="width: 100%;" id="loginInBtn">Log In</button>
+                <button class="btn btn-primary" style="width: 100%;" id="loginInBtn"></button>
             </div>
             <div class="modal-footer">
                 <button
@@ -140,7 +140,6 @@
                         data-bs-dismiss="modal"
                         id="close_nav"
                 >
-                    Close
                 </button>
             </div>
         </div>
@@ -148,18 +147,22 @@
 </div>
 <div id="createAccount" style="display: none;text-align: center">
 
-    <h1>First time configuration of the server</h1>
-    <p>Please create the first account to continue : </p>
-    <label for="TheUserName">Username : </label>
+    <h1 id="firstConfig">First time configuration of the server</h1>
+    <p id="createFirstAccount">Please create the first account to continue : </p>
+    <label id="theUserNameLabel" for="TheUserName">Username : </label>
     <input type="text" id="TheUserName"><br>
-    <label for="ThePassToWor">Password : </label>
+    <label for="ThePassToWor" id="ThePassToWorLabel">Password : </label>
     <input type="password" id="ThePassToWor"><br>
-    <label for="servName">Server Port (Choose wisely) : </label>
+    <label for="servName" id="servNameLabel">Server Port (Choose wisely) : </label>
     <input type="text" id="servName"><br>
-    <button class="btn btn-primary" onclick="servConfig(document.getElementById('TheUserName'),document.getElementById('ThePassToWor'),document.getElementById('servName'))">Create user</button>
+    <button class="btn btn-primary" id="createAccountBtn" onclick="servConfig(document.getElementById('TheUserName'),document.getElementById('ThePassToWor'),document.getElementById('servName'))">Create user</button>
 
 </div>
 </body>
+<script src="lang.js"></script>
+<script type="text/javascript" src="js/profile.js"></script>
+<script src="js/common.js"></script>
+<script type="text/javascript" src="js/language.js"></script>
 <script type="text/javascript" src="js/login"></script>
 <script type="text/javascript" src="/modules/bootstrapJS"></script>
 

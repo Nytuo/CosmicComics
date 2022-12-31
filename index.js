@@ -20,11 +20,7 @@ let imagelink = "null";
 let listOfImages = [];
 let name_of_the_current_book = "";
 let readonly = false;
-const url = document.createElement("a");
-url.setAttribute("href", window.location.href);
-let domain = url.hostname;
-let port = url.port;
-let currentProfile = new Profile(getCookie("selectedProfile"));
+
 let providerEnum = {
     "Marvel": 1,
     "Anilist": 2,
@@ -39,7 +35,7 @@ if (currentProfile.getToken == null) {
 } else {
     fetch("http://" + domain + ":" + port + "/profile/logcheck/" + currentProfile.getToken).then(function (response) {
         return response.text();
-    }).then(function (data) {
+    }).then(async function (data) {
         if (data === "false") {
             window.location.href = "login";
         } else {
@@ -71,7 +67,6 @@ if (currentProfile.getToken == null) {
             }).catch(function (error) {
                 console.log(error);
             });
-            getResponse();
         }
     }).catch(function (error) {
         console.log(error);
@@ -108,7 +103,113 @@ let tooltipTriggerList = [].slice.call(document.querySelectorAll('[data-bs-toggl
 let tooltipList = tooltipTriggerList.map(function (tooltipTriggerEl) {
     return new bootstrap.Tooltip(tooltipTriggerEl);
 });
-let language;
+new bootstrap.Tooltip(document.getElementById("search"), {
+    title: language["search"],
+    placement: "bottom"
+});
+new bootstrap.Tooltip(document.getElementById("menuid"), {
+    title: language["navigation"],
+    placement: "bottom"
+});new bootstrap.Tooltip(document.getElementById("id_accountSystem"), {
+    title: language["userAccount"],
+    placement: "bottom"
+});new bootstrap.Tooltip(document.getElementById("id_createLib"), {
+    title: language["addLib"],
+    placement: "bottom"
+});new bootstrap.Tooltip(document.getElementById("id_opnfile"), {
+    title: language["open_file"],
+    placement: "bottom"
+});new bootstrap.Tooltip(document.getElementById("id_addTrackedBook"), {
+    title: language["TRACKER"],
+    placement: "bottom"
+});new bootstrap.Tooltip(document.getElementById("id_bm"), {
+    title: language["Bookmark"],
+    placement: "bottom"
+});new bootstrap.Tooltip(document.getElementById("id_settings"), {
+    title: language["settings"],
+    placement: "bottom"
+});new bootstrap.Tooltip(document.getElementById("id_firstOfAll"), {
+    title: language["ExtractMissingImg"],
+    placement: "bottom"
+});new bootstrap.Tooltip(document.getElementById("id_tips-btn"), {
+    title: language["wiki"],
+    placement: "bottom"
+});new bootstrap.Tooltip(document.getElementById("id_info"), {
+    title: language["about"],
+    placement: "bottom"
+});new bootstrap.Tooltip(document.getElementById("id_openDL"), {
+    title: language["download"],
+    placement: "bottom"
+});
+
+document.getElementById("upload").innerText = language["upload"];
+document.getElementById("HOMELIB").innerText = language["HOME"];
+document.getElementById("close_libUpload").innerText = language["close"];
+document.getElementById("resetBtn").innerText = language["resetBtn"];
+document.getElementById("uploadBtn").innerText = language["uploadBtn"];
+document.getElementById("id_lib").innerText = language["addLib"];
+document.getElementById("nameOfLib").innerText = language["nameOfLib"];
+document.getElementById("locationOnServer").innerText = language["locationOnServer"];
+document.getElementById("opt0").innerText = language["selectAProvider"];
+document.getElementById("sendlib").innerText = language["addLib"];
+document.getElementById("close_lib").innerText = language["close"];
+document.getElementById("id_moreinfo").innerText = language["moreInfo"];
+document.getElementById("close_moreinfo").innerText = language["close"];
+document.getElementById("close_rematchModal").innerText = language["close"];
+document.getElementById("rematchTitle").innerText = language["rematchTitle"];
+document.getElementById("rematchSearch").placeholder = language["rematchSearch"];
+document.getElementById("rematchYearSearch").placeholder = language["rematchYearSearch"];
+document.getElementById("searchField").placeholder = language["searchInLibrary"];
+document.getElementById("rematchSearchSender").innerText = language["rematchSearchSender"];
+document.getElementById("APISelectorTitle").innerText = language["APISelectorTitle"];
+document.getElementById("Ropt0").innerText = language["selectAProvider"];
+document.getElementById("close_apiselector").innerText = language["close"];
+document.getElementById("navigation").innerText = language["navigation"];
+document.getElementById("close_nav").innerText = language["close"];
+document.getElementById("id_about").innerText = language["about"];
+document.getElementById("version").innerText = language["version"];
+document.getElementById("createdby").innerText = language["createdby"];
+document.getElementById("usewhat").innerHTML = language["technology_used"];
+document.getElementById("seewhere").innerHTML = language["github_promoted"];
+document.getElementById("translated").innerText = language["translation"];
+let betaTest= ["THEO LEPRINCE"]
+document.getElementById("beta_test").innerText = language["beta_test"]+betaTest.toString();
+document.getElementById("project").innerHTML = language["license"];
+document.getElementById("close_about").innerText = language["close"];
+document.getElementById("id_openDLtxt").innerText = language["Downloader"];
+document.getElementById("downloaderSpeech").innerText = language["downloaderSpeech"];
+document.getElementById("id_btnDLStart").innerText = language["startDownload"];
+document.getElementById("id_btnDLOpen").innerText = language["openDL"];
+document.getElementById("close_openDL").innerText = language["close"];
+document.getElementById("close_tips").innerText = language["close"];
+document.getElementById("close_bm").innerText = language["close"];
+document.getElementById("id_tips").innerText = language["tips"];
+document.getElementById("id_bmm").innerText = language["Bookmark"];
+document.getElementById("id_settingsmod").innerText = language["settings"];
+document.getElementById("id_btn_CTN").innerText = language["clear_tb"];
+document.getElementById("selectTheme_id").innerText = language["select_a_theme"];
+document.getElementById("selectLang_id").innerText = language["select_a_language"];
+document.getElementById("id_btn_TE").innerText = language["nothemeevent"];
+document.getElementById("close_settings").innerText = language["close"];
+document.getElementById("volumesLabel").innerText = language["volumesLabel"];
+document.getElementById("overlaymsg").innerText = language["overlaymsg_takecare"];
+document.getElementById("toReadd").innerText = language["toRead"];
+document.getElementById("recentlyAddedLabel").innerText = language["recentlyAdded"];
+document.getElementById("myfav").innerText = language["myfavorites"];
+document.getElementById("continueReading").innerText = language["continue_reading"];
+document.getElementById("close_mna").innerText = language["close"];
+document.getElementById("sendaccount").innerText = language["applyChanges"];
+document.getElementById("sendbdd").innerText = language["downloadCopyBDD"];
+document.getElementById("delaccount").innerText = language["delAccount"];
+document.getElementById("passwmanagerLabel").innerText = language["InsertPassword"];
+document.getElementById("usernamemanagerLabel").innerText = language["theUserNameLabel"];
+document.getElementById("id_modifAccount").innerText = language["Modifyyouraccount"];
+document.getElementById("close_edit").innerText = language["close"];
+document.getElementById("sendEdit").innerText = language["send"];
+document.getElementById("id_editmodal").innerText = language["EDIT"];
+
+
+
 fetch("http://" + domain + ":" + port + "/dirname").then(function (response) {
     return response.text();
 }).then(function (data) {
@@ -133,29 +234,7 @@ function setTheme(theme) {
     document.head.getElementsByTagName("link")[5].href = "/themes/" + theme;
 }
 
-/**
- * Get the response from the server
- * @returns {Promise<void>} The response
- */
-async function getResponse() {
-    console.log("begin Request");
-    const response = await fetch("http://" + domain + ":" + port + "/config/getConfig/" + currentProfile.getToken);
-    console.log("Requested");
-    const dataa = await response.json().then((data) => {
-        console.log(data);
-        let configFile = data;
-        configFile = JSON.stringify(configFile);
-        let parsedJSON = JSON.parse(configFile);
-        let configlang = SearchInJSON("language", parsedJSON);
-        console.log(configlang);
-        fetch("http://" + domain + ":" + port + "/lang/" + configlang).then((response) => {
-            response.json().then((datoo) => {
-                console.log(datoo);
-                language = datoo;
-            });
-        });
-    });
-}
+
 
 /**
  * Get the version and display it on the info
@@ -163,7 +242,7 @@ async function getResponse() {
 fetch("http://" + domain + ":" + port + "/getVersion").then(function (response) {
     return response.text();
 }).then(function (data) {
-    document.getElementById("version").innerText = "Version : " + data;
+    document.getElementById("version").innerText = language["version"] + data;
 }).catch(function (error) {
     console.log(error);
 });
@@ -233,41 +312,28 @@ async function InsertIntoDB(dbname, dbinfo, values) {
  * @returns {Promise<void>} The response
  */
 async function deleteLib(elElement) {
-    let confirmDelete = confirm("Would you like to delete " + elElement["NAME"] + " ?");
+    let confirmDelete = confirm(language["deleteaccount"]+ elElement["NAME"] + " ?");
     if (confirmDelete) {
         await fetch('http://' + domain + ":" + port + '/DB/lib/delete/' + currentProfile.getToken + "/" + elElement["ID_LIBRARY"]).then(() => {
-            alert("The library has been deleted");
+            alert(language["libraryDeleted"]);
             location.reload();
         });
     }
 }
 
-/**
- * Get the browser cookies
- * @param {string} cName The name of the cookie
- */
-function getCookie(cName) {
-    const name = cName + "=";
-    const cDecoded = decodeURIComponent(document.cookie); //to be careful
-    const cArr = cDecoded.split('; ');
-    let res;
-    cArr.forEach(val => {
-        if (val.indexOf(name) === 0) res = val.substring(name.length);
-    });
-    return res;
-}
+
 
 /**
  * Change the Lib modal to modify the library
  * @param elElement The element to modify
  */
 function modifyLib(elElement) {
-    document.getElementById("id_lib").innerText = "Modify a library";
+    document.getElementById("id_lib").innerText = language["modifyLib"];
     document.getElementById("namelocation").value = elElement["NAME"];
     document.getElementById("locationa").value = elElement["PATH"];
     document.getElementById("opt" + elElement["API_ID"]).setAttribute("selected", "true");
     document.getElementById("opt" + elElement["API_ID"]).selected = true;
-    document.getElementById("sendlib").innerText = "Modify library";
+    document.getElementById("sendlib").innerText = language["modifyLib"];
     document.getElementById("sendlib").onclick = function () {
         return updateLibrary({'form': [document.getElementById('namelocation'), document.getElementById('locationa'), document.getElementById('providerID')]}, elElement["ID_LIBRARY"]);
     };
@@ -312,14 +378,16 @@ function resetOverlay() {
             console.log(e);
         }
     }
-    document.getElementById("ContentView").innerHTML = "<h2>Volumes : </h2>";
+    document.getElementById("ContentView").innerHTML = "<h2>"+language["volumes"] +"</h2>";
 }
+
+
 
 /**
  * Reset the lib modal to default (adding a library)
  */
 function resetLibModal() {
-    document.getElementById("id_lib").innerText = "Adding a library";
+    document.getElementById("id_lib").innerText = language["addLib"];
     document.getElementById("namelocation").removeAttribute('value');
     document.getElementById("locationa").removeAttribute("value");
     document.getElementById("namelocation").value = "";
@@ -392,7 +460,7 @@ async function discoverLibraries() {
         document.getElementById("overlay").style.display = "none";
         document.getElementById("overlay2").style.display = "none";
         document.getElementById("contentViewer").style.display = "none";
-        addToBreadCrumb("Downloads", () => {
+        addToBreadCrumb(language["download"], () => {
             return openLibrary(CosmicComicsTemp + "/downloads", 2);
         });
         openLibrary(CosmicComicsTemp + "/downloads", 2);
@@ -408,7 +476,7 @@ async function discoverLibraries() {
     logo.style.lineHeight = "1";
     btn.appendChild(logo);
     let naming = document.createElement("span");
-    naming.innerText = "Downloads";
+    naming.innerText = language["download"];
     btn.appendChild(naming);
     btn.className = "btn btns libbtn";
     div.style.display = "flex";
@@ -429,7 +497,7 @@ async function discoverLibraries() {
         document.getElementById("overlay").style.display = "none";
         document.getElementById("overlay2").style.display = "none";
         document.getElementById("contentViewer").style.display = "none";
-        addToBreadCrumb("ALL", () => {
+        addToBreadCrumb(language["ALL"], () => {
             return AllBooks();
         });
         AllBooks();
@@ -445,7 +513,7 @@ async function discoverLibraries() {
     logo2.style.lineHeight = "1";
     btn2.appendChild(logo2);
     let naming2 = document.createElement("span");
-    naming2.innerText = "ALL";
+    naming2.innerText = language["ALL"];
     btn2.appendChild(naming2);
     btn2.className = "btn btns libbtn";
     div2.style.display = "flex";
@@ -466,7 +534,7 @@ async function discoverLibraries() {
         document.getElementById("overlay").style.display = "none";
         document.getElementById("overlay2").style.display = "none";
         document.getElementById("contentViewer").style.display = "none";
-        addToBreadCrumb("TRACKER", () => {
+        addToBreadCrumb(language["TRACKER"], () => {
             return AllBooks("PATH IS NULL OR PATH = '' OR PATH = 'null'");
         });
         AllBooks("PATH IS NULL OR PATH = '' OR PATH = 'null'");
@@ -483,7 +551,7 @@ async function discoverLibraries() {
     logo3.style.lineHeight = "1";
     btn3.appendChild(logo3);
     let naming3 = document.createElement("span");
-    naming3.innerText = "TRACKER";
+    naming3.innerText = language["TRACKER"];
     btn3.appendChild(naming3);
     btn3.className = "btn btns libbtn";
     div3.style.display = "flex";
@@ -547,11 +615,11 @@ async function discoverLibraries() {
             const li = document.createElement("li");
             const li2 = document.createElement("li");
             const li3 = document.createElement("li");
-            li.innerText = "Delete";
-            li2.innerText = "Modify";
+            li.innerText = language["DELETE"]
+            li2.innerText = language["EDIT"]
             li2.setAttribute("data-bs-toggle", "modal");
             li2.setAttribute("data-bs-target", "#lib");
-            li3.innerText = "Refresh metadata";
+            li3.innerText = language["refreshMetadata"]
             li.addEventListener("click", function () {
                 deleteLib(el);
             });
@@ -775,7 +843,7 @@ function openLibrary(folder, provider = 0) {
             console.log(result);
             DetectFolderInLibrary(result).then((data) => {
                 console.log(data);
-                if (data.length <= 0) throw new Error("Folder empty or not found");
+                if (data.length <= 0) throw new Error(language["Folderemptyornotfound"]);
                 //Ajouter a la DB les dossiers trouvés en tant que Collection
                 if (provider === providerEnum.OL || provider === providerEnum.GBooks) {
                     //inserer une series OL
@@ -1176,7 +1244,7 @@ function LoadImages(numberOf) {
             document.getElementById("overlay2").style.display = "none";
             document.getElementById("overlay").style.display = "none";
             document.getElementById("ContainerExplorer").style.display = "flex";
-            document.getElementById("home").innerText = "This library is empty. If you think this is an error, please refresh the page and try again.";
+            document.getElementById("home").innerText = language["empty_library"];
             document.getElementById("home").style.display = "block";
             document.getElementById("home").style.fontSize = "24px";
         });
@@ -1207,7 +1275,7 @@ function openInViewer() {
         let encoded = encodeURIComponent(url.replaceAll("/", "%C3%B9"));
         window.location.href = "viewer.html?" + encoded;
     } else {
-        alert("Failed to load file");
+        alert(language["Failedtoloadfile"]);
     }
 }
 
@@ -1246,7 +1314,7 @@ function listBM() {
                 });
                 btn.className = "btn pure-material-button-contained";
                 btn.style = "margin:5px";
-                btn.innerText = "See the page " + file["page"];
+                btn.innerText = language["Seethepage"] + file["page"];
                 let image = document.createElement("img");
                 image.src = res;
                 image.style = "width:100%;height:100%;";
@@ -1300,7 +1368,7 @@ document.addEventListener("drop", (event) => {
         if (f.path.includes(".cbz") || f.path.includes(".cbr") || f.path.includes(".cbt") || f.path.includes(".cb7") || f.path.includes(".zip") || f.path.includes(".rar") || f.path.includes(".7z") || f.path.includes(".tar")) {
             window.location.href = "viewer.html?" + f.path;
         } else {
-            Toastifycation("drag&drop_fail", "#ff0000");
+            Toastifycation(language["drag&drop_fail"], "#ff0000");
         }
     }
 });
@@ -1319,7 +1387,16 @@ function selectTheme() {
     document.head.getElementsByTagName("link")[5].href = "/themes/" + document.getElementById("themeselector").value;
     modifyConfigJson("theme", document.getElementById("themeselector").value);
 }
-
+function setCookie(cName, cValue, expHours) {
+    let date = new Date();
+    date.setTime(date.getTime() + (expHours * 60 * 60 * 1000));
+    const expires = "expires=" + date.toUTCString();
+    document.cookie = cName + "=" + cValue + "; " + expires + "; path=/";
+}
+function selectLang() {
+    setCookie("lang", document.getElementById("languageselector").value, 60);
+    refreshPage()
+}
 fetch('http://' + domain + ":" + port + "/getThemes").then((response) => {
     return response.text();
 }).then(function (res) {
@@ -1346,10 +1423,10 @@ async function downloader() {
     };
     await fetch('http://' + domain + ":" + port + '/downloadBook', option).then(() => {
         console.log("downloaded");
-        Toastifycation("Downloaded");
+        Toastifycation(language["downloaded"]);
     }).catch(err => {
         console.log(err);
-        Toastifycation("Error while downloading");
+        Toastifycation(language["error"]);
     });
 }
 
@@ -1409,7 +1486,7 @@ function HomeRoutine() {
         if (TheBookun.length === 0) {
             const element = document.getElementById("continueReadingHome");
             let node = document.createElement("p");
-            node.innerHTML = "Nothing to display here !<br/>Open a new book or try one of those below.";
+            node.innerHTML = language["nothingHere"];
             element.appendChild(node);
         }
     });
@@ -1434,7 +1511,7 @@ function HomeRoutine() {
         if (TheBookun.length === 0) {
             const element = document.getElementById("recentlyAdded");
             let node = document.createElement("p");
-            node.innerText = "Nothing to display here !";
+            node.innerText = language["nothingHere"]
             element.appendChild(node);
         }
     });
@@ -1460,7 +1537,7 @@ function HomeRoutine() {
         if (TheBookun.length === 0) {
             const element = document.getElementById("toRead");
             let node = document.createElement("p");
-            node.innerHTML = "Nothing to display here !<br/>Look's like you read all your books. Consider to import new ones!";
+            node.innerHTML = language["nothingHere"];
             element.appendChild(node);
         }
     });
@@ -1487,7 +1564,7 @@ function HomeRoutine() {
         if (TheBookun.length === 0) {
             const element = document.getElementById("myfavoriteHome");
             let node = document.createElement("p");
-            node.innerHTML = "Nothing to display here !<br/>Look's like you don't love any comic book yet !";
+            node.innerHTML = language["nothingHere"];
             element.appendChild(node);
         }
     });
@@ -1505,7 +1582,7 @@ function returnToHome() {
     document.getElementById("overlay").style.display = "none";
     document.getElementById("overlay2").style.display = "none";
     document.getElementById("contentViewer").style.display = "none";
-    document.getElementById('home').innerHTML = "    <p>Continue reading : </p>\n" + "    <div id=\"continueReadingHome\"></div>\n" + "    <p>My favorites : </p>\n" + "    <div id=\"myfavoriteHome\"></div>\n" + "    <p>Recently added : </p>\n" + "    <div id=\"recentlyAdded\"></div>\n" + "    <p>To read : </p>\n" + "    <div id=\"toRead\"></div>\n";
+    document.getElementById('home').innerHTML = "    <p>"+language["continue_reading"]+"</p>\n" + "    <div id=\"continueReadingHome\"></div>\n" + "    <p>"+language["favorite"]+"</p>\n" + "    <div id=\"myfavoriteHome\"></div>\n" + "    <p>"+language["recentlyAdded"]+"</p>\n" + "    <div id=\"recentlyAdded\"></div>\n" + "    <p>"+language["toRead"]+"</p>\n" + "    <div id=\"toRead\"></div>\n";
     HomeRoutine();
     document.getElementById('home').style.display = 'block';
     document.getElementById('home').style.fontSize = '16px';
@@ -1537,7 +1614,7 @@ async function AllBooks(filters = "") {
                 document.getElementById("overlay2").style.display = "none";
                 document.getElementById("overlay").style.display = "none";
                 document.getElementById("ContainerExplorer").style.display = "flex";
-                document.getElementById("home").innerText = "This library is empty. If you think this is an error, please refresh the page and try again.";
+                document.getElementById("home").innerText = language["empty_library"]
                 document.getElementById("home").style.display = "block";
                 document.getElementById("home").style.fontSize = "24px";
             });
@@ -1602,7 +1679,7 @@ async function setSearch(res) {
                     if (res[key].series != null && res[key].series !== "null") {
                         series.innerText = res[key].series;
                     } else {
-                        series.innerText = "No series linked";
+                        series.innerText = language["noseries"];
                     }
                 }
             }
@@ -1727,6 +1804,43 @@ function resolveTitle(title) {
 
 async function createSeries(provider, path, libraryPath, res) {
     resetOverlay();
+    new bootstrap.Tooltip(document.getElementById("playbutton"), {
+        title: language["PLAY"],
+        placement: "bottom",
+    });
+    new bootstrap.Tooltip(document.getElementById("checkbtn"), {
+        title: language["mkread"],
+        placement: "bottom"
+    });
+    new bootstrap.Tooltip(document.getElementById("readingbtndetails"), {
+        title: language["mkreading"],
+        placement: "bottom"
+    });
+    new bootstrap.Tooltip(document.getElementById("decheckbtn"), {
+        title: language["mkunread"],
+        placement: "bottom"
+    });
+    new bootstrap.Tooltip(document.getElementById("favoritebtn"), {
+        title: language["toogle_fav"],
+        placement: "bottom"
+    });
+    new bootstrap.Tooltip(document.getElementById("editmodalBtn"), {
+        title: language["EDIT"],
+        placement: "bottom"
+    });
+    new bootstrap.Tooltip(document.getElementById("DLBOOK"), {
+        title: language["downloadBook"],
+        placement: "bottom"
+    });
+    new bootstrap.Tooltip(document.getElementById("refreshBtn"), {
+        title: language["refreshMetadata"],
+        placement: "bottom"
+    });
+    new bootstrap.Tooltip(document.getElementById("rematchBtn"), {
+        title: language["rematch"],
+        placement: "bottom"
+    });
+
     console.log(provider);
     document.documentElement.style.overflow = "hidden";
     addToBreadCrumb(resolveTitle(res[0].title), () => {
@@ -1802,12 +1916,13 @@ async function createSeries(provider, path, libraryPath, res) {
                 }
             })
         } else if (provider === providerEnum.MANUAL) {
-            alert("Manual Provider can't be rematched")
+            alert(language["providerCannotRematch"])
         } else if (provider === providerEnum.OL) {
-            alert("OL Provider can't be rematched")
+            alert(language["providerCannotRematch"])
         } else if (provider === providerEnum.GBooks) {
-            alert("GBooks Provider can't be rematched")
+            alert(language["providerCannotRematch"])
         } else {
+            alert(language["providerCannotRematch"])
         }
         //fetch API
         //return results to DIV#Result
@@ -1818,13 +1933,13 @@ async function createSeries(provider, path, libraryPath, res) {
         if (!isLocked()) {
             await new API().refreshMeta(res[0].ID_Series, provider, "series");
         } else {
-            Toastifycation("This series is locked", "#ff0000");
+            Toastifycation(language["serieslocked"], "#ff0000");
         }
     }
     if (!APINOTFOUND) {
-        document.getElementById("provider_text").innerText = ((provider === providerEnum.Marvel) ? ("Data provided by Marvel. © 2014 Marvel") : ((provider === providerEnum.Anilist) ? ("Data provided by Anilist.") : ((provider === providerEnum.MANUAL) ? ("The Data are not provided by an API.") : ((provider === providerEnum.OL) ? ("Data provided by OpenLibrary.") : ((provider === providerEnum.GBooks) ? ("Data provided by Google Books.") : "")))));
+        document.getElementById("provider_text").innerText = ((provider === providerEnum.Marvel) ? (language['providedBy']+" Marvel. © 2014 Marvel") : ((provider === providerEnum.Anilist) ? (language['providedBy']+" Anilist.") : ((provider === providerEnum.MANUAL) ? (language["notFromAPI"]) : ((provider === providerEnum.OL) ? (language['providedBy']+" OpenLibrary.") : ((provider === providerEnum.GBooks) ? (language['providedBy']+" Google Books.") : "")))));
     } else {
-        document.getElementById("provider_text").innerText = "The data are not from the API";
+        document.getElementById("provider_text").innerText = language["notFromAPI"];
     }
     for (let i = 1; i <= 5; i++) {
         document.getElementById("rating-" + i).onclick = function () {
@@ -1902,9 +2017,9 @@ async function createSeries(provider, path, libraryPath, res) {
                 NameToFetchList.push("'" + el.name.replaceAll("'", "''") + "'");
             });
         } else if (provider === providerEnum.OL) {
-            alert("Open Library cannot be used to fetch characters");
+            alert("Open Library "+language["cannotFetchCharacters"]);
         } else if (provider === providerEnum.GBooks) {
-            alert("Google Books cannot be used to fetch characters");
+            alert("Google Books "+language["cannotFetchCharacters"]);
         }
         let NameToFetch = NameToFetchList.join(",");
         let container = document.createElement("div");
@@ -1958,7 +2073,7 @@ async function createSeries(provider, path, libraryPath, res) {
                 container.appendChild(divs);
             });
         });
-        document.getElementById("characters").innerHTML = "<h1>" + "Characters" + ":</h1> " + "Number of characters : " + ((provider === providerEnum.Marvel) ? (JSON.parse(res[0].CHARACTERS)["available"]) : (JSON.parse(res[0].CHARACTERS).length)) + "<br/>";
+        document.getElementById("characters").innerHTML = "<h1>" + language["characters"] + ":</h1> " + language["Numberofcharacters"] + ((provider === providerEnum.Marvel) ? (JSON.parse(res[0].CHARACTERS)["available"]) : (JSON.parse(res[0].CHARACTERS).length)) + "<br/>";
         let scrollCharactersAmount = 0;
         let moveRight = document.createElement("button");
         moveRight.className = "scrollBtnR";
@@ -1979,7 +2094,7 @@ async function createSeries(provider, path, libraryPath, res) {
         document.getElementById("characters").appendChild(moveLeft);
         document.getElementById("characters").appendChild(moveRight);
         document.getElementById("characters").appendChild(container);
-        document.getElementById("OtherTitles").innerHTML = ((provider === providerEnum.Marvel) ? ("A few comics in this series (for a complete view check the Marvel's website)") : ("Relations")) + " : ";
+        document.getElementById("OtherTitles").innerHTML = ((provider === providerEnum.Marvel) ? (language["AFewComics"]) : (language["Relations"])) + " : ";
         await getFromDB("relations", "* FROM relations WHERE series = '" + res[0].ID_Series + "'").then((clres) => {
             clres = JSON.parse(clres);
             console.log(clres);
@@ -2033,7 +2148,7 @@ async function createSeries(provider, path, libraryPath, res) {
                         }
                     }
                     document.getElementById("moreinfo_btn").target = "_blank";
-                    document.getElementById("moreinfo_btn").innerText = "See more";
+                    document.getElementById("moreinfo_btn").innerText = language["seeMore"];
                 };
                 reltxt.className = "cardcusto";
                 reltxt.style.cursor = "pointer";
@@ -2052,7 +2167,7 @@ async function createSeries(provider, path, libraryPath, res) {
             });
             document.getElementById("OtherTitles").appendChild(divlist);
         });
-        let tmpstaff = "Number of people : " + ((provider === providerEnum.Marvel) ? (JSON.parse(res[0].STAFF)["available"]) : (JSON.parse(res[0].STAFF).length)) + "<br/>";
+        let tmpstaff = "Numberofpeople : " + ((provider === providerEnum.Marvel) ? (JSON.parse(res[0].STAFF)["available"]) : (JSON.parse(res[0].STAFF).length)) + "<br/>";
         let StaffToFetchList = [];
         if (provider === providerEnum.Marvel) {
             JSON.parse(res[0].STAFF)["items"].forEach((el) => {
@@ -2102,7 +2217,7 @@ async function createSeries(provider, path, libraryPath, res) {
                         }
                     }
                     document.getElementById("moreinfo_btn").target = "_blank";
-                    document.getElementById("moreinfo_btn").innerText = "See more";
+                    document.getElementById("moreinfo_btn").innerText = language["seeMore"];
                 });
                 for (let j = 0; j < clres.length; j++) {
                     if (provider === providerEnum.Marvel) {
@@ -2122,7 +2237,7 @@ async function createSeries(provider, path, libraryPath, res) {
                 }
             }
         });
-        document.getElementById("Staff").innerHTML = "<h1>" + "Staff" + ":</h1> " + "<br/>" + tmpstaff;
+        document.getElementById("Staff").innerHTML = "<h1>" + language["Staff"] + ":</h1> " + "<br/>" + tmpstaff;
         let scrollStaffAmount = 0;
         let moveRight2 = document.createElement("button");
         moveRight2.className = "scrollBtnR";
@@ -2158,7 +2273,7 @@ async function createSeries(provider, path, libraryPath, res) {
         }
     }
     if (res[0]["chapters"] != null) {
-        document.getElementById("chapters").innerText = ((provider === providerEnum.Marvel) ? ("Number of Comics in this series : ") : ("Number of chapter in this series : ")) + res[0]["chapters"];
+        document.getElementById("chapters").innerText = ((provider === providerEnum.Marvel) ? (language["NumberComics"]) : (language["NumberChapter"])) + res[0]["chapters"];
     }
     document.getElementById("contentViewer").style.display = "block";
     animateCSS(document.getElementById("onContentViewer"), "fadeIn").then((message) => {
@@ -2182,20 +2297,20 @@ async function createSeries(provider, path, libraryPath, res) {
     });
     document.getElementById("checkbtn").addEventListener("click", function (e) {
         OneForAll("unread", "reading", "read", res[0].title);
-        Toastifycation("Set all as Read", "#00C33C");
+        Toastifycation(language["marked_as_read"], "#00C33C");
     });
     document.getElementById("readingbtndetails").addEventListener("click", function (e) {
         OneForAll("unread", "read", "reading", res[0].title);
-        Toastifycation("Set all as Reading", "#00C33C");
+        Toastifycation(language["marked_as_reading"], "#00C33C");
     });
     document.getElementById("decheckbtn").addEventListener("click", function (e) {
         OneForAll("read", "reading", "unread", res[0].title);
-        Toastifycation("Set all as Unread", "#00C33C");
+        Toastifycation(language["marked_as_unread"], "#00C33C");
     });
     let currentFav = res[0].favorite;
     document.getElementById("favoritebtn").addEventListener("click", async function (e) {
         if (currentFav === 1) {
-            Toastifycation("Removed from favorite", "#00C33C");
+            Toastifycation(language["remove_fav"], "#00C33C");
             currentFav = 0;
             await getFromDB("Series", "* FROM Series WHERE favorite=1").then(async (resa) => {
                 let bookList = JSON.parse(resa);
@@ -2219,7 +2334,7 @@ async function createSeries(provider, path, libraryPath, res) {
                 }
             });
         } else {
-            Toastifycation("Set as favorite", "#00C33C");
+            Toastifycation(language["add_fav"], "#00C33C");
             currentFav = 1;
             await getFromDB("Series", "* FROM Series WHERE favorite=0").then(async (resa) => {
                 let bookList = JSON.parse(resa);
@@ -2247,7 +2362,7 @@ async function createSeries(provider, path, libraryPath, res) {
     if (!APINOTFOUND) {
         if (provider === providerEnum.Marvel) {
             loadView(path, libraryPath, JSON.parse(res[0].start_date), provider);
-            document.getElementById("id").innerText = "This series ID from Marvel : " + parseInt(res[0].ID_Series);
+            document.getElementById("id").innerText = language["ThisseriesIDfromMarvel"] + parseInt(res[0].ID_Series);
             if (res[0].description != null && res[0].description !== "null") {
                 document.getElementById("description").innerText = res[0].description;
             } else {
@@ -2255,25 +2370,25 @@ async function createSeries(provider, path, libraryPath, res) {
             }
             document.getElementById("averageProgress").style.display = "none";
             if (JSON.parse(res[0].end_date) > new Date().getFullYear()) {
-                document.getElementById("Status").innerText = "RELEASING";
+                document.getElementById("Status").innerText = language["RELEASING"];
                 document.getElementById("Status").className = "releasing";
             } else if (JSON.parse(res[0].end_date) < new Date().getFullYear()) {
-                document.getElementById("Status").innerText = "FINISHED";
+                document.getElementById("Status").innerText = language["FINISHED"];
                 document.getElementById("Status").className = "released";
             } else if (JSON.parse(res[0].start_date) > new Date().getFullYear()) {
-                document.getElementById("Status").innerText = "NOT YET RELEASED";
+                document.getElementById("Status").innerText = language["NOTYETRELEASED"];
                 document.getElementById("Status").className = "NotYet";
             } else if (JSON.parse(res[0].start_date) === new Date().getFullYear()) {
-                document.getElementById("Status").innerText = "END SOON";
+                document.getElementById("Status").innerText = language["ENDSOON"];
                 document.getElementById("Status").className = "releasing";
             } else {
-                document.getElementById("Status").innerText = "UNKNOWN";
+                document.getElementById("Status").innerText = language["UNKNOWN"];
                 document.getElementById("Status").className = "NotYet";
             }
         } else if (provider === providerEnum.Anilist || provider === providerEnum.MANUAL || provider === providerEnum.OL || provider === providerEnum.GBooks) {
             loadView(path, libraryPath, "", provider);
             document.getElementById("description").innerText = res[0].description;
-            document.getElementById("genres").innerText = "Genres " + ":";
+            document.getElementById("genres").innerText = language["Genres"] + ":";
             JSON.parse(res[0].genres).forEach((el, index) => {
                 if (index !== JSON.parse(res[0].genres).length - 1) {
                     document.getElementById("genres").innerText += " " + el + ", ";
@@ -2281,8 +2396,8 @@ async function createSeries(provider, path, libraryPath, res) {
                     document.getElementById("genres").innerText += " " + el;
                 }
             });
-            document.getElementById("Trending").innerText = "Trending : " + res[0]["TRENDING"];
-            document.getElementById("Volumes").innerText = "Number of Volumes : " + res[0]["volumes"];
+            document.getElementById("Trending").innerText = language["trending"] + res[0]["TRENDING"];
+            document.getElementById("Volumes").innerText = language["numberOfVolume"]+ res[0]["volumes"];
             document.getElementById("averageScore").innerText = res[0]["Score"];
             document.querySelectorAll(".circle-small .progress.one").forEach((el) => {
                 el.style.strokeDashoffset = Math.abs(100 - res[0]["Score"]);
@@ -2307,23 +2422,23 @@ async function createSeries(provider, path, libraryPath, res) {
             }
             document.getElementById("averageProgress").style.display = "none";
             if (JSON.parse(res[0].end_date) == null && JSON.parse(res[0].start_date) == null) {
-                document.getElementById("Status").innerText = "UNKNOWN";
+                document.getElementById("Status").innerText = language["UNKNOWN"];
                 document.getElementById("Status").className = "NotYet";
             } else {
                 if (JSON.parse(res[0].end_date) > new Date().getFullYear()) {
-                    document.getElementById("Status").innerText = "RELEASING";
+                    document.getElementById("Status").innerText = language["RELEASING"];
                     document.getElementById("Status").className = "releasing";
                 } else if (JSON.parse(res[0].end_date) < new Date().getFullYear()) {
-                    document.getElementById("Status").innerText = "FINISHED";
+                    document.getElementById("Status").innerText = language["FINISHED"];
                     document.getElementById("Status").className = "released";
                 } else if (JSON.parse(res[0].start_date) > new Date().getFullYear()) {
-                    document.getElementById("Status").innerText = "NOT YET RELEASED";
+                    document.getElementById("Status").innerText = language["NOTYETRELEASED"];
                     document.getElementById("Status").className = "NotYet";
                 } else if (JSON.parse(res[0].start_date) === new Date().getFullYear()) {
-                    document.getElementById("Status").innerText = "END SOON";
+                    document.getElementById("Status").innerText = language["ENDSOON"];
                     document.getElementById("Status").className = "releasing";
                 } else {
-                    document.getElementById("Status").innerText = "UNKNOWN";
+                    document.getElementById("Status").innerText = language["UNKNOWN"];
                     document.getElementById("Status").className = "NotYet";
                 }
             }
@@ -2331,12 +2446,12 @@ async function createSeries(provider, path, libraryPath, res) {
             loadView(path, libraryPath, "", provider);
             document.getElementById("description").innerText = res[0].description;
             if (res[0]["TRENDING"] != null && res[0]["TRENDING"] !== "null") {
-                document.getElementById("Trending").innerText = "Trending : " + res[0]["TRENDING"];
+                document.getElementById("Trending").innerText = language["trending"] + res[0]["TRENDING"];
             } else {
                 document.getElementById("Trending").innerText = "";
             }
             if (res[0]["volumes"] != null && res[0]["volumes"] !== "null") {
-                document.getElementById("Volumes").innerText = "Number of Volumes : " + res[0]["volumes"];
+                document.getElementById("Volumes").innerText = language["numberOfVolume"] + res[0]["volumes"];
             } else {
                 document.getElementById("Volumes").innerText = "";
             }
@@ -2353,7 +2468,7 @@ async function createSeries(provider, path, libraryPath, res) {
                 });
                 document.documentElement.style.setProperty('--averageScore', Math.abs(100));
             }
-            document.getElementById("Status").innerText = ((res[0]["statut"] == null) ? "UNKNOWN" : res[0]["statut"]);
+            document.getElementById("Status").innerText = ((res[0]["statut"] == null) ? language["UNKNOWN"] : res[0]["statut"]);
             if (res[0]["statut"] === "RELEASING") {
                 document.getElementById("Status").className = "releasing";
             } else if (res[0]["statut"] === "FINISHED") {
@@ -2366,7 +2481,7 @@ async function createSeries(provider, path, libraryPath, res) {
         }
     }
     if (res[0].favorite === 1) {
-        document.getElementById("Status").innerText += " (Favorite)";
+        document.getElementById("Status").innerText += language["favoriteParenthesis"];
         document.getElementById("Status").classList.add("favorite");
     }
 }
@@ -2422,7 +2537,7 @@ function AllForOne(W1, W2, A, ID) {
     fetch("http://" + domain + ":" + port + "/DB/update", options);
 }
 
-addToBreadCrumb("Home", () => {
+addToBreadCrumb(language["HOME"], () => {
     returnToHome();
 });
 
@@ -2568,7 +2683,7 @@ document.getElementById("id_addTrackedBook").addEventListener("click", () => {
             } else if (provider === "3") {
             } else if (provider === "4") {
             } else {
-                alert("Please select a valid provider");
+                alert(language["selectAProvider"]);
             }
         } catch (e) {
             TrueDeleteFromDB("Books", TheBook.ID_book);
@@ -2587,6 +2702,43 @@ document.getElementById("id_addTrackedBook").addEventListener("click", () => {
 async function createDetails(TheBook, provider) {
     resetOverlay();
     document.documentElement.style.overflow = "hidden";
+    new bootstrap.Tooltip(document.getElementById("playbutton"), {
+        title: language["PLAY"],
+        placement: "bottom",
+    });
+    new bootstrap.Tooltip(document.getElementById("checkbtn"), {
+        title: language["mkread"],
+        placement: "bottom"
+    });
+    new bootstrap.Tooltip(document.getElementById("readingbtndetails"), {
+        title: language["mkreading"],
+        placement: "bottom"
+    });
+    new bootstrap.Tooltip(document.getElementById("decheckbtn"), {
+        title: language["mkunread"],
+        placement: "bottom"
+    });
+    new bootstrap.Tooltip(document.getElementById("favoritebtn"), {
+        title: language["toogle_fav"],
+        placement: "bottom"
+    });
+    new bootstrap.Tooltip(document.getElementById("editmodalBtn"), {
+        title: language["EDIT"],
+        placement: "bottom"
+    });
+    new bootstrap.Tooltip(document.getElementById("DLBOOK"), {
+        title: language["downloadBook"],
+        placement: "bottom"
+    });
+    new bootstrap.Tooltip(document.getElementById("refreshBtn"), {
+        title: language["refreshMetadata"],
+        placement: "bottom"
+    });
+    new bootstrap.Tooltip(document.getElementById("rematchBtn"), {
+        title: language["rematch"],
+        placement: "bottom"
+    });
+
     console.log(provider);
     document.getElementById('bookEdit').style.display = "block";
     document.getElementById('seriesEdit').style.display = "none";
@@ -2618,9 +2770,9 @@ async function createDetails(TheBook, provider) {
             })
         } else if (provider === providerEnum.Anilist) {
             //Anilist cannot update the book from the API
-            alert("Anilist cannot update the book from the API");
+            alert(language["providerCannotRematch"]);
         } else if (provider === providerEnum.MANUAL) {
-            alert("You can't rematch a manual entry")
+            alert(language["providerCannotRematch"])
         } else if (provider === providerEnum.OL) {
             new OpenLibrary().GetComics(search.value).then((cdata) => {
                 if (cdata.hasOwnProperty("num_found")) {
@@ -2682,12 +2834,12 @@ async function createDetails(TheBook, provider) {
     document.getElementById("lockCheck").checked = isLocked();
     document.getElementById('refresh').onclick = async () => {
         if (provider === providerEnum.Anilist || provider === providerEnum.MANUAL) {
-            Toastifycation("Provider is not compatible for this feature", "#ff0000")
+            Toastifycation(language["providerCannotRematch"], "#ff0000")
         } else {
             if (!isLocked()) {
                 await new API().refreshMeta(TheBook.ID_book, provider, "book");
             } else {
-                Toastifycation("This book is locked", "#ff0000");
+                Toastifycation(language["bookLocked"], "#ff0000");
             }
         }
     }
@@ -2723,7 +2875,7 @@ async function createDetails(TheBook, provider) {
     addToBreadCrumb(TheBook.NOM, () => {
         return createDetails(TheBook, provider);
     });
-    document.getElementById("provider_text").innerText = ((provider === providerEnum.Marvel) ? ("Data provided by Marvel. © 2014 Marvel") : ((provider === providerEnum.Anilist) ? ("Data provided by Anilist.") : ((provider === providerEnum.MANUAL) ? ("The Data are not provided by an API.") : ((provider === providerEnum.OL) ? ("Data provided by OpenLibrary.") : ((provider === providerEnum.GBooks) ? ("Data provided by Google Books.") : "")))));
+    document.getElementById("provider_text").innerText = ((provider === providerEnum.Marvel) ? (language["providedBy"]+" Marvel. © 2014 Marvel") : ((provider === providerEnum.Anilist) ? (language["providedBy"]+" Anilist.") : ((provider === providerEnum.MANUAL) ? (language["notFromAPI"]) : ((provider === providerEnum.OL) ? (language["providedBy"]+" OpenLibrary.") : ((provider === providerEnum.GBooks) ? (language["providedBy"]+" Google Books.") : "")))));
     document.getElementById("contentViewer").style.display = "block";
     document.getElementById("DLBOOK").addEventListener("click", function (e) {
         let path = TheBook.PATH;
@@ -2753,18 +2905,18 @@ async function createDetails(TheBook, provider) {
     document.getElementById("OtherTitles").innerText = "";
     document.getElementById("relations").innerText = "";
     if (TheBook.characters !== "null" && providerEnum.Marvel) {
-        document.getElementById("id").innerText = "This is a " + TheBook.format + " of " + TheBook.pageCount + " pages. <br/> This is part of the '" + JSON.parse(TheBook.series).name + "' series.";
+        document.getElementById("id").innerText = language["thisisa"] + TheBook.format + " "+language["of"] +" "+ TheBook.pageCount+" " + language["pages"]+"<br/>"+language["Thisispartofthe"] + JSON.parse(TheBook.series).name + "' " +language["series"];
     } else {
         if (provider === providerEnum.Anilist) {
-            document.getElementById("id").innerText = "This is part of the '" + TheBook.series.split("_")[2].replaceAll("$", " ") + "' series.";
+            document.getElementById("id").innerText = language["Thisispartofthe"] + TheBook.series.split("_")[2].replaceAll("$", " ") + "' series.";
         } else if (provider === providerEnum.Marvel) {
-            document.getElementById("id").innerText = "This is part of the '" + JSON.parse(TheBook.series).name + "' series.";
+            document.getElementById("id").innerText = language["Thisispartofthe"] + JSON.parse(TheBook.series).name + "' series.";
         } else if (provider === providerEnum.MANUAL) {
-            document.getElementById("id").innerText = "This is part of the '" + TheBook.series + "' series.";
+            document.getElementById("id").innerText = language["Thisispartofthe"]+ TheBook.series + "' series.";
         } else if (provider === providerEnum.OL) {
-            document.getElementById("id").innerText = "This is part of the '" + TheBook.series + "' series.";
+            document.getElementById("id").innerText = language["Thisispartofthe"] + TheBook.series + "' series.";
         } else if (provider === providerEnum.GBooks) {
-            document.getElementById("id").innerText = "This is a " + TheBook.format + " of " + TheBook.pageCount + " pages. <br/> This is part of the '" + TheBook.series + "' series.";
+            document.getElementById("id").innerText = language["this is a"] + TheBook.format + " "+language["of"] +" "+ TheBook.pageCount+" " + language["pages"]+"<br/>"+language["Thisispartofthe"] +  TheBook.series + "' " +language["series"];
 
         }
     }
@@ -2795,15 +2947,15 @@ async function createDetails(TheBook, provider) {
     }
     document.getElementById("checkbtn").addEventListener("click", function (e) {
         AllForOne("unread", "reading", "read", TheBook.ID_book);
-        Toastifycation("Set as Read", "#00C33C");
+        Toastifycation(language["mkread"], "#00C33C");
     });
     document.getElementById("readingbtndetails").addEventListener("click", function (e) {
         AllForOne("unread", "read", "reading", TheBook.ID_book);
-        Toastifycation("Set all as Reading", "#00C33C");
+        Toastifycation(language["mkreading"], "#00C33C");
     });
     document.getElementById("decheckbtn").addEventListener("click", function (e) {
         AllForOne("read", "reading", "unread", TheBook.ID_book);
-        Toastifycation("Set all as Unread", "#00C33C");
+        Toastifycation(language["mkunread"], "#00C33C");
     });
     if (TheBook.URLCover != null && TheBook.URLCover !== "null") {
         const options = {
@@ -2823,7 +2975,7 @@ async function createDetails(TheBook, provider) {
     document.getElementById("favoritebtn").addEventListener("click", async function (e) {
         if (TheBook.favorite === 1) {
             TheBook.favorite = 0;
-            Toastifycation("Removed from favorite", "#00C33C");
+            Toastifycation(language["remove_fav"], "#00C33C");
             await getFromDB("Books", "* FROM Books WHERE favorite=1").then(async (resa) => {
                 let bookList = JSON.parse(resa);
                 console.log(bookList);
@@ -2847,7 +2999,7 @@ async function createDetails(TheBook, provider) {
             });
         } else {
             TheBook.favorite = 1;
-            Toastifycation("Set as favorite", "#00C33C");
+            Toastifycation(language["add_fav"], "#00C33C");
             await getFromDB("Books", "* FROM Books WHERE favorite=0").then(async (resa) => {
                 let bookList = JSON.parse(resa);
                 console.log(bookList);
@@ -2920,7 +3072,7 @@ async function createDetails(TheBook, provider) {
                         }
                     }
                     document.getElementById("moreinfo_btn").target = "_blank";
-                    document.getElementById("moreinfo_btn").innerText = "See more";
+                    document.getElementById("moreinfo_btn").innerText = language["seeMore"];
                 });
                 if (provider === providerEnum.Marvel) {
                     divs2.innerHTML = "<img alt='a character' src='" + JSON.parse(el.image).path + "/detail." + JSON.parse(el.image).extension + "' class='img-charac'/><br><span>" + el.name + "</span>";
@@ -2935,19 +3087,19 @@ async function createDetails(TheBook, provider) {
             });
         });
         if (TheBook.read === 1 || TheBook.read === "true") {
-            document.getElementById("Status").innerText = "READ";
+            document.getElementById("Status").innerText = language["READ"];
             document.getElementById("Status").className = "released";
         } else if (TheBook.unread === 1 || TheBook.unread === "true") {
-            document.getElementById("Status").innerText = "UNREAD";
+            document.getElementById("Status").innerText = language["UNREAD"];
             document.getElementById("Status").className = "NotYet";
         } else if (TheBook.reading === 1 || TheBook.reading === "true") {
-            document.getElementById("Status").innerText = "READING";
+            document.getElementById("Status").innerText = language["READING"];
             document.getElementById("Status").className = "releasing";
         }
         if (TheBook.favorite === 1) {
-            document.getElementById("Status").innerText += "(Favorite)";
+            document.getElementById("Status").innerText += language["favoriteParenthesis"];
         }
-        document.getElementById("readstat").innerHTML = "<input type=\"number\" step=\"1\" min=\"0\" id=\"readAddInput\">" + " / " + TheBook.pageCount + " pages read";
+        document.getElementById("readstat").innerHTML = "<input type=\"number\" step=\"1\" min=\"0\" id=\"readAddInput\">" + " / " + TheBook.pageCount + " "+ language["pagesRead"];
         document.getElementById("readAddInput").value = TheBook.last_page;
         document.getElementById("readAddInput").max = TheBook.pageCount;
         document.getElementById("readAddInput").addEventListener("change", async function (e) {
@@ -2967,7 +3119,7 @@ async function createDetails(TheBook, provider) {
                 Toastifycation("Error", "#d92027");
             });
         });
-        document.getElementById("characters").innerHTML = "<h1>" + "Characters" + ":</h1> " + "Number of characters : " + ((provider === providerEnum.Marvel) ? (JSON.parse(TheBook.characters)["available"]) : ((TheBook.characters !== "null") ? (JSON.parse(TheBook.characters).length) : (0))) + "<br/>";
+        document.getElementById("characters").innerHTML = "<h1>" + language["characters"] + ":</h1> " + language["Numberofcharacters"] + ((provider === providerEnum.Marvel) ? (JSON.parse(TheBook.characters)["available"]) : ((TheBook.characters !== "null") ? (JSON.parse(TheBook.characters).length) : (0))) + "<br/>";
         document.getElementById("detailSeparator").style.marginTop = "5vh";
         let scrollCharactersAmount = 0;
         let moveRight = document.createElement("button");
@@ -2992,7 +3144,7 @@ async function createDetails(TheBook, provider) {
     }
     //Genres
     if (TheBook.creators !== "null" && TheBook.creators !== null && TheBook.creators !== undefined && TheBook.creators !== "") {
-        let tmpstaff = "Number of people : " + ((provider === providerEnum.Marvel) ? (JSON.parse(TheBook["creators"])["available"]) : ((TheBook["creators"] !== "null") ? (JSON.parse(TheBook["creators"]).length) : ("0"))) + "<br/>";
+        let tmpstaff = language["Numberofpeople"] + ((provider === providerEnum.Marvel) ? (JSON.parse(TheBook["creators"])["available"]) : ((TheBook["creators"] !== "null") ? (JSON.parse(TheBook["creators"]).length) : ("0"))) + "<br/>";
         let StaffToFetchList = [];
         if (provider === providerEnum.Marvel) {
             JSON.parse(TheBook.creators)["items"].forEach((el) => {
@@ -3055,7 +3207,7 @@ async function createDetails(TheBook, provider) {
                             }
                         }
                         document.getElementById("moreinfo_btn").target = "_blank";
-                        document.getElementById("moreinfo_btn").innerText = "See more";
+                        document.getElementById("moreinfo_btn").innerText = language["seeMore"]
                     });
                     divs.appendChild(divs2);
                     divs2.style.marginTop = "10px";
@@ -3065,7 +3217,7 @@ async function createDetails(TheBook, provider) {
                 }
             }
         });
-        document.getElementById("Staff").innerHTML = "<h1>" + "Staff" + ":</h1> " + "<br/>" + tmpstaff;
+        document.getElementById("Staff").innerHTML = "<h1>" + language["Staff"] + ":</h1> " + "<br/>" + tmpstaff;
         let scrollStaffAmount = 0;
         let moveRight2 = document.createElement("button");
         moveRight2.className = "scrollBtnR";
@@ -3098,13 +3250,13 @@ async function createDetails(TheBook, provider) {
         }
     }
     if (TheBook.issueNumber !== "null" && TheBook.issueNumber !== "" && TheBook.issueNumber != null) {
-        document.getElementById("chapters").innerText = "Number of this volume within the series : " + TheBook.issueNumber;
+        document.getElementById("chapters").innerText = language["Numberofthisvolumewithintheseries"] + TheBook.issueNumber;
     } else {
         document.getElementById("chapters").innerText = "";
     }
     if (TheBook.prices !== "null" && TheBook.prices !== "" && TheBook.prices != null) {
         if (provider === providerEnum.Marvel) {
-            document.getElementById("price").innerHTML += "Prices : <br/>";
+            document.getElementById("price").innerHTML += language["prices"]+"<br/>";
             for (let a = 0; a < JSON.parse(TheBook.prices).length; a++) {
                 console.log(JSON.parse(TheBook.prices)[a]);
                 document.getElementById("price").innerHTML += JSON.parse(TheBook.prices)[a].type.replace(/([A-Z])/g, ' $1').trim() + " : " + JSON.parse(TheBook.prices)[a].price + "<br/>";
@@ -3112,7 +3264,7 @@ async function createDetails(TheBook, provider) {
         }
     }
     if (TheBook.dates !== "null") {
-        document.getElementById("startDate").innerHTML = "Dates : <br/>";
+        document.getElementById("startDate").innerHTML = language["dates"]+"<br/>";
         try {
 
             for (let b = 0; b < JSON.parse(TheBook.dates).length; b++) {
@@ -3139,7 +3291,7 @@ async function createDetails(TheBook, provider) {
 function createVariants(TheBook) {
     console.log(TheBook);
     let variants = JSON.parse(TheBook.variants);
-    document.getElementById("relations").appendChild(document.createTextNode("Variants list : "));
+    document.getElementById("relations").appendChild(document.createTextNode(language["variantsList"]+" : "));
     document.getElementById("relations").appendChild(document.createElement("br"));
     variants.forEach((el, index) => {
         document.getElementById("relations").appendChild(document.createTextNode(el.name));
@@ -3260,7 +3412,7 @@ function createContextMenu(elements = [{}]) {
 function AccountMenu() {
     let menu = createContextMenu(
         [{
-            "nom": "Modify your account",
+            "nom": language["Modifyyouraccount"],
             "attribs": {
                 "data-bs-toggle": "modal",
                 "data-bs-target": "#modifAccount"
@@ -3268,14 +3420,14 @@ function AccountMenu() {
             "listeners": {}
         },
             {
-                "nom": "Create a new user",
+                "nom": language["Createanewuser"],
                 "attribs": {
                     "data-bs-toggle": "modal",
                     "data-bs-target": "#modifAccount"
                 },
                 "listeners": {
                     "click": function () {
-                        document.getElementById("id_modifAccount").innerText = "Create a new user";
+                        document.getElementById("id_modifAccount").innerText = language["Createanewuser"];
                         document.getElementById("delaccount").style.display = "none";
                         document.getElementById("sendbdd").style.display = "none";
                         document.getElementById("sendaccount").onclick = async function () {
@@ -3286,7 +3438,7 @@ function AccountMenu() {
                 }
             },
             {
-                "nom": "Logout",
+                "nom": language["logout"],
                 "attribs": {},
                 "listeners": {
                     "click": function () {
@@ -3300,7 +3452,12 @@ function AccountMenu() {
     menu.style.display = "flex";
     document.addEventListener("click", function (e) {
         if (e.target !== menu && e.target !== document.getElementById("id_accountSystem") && e.target !== document.getElementById("icon_id_accountSystem")) {
+            try{
             document.body.removeChild(menu);
+
+            }catch (e) {
+                console.log(e)
+            }
         }
     });
 }
@@ -3384,6 +3541,6 @@ document.getElementById("id_firstOfAll").addEventListener("click", function (e) 
             "token": currentProfile.getToken
         }, null, 2)
     }).then((res) => {
-        Toastifycation("empty image ressources will be filled up", "#00C33C");
+        Toastifycation(language["emptyimageressourceswillbefilledupwiththecover"], "#00C33C");
     })
 })

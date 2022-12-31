@@ -48,16 +48,8 @@ let devMode = false;
 if (devMode) {
     CosmicComicsTemp = path.join(__dirname, "CosmicData");
 }
-if (!fs.existsSync(CosmicComicsTemp+"/.env")){
-	let envTemplate = "MARVEL_PUBLIC_KEY=\nMARVEL_PRIVATE_KEY=\nGBOOKSAPIKEY=\n"
-    fs.writeFileSync(CosmicComicsTemp + "/.env", envTemplate, {encoding: 'utf8'});
-}
-const dotenv = require('dotenv');
-dotenv.config({
-path: CosmicComicsTemp+"/.env"
-});
-let MarvelPublicKey = process.env.MARVEL_PUBLIC_KEY;
-let MarvelPrivateKey = process.env.MARVEL_PRIVATE_KEY;
+
+
 let path2Data;
 if (isPortable) {
     if (isElectron) {
@@ -76,6 +68,16 @@ if (isPortable) {
 }
 let CosmicComicsTemp = path2Data;
 
+if (!fs.existsSync(CosmicComicsTemp+"/.env")){
+    let envTemplate = "MARVEL_PUBLIC_KEY=\nMARVEL_PRIVATE_KEY=\nGBOOKSAPIKEY=\n"
+    fs.writeFileSync(CosmicComicsTemp + "/.env", envTemplate, {encoding: 'utf8'});
+}
+const dotenv = require('dotenv');
+dotenv.config({
+    path: CosmicComicsTemp+"/.env"
+});
+let MarvelPublicKey = process.env.MARVEL_PUBLIC_KEY;
+let MarvelPrivateKey = process.env.MARVEL_PRIVATE_KEY;
 let sqlite3 = require("sqlite3");
 const anilist = require("anilist-node");
 const AniList = new anilist();

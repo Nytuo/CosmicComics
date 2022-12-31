@@ -412,7 +412,7 @@ ul.staggered-list li {
 ul li {
     float: left;
     padding: 0 0 0;
-    margin: 0 5px 5px;
+    margin: 0 0px 3px;
     cursor: pointer;
 }
 
@@ -1378,6 +1378,7 @@ a[href^="http://marvel.com"] {
     width: 200px;
     background-color: var(--color-bg-secondary);
     box-shadow: 0 10px 20px var(--cardCustoShadow);
+    z-index: 10000;
 }
 
 /* The context menu items style*/

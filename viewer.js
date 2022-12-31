@@ -43,10 +43,6 @@ let CosmicComicsData = "C:/Users/Public/Cosmic-Comics/data";
 let CosmicComicsTemp = "C:/Users/Public/Cosmic-Comics/data";
 let CosmicComicsTempI = "C:/Users/Public/Cosmic-Comics/data";
 let listofImg;
-const url = document.createElement("a");
-url.setAttribute("href", window.location.href);
-let domain = url.hostname;
-let port = url.port;
 let currentUser = "";
 let connected = getCookie("selectedProfile");
 console.log(connected);
@@ -60,7 +56,7 @@ if (connected == null) {
 } else {
 	fetch("http://" + domain + ":" + port + "/profile/logcheck/" + connected).then(function (response) {
 		return response.text();
-	}).then(function (data) {
+	}).then(async function (data) {
 		if (data === "false") {
 			window.location.href = "login";
 		} else {
@@ -76,7 +72,12 @@ if (connected == null) {
 			}).catch(function (error) {
 				console.log(error);
 			});
-			getResponse();
+			await getFromDB("Books", "ID_book FROM Books WHERE PATH='" + path + "'").then((res) => {
+				console.log(res);
+				bookID = JSON.parse(res)[0].ID_book;
+				console.log(bookID);
+			})
+			loadParameters();
 		}
 	}).catch(function (error) {
 		console.log(error);
@@ -131,160 +132,129 @@ let DPMNoH = false;
 let wasDPM = false;
 let PPwasDPM = false;
 let mangaMode = false;
-let language;
-console.log(language);
 let bookID = "NaID_"+Math.random()*100500;
-async function getResponse() {
-	console.log("begin Request");
-	const response = await fetch("http://" + domain + ":" + port + "/config/getConfig/" + connected);
-	console.log("Requested");
-	await getFromDB("Books", "ID_book FROM Books WHERE PATH='" + path + "'").then((res) => {
-		console.log(res);
-		bookID= JSON.parse(res)[0].ID_book;
-		console.log(bookID);
 
-	})
-	const dataa = await response.json().then((data) => {
-		console.log(data);
-		let configFile = data;
-		configFile = JSON.stringify(configFile);
-		let parsedJSON = JSON.parse(configFile);
-		let configlang = GetElFromInforPath("language", parsedJSON);
-		console.log(configlang);
-		fetch("http://" + domain + ":" + port + "/lang/" + configlang).then(
-			(response) => {
-				response.json().then((datoo) => {
-					console.log(datoo);
-					language = datoo;
-					loadParameters();
-					//Languages for ToolTips and other things
-					new bootstrap.Tooltip(document.getElementById("goback_id"), {
-						title: language[0]["go_back"],
-						placement: "bottom"
-					});
-					new bootstrap.Tooltip(document.getElementById("magnifier_id"), {
-						title: language[0]["magnifier_toggle"],
-						placement: "bottom"
-					});
-					new bootstrap.Tooltip(document.getElementById("id_gostart"), {
-						title: language[0]["go_start"],
-						placement: "bottom"
-					});
-					new bootstrap.Tooltip(document.getElementById("id_bookmenu"), {
-						title: language[0]["book_settings"],
-						placement: "bottom"
-					});
-					new bootstrap.Tooltip(document.getElementById("id_goprevious"), {
-						title: language[0]["go_previous"],
-						placement: "bottom"
-					});
-					new bootstrap.Tooltip(document.getElementById("nextpage"), {
-						title: language[0]["go_next"],
-						placement: "bottom"
-					});
-					new bootstrap.Tooltip(document.getElementById("id_goend"), {
-						title: language[0]["go_end"],
-						placement: "bottom"
-					});
-					new bootstrap.Tooltip(document.getElementById("id_mkread"), {
-						title: language[0]["mkread"],
-						placement: "bottom"
-					});
-					new bootstrap.Tooltip(document.getElementById("id_mkreading"), {
-						title: language[0]["mkreading"],
-						placement: "bottom"
-					});
-					new bootstrap.Tooltip(document.getElementById("id_mkunread"), {
-						title: language[0]["mkunread"],
-						placement: "bottom"
-					});
-					new bootstrap.Tooltip(document.getElementById("id_togglefav"), {
-						title: language[0]["toogle_fav"],
-						placement: "bottom"
-					});
-					new bootstrap.Tooltip(document.getElementById("id_fixheight"), {
-						title: language[0]["fix_height"],
-						placement: "bottom"
-					});
-					new bootstrap.Tooltip(document.getElementById("id_fixwidth"), {
-						title: language[0]["fix_width"],
-						placement: "bottom"
-					});
-					new bootstrap.Tooltip(document.getElementById("id_autobgcolor"), {
-						title: language[0]["auto_bg_color"],
-						placement: "bottom"
-					});
-					new bootstrap.Tooltip(document.getElementById("id_zoomin"), {
-						title: language[0]["zoom_in"],
-						placement: "bottom"
-					});
-					new bootstrap.Tooltip(document.getElementById("id_zoomout"), {
-						title: language[0]["zoom_out"],
-						placement: "bottom"
-					});
-					new bootstrap.Tooltip(document.getElementById("id_toogleBookMark"), {
-						title: language[0]["Bookmark"],
-						placement: "bottom"
-					});
-					(document.getElementById("id_magnifiermod").innerText =
-						language[0]["magnifier_mod"]),
-						(document.getElementById("zoomlvl").innerText = language[0]["zoom"]);
-					document.getElementById("widthlvl").innerText = language[0]["width"];
-					document.getElementById("heightlvl").innerText = language[0]["height"];
-					document.getElementById("BGBTTXT").innerText =
-						language[0]["background_by_theme"];
-					document.getElementById("Radiuslvl").innerText = language[0]["radius"];
-					new bootstrap.Tooltip(document.getElementById("magnifier_note"), {
-						title: language[0]["magnifier_note"],
-						placement: "bottom"
-					});
-					document.getElementById("id_spawnmagnifier").innerText =
-						language[0]["spawn_magnifier"];
-					document.getElementById("id_destroymagnifier").innerText =
-						language[0]["destroy_magnifier"];
-					document.getElementById("id_booksettings").innerText =
-						language[0]["book_settings"];
-					console.log(language[0]["book_settings"]);
-					document.getElementById("DPMTXT").innerText = language[0]["double_page_mode"];
-					document.getElementById("BPABTXT").innerText =
-						language[0]["blank_at_beggining"];
-					document.getElementById("NDPFHTXT").innerText =
-						language[0]["no_dpm_horizontal"];
-					document.getElementById("MMTXT").innerText = language[0]["manga_mode"];
-					document.getElementById("SSTXT").innerText = language[0]["Slideshow"];
-					document.getElementById("NBARTXT").innerText = language[0]["nobar"];
-					document.getElementById("SSBTXT").innerText = language[0]["sideBar"];
-					document.getElementById("PCTXT").innerText = language[0]["PageCount"];
-					document.getElementById("VIVTXT").innerText = language[0]["vertical_reader"];
-					document.getElementById("WTMTXT").innerText = language[0]["Webtoon_Mode"];
-					document.getElementById("RZPSTXT").innerText = language[0]["reset_zoom"];
-					document.getElementById("SBVSTXT").innerText = language[0]["scrollBar_visible"];
-					document.getElementById("marginlvl").innerText = language[0]["margin"];
-					document.getElementById("rotlvl").innerText = language[0]["rotation"];
-					document.getElementById("zlvll").innerText = language[0]["zoomlvl"];
-					document.getElementById("sstxt").innerText = language[0]["slideshow_interval"];
-					document.getElementById("lsps").innerText = language[0]["page_slider"];
-					document.getElementById("colorpicker_txt_id").innerText =
-						language[0]["color_picker"];
-					document.getElementById("close_id_books").innerText = language[0]["close"];
-					new bootstrap.Tooltip(document.getElementById("id_rotateright"), {
-						title: language[0]["rotate_right"],
-						placement: "bottom"
-					});
-					new bootstrap.Tooltip(document.getElementById("id_rotateleft"), {
-						title: language[0]["rotate_left"],
-						placement: "bottom"
-					});
-					new bootstrap.Tooltip(document.getElementById("fullscreen_id"), {
-						title: language[0]["full_screen"],
-						placement: "bottom"
-					});
-				});
-			}
-		);
-	});
-}
-
+new bootstrap.Tooltip(document.getElementById("goback_id"), {
+	title: language["go_back"],
+	placement: "bottom"
+});
+new bootstrap.Tooltip(document.getElementById("magnifier_id"), {
+	title: language["magnifier_toggle"],
+	placement: "bottom"
+});
+new bootstrap.Tooltip(document.getElementById("id_gostart"), {
+	title: language["go_start"],
+	placement: "bottom"
+});
+new bootstrap.Tooltip(document.getElementById("id_bookmenu"), {
+	title: language["book_settings"],
+	placement: "bottom"
+});
+new bootstrap.Tooltip(document.getElementById("id_goprevious"), {
+	title: language["go_previous"],
+	placement: "bottom"
+});
+new bootstrap.Tooltip(document.getElementById("nextpage"), {
+	title: language["go_next"],
+	placement: "bottom"
+});
+new bootstrap.Tooltip(document.getElementById("id_goend"), {
+	title: language["go_end"],
+	placement: "bottom"
+});
+new bootstrap.Tooltip(document.getElementById("id_mkread"), {
+	title: language["mkread"],
+	placement: "bottom"
+});
+new bootstrap.Tooltip(document.getElementById("id_mkreading"), {
+	title: language["mkreading"],
+	placement: "bottom"
+});
+new bootstrap.Tooltip(document.getElementById("id_mkunread"), {
+	title: language["mkunread"],
+	placement: "bottom"
+});
+new bootstrap.Tooltip(document.getElementById("id_togglefav"), {
+	title: language["toogle_fav"],
+	placement: "bottom"
+});
+new bootstrap.Tooltip(document.getElementById("id_fixheight"), {
+	title: language["fix_height"],
+	placement: "bottom"
+});
+new bootstrap.Tooltip(document.getElementById("id_fixwidth"), {
+	title: language["fix_width"],
+	placement: "bottom"
+});
+new bootstrap.Tooltip(document.getElementById("id_autobgcolor"), {
+	title: language["auto_bg_color"],
+	placement: "bottom"
+});
+new bootstrap.Tooltip(document.getElementById("id_zoomin"), {
+	title: language["zoom_in"],
+	placement: "bottom"
+});
+new bootstrap.Tooltip(document.getElementById("id_zoomout"), {
+	title: language["zoom_out"],
+	placement: "bottom"
+});
+new bootstrap.Tooltip(document.getElementById("id_toogleBookMark"), {
+	title: language["Bookmark"],
+	placement: "bottom"
+});
+(document.getElementById("id_magnifiermod").innerText =
+	language["magnifier_mod"]),
+	(document.getElementById("zoomlvl").innerText = language["zoom"]);
+document.getElementById("widthlvl").innerText = language["width"];
+document.getElementById("heightlvl").innerText = language["height"];
+document.getElementById("BGBTTXT").innerText =
+	language["background_by_theme"];
+document.getElementById("Radiuslvl").innerText = language["radius"];
+new bootstrap.Tooltip(document.getElementById("magnifier_note"), {
+	title: language["magnifier_note"],
+	placement: "bottom"
+});
+document.getElementById("id_spawnmagnifier").innerText =
+	language["spawn_magnifier"];
+document.getElementById("id_destroymagnifier").innerText =
+	language["destroy_magnifier"];
+document.getElementById("id_booksettings").innerText =
+	language["book_settings"];
+console.log(language["book_settings"]);
+document.getElementById("DPMTXT").innerText = language["double_page_mode"];
+document.getElementById("BPABTXT").innerText =
+	language["blank_at_beggining"];
+document.getElementById("NDPFHTXT").innerText =
+	language["no_dpm_horizontal"];
+document.getElementById("MMTXT").innerText = language["manga_mode"];
+document.getElementById("SSTXT").innerText = language["Slideshow"];
+document.getElementById("NBARTXT").innerText = language["nobar"];
+document.getElementById("SSBTXT").innerText = language["sideBar"];
+document.getElementById("PCTXT").innerText = language["PageCount"];
+document.getElementById("VIVTXT").innerText = language["vertical_reader"];
+document.getElementById("WTMTXT").innerText = language["Webtoon_Mode"];
+document.getElementById("RZPSTXT").innerText = language["reset_zoom"];
+document.getElementById("SBVSTXT").innerText = language["scrollBar_visible"];
+document.getElementById("marginlvl").innerText = language["margin"];
+document.getElementById("rotlvl").innerText = language["rotation"];
+document.getElementById("zlvll").innerText = language["zoomlvl"];
+document.getElementById("sstxt").innerText = language["slideshow_interval"];
+document.getElementById("lsps").innerText = language["page_slider"];
+document.getElementById("colorpicker_txt_id").innerText =
+	language["color_picker"];
+document.getElementById("close_id_books").innerText = language["close"];
+new bootstrap.Tooltip(document.getElementById("id_rotateright"), {
+	title: language["rotate_right"],
+	placement: "bottom"
+});
+new bootstrap.Tooltip(document.getElementById("id_rotateleft"), {
+	title: language["rotate_left"],
+	placement: "bottom"
+});
+new bootstrap.Tooltip(document.getElementById("fullscreen_id"), {
+	title: language["full_screen"],
+	placement: "bottom"
+});
 let BGBT = false; // Background By Theme
 //toolTips
 let tooltipTriggerList = [].slice.call(
@@ -591,7 +561,7 @@ function BGBTF() {
 
 //same as the one in the "end" listener of the ZIP but for RAR archive
 function postunrar() {
-	Toastifycation(language[0]["extraction_completed"], "#00C33C");
+	Toastifycation(language["extraction_completed"], "#00C33C");
 	let filepage = GetFilePage();
 	preloadImage(listofImg);
 	console.log(filepage);
@@ -700,7 +670,7 @@ async function prepareReader() {
 							console.log(error);
 						}
 					}
-					Toastifycation(language[0]["loaded_local"], "#00C33C");
+					Toastifycation(language["loaded_local"], "#00C33C");
 				}
 			).catch(function (error) {
 				console.log(error);
@@ -783,7 +753,7 @@ async function Viewer() {
 													Reader(listofImgLoc, lastpage);
 												}
 											}
-											Toastifycation(language[0]["loaded_local"], "#00C33C");
+											Toastifycation(language["loaded_local"], "#00C33C");
 										}
 									).catch(function (error) {
 										console.log(error);
@@ -1327,7 +1297,7 @@ async function getFromDB(dbname, request) {
 
 //mark as read
 function markasread() {
-	Toastifycation(language[0]["marked_as_read"], "#00C33C");
+	Toastifycation(language["marked_as_read"], "#00C33C");
 	ModifyDB(
 		"Books",
 		"reading",
@@ -1352,7 +1322,7 @@ function markasread() {
 
 //Mark as unread
 function markasunread() {
-	Toastifycation(language[0]["marked_as_unread"], "#00C33C");
+	Toastifycation(language["marked_as_unread"], "#00C33C");
 	ModifyDB(
 		"Books",
 		"reading",
@@ -1410,7 +1380,7 @@ async function InsertIntoDB(dbname, dbinfo, values) {
 //mark as reading
 function markasreading() {
 	console.log("reading");
-	Toastifycation(language[0]["marked_as_reading"], "#00C33C");
+	Toastifycation(language["marked_as_reading"], "#00C33C");
 	ModifyDB(
 		"Books",
 		"reading",
@@ -1441,7 +1411,7 @@ function ToogleFav() {
 		res = JSON.parse(res)[0]["favorite"];
 		console.log(res);
 		if (res === true) {
-			Toastifycation(language[0]["remove_fav"], "#00C33C");
+			Toastifycation(language["remove_fav"], "#00C33C");
 			document.getElementById("favoicon").innerText = "favorite_border";
 			ModifyDB(
 				"Books",
@@ -1450,7 +1420,7 @@ function ToogleFav() {
 				shortname
 			);
 		} else if (res === false) {
-			Toastifycation(language[0]["add_fav"], "#00C33C");
+			Toastifycation(language["add_fav"], "#00C33C");
 			document.getElementById("favoicon").innerText = "favorite";
 			ModifyDB(
 				"Books",
@@ -1459,7 +1429,7 @@ function ToogleFav() {
 				shortname
 			);
 		} else {
-			Toastifycation(language[0]["error"], "#ff0000");
+			Toastifycation(language["error"], "#ff0000");
 			console.log("FAV : Error");
 		}
 	});
@@ -1596,7 +1566,7 @@ function changeZoomLVL() {
 	let val = document.getElementById("zlvls").value;
 	ZoomLVL = parseInt(val);
 	document.getElementById("zlvll").innerText =
-		language[0]["zoomlvl"] + " (" + ZoomLVL + "px):";
+		language["zoomlvl"] + " (" + ZoomLVL + "px):";
 	modifyConfigJson(CosmicComicsData + "/config.json", "ZoomLVL", ZoomLVL);
 }
 
@@ -1865,7 +1835,7 @@ function MarginSlider() {
 			document.getElementById("imgViewer_" + i).style.marginBottom =
 				document.getElementById("MarginValue").value;
 			document.getElementById("marginlvl").innerText =
-				language[0]["margin"] +
+				language["margin"] +
 				" (" +
 				document.getElementById("MarginValue").value +
 				" px):";
@@ -1879,7 +1849,7 @@ function MarginSlider() {
 		document.getElementById("imgViewer_1").style.marginLeft =
 			document.getElementById("MarginValue").value;
 		document.getElementById("marginlvl").innerText =
-			language[0]["margin"] +
+			language["margin"] +
 			" (" +
 			document.getElementById("MarginValue").value +
 			" px):";
@@ -2000,11 +1970,11 @@ function preloadImage(listImages) {
 
 //Error When loading images
 document.getElementById("imgViewer_0").onerror = function () {
-	Toastifycation(language[0]["error"], "#ff0000");
+	Toastifycation(language["error"], "#ff0000");
 	document.getElementById("imgViewer_0").src = "Images/fileDefault.webp";
 };
 document.getElementById("imgViewer_1").onerror = function () {
-	Toastifycation(language[0]["error"], "#ff0000");
+	Toastifycation(language["error"], "#ff0000");
 	document.getElementById("imgViewer_1").src = "Images/fileDefault.webp";
 };
 document.getElementById("imgViewer_0").addEventListener("load", () => {
@@ -2095,7 +2065,7 @@ function AlwaysRotate() {
 		document.getElementById("imgViewer_1").style.transform =
 			"rotate(" + AlwaysRotateV + "deg)";
 		document.getElementById("rotlvl").innerText =
-			language[0]["rotation"] + " (" + rotateval + " degrees):";
+			language["rotation"] + " (" + rotateval + " degrees):";
 	}
 	modifyConfigJson(
 		CosmicComicsData + "/config.json",
@@ -2133,11 +2103,11 @@ function TSS() {
 //Text of the Slide Show slider
 function ShowOnChangeSlideShow() {
 	document.getElementById("sstxt").innerText =
-		language[0]["slideshow_interval"] +
+		language["slideshow_interval"] +
 		" (" +
 		document.getElementById("SSValue").value +
 		" " +
-		language[0]["secondes"] +
+		language["secondes"] +
 		"):";
 }
 
@@ -2376,7 +2346,7 @@ let observer = new IntersectionObserver(
 function pageslide() {
 	let pageto = document.getElementById("sps").value - 1;
 	document.getElementById("lsps").innerText =
-		language[0]["page_slider"] +
+		language["page_slider"] +
 		" (" +
 		document.getElementById("sps").value +
 		"):";
@@ -2392,7 +2362,7 @@ function pagechoose() {
 	) {
 		Reader(listofImg, pageto);
 	} else {
-		Toastifycation(language[0]["not_available"], "#ff0000");
+		Toastifycation(language["not_available"], "#ff0000");
 	}
 }
 
@@ -2576,11 +2546,11 @@ function loadParameters() {
 			}
 		}
 		document.getElementById("sstxt").innerText =
-			language[0]["slideshow_interval"] +
+			language["slideshow_interval"] +
 			" (" +
 			configSST +
 			" " +
-			language[0]["secondes"] +
+			language["secondes"] +
 			"):";
 		document.getElementById("RotateValue").value = configRA;
 		AlwaysRotate();
@@ -2588,12 +2558,12 @@ function loadParameters() {
 			for (let i = 0; i < VIV_Count; i++) {
 				document.getElementById("imgViewer_" + i).style.marginBottom = configM;
 				document.getElementById("marginlvl").innerText =
-					language[0]["margin"] + " (" + configM + " px):";
+					language["margin"] + " (" + configM + " px):";
 			}
 		} else {
 			document.getElementById("imgViewer_1").style.marginLeft = configM;
 			document.getElementById("marginlvl").innerText =
-				language[0]["margin"] + " (" + configM + " px):";
+				language["margin"] + " (" + configM + " px):";
 		}
 		if (configMM === true) {
 			MMT();

@@ -93,7 +93,7 @@ along with Cosmic-Comics.  If not, see <https://www.gnu.org/licenses/>.--->
         </div>
         <div>
             <button class="btn btns libbtn" id="libHome" onclick="returnToHome()"><i class="material-icons"
-                                                                                     style="line-height: 1;float: left;">home</i><span>Home</span>
+                                                                                     style="line-height: 1;float: left;">home</i><span id="HOMELIB">Home</span>
             </button>
         </div>
     </div>
@@ -108,7 +108,7 @@ along with Cosmic-Comics.  If not, see <https://www.gnu.org/licenses/>.--->
     <div class="modal-dialog modal-dialog-centered">
         <div class="modal-content">
             <div class="modal-header">
-                <h5 class="modal-title">Upload:</h5>
+                <h5 class="modal-title" id="upload"></h5>
                 <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
             </div>
             <div class="modal-body" style="text-align: center">
@@ -116,14 +116,13 @@ along with Cosmic-Comics.  If not, see <https://www.gnu.org/licenses/>.--->
                 <form action="/uploadComic" target="dummyUpload" onsubmit="openInViewer();" method="post" enctype="multipart/form-data">
 
                 <input type="file" name="ComicTemp" id="fileUp">
-                <button class="btn pure-material-button-contained" style="margin-top: 10px;" type="submit">Upload</button>
-                <button class="btn pure-material-button-contained-secondary" style="margin-top: 10px;"  type="reset">Reset</button>
+                <button class="btn pure-material-button-contained" style="margin-top: 10px;" type="submit" id="uploadBtn">Upload</button>
+                <button class="btn pure-material-button-contained-secondary" style="margin-top: 10px;"  type="reset" id="resetBtn">Reset</button>
                 </form>
 
             </div>
             <div class="modal-footer">
                 <button type="button" class="btn pure-material-button-contained-secondary" data-bs-dismiss="modal" id="close_libUpload">
-                    Close
                 </button>
             </div>
         </div>
@@ -142,23 +141,23 @@ along with Cosmic-Comics.  If not, see <https://www.gnu.org/licenses/>.--->
             <div class="modal-body" style="text-align: center">
                 <div class="input-field">
                 <input class="form-control" type="text" id="namelocation" name="namelocation" autocomplete="off"/>
-                <label  for="namelocation">Name of the library</label>
+                <label  for="namelocation" id="nameOfLib">Name of the library</label>
                 </div>
                 <br>
                 <div class="input-field">
 
                 <input class="form-control" type="text" id="locationa" name="locationa" autocomplete="off"/>
-                <label for="locationa">Location on the server</label>
+                <label for="locationa" id="locationOnServer">Location on the server</label>
                 </div>
                 <br>
                 <label>
                     <select id="providerID" name="providerID">
                         <option id="opt0" value="" disabled selected>Select a provider</option>
-                        <option id="opt1" value="1">Marvel API (Comics Marvel & Star Wars)</option>
+                        <option id="opt1" value="1">Marvel (Comics Marvel & Star Wars)</option>
                         <option id="opt2" value="2">Anilist (Manga)</option>
-                        <option id="opt3" value="4">Google Books (ALL)</option>
-                        <option id="opt4" value="3">Open Library (ALL)</option>
-                        <option id="opt5" value="0">MANUAL (YOU HAVE THE CONTROL)</option>
+                        <option id="opt3" value="4">Google Books</option>
+                        <option id="opt4" value="3">Open Library</option>
+                        <option id="opt5" value="0">MANUAL</option>
                     </select>
                 </label>
                 <br>
@@ -209,7 +208,7 @@ along with Cosmic-Comics.  If not, see <https://www.gnu.org/licenses/>.--->
     <div class="modal-dialog modal-xl modal-dialog-scrollable modal-dialog-centered">
         <div class="modal-content">
             <div class="modal-header">
-                <h5 class="modal-title">Rematch : </h5>
+                <h5 class="modal-title" id="rematchTitle">Rematch : </h5>
                 <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
             </div>
             <div class="modal-body" style="text-align: center">
@@ -235,18 +234,18 @@ along with Cosmic-Comics.  If not, see <https://www.gnu.org/licenses/>.--->
     <div class="modal-dialog modal-xl modal-dialog-scrollable modal-dialog-centered">
         <div class="modal-content">
             <div class="modal-header">
-                <h5 class="modal-title">API Selector : </h5>
+                <h5 class="modal-title" id="APISelectorTitle">API Selector : </h5>
                 <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
             </div>
             <div class="modal-body" style="text-align: center">
                 <label>
                     <select id="RproviderID" name="providerID">
                         <option id="Ropt0" value="" disabled selected>Select a provider</option>
-                        <option id="Ropt1" value="1">Marvel API (Comics Marvel & Star Wars)</option>
+                        <option id="Ropt1" value="1">Marvel (Comics Marvel & Star Wars)</option>
                         <option id="Ropt2" value="2">Anilist (Manga)</option>
-                        <option id="Ropt3" value="4">Google Books API (ALL)</option>
-                        <option id="Ropt4" value="3">Open Library (ALL)</option>
-                        <option id="Ropt5" value="0">MANUAL (YOU HAVE THE CONTROL)</option>
+                        <option id="Ropt3" value="4">Google Books</option>
+                        <option id="Ropt4" value="3">Open Library</option>
+                        <option id="Ropt5" value="0">MANUAL</option>
                     </select>
                 </label>
             </div>
@@ -265,7 +264,7 @@ along with Cosmic-Comics.  If not, see <https://www.gnu.org/licenses/>.--->
     <div class="modal-dialog modal-dialog-centered">
         <div class="modal-content">
             <div class="modal-header">
-                <h5 class="modal-title" id="id_nav">Navigation</h5>
+                <h5 class="modal-title" id="navigation">Navigation</h5>
                 <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"
                         aria-label="Close"></button>
             </div>
@@ -279,10 +278,6 @@ along with Cosmic-Comics.  If not, see <https://www.gnu.org/licenses/>.--->
                             data-bs-target="#settingsmodal">
                         <i class="material-icons">settings</i>
                     </button>
-                    <button class="btn" style="margin: 10px" id="id_theme" data-bs-toggle="modal"
-                            data-bs-target="#thememodal">
-                        <i class="material-icons">palette</i>
-                    </button>
                     <button class="btn" style="margin: 10px" id="id_openDL" data-bs-toggle="modal"
                             data-bs-target="#dlmodal">
                         <i class="material-icons">download</i>
@@ -291,10 +286,10 @@ along with Cosmic-Comics.  If not, see <https://www.gnu.org/licenses/>.--->
                             style="margin: 10px; height: 40px" id="id_info">
                         <i class="material-icons">info</i>
                     </button>
-                    <button class="btn" data-bs-toggle="modal" data-bs-target="#tips"
+                    <a class="btn" href="https://github.com/Nytuo/CosmicComics/wiki" target="_blank"
                             style="margin: 10px; height: 40px" id="id_tips-btn">
                         <i class="material-icons">tips_and_updates</i>
-                    </button>
+                    </a>
                     <button class="btn"
                             style="margin: 10px; height: 40px" id="id_firstOfAll">
                         <i class="material-icons">photo_library</i>
@@ -335,10 +330,10 @@ along with Cosmic-Comics.  If not, see <https://www.gnu.org/licenses/>.--->
                                                                                   href='https://www.gnu.org/licenses/gpl-3.0.html'>GNU
                     GPL-3.0</a> license.</p>
                 <p id="translated"></p>
-                <p id="beta_test">Thanks to the beta tester : THEO LEPRINCE</p>
-                <a href="#" onclick="shell.openExternal('https://nytuo.yo.fr/')"><img
+                <p id="beta_test">THEO LEPRINCE</p>
+                <a href="https://nytuo.yo.fr" target="_blank"><img
                         src="Images/Nytuo_softwares.png" alt="" class="" height="80px"/></a>
-                <a href="#" onclick="shell.openExternal('https://nytuo.yo.fr/')"><img src="Images/Nytuo website.png"
+                <a href="https://nytuo.yo.fr" target="_blank"><img src="Images/Nytuo website.png"
                                                                                       alt="" class=""
                                                                                       height="80px"/></a>
             </div>
@@ -361,9 +356,9 @@ along with Cosmic-Comics.  If not, see <https://www.gnu.org/licenses/>.--->
                         aria-label="Close"></button>
             </div>
             <div class="modal-body" style="text-align: center">
-                <p class="red">This functionality not work on all websites, such as the one's which use Google Drive
+                <p class="red" id="downloaderSpeech">This functionality not work on all websites, such as the one's which use Google Drive
                     or
-                    no-direct image link.</p>
+                    no-direct image link. Needs python on the server machine to work</p>
                 <div class="mb-3">
                     <label for="id_NAME_DL"></label><input class="form-control" type="text"
                                                            placeholder="Name of the series"
@@ -457,6 +452,18 @@ along with Cosmic-Comics.  If not, see <https://www.gnu.org/licenses/>.--->
                     <select aria-label="Default select example" style="margin-bottom: 5px"
                             onchange="selectTheme()" id="themeselector">
                         <option value="" id="selectTheme_id">Select a theme</option>
+                    </select>
+                </div>
+                <div style="margin: 10px">
+                    <select aria-label="Default select example" style="margin-bottom: 5px"
+                            onchange="selectLang()" id="languageselector">
+                        <option value="" id="selectLang_id">Select a language</option>
+                        <option value="fr" id="selectfr_id">Français</option>
+                        <option value="en" id="selecten_id">English</option>
+                        <option value="es" id="selectes_id">Espanol</option>
+                        <option value="it" id="selectit_id">Italian</option>
+                        <option value="de" id="selectde_id">Deutsch</option>
+                        <option value="dev" id="selectdev_id">Dev</option>
                     </select>
                 </div>
                 <button id="id_btn_TE" class="btn pure-material-button-contained" style="width: 100%" onclick="ToggleTBY()">
@@ -608,7 +615,7 @@ along with Cosmic-Comics.  If not, see <https://www.gnu.org/licenses/>.--->
             </div>
             <div class="modal-body" style="text-align: left">
                 <p>Warning : Be careful when you modify those fields, DO NOT change the way they are written. If an item have '"', {} or [] at the beginning and at the end DO NOT remove them change only the
-                    content. The fields marked with a red * <span style="color: red">*</span> have to be in the same</p>
+                    content. The fields marked with a red * <span style="color: red">*</span> have to respect this pattern.</p>
                 <div id="commonEdit">
                     <label for="lockCheck">Lock this item ? (That prevent the metadata to be overwritten when refresh and disable
                         rematch)</label>
@@ -739,14 +746,14 @@ along with Cosmic-Comics.  If not, see <https://www.gnu.org/licenses/>.--->
                 <div class="input-field col s6">
                     <input class="form-control" type="text" id="usernameManager" name="usernameManager"
                                                        autocomplete="off"/>
-                    <label for="usernameManager">Username : </label>
+                    <label for="usernameManager" id="usernamemanagerLabel">Username : </label>
                 </div>
                 <br>
                 <div class="input-field col s6">
 
                 <input class="form-control" type="text" id="passwordManager" name="passwordManager"
                        autocomplete="off"/>
-                <label for="passwordManager">Password : </label>
+                <label for="passwordManager" id="passwmanagerLabel">Password : </label>
                 </div>
                 <br>
                 <div id="AMImages">
@@ -786,15 +793,16 @@ along with Cosmic-Comics.  If not, see <https://www.gnu.org/licenses/>.--->
     </div>
 </div>
 <div id="home">
-    <p>Continue reading : </p>
+    <p id="continueReading">Continue reading : </p>
     <div id="continueReadingHome">
 
     </div>
-    <p>My favorites : </p>
+    <p id="myfav">My favorites : </p>
+
     <div id="myfavoriteHome"></div>
-    <p>Recently added : </p>
+    <p id="recentlyAddedLabel">Recently added : </p>
     <div id="recentlyAdded"></div>
-    <p>To read : </p>
+    <p id="toReadd">To read : </p>
     <div id="toRead"></div>
 </div>
 <!--The overlay-->
@@ -836,16 +844,16 @@ along with Cosmic-Comics.  If not, see <https://www.gnu.org/licenses/>.--->
             <div id="startDate"></div>
 
             <div id="btnsActions">
-                <a href="#" id="playbutton"> <i class="material-icons" style="">play_arrow</i></a>
+                <a href="#" id="playbutton"><i class="material-icons">play_arrow</i></a>
                 <a href="#" id="checkbtn"> <i class="material-icons" style="">check</i></a>
                 <a href="#" id="readingbtndetails"> <i class="material-icons" style="">auto_stories</i></a>
                 <a href="#" id="decheckbtn"> <i class="material-icons" style="">close</i></a>
                 <a href="#" id="favoritebtn"> <i class="material-icons" style="">favorite</i></a>
-                <a href="#" data-bs-target="#editmodal" data-bs-toggle="modal"> <i class="material-icons"
+                <a href="#" data-bs-target="#editmodal" data-bs-toggle="modal" id="editmodalBtn"> <i class="material-icons"
                                                                                    style="">edit</i></a>
                 <a href="#" id="DLBOOK"> <i class="material-icons" style="">download</i></a>
-                <a href="#"> <i class="material-icons" id="refresh" style="">refresh</i></a>
-                <a href="#"> <i class="material-icons" id="rematch" style="">youtube_searched_for</i></a>
+                <a href="#" id="refreshBtn"> <i class="material-icons" id="refresh" style="">refresh</i></a>
+                <a href="#" id="rematchBtn"> <i class="material-icons" id="rematch" style="">youtube_searched_for</i></a>
                 <div class="rating">
                     <input type="radio" name="rating" id="rating-5" onClick="changeRating('Series', 5)"/>
                     <label For="rating-5"></label>
@@ -1066,7 +1074,7 @@ along with Cosmic-Comics.  If not, see <https://www.gnu.org/licenses/>.--->
             <div id="readstat"><input type="number" step="1" min="0" id="readAddInput"></div>
             <div id="detailSeparator" style="margin-top:30vh;"></div>
             <div id="ContentView">
-                <h2>Volumes : </h2>
+                <h2 id="volumesLabel">Volumes : </h2>
             </div>
             <div id="characters"></div>
             <div id="Staff"></div>
@@ -1081,18 +1089,21 @@ along with Cosmic-Comics.  If not, see <https://www.gnu.org/licenses/>.--->
     </div>
 </div>
 <!--Loading scripts-->
+<script src="lang.js"></script>
 <script type="text/javascript" src="js/Card.js"></script>
 <script type="text/javascript" src="js/Book.js"></script>
 <script type="text/javascript" src="js/profile.js"></script>
+<script src="js/common.js"></script>
+<script type="text/javascript" src="js/language.js"></script>
 <script type="text/javascript" src="js/api/Anilist.js"></script>
 <script type="text/javascript" src="js/api/API.js"></script>
 <script type="text/javascript" src="js/api/GoogleBooks.js"></script>
 <script type="text/javascript" src="js/api/Marvel.js"></script>
 <script type="text/javascript" src="js/api/OpenLibrary.js"></script>
 
-<script type="text/javascript" src="index.js"></script>
 <script type="text/javascript" src="/js/materialize.js"></script>
 <script type="text/javascript" src="/modules/bootstrapJS"></script>
+<script type="text/javascript" src="index.js"></script>
 </body>
 
 </html>

@@ -1,10 +1,16 @@
 window.scroll(0, 0);
 const profilesDiv = document.getElementById("login_discover")
-const url = document.createElement("a");
-url.setAttribute("href", window.location.href);
-let domain = url.hostname;
-let port = url.port;
 
+document.getElementById("whosreading").innerText = language["whosreading"];
+document.getElementById("id_log").innerText = language["login"];
+document.getElementById("close_nav").innerText = language["close"];
+document.getElementById("loginInBtn").innerText = language["loginInBtn"];
+document.getElementById("firstConfig").innerText = language["firstConfig"];
+document.getElementById("createFirstAccount").innerText = language["createFirstAccount"];
+document.getElementById("theUserNameLabel").innerText = language["theUserNameLabel"];
+document.getElementById("ThePassToWorLabel").innerText = language["ThePassToWorLabel"];
+document.getElementById("servNameLabel").innerText = language["servNameLabel"];
+document.getElementById("createAccountBtn").innerText = language["createAccountBtn"];
 
 async function discover(){
     fetch("http://" + domain + ":" + port + "/profile/discover").then(function (response) {
@@ -29,7 +35,7 @@ async function discover(){
             profileDiv.className = "login_elements";
             if (profile.passcode === true) {
                 profileDiv.addEventListener("click", function () {
-                    document.getElementById("id_log").innerText = "Login for : " + profile.name;
+                    document.getElementById("id_log").innerText = language["loginFor"] + profile.name;
                     let myModal = new bootstrap.Modal(document.getElementById('passcode'), {
                         keyboard: false
                     })
@@ -37,17 +43,17 @@ async function discover(){
                     myModal.show(modalToggle)
     
                     document.getElementById("loginInBtn").addEventListener("click", async function () {
-                        if (document.getElementById("ThePassToWord").value.trim() === "") alert("This account needs a password to login. Please enter a password below.");
+                        if (document.getElementById("ThePassToWord").value.trim() === "") alert(language["needPassword"]);
                         await fetch("http://" + domain + ":" + port + "/profile/login/" + profile.name + "/" + document.getElementById("ThePassToWord").value.trim()).then(function (response) {
                             return response.text();
                         }).then(function (data) {
                             if (data === "false") {
-                                alert("Wrong password");
+                                alert(language["wrongPassword"]);
                             } else if(data){
                                 setCookie('selectedProfile', data, 2);
                                 window.location.href = "index";
                             }else{
-                                alert("Please insert a password");
+                                alert(language["InsertPassword"]);
                             }
                         }).catch(function (error) {
                             console.log(error);
