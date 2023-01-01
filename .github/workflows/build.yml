@@ -34,7 +34,7 @@ jobs:
             sudo apt install rpm
             sudo apt install build-essential
             sudo apt install flatpak flatpak-builder
-            sudo flatpak remote-add --assumeyes --if-not-exists flathub https://flathub.org/repo/flathub.flatpakrepo
+            sudo flatpak remote-add --if-not-exists flathub https://flathub.org/repo/flathub.flatpakrepo
             sudo flatpak install --assumeyes flathub org.freedesktop.Platform//22.08 org.freedesktop.Sdk//22.08 org.electronjs.Electron2.BaseApp//22.08
             yarn install
             yarn dist
