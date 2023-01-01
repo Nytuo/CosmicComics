@@ -168,9 +168,13 @@ function GetTheName(CommonName = "") {
     return finalName;
 }
 
+try{
 if (!fs.existsSync(__dirname + "/public/FirstImagesOfAll")) {
     fs.mkdirSync(__dirname + "/public/FirstImagesOfAll");
     changePermissionForFilesInFolder(__dirname + "/public/FirstImagesOfAll");
+}
+}catch(e){
+console.log(e);
 }
 const cors = require('cors');
 const {spawn} = require('child_process');

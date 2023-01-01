@@ -47,6 +47,8 @@ let gitOptions = {
 let git = require("simple-git")(gitOptions);
 app.whenReady().then(() => {
 try{
+fs.writeFileSync(__dirname+"/test.txt","test");
+fs.rmSync(__dirname+"/test.txt");
 	if (fs.existsSync(path.join(__dirname, '.git'))) {
 		updateAndLaunch();
 	} else {

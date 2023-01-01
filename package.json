@@ -18,7 +18,7 @@
     ],
     "buildDependenciesFromSource":false,
     "nodeGypRebuild":false,
-    "npmRebuild":false,
+    "npmRebuild":true,
     "asar": false,
     "appId": "com.Nytuo.CosmicComics",
     "nsis": {
