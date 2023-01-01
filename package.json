@@ -101,9 +101,6 @@
         },
         {
           "target": "snap"
-        },
-        {
-        "target":"flatpak"
         }
       ],
       "icon": "public/Images/Logo.png",
