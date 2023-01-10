@@ -662,7 +662,11 @@ async function prepareReader() {
 						try {
 							await getFromDB("Books", "last_page FROM Books WHERE PATH='" + path + "'").then(async (res) => {
 								console.log(res);
-								lastpage = JSON.parse(res)[0]["last_page"];
+								if (res === "[]" || res === undefined || res === null || res === "" || res.length === 0){
+									lastpage = 0;
+								}else{
+									lastpage = JSON.parse(res)[0]["last_page"];
+								}
 								console.log(lastpage);
 								Reader(listofImgLoc, lastpage);
 							});

@@ -12,7 +12,6 @@ const Seven = require("node-7z");
 const {getColor, getPalette} = require('color-extr-thief');
 const Path27Zip = SevenBin.path7za;
 const webp = require('webp-converter');
-const PdfExtractor = require("pdf-extractor").PdfExtractor;
 let CryptoJS = require("crypto-js");
 app.use("", express.static(__dirname + "/public"));
 app.use("/js", express.static(__dirname + "/js"));
@@ -1928,15 +1927,33 @@ async function UnZip(zipPath, ExtractDir, name, ext, token) {
                 console.log("An error occured" + err);
             });
         } else if (ext === "pdf") {
-            let pdfExtractor = new PdfExtractor(ExtractDir, {
-                viewportScale: (width, height) => {
-                    if (width > height) {
-                        return 1100 / width;
-                    }
-                    return 800 / width;
-                },
-            })
-            pdfExtractor.parse(zipPath).then((data) => {
+
+            const {spawn} = require('child_process');
+            let arch = os.arch();
+            let oos = os.platform()
+            let supportedArch = ["arm64","x64","ia32"]
+            let supportedOS = ["win32","linux"]    
+            if (!supportedArch.includes(arch) && !supportedOS.includes(oos)) {
+                console.log("Unsupported OS or Arch");
+                return;
+            }
+            const convertLoc = __dirname+ "/external_scripts/"+oos+"/"+arch+"/convert" + (oos === "win32" ? ".exe" : "");
+            let ls;
+            if (oos === "win32") {
+            ls = spawn("cmd" , ["/c", convertLoc, "-density", "300", zipPath, ExtractDir + "/%d.jpg"]);
+            } else
+            if (oos === "linux") {
+            ls = spawn("/bin/bash", ["-c", convertLoc + " -density 300 " + zipPath + " " + ExtractDir + "/%d.jpg"]);
+            }
+            ls.stdout.on('data', (data) => {
+                console.log(`stdout: ${data}`);
+                
+            });
+            ls.stderr.on('data', (data) => {
+                console.log(`stderr: ${data}`);
+            });               
+            ls.on('close', (code) => {
+                console.log(`child process exited with code ${code}`);  
                 listOfElements = GetListOfImg(CosmicComicsTemp + "/profiles/" + resolveToken(token) + "/current_book");
                 console.log("finish");
                 var name1 = path.basename(zipPath);
@@ -1953,8 +1970,14 @@ async function UnZip(zipPath, ExtractDir, name, ext, token) {
                                 result.push(row);
                             });
                             console.log(result);
-                            SendTo(result[0].last_page);
-                            return result[0].last_page;
+                            if (result === undefined || result.length == 0) {
+                                SendTo(0);
+                                return 0;
+                            }else{
+
+                                SendTo(result[0].last_page);
+                                return result[0].last_page;
+                            }
                         });
                     } catch (e) {
                         console.log(e);
@@ -1963,7 +1986,6 @@ async function UnZip(zipPath, ExtractDir, name, ext, token) {
                     console.log(error);
                 }
             });
-
         } else if (
             ext == "zip" ||
             ext == "cbz" ||

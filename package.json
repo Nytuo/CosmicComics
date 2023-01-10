@@ -16,9 +16,9 @@
       "!languages/dev.json",
       "!CosmicData${/*}"
     ],
-    "buildDependenciesFromSource":false,
-    "nodeGypRebuild":false,
-    "npmRebuild":true,
+    "buildDependenciesFromSource": false,
+    "nodeGypRebuild": false,
+    "npmRebuild": false,
     "asar": false,
     "appId": "com.Nytuo.CosmicComics",
     "nsis": {
@@ -30,9 +30,9 @@
     "snap": {
       "confinement": "strict"
     },
-    "flatpak":{
-    "runtimeVersion":22.08,
-    "baseVersion":22.08
+    "flatpak": {
+      "runtimeVersion": 22.08,
+      "baseVersion": 22.08
     },
     "publish": [
       {
@@ -103,7 +103,7 @@
           "target": "snap"
         },
         {
-          "target":"flatpak"
+          "target": "flatpak"
         }
       ],
       "icon": "public/Images/Logo.png",
@@ -137,14 +137,13 @@
   },
   "devDependencies": {
     "electron": "^23.0.0-alpha.3",
-    "electron-builder": "^24.0.0-alpha.8"
+    "electron-builder": "^24.0.0-alpha.9"
   },
   "dependencies": {
     "7zip-bin": "^5.1.1",
     "@popperjs/core": "^2.9.2",
     "anilist-node": "^1.13.1",
     "bootstrap": "^5.0.2",
-    "canvas": "^2.11.0",
     "color-extr-thief": "^2.3.4",
     "cors": "^2.8.5",
     "crypto-js": "^4.1.1",
@@ -157,7 +156,6 @@
     "multer": "^1.4.5-lts.1",
     "node-7z": "^3.0.0",
     "nodemon": "^2.0.15",
-    "pdf-extractor": "^2.2.0",
     "puppeteer": "^19.4.0",
     "simple-git": "^3.15.1",
     "sqlite3": "^5.0.11",
@@ -165,12 +163,5 @@
     "unrar": "^0.2.0",
     "unrar-binaries": "^1.1.0",
     "webp-converter": "^2.3.3"
-  },
-  "overrides": {
-    "pdf-extractor": {
-      "dependencies": {
-        "canvas": "^2.10.2"
-      }
-    }
   }
 }
