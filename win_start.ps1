@@ -78,16 +78,10 @@ function FirstInstall
     }
     else
     {
-        if (Command-Test node)
-        {
-            Write-Host "INFO : Node already installed." -ForegroundColor Blue
 
-        }
-        else
-        {
             Write-Host "INFO : Downloading Node..." -ForegroundColor Blue
             DLNode
-        }
+        
 
     }
     CleanUp
@@ -96,11 +90,11 @@ function FirstInstall
     Write-Host "INFO : Installing dependencies..." -ForegroundColor Blue
     if (((Get-CimInstance Win32_operatingsystem).OSArchitecture) -eq "64-bit" -or ((Get-CimInstance Win32_operatingsystem).OSArchitecture) -eq "64 bits")
     {
-        $nodeins = Join-Path -Path $installoc -ChildPath "/node/node-v16.14.2-win-x64/npm install --production"
+        $nodeins = Join-Path -Path $installoc -ChildPath "/node/node-v18.12.1-win-x64/npm install --production"
     }
     else
     {
-        $nodeins = Join-Path -Path $installoc -ChildPath "/node/node-v16.14.2-win-x86/npm install --production"
+        $nodeins = Join-Path -Path $installoc -ChildPath "/node/node-v18.12.1-win-x86/npm install --production"
     }
     cmd.exe /c $nodeins
 }
@@ -111,14 +105,14 @@ function DLNode
     if (((Get-CimInstance Win32_operatingsystem).OSArchitecture) -eq "64-bit" -or ((Get-CimInstance Win32_operatingsystem).OSArchitecture) -eq "64 bits")
     {
 
-        curl.exe https://nodejs.org/dist/v16.14.2/node-v16.14.2-win-x64.zip --output node.zip
+        curl.exe https://nodejs.org/dist/v18.12.1/node-v18.12.1-win-x64.zip --output node.zip
         Expand-Archive -Path node.zip -DestinationPath node
 
     }
     elseif (((Get-CimInstance Win32_operatingsystem).OSArchitecture) -eq "32-bit" -or ((Get-CimInstance Win32_operatingsystem).OSArchitecture) -eq "32 bits")
     {
 
-        curl.exe https://nodejs.org/dist/v16.14.2/node-v16.14.2-win-x86.zip --output node.zip
+        curl.exe https://nodejs.org/dist/v18.12.1/node-v18.12.1-win-x86.zip --output node.zip
         Expand-Archive -Path node.zip -DestinationPath node
 
     }
@@ -184,11 +178,11 @@ function setNodePath
     param ()
     if (((Get-CimInstance Win32_operatingsystem).OSArchitecture) -eq "64-bit" -or ((Get-CimInstance Win32_operatingsystem).OSArchitecture) -eq "64 bits")
     {
-        $env:Path += ";$installoc/node/node-v16.14.2-win-x64"
+        $env:Path += ";$installoc/node/node-v18.12.1-win-x64"
     }
     else
     {
-        $env:Path += ";$installoc/node/node-v16.14.2-win-x86"
+        $env:Path += ";$installoc/node/node-v18.12.1-win-x86"
     }
 }
 function LaunchServer
@@ -226,11 +220,11 @@ function LaunchServer
     if (((Get-CimInstance Win32_operatingsystem).OSArchitecture) -eq "64-bit" -or ((Get-CimInstance Win32_operatingsystem).OSArchitecture) -eq "64 bits")
     {
 
-        $nodepm = Join-Path -Path $installoc -ChildPath "/node/node-v16.14.2-win-x64/npm run serv"
+        $nodepm = Join-Path -Path $installoc -ChildPath "/node/node-v18.12.1-win-x64/npm run serv"
     }
     elseif (((Get-CimInstance Win32_operatingsystem).OSArchitecture) -eq "32-bit" -or ((Get-CimInstance Win32_operatingsystem).OSArchitecture) -eq "32 bits")
     {
-        $nodepm = Join-Path -Path $installoc -ChildPath "/node/node-v16.14.2-win-x86/npm run serv"
+        $nodepm = Join-Path -Path $installoc -ChildPath "/node/node-v18.12.1-win-x86/npm run serv"
 
     }
     start http://localhost:$port
@@ -256,17 +250,11 @@ if (Test-Path -Path $installoc/Git)
 }
 else
 {
-    if (Command-Test git)
-    {
-        Write-Host -ForegroundColor Blue "INFO : Git already installed."
 
-    }
-    else
-    {
         Write-Host -ForegroundColor Blue "INFO : Git not found. Will be downloaded and installed"
 
         GetGit
-    }
+    
 
 }
 

@@ -68,6 +68,9 @@ if (isPortable) {
 }
 let CosmicComicsTemp = path2Data;
 
+//Creating the folders to the CosmicData's path
+fs.mkdirSync(CosmicComicsTemp, {recursive: true});
+
 if (!fs.existsSync(CosmicComicsTemp+"/.env")){
     let envTemplate = "MARVEL_PUBLIC_KEY=\nMARVEL_PRIVATE_KEY=\nGBOOKSAPIKEY=\n"
     fs.writeFileSync(CosmicComicsTemp + "/.env", envTemplate, {encoding: 'utf8'});
@@ -108,8 +111,7 @@ const ValidatedExtensionImage = [
 ];
 let mangaMode = false;
 
-//Creating the folders to the CosmicData's path
-fs.mkdirSync(CosmicComicsTemp, {recursive: true});
+
 //If the serverconfig.json doesn't exist, create it
 if (!fs.existsSync(CosmicComicsTemp + "/serverconfig.json")) {
     const obj = {
