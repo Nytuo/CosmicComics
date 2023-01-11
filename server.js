@@ -1929,22 +1929,8 @@ async function UnZip(zipPath, ExtractDir, name, ext, token) {
         } else if (ext === "pdf") {
 
             const {spawn} = require('child_process');
-            let arch = os.arch();
-            let oos = os.platform()
-            let supportedArch = ["arm64","x64","ia32"]
-            let supportedOS = ["win32","linux"]    
-            if (!supportedArch.includes(arch) && !supportedOS.includes(oos)) {
-                console.log("Unsupported OS or Arch");
-                return;
-            }
-            const convertLoc = __dirname+ "/external_scripts/"+oos+"/"+arch+"/convert" + (oos === "win32" ? ".exe" : "");
             let ls;
-            if (oos === "win32") {
-            ls = spawn("cmd" , ["/c", convertLoc, "-density", "300", zipPath, ExtractDir + "/%d.jpg"]);
-            } else
-            if (oos === "linux") {
-            ls = spawn("/bin/bash", ["-c", convertLoc + " -density 300 " + zipPath + " " + ExtractDir + "/%d.jpg"]);
-            }
+            ls = spawn('convert', ['-density', '300', zipPath, ExtractDir + '/%d.jpg']);
             ls.stdout.on('data', (data) => {
                 console.log(`stdout: ${data}`);
                 
