@@ -34,6 +34,13 @@
       "runtimeVersion": 22.08,
       "baseVersion": 22.08
     },
+    "appx":{
+      "displayName": "Cosmic Comics",
+      "identityName": "63948Nytuo.CosmicComics",
+      "publisher": "CN=65511420-BCA9-4A4C-A702-D5D8735EC387",
+      "applicationId": "CosmicComics",
+      "publisherDisplayName": "Nytuo"
+    },
     "publish": [
       {
         "provider": "github",
@@ -49,18 +56,27 @@
         "github"
       ],
       "target": [
-        {
-          "target": "nsis",
+       {"target": "nsis",
           "arch": [
             "x64",
-            "ia32"
+            "ia32",
+            "arm64"
           ]
         },
         {
           "target": "zip",
           "arch": [
             "x64",
-            "ia32"
+            "ia32",
+            "arm64"
+          ]
+        },
+        {
+          "target": "appx",
+          "arch": [
+            "x64",
+            "ia32",
+            "arm64"
           ]
         }
       ],
