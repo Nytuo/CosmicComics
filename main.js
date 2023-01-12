@@ -45,34 +45,61 @@ let gitOptions = {
 
 }
 let git = require("simple-git")(gitOptions);
-app.whenReady().then(() => {
-try{
-fs.writeFileSync(__dirname+"/test.txt","test");
-fs.rmSync(__dirname+"/test.txt");
-	if (fs.existsSync(path.join(__dirname, '.git'))) {
-		updateAndLaunch();
-	} else {
-		console.log("No git repository found, initializing...");
-		git.init(false,{},function (err, init) {
-			console.log(err);
-			git.addRemote('origin', url+ '.git', function (err) {
-				console.log(err);
+var isWin = require('os').platform().indexOf('win') > -1;
+
+var where = isWin ? 'where' : 'type';
+
+var spawn = require('child_process').spawn;
+
+var out = spawn(where + ' git', [], { shell: true });
+
+function PrepareLaunch() {
+	fs.access(__dirname, fs.constants.W_OK, (err) => {
+		if (err) {
+			console.log("Can't write on the directory, skipping update");
+			launch();
+		} else {
+			if (fs.existsSync(path.join(__dirname, '.git'))) {
 				updateAndLaunch();
-			});
-		});
-
-
-	}
-}catch (e){
-	console.log("Update via Git not possible, this may be due to no write access or contained app such as AppX or Snap/flatpak");
-	createServer();
-						createWindow();
-						app.on('activate', () => {
-							if (BrowserWindow.getAllWindows().length === 0) {
-								createWindow();
-							}
-						});
+			} else {
+				console.log("No git repository found, initializing...");
+				git.init(false,{},function (err, init) {
+					console.log(err);
+					git.addRemote('origin', url+ '.git', function (err) {
+						console.log(err);
+						updateAndLaunch();
+					});
+				});
+			}
+		}
+	});
 }
+
+out.on('close', function (code) {
+    console.log('git exit code : ' + code);
+	if (code === 0) {
+		PrepareLaunch();
+	}else{
+		console.log("Git not installed, skipping update");
+		launch();
+	}
+});
+
+
+
+function launch(){
+	createServer();
+	createWindow();
+	app.on('activate', () => {
+		if (BrowserWindow.getAllWindows().length === 0) {
+			createWindow();
+		}
+	});
+}
+
+app.whenReady().then(() => {
+
+
 	
 });
 
@@ -88,13 +115,7 @@ function updateAndLaunch() {
 					if (err){
 						app.quit();
 					}else{
-						createServer();
-						createWindow();
-						app.on('activate', () => {
-							if (BrowserWindow.getAllWindows().length === 0) {
-								createWindow();
-							}
-						});
+						launch();
 					}
 
 				});
