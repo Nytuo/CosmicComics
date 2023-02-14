@@ -30,7 +30,7 @@ This is all you can do with this software and more:
 - Many Customizable parameters
 - Zoom, Auto Background Color, Double page Mode, Blank first page, No double page for Horizontal, Manga Mode, Webtoon Mode, fullscreen, rotations, Bookmarks, Slideshow, SideBar, Hide Menu Bar.
 - Display information about Comics/ Manga
-- Libraries with API support
+- Libraries information provided by APIs (Marvel API, Google Books API, Anilist,...)
 - Continue reading where you stopped and more...
 
 ## How to install
