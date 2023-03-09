@@ -1,0 +1,13 @@
+version: "3.0"
+services:    
+  cosmiccomics:
+    image: nytuo/cosmic_comics:2.0.0
+    container_name: cosmiccomics
+    command: npm run serv
+    volumes:
+      - /path/to/library/on/pc:/path/to/library/on/docker
+      - .:/usr/app
+      - /usr/app/node_modules
+    ports:
+      - 4696:4696
+    restart: unless-stopped
