@@ -262,8 +262,16 @@ app.use(cors());
 app.use(express.json({limit: "50mb"}));
 app.use(express.urlencoded({extended: true}));
 app.use(limiterDefault)
-let host, port;
-const server = app.listen(JSON.parse(fs.readFileSync(CosmicComicsTemp + "/serverconfig.json").toString()).port, "0.0.0.0", function () {
+let host;
+const args = process.argv.slice(2);
+let port = JSON.parse(fs.readFileSync(CosmicComicsTemp + "/serverconfig.json").toString()).port;
+for (let i = 0; i < args.length; i++) {
+    if (args[i] === "-p" || args[i] === "--port") {
+        port = args[i + 1];
+        break;
+    }
+}
+const server = app.listen(port, "0.0.0.0", function () {
     host = this.address().address;
     port = this.address().port;
     console.log("Listening on port %s:%s!", host, port);

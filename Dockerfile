@@ -1,5 +1,9 @@
 FROM node:18-alpine
-ENV NODE_ENV=production
-WORKDIR /app
-COPY ["package.json", "package-lock.json*", "./"]
-RUN npm install --production
+RUN mkdir -p /home/node/app/node_modules && chown -R node:node /home/node/app
+WORKDIR /home/node/app
+COPY package*.json ./
+USER node
+RUN npm install
+COPY --chown=node:node . .
+EXPOSE 4696
+CMD ["node","server.js","--port","4696"]
