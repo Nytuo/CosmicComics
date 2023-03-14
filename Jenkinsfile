@@ -3,9 +3,15 @@ node {
     checkout scm
   }
   stage('SonarQube Analysis') {
-    def scannerHome = tool 'SonarScanner';
-    withSonarQubeEnv() {
-      sh "${scannerHome}/bin/sonar-scanner"
+    steps{
+      nodejs(nodeJSInstallationName: 'nodejs'){
+        sh "node -v"
+        sh "npm install"
+        withSonarQubeEnv('SonarScanner'){
+        sh "npm install sonar-scanner"
+          sh "npm run sonar"
+        }
+      }
     }
   }
 }
