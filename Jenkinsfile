@@ -1,7 +1,5 @@
 pipeline  {
-  agent {
-    label 'master'
-  }
+  agent none
   tools{
     nodejs 'nodejs18'
   }
