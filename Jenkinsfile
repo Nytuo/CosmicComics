@@ -1,20 +1,25 @@
-node {
+pipeline  {
+  agent {
+    label 'master'
+  }
+  tools{
+    nodejs 'nodejs18'
+  }
   stages{
-    
-  stage('SCM') {
+    stage('SCM') {
     checkout scm
   }
-  stage('SonarQube Analysis') {
+    stage('SonarQube Analysis') {
     steps{
-      nodejs(nodeJSInstallationName: 'nodejs18'){
-        sh "node -v"
-        sh "npm install"
-        withSonarQubeEnv('SonarScanner'){
-        sh "npm install sonar-scanner"
-          sh "npm run sonar"
+script {
+          def scannerHome = tool 'SonarScanner';
+          withSonarQubeEnv('sonarqube') {
+            sh "${tool("sonarscan ")}/bin/sonar-scanner"
+          }
         }
-      }
     }
   }
   }
+
+  
 }
