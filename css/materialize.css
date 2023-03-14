@@ -1249,7 +1249,6 @@ textarea.materialize-textarea {
   height: 14px;
   background-color: rgba(0, 0, 0, 0.38);
   border-radius: 15px;
-  margin-right: 10px;
   -webkit-transition: background 0.3s ease;
   transition: background 0.3s ease;
   vertical-align: middle;
@@ -1766,7 +1765,6 @@ input[type=range]::-ms-thumb {
 
 .timepicker-text-container {
   font-size: 4rem;
-  font-weight: bold;
   text-align: center;
   color: rgba(255, 255, 255, 0.6);
   font-weight: 400;

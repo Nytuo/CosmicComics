@@ -560,7 +560,7 @@ function BGBTF() {
 }
 
 //same as the one in the "end" listener of the ZIP but for RAR archive
-function postunrar() {
+async function postunrar() {
 	Toastifycation(language["extraction_completed"], "#00C33C");
 	let filepage = GetFilePage();
 	preloadImage(listofImg);
@@ -574,7 +574,7 @@ function postunrar() {
 	} else {
 		let lastpage = 0;
 		try {
-			getFromDB("Books", "last_page FROM Books WHERE PATH='" + path + "'").then((res) => {
+			await getFromDB("Books", "last_page FROM Books WHERE PATH='" + path + "'").then((res) => {
 				lastpage = JSON.parse(res)[0]["last_page"];
 				document.getElementById("overlay").style.display = "none";
 				setTimeout(() => {
@@ -1219,11 +1219,7 @@ function FixHeight() {
 
 //GO to the beginning
 function Start() {
-	if (mangaMode === true) {
 		Reader(listofImg, 0);
-	} else {
-		Reader(listofImg, 0);
-	}
 }
 
 //Send BE
@@ -1414,7 +1410,7 @@ function ToogleFav() {
 		console.log(info);
 		res = JSON.parse(res)[0]["favorite"];
 		console.log(res);
-		if (res === true) {
+		if (res) {
 			Toastifycation(language["remove_fav"], "#00C33C");
 			document.getElementById("favoicon").innerText = "favorite_border";
 			ModifyDB(
@@ -1423,7 +1419,7 @@ function ToogleFav() {
 				false,
 				shortname
 			);
-		} else if (res === false) {
+		} else{
 			Toastifycation(language["add_fav"], "#00C33C");
 			document.getElementById("favoicon").innerText = "favorite";
 			ModifyDB(
@@ -1432,9 +1428,6 @@ function ToogleFav() {
 				true,
 				shortname
 			);
-		} else {
-			Toastifycation(language["error"], "#ff0000");
-			console.log("FAV : Error");
 		}
 	});
 }
@@ -1525,12 +1518,6 @@ function handleTouchMove(evt) {
 			NextPage();
 		} else {
 			PreviousPage();
-		}
-	} else {
-		if ( yDiff > 0 ) {
-			/* down swipe */
-		} else {
-			/* up swipe */
 		}
 	}
 	/* reset values */
@@ -1747,9 +1734,9 @@ function TBM() {
 
 //Send BE
 //Loading the BookMark
-function LoadBMI(pagec = 0) {
+async function LoadBMI(pagec = 0) {
 	try {
-		getFromDB("Bookmarks", "* FROM Bookmarks WHERE BOOK_ID='" + bookID + "' AND page=" + pagec + ";").then((res) => {
+		await getFromDB("Bookmarks", "* FROM Bookmarks WHERE BOOK_ID='" + bookID + "' AND page=" + pagec + ";").then((res) => {
 			res = JSON.parse(res);
 			console.log(res);
 			if (res.length !== 0) {
@@ -2687,8 +2674,8 @@ window.addEventListener("wheel", function (e) {
 			if (nb_of_next === 2) {
 				nb_of_next = 0;
 				nb_of_prev = 0;
-				Auth_next === false;
-				Auth_Prev === false;
+				Auth_next = false;
+				Auth_Prev = false;
 				NextPage();
 			}
 		}
@@ -2696,9 +2683,9 @@ window.addEventListener("wheel", function (e) {
 			nb_of_prev += 1;
 			if (nb_of_prev === 2) {
 				nb_of_next = 0;
-				Auth_next === false;
+				Auth_next = false;
 				nb_of_prev = 0;
-				Auth_Prev === false;
+				Auth_Prev = false;
 				PreviousPage();
 			}
 		}

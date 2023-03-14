@@ -73,56 +73,65 @@ along with Cosmic-Comics.  If not, see <https://www.gnu.org/licenses/>.--->
     <label>
         <input type="search" placeholder="Search in your libraries..." id="searchField"/>
     </label>
-    <ul id="searchResults"></ul>
+    <ul id="searchResults">
+    </ul>
 
-
-    <div class="folderExplorer librariesSideBar" id="folderExplorer">
-        <div id="groupbtn" class="btn-group" role="group" aria-label="Basic example">
-            <button class="btn btn-primary" style="height: 40px;" data-bs-toggle="modal" data-bs-target="#lib"
-                    id="id_createLib">
-                <li class="material-icons">library_add</li>
-            </button>
-            <button class="btn btn-primary" style="height: 40px;" data-bs-toggle="modal" data-bs-target="#libUpload"
-                    id="id_opnfile">
-                <i class="material-icons">note_add</i>
-            </button>
-            <button class="btn btn-primary" style="height: 40px;"
-                    id="id_addTrackedBook">
-                <i class="material-icons">local_library</i>
-            </button>
+        <div class="folderExplorer librariesSideBar" id="folderExplorer">
+            <div id="groupbtn" class="btn-group" role="group" aria-label="Basic example">
+                <button class="btn btn-primary" style="height: 40px;" data-bs-toggle="modal" data-bs-target="#lib"
+                        id="id_createLib">
+                    <li class="material-icons">library_add</li>
+                </button>
+                <button class="btn btn-primary" style="height: 40px;" data-bs-toggle="modal" data-bs-target="#libUpload"
+                        id="id_opnfile">
+                    <i class="material-icons">note_add</i>
+                </button>
+                <button class="btn btn-primary" style="height: 40px;"
+                        id="id_addTrackedBook">
+                    <i class="material-icons">local_library</i>
+                </button>
+            </div>
+            <div>
+                <button class="btn btns libbtn" id="libHome" onclick="returnToHome()"><i class="material-icons"
+                                                                                         style="line-height: 1;float: left;">home</i><span
+                        id="HOMELIB">Home</span>
+                </button>
+            </div>
         </div>
-        <div>
-            <button class="btn btns libbtn" id="libHome" onclick="returnToHome()"><i class="material-icons"
-                                                                                     style="line-height: 1;float: left;">home</i><span id="HOMELIB">Home</span>
-            </button>
-        </div>
-    </div>
-
 </header>
 
 <body>
-<iframe width="854" height="480" style="display: none" id="iframe_yt_music" src="" allowfullscreen></iframe>
+<iframe width="854" height="480" style="display: none" id="iframe_yt_music" src="" allowfullscreen
+        title="youtubeMusicFrame"></iframe>
 
-<div class="modal animate__animated animate__fadeInDown animate__faster" id="libUpload" tabindex="-1" aria-labelledby="libUpload"
+<div class="modal animate__animated animate__fadeInDown animate__faster" id="libUpload" tabindex="-1"
+     aria-labelledby="libUpload"
      aria-hidden="true" data-bs-backdrop="static" data-bs-keyboard="false" style="overflow: hidden">
     <div class="modal-dialog modal-dialog-centered">
         <div class="modal-content">
             <div class="modal-header">
                 <h5 class="modal-title" id="upload"></h5>
-                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"
+                        aria-label="Close"></button>
             </div>
             <div class="modal-body" style="text-align: center">
-        <iframe name="dummyUpload" id="dummyUpload" style="display: none"></iframe>
-                <form action="/uploadComic" target="dummyUpload" onsubmit="openInViewer();" method="post" enctype="multipart/form-data">
+                <iframe name="dummyUpload" id="dummyUpload" style="display: none" title="dummyUpload"></iframe>
+                <form action="/uploadComic" target="dummyUpload" onsubmit="openInViewer();" method="post"
+                      enctype="multipart/form-data">
 
-                <input type="file" name="ComicTemp" id="fileUp">
-                <button class="btn pure-material-button-contained" style="margin-top: 10px;" type="submit" id="uploadBtn">Upload</button>
-                <button class="btn pure-material-button-contained-secondary" style="margin-top: 10px;"  type="reset" id="resetBtn">Reset</button>
+                    <input type="file" name="ComicTemp" id="fileUp">
+                    <button class="btn pure-material-button-contained" style="margin-top: 10px;" type="submit"
+                            id="uploadBtn">Upload
+                    </button>
+                    <button class="btn pure-material-button-contained-secondary" style="margin-top: 10px;" type="reset"
+                            id="resetBtn">Reset
+                    </button>
                 </form>
 
             </div>
             <div class="modal-footer">
-                <button type="button" class="btn pure-material-button-contained-secondary" data-bs-dismiss="modal" id="close_libUpload">
+                <button type="button" class="btn pure-material-button-contained-secondary" data-bs-dismiss="modal"
+                        id="close_libUpload">
                 </button>
             </div>
         </div>
@@ -140,14 +149,14 @@ along with Cosmic-Comics.  If not, see <https://www.gnu.org/licenses/>.--->
             </div>
             <div class="modal-body" style="text-align: center">
                 <div class="input-field">
-                <input class="form-control" type="text" id="namelocation" name="namelocation" autocomplete="off"/>
-                <label  for="namelocation" id="nameOfLib">Name of the library</label>
+                    <input class="form-control" type="text" id="namelocation" name="namelocation" autocomplete="off"/>
+                    <label for="namelocation" id="nameOfLib">Name of the library</label>
                 </div>
                 <br>
                 <div class="input-field">
 
-                <input class="form-control" type="text" id="locationa" name="locationa" autocomplete="off"/>
-                <label for="locationa" id="locationOnServer">Location on the server</label>
+                    <input class="form-control" type="text" id="locationa" name="locationa" autocomplete="off"/>
+                    <label for="locationa" id="locationOnServer">Location on the server</label>
                 </div>
                 <br>
                 <label>
@@ -168,7 +177,8 @@ along with Cosmic-Comics.  If not, see <https://www.gnu.org/licenses/>.--->
 
             </div>
             <div class="modal-footer">
-                <button type="button" class="btn pure-material-button-contained-secondary" data-bs-dismiss="modal" id="close_lib"
+                <button type="button" class="btn pure-material-button-contained-secondary" data-bs-dismiss="modal"
+                        id="close_lib"
                         onclick="resetLibModal()">
                     Close
                 </button>
@@ -194,7 +204,8 @@ along with Cosmic-Comics.  If not, see <https://www.gnu.org/licenses/>.--->
                 <a class="btn pure-material-button-contained" style="cursor: pointer" id="moreinfo_btn"></a>
             </div>
             <div class="modal-footer">
-                <button type="button" class="btn pure-material-button-contained-secondary" data-bs-dismiss="modal" id="close_moreinfo"
+                <button type="button" class="btn pure-material-button-contained-secondary" data-bs-dismiss="modal"
+                        id="close_moreinfo"
                         onclick="resetLibModal()">
                     Close
                 </button>
@@ -209,7 +220,8 @@ along with Cosmic-Comics.  If not, see <https://www.gnu.org/licenses/>.--->
         <div class="modal-content">
             <div class="modal-header">
                 <h5 class="modal-title" id="rematchTitle">Rematch : </h5>
-                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"
+                        aria-label="Close"></button>
             </div>
             <div class="modal-body" style="text-align: center">
                 <input type="text" id="rematchSearch" placeholder="Search title in the library's API">
@@ -220,7 +232,8 @@ along with Cosmic-Comics.  If not, see <https://www.gnu.org/licenses/>.--->
                 </div>
             </div>
             <div class="modal-footer">
-                <button type="button" class="btn pure-material-button-contained-secondary" data-bs-dismiss="modal" id="close_rematchModal">
+                <button type="button" class="btn pure-material-button-contained-secondary" data-bs-dismiss="modal"
+                        id="close_rematchModal">
                     Close
                 </button>
             </div>
@@ -235,7 +248,8 @@ along with Cosmic-Comics.  If not, see <https://www.gnu.org/licenses/>.--->
         <div class="modal-content">
             <div class="modal-header">
                 <h5 class="modal-title" id="APISelectorTitle">API Selector : </h5>
-                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"
+                        aria-label="Close"></button>
             </div>
             <div class="modal-body" style="text-align: center">
                 <label>
@@ -250,7 +264,8 @@ along with Cosmic-Comics.  If not, see <https://www.gnu.org/licenses/>.--->
                 </label>
             </div>
             <div class="modal-footer">
-                <button type="button" class="btn pure-material-button-contained-secondary" data-bs-dismiss="modal" id="close_apiselector">
+                <button type="button" class="btn pure-material-button-contained-secondary" data-bs-dismiss="modal"
+                        id="close_apiselector">
                     Close
                 </button>
             </div>
@@ -287,7 +302,7 @@ along with Cosmic-Comics.  If not, see <https://www.gnu.org/licenses/>.--->
                         <i class="material-icons">info</i>
                     </button>
                     <a class="btn" href="https://github.com/Nytuo/CosmicComics/wiki" target="_blank"
-                            style="margin: 10px; height: 40px" id="id_tips-btn">
+                       style="margin: 10px; height: 40px" id="id_tips-btn">
                         <i class="material-icons">tips_and_updates</i>
                     </a>
                     <button class="btn"
@@ -297,7 +312,8 @@ along with Cosmic-Comics.  If not, see <https://www.gnu.org/licenses/>.--->
                 </div>
             </div>
             <div class="modal-footer">
-                <button type="button" class="btn pure-material-button-contained-secondary" data-bs-dismiss="modal" id="close_nav">
+                <button type="button" class="btn pure-material-button-contained-secondary" data-bs-dismiss="modal"
+                        id="close_nav">
                     Close
                 </button>
             </div>
@@ -334,11 +350,12 @@ along with Cosmic-Comics.  If not, see <https://www.gnu.org/licenses/>.--->
                 <a href="https://nytuo.yo.fr" target="_blank"><img
                         src="Images/Nytuo_softwares.png" alt="" class="" height="80px"/></a>
                 <a href="https://nytuo.yo.fr" target="_blank"><img src="Images/Nytuo website.png"
-                                                                                      alt="" class=""
-                                                                                      height="80px"/></a>
+                                                                   alt="" class=""
+                                                                   height="80px"/></a>
             </div>
             <div class="modal-footer">
-                <button type="button" class="btn pure-material-button-contained-secondary" data-bs-dismiss="modal" id="close_about">
+                <button type="button" class="btn pure-material-button-contained-secondary" data-bs-dismiss="modal"
+                        id="close_about">
                     Close
                 </button>
             </div>
@@ -356,7 +373,8 @@ along with Cosmic-Comics.  If not, see <https://www.gnu.org/licenses/>.--->
                         aria-label="Close"></button>
             </div>
             <div class="modal-body" style="text-align: center">
-                <p class="red" id="downloaderSpeech">This functionality not work on all websites, such as the one's which use Google Drive
+                <p class="red" id="downloaderSpeech">This functionality not work on all websites, such as the one's
+                    which use Google Drive
                     or
                     no-direct image link. Needs python on the server machine to work</p>
                 <div class="mb-3">
@@ -369,7 +387,9 @@ along with Cosmic-Comics.  If not, see <https://www.gnu.org/licenses/>.--->
                     <label for="id_URLDL"></label><input class="form-control" type="text" placeholder="URL"
                                                          id="id_URLDL">
                 </div>
-                <button class="btn pure-material-button-contained" onclick="downloader();" id="id_btnDLStart">Start Download</button>
+                <button class="btn pure-material-button-contained" onclick="downloader();" id="id_btnDLStart">Start
+                    Download
+                </button>
                 <div class="progress" id="progressbarDL">
                     <div id="prgsDL" class="determinate"></div>
                 </div>
@@ -379,7 +399,8 @@ along with Cosmic-Comics.  If not, see <https://www.gnu.org/licenses/>.--->
                 </button>
             </div>
             <div class="modal-footer">
-                <button type="button" class="btn pure-material-button-contained-secondary" data-bs-dismiss="modal" id="close_openDL">
+                <button type="button" class="btn pure-material-button-contained-secondary" data-bs-dismiss="modal"
+                        id="close_openDL">
                     Close
                 </button>
             </div>
@@ -405,7 +426,8 @@ along with Cosmic-Comics.  If not, see <https://www.gnu.org/licenses/>.--->
                 </ul>
             </div>
             <div class="modal-footer">
-                <button type="button" class="btn pure-material-button-contained-secondary" data-bs-dismiss="modal" id="close_tips">
+                <button type="button" class="btn pure-material-button-contained-secondary" data-bs-dismiss="modal"
+                        id="close_tips">
                     Close
                 </button>
             </div>
@@ -426,7 +448,8 @@ along with Cosmic-Comics.  If not, see <https://www.gnu.org/licenses/>.--->
                 <div id="bookmarkContainer" style="text-align: center"></div>
             </div>
             <div class="modal-footer">
-                <button type="button" class="btn pure-material-button-contained-secondary" data-bs-dismiss="modal" id="close_bm">
+                <button type="button" class="btn pure-material-button-contained-secondary" data-bs-dismiss="modal"
+                        id="close_bm">
                     Close
                 </button>
             </div>
@@ -445,7 +468,8 @@ along with Cosmic-Comics.  If not, see <https://www.gnu.org/licenses/>.--->
             </div>
             <div class="modal-body" style="text-align: center">
 
-                <button id="id_btn_CTN" class="btn pure-material-button-contained" style="width: 100%" onclick="clearTN()">
+                <button id="id_btn_CTN" class="btn pure-material-button-contained" style="width: 100%"
+                        onclick="clearTN()">
                     Clear the thumbnails
                 </button>
                 <div style="margin: 10px">
@@ -466,12 +490,14 @@ along with Cosmic-Comics.  If not, see <https://www.gnu.org/licenses/>.--->
                         <option value="dev" id="selectdev_id">Dev</option>
                     </select>
                 </div>
-                <button id="id_btn_TE" class="btn pure-material-button-contained" style="width: 100%" onclick="ToggleTBY()">
+                <button id="id_btn_TE" class="btn pure-material-button-contained" style="width: 100%"
+                        onclick="ToggleTBY()">
                     No theme by event
                 </button>
             </div>
             <div class="modal-footer">
-                <button type="button" class="btn pure-material-button-contained-secondary" data-bs-dismiss="modal" id="close_settings">
+                <button type="button" class="btn pure-material-button-contained-secondary" data-bs-dismiss="modal"
+                        id="close_settings">
                     Close
                 </button>
             </div>
@@ -597,7 +623,8 @@ along with Cosmic-Comics.  If not, see <https://www.gnu.org/licenses/>.--->
                        title="Choose your color" onchange="saveToTheme(this,'progress_color')"/>
             </div>
             <div class="modal-footer">
-                <button type="button" class="btn pure-material-button-contained-secondary" data-bs-dismiss="modal" id="close_theme">
+                <button type="button" class="btn pure-material-button-contained-secondary" data-bs-dismiss="modal"
+                        id="close_theme">
                     Close
                 </button>
             </div>
@@ -605,7 +632,8 @@ along with Cosmic-Comics.  If not, see <https://www.gnu.org/licenses/>.--->
     </div>
 </div>
 <div class="modal animate__animated animate__fadeInDown animate__faster" id="editmodal" tabindex="-1"
-     aria-labelledby="id_editmodal" data-bs-backdrop="static" aria-hidden="true" data-bs-keyboard="false" style="overflow: hidden">
+     aria-labelledby="id_editmodal" data-bs-backdrop="static" aria-hidden="true" data-bs-keyboard="false"
+     style="overflow: hidden">
     <div class="modal-dialog modal-dialog-centered modal-dialog-scrollable">
         <div class="modal-content">
             <div class="modal-header">
@@ -614,12 +642,15 @@ along with Cosmic-Comics.  If not, see <https://www.gnu.org/licenses/>.--->
                         aria-label="Close"></button>
             </div>
             <div class="modal-body" style="text-align: left">
-                <p>Warning : Be careful when you modify those fields, DO NOT change the way they are written. If an item have '"', {} or [] at the beginning and at the end DO NOT remove them change only the
-                    content. The fields marked with a red * <span style="color: red">*</span> have to respect this pattern.</p>
+                <p>Warning : Be careful when you modify those fields, DO NOT change the way they are written. If an item
+                    have '"', {} or [] at the beginning and at the end DO NOT remove them change only the
+                    content. The fields marked with a red * <span style="color: red">*</span> have to respect this
+                    pattern.</p>
                 <div id="commonEdit">
-                    <label for="lockCheck">Lock this item ? (That prevent the metadata to be overwritten when refresh and disable
+                    <label for="lockCheck">Lock this item ? (That prevent the metadata to be overwritten when refresh
+                        and disable
                         rematch)</label>
-                        <input type="checkbox" id="lockCheck"/>
+                    <input type="checkbox" id="lockCheck"/>
 
 
                     <label>
@@ -724,7 +755,8 @@ along with Cosmic-Comics.  If not, see <https://www.gnu.org/licenses/>.--->
             </div>
             <div class="modal-footer">
                 <button class="btn pure-material-button-contained" id="sendEdit">SEND</button>
-                <button type="button" class="btn pure-material-button-contained-secondary" data-bs-dismiss="modal" id="close_edit">
+                <button type="button" class="btn pure-material-button-contained-secondary" data-bs-dismiss="modal"
+                        id="close_edit">
                     Close
                 </button>
             </div>
@@ -745,20 +777,21 @@ along with Cosmic-Comics.  If not, see <https://www.gnu.org/licenses/>.--->
             <div class="modal-body" style="text-align: center">
                 <div class="input-field col s6">
                     <input class="form-control" type="text" id="usernameManager" name="usernameManager"
-                                                       autocomplete="off"/>
+                           autocomplete="off"/>
                     <label for="usernameManager" id="usernamemanagerLabel">Username : </label>
                 </div>
                 <br>
                 <div class="input-field col s6">
 
-                <input class="form-control" type="text" id="passwordManager" name="passwordManager"
-                       autocomplete="off"/>
-                <label for="passwordManager" id="passwmanagerLabel">Password : </label>
+                    <input class="form-control" type="text" id="passwordManager" name="passwordManager"
+                           autocomplete="off"/>
+                    <label for="passwordManager" id="passwmanagerLabel">Password : </label>
                 </div>
                 <br>
                 <div id="AMImages">
                     <template id="template_AMI">
-                        <img src="Images/account_default/1.jpg" style="width: 60px;height:60px;margin-left:5px;"/>
+                        <img src="Images/account_default/1.jpg" style="width: 60px;height:60px;margin-left:5px;"
+                             alt="Account profile picture"/>
                     </template>
 
                 </div>
@@ -775,7 +808,8 @@ along with Cosmic-Comics.  If not, see <https://www.gnu.org/licenses/>.--->
 
             </div>
             <div class="modal-footer">
-                <button type="button" class="btn pure-material-button-contained-secondary" data-bs-dismiss="modal" id="close_mna">
+                <button type="button" class="btn pure-material-button-contained-secondary" data-bs-dismiss="modal"
+                        id="close_mna">
                     Close
                 </button>
             </div>
@@ -849,11 +883,13 @@ along with Cosmic-Comics.  If not, see <https://www.gnu.org/licenses/>.--->
                 <a href="#" id="readingbtndetails"> <i class="material-icons" style="">auto_stories</i></a>
                 <a href="#" id="decheckbtn"> <i class="material-icons" style="">close</i></a>
                 <a href="#" id="favoritebtn"> <i class="material-icons" style="">favorite</i></a>
-                <a href="#" data-bs-target="#editmodal" data-bs-toggle="modal" id="editmodalBtn"> <i class="material-icons"
-                                                                                   style="">edit</i></a>
+                <a href="#" data-bs-target="#editmodal" data-bs-toggle="modal" id="editmodalBtn"> <i
+                        class="material-icons"
+                        style="">edit</i></a>
                 <a href="#" id="DLBOOK"> <i class="material-icons" style="">download</i></a>
                 <a href="#" id="refreshBtn"> <i class="material-icons" id="refresh" style="">refresh</i></a>
-                <a href="#" id="rematchBtn"> <i class="material-icons" id="rematch" style="">youtube_searched_for</i></a>
+                <a href="#" id="rematchBtn"> <i class="material-icons" id="rematch"
+                                                style="">youtube_searched_for</i></a>
                 <div class="rating">
                     <input type="radio" name="rating" id="rating-5" onClick="changeRating('Series', 5)"/>
                     <label For="rating-5"></label>

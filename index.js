@@ -805,13 +805,6 @@ function summonSearch() {
 }
 
 /**
- * Reload the page
- */
-function refreshPage() {
-    window.location.href = window.location.href;
-}
-
-/**
  * Scan for folders in the library
  * @param {string} result The path to the library
  * @returns {Promise<string[]>} The list of folders
@@ -957,7 +950,7 @@ function loadView(FolderRes, libraryPath, date = "", provider = providerEnum.MAN
         for (let index = 0; index < data.length; index++) {
             const path = data[index];
             let name = path.replaceAll(libraryPath.replaceAll("\\", "/"), "")
-            let realname = /[^\\\/]+(?=\.[\w]+$)|[^\\\/]+$/.exec(name)[0];
+            let realname = /[^\\\/]+(?=\.\w+$)|[^\\\/]+$/.exec(name)[0];
             let readBookNB = await getFromDB("Books", "COUNT(*) FROM Books WHERE READ = 1 AND PATH = '" + path + "'");
             document.getElementById("readstat").innerText = JSON.parse(readBookNB)[0]["COUNT(*)"] + " / " + data.length + " volumes read";
             await getFromDB("Books", "* FROM Books WHERE PATH = '" + path + "'").then(async (resa) => {
@@ -1395,7 +1388,7 @@ function setCookie(cName, cValue, expHours) {
 }
 function selectLang() {
     setCookie("lang", document.getElementById("languageselector").value, 60);
-    refreshPage()
+    window.location.reload();
 }
 fetch(PDP + "/getThemes").then((response) => {
     return response.text();

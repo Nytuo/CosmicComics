@@ -2115,7 +2115,6 @@ function GetListOfImg(dirPath) {
                 return listOfImage;
             }
         }
-        return listOfImage;
     } else {
         return [];
     }
