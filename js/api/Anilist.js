@@ -1,7 +1,7 @@
 class Anilist {
 
     async InsertBook(realname,path){
-        fetch("http://" + domain + ":" + port + "/insert/anilist/book", {
+        fetch(PDP + "/insert/anilist/book", {
             method: "POST",
             headers: {
                 'Content-Type': 'application/json',
@@ -20,7 +20,7 @@ class Anilist {
      * @return {Promise<*>} The list of mangas
      */
     async GET_SEARCH(name) {
-        return fetch("http://" + domain + ":" + port + "/api/anilist/searchOnly/" + name).then(function (response) {
+        return fetch(PDP + "/api/anilist/searchOnly/" + name).then(function (response) {
             return response.text();
         }).then(function (data) {
             data = JSON.parse(data);
@@ -37,7 +37,7 @@ class Anilist {
      * @param {string} path The path to the manga
      */
     POST_SEARCH(name, path) {
-        fetch("http://" + domain + ":" + port + "/api/anilist", {
+        fetch(PDP + "/api/anilist", {
             method: "POST",
             headers: {
                 "Content-Type": "application/json",

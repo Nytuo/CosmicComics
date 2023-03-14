@@ -1,6 +1,6 @@
 class OpenLibrary {
     async InsertBook(name = "", path) {
-        return fetch("http://" + domain + ":" + port + "/insert/ol/book/", {
+        return fetch(PDP + "/insert/ol/book/", {
             method: "GET",
             headers: {
                 'Content-Type': 'application/json',
@@ -21,7 +21,7 @@ class OpenLibrary {
 
     async GetComics(name = "") {
         name = encodeURIComponent(name);
-        return fetch("http://" + domain + ":" + port + "/api/ol/getComics/" + name).then(function (response) {
+        return fetch(PDP + "/api/ol/getComics/" + name).then(function (response) {
             return response.text();
         }).then(function (data) {
             data = JSON.parse(data);

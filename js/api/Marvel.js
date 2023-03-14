@@ -3,7 +3,7 @@ class Marvel {
 
     }
     async SearchComic(name = "", date = "") {
-        return fetch("http://" + domain + ":" + port + "/api/marvel/searchonly/" + name + "/" + date).then(function (response) {
+        return fetch(PDP + "/api/marvel/searchonly/" + name + "/" + date).then(function (response) {
             return response.text();
         }).then(function (data) {
             console.log(data);
@@ -17,7 +17,7 @@ class Marvel {
     async GetComics(name = "", date = "") {
         name = encodeURIComponent(name);
         date = encodeURIComponent(date);
-        return fetch("http://" + domain + ":" + port + "/api/marvel/getComics/" + name + "/" + date).then(function (response) {
+        return fetch(PDP + "/api/marvel/getComics/" + name + "/" + date).then(function (response) {
             return response.text();
         }).then(function (data) {
             data = JSON.parse(data);
@@ -28,7 +28,7 @@ class Marvel {
     }
 
     async InsertBook(name = "", date = "", path) {
-        return fetch("http://" + domain + ":" + port + "/insert/marvel/book/", {
+        return fetch(PDP + "/insert/marvel/book/", {
             method: "GET",
             headers: {
                 'Content-Type': 'application/json',
@@ -48,7 +48,7 @@ class Marvel {
         });
     }
     InsertSeries(name = "", path) {
-    fetch('http://' + domain + ":" + port + '/api/marvel/', {
+    fetch(PDP+ '/api/marvel/', {
         method: 'POST',
         headers: {
             'Content-Type': 'application/json',

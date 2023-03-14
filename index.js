@@ -33,7 +33,7 @@ let searchtoggle = true;
 if (currentProfile.getToken == null) {
     window.location.href = "login";
 } else {
-    fetch("http://" + domain + ":" + port + "/profile/logcheck/" + currentProfile.getToken).then(function (response) {
+    fetch(PDP+ "/profile/logcheck/" + currentProfile.getToken).then(function (response) {
         return response.text();
     }).then(async function (data) {
         if (data === "false") {
@@ -41,7 +41,7 @@ if (currentProfile.getToken == null) {
         } else {
             currentProfile.setName = data;
             document.getElementById("icon_id_accountSystem").src = currentProfile.getPP;
-            fetch("http://" + domain + ":" + port + "/config/getConfig/" + currentProfile.getToken).then(function (response) {
+            fetch(PDP + "/config/getConfig/" + currentProfile.getToken).then(function (response) {
                 return response.text();
             }).then(function (data) {
                 let d = SearchInJSON("display_style", JSON.parse(data));
@@ -49,7 +49,7 @@ if (currentProfile.getToken == null) {
             }).catch(function (error) {
                 console.log(error);
             });
-            fetch("http://" + domain + ":" + port + "/config/getConfig/" + currentProfile.getToken).then(function (response) {
+            fetch(PDP + "/config/getConfig/" + currentProfile.getToken).then(function (response) {
                 return response.text();
             }).then(function (data) {
                 currenttheme = SearchInJSON("theme", JSON.parse(data));
@@ -58,7 +58,7 @@ if (currentProfile.getToken == null) {
             }).catch(function (error) {
                 console.log(error);
             });
-            fetch("http://" + domain + ":" + port + "/config/getConfig/" + currentProfile.getToken).then(function (response) {
+            fetch(PDP + "/config/getConfig/" + currentProfile.getToken).then(function (response) {
                 return response.text();
             }).then(function (data) {
                 let currenttheme = SearchInJSON("theme", JSON.parse(data));
@@ -210,7 +210,7 @@ document.getElementById("id_editmodal").innerText = language["EDIT"];
 
 
 
-fetch("http://" + domain + ":" + port + "/dirname").then(function (response) {
+fetch(PDP + "/dirname").then(function (response) {
     return response.text();
 }).then(function (data) {
     dirnameFE = data;
@@ -220,7 +220,7 @@ fetch("http://" + domain + ":" + port + "/dirname").then(function (response) {
 }).catch(function (error) {
     console.log(error);
 });
-fetch("http://" + domain + ":" + port + "/CosmicDataLoc").then(function (response) {
+fetch(PDP + "/CosmicDataLoc").then(function (response) {
     return response.text();
 }).then(function (data) {
     CosmicComicsTemp = data;
@@ -239,7 +239,7 @@ function setTheme(theme) {
 /**
  * Get the version and display it on the info
  */
-fetch("http://" + domain + ":" + port + "/getVersion").then(function (response) {
+fetch(PDP + "/getVersion").then(function (response) {
     return response.text();
 }).then(function (data) {
     document.getElementById("version").innerText = language["version"] + data;
@@ -282,7 +282,7 @@ async function getFromDB(dbname, request) {
             "request": request
         }, null, 2)
     };
-    return fetch('http://' + domain + ":" + port + '/DB/get/' + currentProfile.getToken + "/" + dbname, option).then(function (response) {
+    return fetch(PDP+ '/DB/get/' + currentProfile.getToken + "/" + dbname, option).then(function (response) {
         return response.text();
     }).then(function (data) {
         return data;
@@ -303,7 +303,7 @@ async function InsertIntoDB(dbname, dbinfo, values) {
             "into": dbinfo, "val": values
         }, null, 2)
     };
-    return fetch('http://' + domain + ":" + port + '/DB/insert/' + currentProfile.getToken + "/" + dbname, option);
+    return fetch(PDP + '/DB/insert/' + currentProfile.getToken + "/" + dbname, option);
 }
 
 /**
@@ -314,7 +314,7 @@ async function InsertIntoDB(dbname, dbinfo, values) {
 async function deleteLib(elElement) {
     let confirmDelete = confirm(language["deleteaccount"]+ elElement["NAME"] + " ?");
     if (confirmDelete) {
-        await fetch('http://' + domain + ":" + port + '/DB/lib/delete/' + currentProfile.getToken + "/" + elElement["ID_LIBRARY"]).then(() => {
+        await fetch(PDP + '/DB/lib/delete/' + currentProfile.getToken + "/" + elElement["ID_LIBRARY"]).then(() => {
             alert(language["libraryDeleted"]);
             location.reload();
         });
@@ -668,7 +668,7 @@ discoverLibraries().then(r => {
  */
 function modifyConfigJson(tomod, mod) {
     //check si obj exist pour remplacer valeur
-    fetch("http://" + domain + ":" + port + "/config/getConfig/" + currentProfile.getToken).then(function (response) {
+    fetch(PDP + "/config/getConfig/" + currentProfile.getToken).then(function (response) {
         return response.text();
     }).then(function (data) {
         let config = JSON.parse(data);
@@ -820,7 +820,7 @@ async function DetectFolderInLibrary(result) {
     result = result.replaceAll("\\", "/");
     result = result.replaceAll("//", "/");
     result = result.replaceAll("/", "ù");
-    return fetch("http://" + domain + ":" + port + "/getListOfFolder/" + result).then(function (response) {
+    return fetch(PDP + "/getListOfFolder/" + result).then(function (response) {
         return response.text();
     }).then(function (data) {
         return data;
@@ -950,7 +950,7 @@ function loadView(FolderRes, libraryPath, date = "", provider = providerEnum.MAN
     FolderRes = FolderRes.replaceAll("\\", "/");
     FolderRes = FolderRes.replaceAll("//", "/");
     FolderRes = FolderRes.replaceAll("/", "ù");
-    fetch("http://" + domain + ":" + port + "/getListOfFilesAndFolders/" + FolderRes).then((response) => {
+    fetch(PDP + "/getListOfFilesAndFolders/" + FolderRes).then((response) => {
         return response.text();
     }).then(async (data) => {
         data = JSON.parse(data);
@@ -1291,7 +1291,7 @@ function listBM() {
             'Content-Type': 'application/json', "token": currentProfile.getToken,
         }
     };
-    fetch('http://' + domain + ":" + port + "/BM/getBM", option).then((response) => {
+    fetch(PDP + "/BM/getBM", option).then((response) => {
         return response.json();
     }).then(function (info) {
         console.log(info);
@@ -1397,7 +1397,7 @@ function selectLang() {
     setCookie("lang", document.getElementById("languageselector").value, 60);
     refreshPage()
 }
-fetch('http://' + domain + ":" + port + "/getThemes").then((response) => {
+fetch(PDP + "/getThemes").then((response) => {
     return response.text();
 }).then(function (res) {
     res = JSON.parse(res);
@@ -1421,7 +1421,7 @@ async function downloader() {
             "url": url, "name": name, "vol": vol
         }, null, 2)
     };
-    await fetch('http://' + domain + ":" + port + '/downloadBook', option).then(() => {
+    await fetch(PDP + '/downloadBook', option).then(() => {
         console.log("downloaded");
         Toastifycation(language["downloaded"]);
     }).catch(err => {
@@ -1457,7 +1457,7 @@ async function updateLibrary(forma, id) {
             "name": forma.form[0].value, "path": forma.form[1].value, "api_id": forma.form[2].value
         }, null, 2)
     };
-    await fetch('http://' + domain + ":" + port + '/DB/lib/update/' + currentProfile.getToken + "/" + id, option).then(() => {
+    await fetch(PDP + '/DB/lib/update/' + currentProfile.getToken + "/" + id, option).then(() => {
         window.location.href = window.location.href.split("?")[0];
     });
 }
@@ -1868,7 +1868,7 @@ async function createSeries(provider, path, libraryPath, res) {
         })
         values.push(document.getElementById("lockCheck").checked);
         columns.push("lock");
-        await fetch("http://" + domain + ":" + port + "/DB/update", {
+        await fetch(PDP + "/DB/update", {
             method: "POST", headers: {
                 "Content-Type": "application/json"
             }, body: JSON.stringify({
@@ -1966,7 +1966,7 @@ async function createSeries(provider, path, libraryPath, res) {
                     "img": ((provider === providerEnum.Marvel) ? (JSON.parse(res[0].BG).path + "/detail." + JSON.parse(res[0].BG).extension) : (res[0].BG))
                 }
             };
-            await fetch("http://" + domain + ":" + port + "/img/getPalette/" + currentProfile.getToken, options).then(function (response) {
+            await fetch(PDP + "/img/getPalette/" + currentProfile.getToken, options).then(function (response) {
                 return response.text();
             }).then(function (data) {
                 let Blurcolors = data;
@@ -1983,7 +1983,7 @@ async function createSeries(provider, path, libraryPath, res) {
                     "Content-Type": "application/json", "img": res[0].BG
                 }
             };
-            await fetch("http://" + domain + ":" + port + "/img/getPalette/" + currentProfile.getToken, options).then(function (response) {
+            await fetch(PDP + "/img/getPalette/" + currentProfile.getToken, options).then(function (response) {
                 return response.text();
             }).then(function (data) {
                 let Blurcolors = data;
@@ -2329,7 +2329,7 @@ async function createSeries(provider, path, libraryPath, res) {
                                 "where": "ID_Series"
                             }, null, 2)
                         };
-                        fetch("http://" + domain + ":" + port + "/DB/update", options);
+                        fetch(PDP + "/DB/update", options);
                     }
                 }
             });
@@ -2353,7 +2353,7 @@ async function createSeries(provider, path, libraryPath, res) {
                                 "where": "ID_Series"
                             }, null, 2)
                         };
-                        fetch("http://" + domain + ":" + port + "/DB/update", options);
+                        fetch(PDP + "/DB/update", options);
                     }
                 }
             });
@@ -2487,7 +2487,7 @@ async function createSeries(provider, path, libraryPath, res) {
 }
 
 function OneForAll(W1, W2, A, title) {
-    fetch("http://" + domain + ":" + port + "/DB/update/OneForAll", {
+    fetch(PDP + "/DB/update/OneForAll", {
         method: "POST",
         headers: {
             "Content-Type": "application/json",
@@ -2534,7 +2534,7 @@ function AllForOne(W1, W2, A, ID) {
             "where": "ID_book"
         }, null, 2)
     };
-    fetch("http://" + domain + ":" + port + "/DB/update", options);
+    fetch(PDP + "/DB/update", options);
 }
 
 addToBreadCrumb(language["HOME"], () => {
@@ -2544,7 +2544,7 @@ addToBreadCrumb(language["HOME"], () => {
 
 
 async function TrueDeleteFromDB(dbName, id, option = "") {
-    return fetch("http://" + domain + ":" + port + '/DB/truedelete/' + currentProfile.getToken + "/" + dbName + "/" + id);
+    return fetch(PDP + '/DB/truedelete/' + currentProfile.getToken + "/" + dbName + "/" + id);
 }
 
 document.getElementById("rematch").setAttribute("data-bs-toggle", "modal");
@@ -2594,7 +2594,7 @@ document.getElementById("id_addTrackedBook").addEventListener("click", () => {
                     console.log(values);
 
                     columns.push("lock");
-                    await fetch("http://" + domain + ":" + port + "/DB/update", {
+                    await fetch(PDP+ "/DB/update", {
                         method: "POST", headers: {
                             "Content-Type": "application/json"
                         }, body: JSON.stringify({
@@ -2662,7 +2662,7 @@ document.getElementById("id_addTrackedBook").addEventListener("click", () => {
                     console.log(values);
 
                     columns.push("lock");
-                    await fetch("http://" + domain + ":" + port + "/DB/update", {
+                    await fetch(PDP + "/DB/update", {
                         method: "POST", headers: {
                             "Content-Type": "application/json"
                         }, body: JSON.stringify({
@@ -2858,7 +2858,7 @@ async function createDetails(TheBook, provider) {
         console.log(values);
 
         columns.push("lock");
-        await fetch("http://" + domain + ":" + port + "/DB/update", {
+        await fetch(PDP+ "/DB/update", {
             method: "POST", headers: {
                 "Content-Type": "application/json"
             }, body: JSON.stringify({
@@ -2963,7 +2963,7 @@ async function createDetails(TheBook, provider) {
                 "Content-Type": "application/json", "img": TheBook.URLCover
             }
         };
-        await fetch("http://" + domain + ":" + port + "/img/getPalette/" + currentProfile.getToken, options).then(function (response) {
+        await fetch(PDP + "/img/getPalette/" + currentProfile.getToken, options).then(function (response) {
             return response.text();
         }).then(function (data) {
             let Blurcolors = data;
@@ -2993,7 +2993,7 @@ async function createDetails(TheBook, provider) {
                                 "where": "PATH"
                             }, null, 2)
                         };
-                        await fetch("http://" + domain + ":" + port + "/DB/update", options);
+                        await fetch(PDP + "/DB/update", options);
                     }
                 }
             });
@@ -3017,7 +3017,7 @@ async function createDetails(TheBook, provider) {
                                 "where": "PATH"
                             }, null, 2)
                         };
-                        await fetch("http://" + domain + ":" + port + "/DB/update", options);
+                        await fetch(PDP + "/DB/update", options);
                     }
                 }
             });
@@ -3115,7 +3115,7 @@ async function createDetails(TheBook, provider) {
                     "where": "ID_book"
                 }, null, 2)
             };
-            await fetch("http://" + domain + ":" + port + "/DB/update", options).catch((err) => {
+            await fetch(PDP + "/DB/update", options).catch((err) => {
                 Toastifycation("Error", "#d92027");
             });
         });
@@ -3362,8 +3362,8 @@ async function downloadBook(path) {
         }, null, 2)
     };
     console.log(option);
-    await fetch('http://' + domain + ":" + port + '/DL', option).then(() => {
-        window.open("http://" + domain + ":" + port + "/getDLBook", "_blank");
+    await fetch(PDP + '/DL', option).then(() => {
+        window.open(PDP + "/getDLBook", "_blank");
     });
 }
 
@@ -3375,7 +3375,7 @@ async function logout() {
     const option = {
         method: 'POST', headers: {'Content-Type': 'application/json'}
     };
-    await fetch('http://' + domain + ":" + port + '/profile/logout/' + currentProfile.getToken, option).then(() => {
+    await fetch(PDP + '/profile/logout/' + currentProfile.getToken, option).then(() => {
         window.location.href = 'login';
     });
 }
@@ -3512,7 +3512,7 @@ function changeRating(table, where, value) {
                 "where": "ID_book"
             }, null, 2)
         };
-        fetch("http://" + domain + ":" + port + "/DB/update", options);
+        fetch(PDP+ "/DB/update", options);
     } else if (table === "Series") {
         console.log(table, value);
         const options = {
@@ -3527,12 +3527,12 @@ function changeRating(table, where, value) {
                 "value": value
             }, null, 2)
         };
-        fetch("http://" + domain + ":" + port + "/DB/update", options);
+        fetch(PDP+ "/DB/update", options);
     }
 }
 
 document.getElementById("id_firstOfAll").addEventListener("click", function (e) {
-    fetch("http://" + domain + ":" + port + "/fillBlankImage", {
+    fetch(PDP + "/fillBlankImage", {
         method: "POST",
         headers: {
             "Content-Type": "application/json"

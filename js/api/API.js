@@ -31,7 +31,7 @@ class API {
      */
     async rematch(new_id, provider, type, old_id, isSeries = false) {
         if (isSeries) {
-            await fetch("http://" + domain + ":" + port + "/DB/update", {
+            await fetch(PDP + "/DB/update", {
                 method: "POST", headers: {
                     "Content-Type": "application/json"
                 }, body: JSON.stringify({
@@ -45,7 +45,7 @@ class API {
                 }, null, 2)
             })
         } else {
-            await fetch("http://" + domain + ":" + port + "/DB/update", {
+            await fetch(PDP + "/DB/update", {
                 method: "POST", headers: {
                     "Content-Type": "application/json"
                 }, body: JSON.stringify({
@@ -71,7 +71,7 @@ class API {
     async refreshMeta(id, provider, type) {
         console.log("Refreshing metadata for " + id + " from " + provider + " (" + type + ")");
         Toastifycation("Refreshing metadata...");
-        fetch("http://" + domain + ":" + port + "/refreshMeta", {
+        fetch(PDP + "/refreshMeta", {
             method: "POST",
             headers: {
                 "Content-Type": "application/json",

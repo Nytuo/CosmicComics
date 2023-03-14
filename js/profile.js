@@ -3,7 +3,7 @@ class Profile {
     constructor(token) {
         this._token = token;
         this._name = "Unknown";
-        this._pp = "http://" + domain + ":" + port + "/profile/getPP/" + this._token;
+        this._pp = PDP+ "/profile/getPP/" + this._token;
 
     }
 
@@ -12,7 +12,7 @@ class Profile {
      */
     async createAccount() {
         let accountsNames = [];
-        fetch("http://" + domain + ":" + port + "/profile/discover").then(function (response) {
+        fetch(PDP + "/profile/discover").then(function (response) {
             return response.text();
         }).then(async function (data) {
             data = JSON.parse(data);
@@ -29,7 +29,7 @@ class Profile {
                     "pp": document.getElementById("newImage").src
                 }, null, 2)
             };
-            fetch('http://' + domain + ":" + port + "/createUser", option).then(() => {
+            fetch(PDP + "/createUser", option).then(() => {
                 console.log("account created !");
             });
             Toastifycation("The user is created", "#00C33C");
@@ -47,7 +47,7 @@ class Profile {
                 "token": this._token
             }, null, 2)
         };
-        fetch('http://' + domain + ":" + port + "/profile/deleteAccount", option).then(() => {
+        fetch(PDP+ "/profile/deleteAccount", option).then(() => {
             Toastifycation("Account deleted", "#00C33C");
         }).catch((err) => {
             Toastifycation("Account not deleted", "#ff0000");
@@ -58,7 +58,7 @@ class Profile {
      * Download the database
      */
     DownloadBDD() {
-        window.open('http://' + domain + ":" + port + "/profile/DLBDD/" + this._token);
+        window.open(PDP + "/profile/DLBDD/" + this._token);
     }
 
     /**

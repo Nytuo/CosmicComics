@@ -271,8 +271,8 @@ class Book {
       }, null, 2)
     };
     console.log(option);
-    await fetch('http://' + domain + ":" + port + '/DL', option).then(() => {
-      window.open("http://" + domain + ":" + port + "/getDLBook", "_blank");
+    await fetch(PDP + '/DL', option).then(() => {
+      window.open(PDP + "/getDLBook", "_blank");
     });
   }
 }

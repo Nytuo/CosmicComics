@@ -54,14 +54,14 @@ function setTheme(theme) {
 if (connected == null) {
 	window.location.href = "login";
 } else {
-	fetch("http://" + domain + ":" + port + "/profile/logcheck/" + connected).then(function (response) {
+	fetch(PDP+ "/profile/logcheck/" + connected).then(function (response) {
 		return response.text();
 	}).then(async function (data) {
 		if (data === "false") {
 			window.location.href = "login";
 		} else {
 			currentUser = data;
-			fetch("http://" + domain + ":" + port + "/config/getConfig/" + connected).then(function (response) {
+			fetch(PDP + "/config/getConfig/" + connected).then(function (response) {
 				return response.text();
 			}).then(function (data) {
 				let currenttheme = GetElFromInforPath(
@@ -83,7 +83,7 @@ if (connected == null) {
 		console.log(error);
 	});
 }
-fetch("http://" + domain + ":" + port + "/viewer/view/current/" + connected).then(
+fetch(PDP+ "/viewer/view/current/" + connected).then(
 	(response) => {
 		response.json().then((data) => {
 				listofImg = data;
@@ -94,7 +94,7 @@ fetch("http://" + domain + ":" + port + "/viewer/view/current/" + connected).the
 		});
 	}
 );
-fetch("http://" + domain + ":" + port + "/dirname").then(function (response) {
+fetch(PDP+ "/dirname").then(function (response) {
 	return response.text();
 }).then(function (data) {
 	dirnameFE = data;
@@ -105,7 +105,7 @@ fetch("http://" + domain + ":" + port + "/dirname").then(function (response) {
 }).catch(function (error) {
 	console.log(error);
 });
-fetch("http://" + domain + ":" + port + "/CosmicDataLoc").then(function (response) {
+fetch(PDP + "/CosmicDataLoc").then(function (response) {
 	return response.text();
 }).then(function (data) {
 	dirnameFE = data;
@@ -273,7 +273,7 @@ let popoverList = popoverTriggerList.map(function (popoverTriggerEl) {
 //Send BE
 //get language reference for the selected language
 function lang(langg) {
-	fetch("http://" + domain + ":" + port + "/lang/" + langg).then(
+	fetch(PDP + "/lang/" + langg).then(
 		(response) => {
 			response.json().then((data) => {
 				return data;
@@ -368,7 +368,7 @@ function Themes() {
 		} else if (currenttheme === "[EVENT] - X-Mas.json") {
 			document.getElementById("logo_id").src = "Images/Logo_n.png";
 		}
-		fetch("http://" + domain + ":" + port + "/themes/read/" + currenttheme).then(function (response) {
+		fetch(PDP + "/themes/read/" + currenttheme).then(function (response) {
 			return response.text();
 		}).then(function (data) {
 			console.log("theme loaded");
@@ -622,7 +622,7 @@ function GetFilePage() {
 let DirectoryPath = window.decodeURIComponent(window.location.search.replace("?", "").split("&")[0]).replace("%3A", ":").replaceAll("%C3%B9", "/");
 console.log(DirectoryPath);
 let isADirectory;
-fetch("http://" + domain + ":" + port + "/view/isDir/" + encodeURIComponent(decodeURIComponent(window.location.search).replace("?", "").split("&")[0])).then((res) => {
+fetch(PDP + "/view/isDir/" + encodeURIComponent(decodeURIComponent(window.location.search).replace("?", "").split("&")[0])).then((res) => {
 	return res.json();
 }).then((res) => {
 	isADirectory = res;
@@ -630,7 +630,7 @@ fetch("http://" + domain + ":" + port + "/view/isDir/" + encodeURIComponent(deco
 
 async function prepareReader() {
 	Toastifycation("loading_cache", "#292929");
-	await fetch("http://" + domain + ":" + port + "/viewer/view/current/" + connected).then(
+	await fetch(PDP + "/viewer/view/current/" + connected).then(
 		(response) => {
 			response.json().then(async (data) => {
 					let listofImgLoc = data;
@@ -693,16 +693,16 @@ async function Viewer() {
 	//Else, the folder is created, as well as the path.txt and already contains the images
 	var path = GetFilePath();
 	console.log(path);
-	await fetch("http://" + domain + ":" + port + "/view/isDir/" + window.location.search.replace("?", "").split("&")[0]).then((response) => {
+	await fetch(PDP + "/view/isDir/" + window.location.search.replace("?", "").split("&")[0]).then((response) => {
 		response.json().then(async (isDir) => {
 			if (isDir === true) {
 				CosmicComicsTempI = path + "/";
 			}
-			await fetch("http://" + domain + ":" + port + "/view/exist/" + window.encodeURIComponent(CosmicComicsTempI)).then((response) => {
+			await fetch(PDP + "/view/exist/" + window.encodeURIComponent(CosmicComicsTempI)).then((response) => {
 				response.json().then(async (existCCI) => {
 					if (!existCCI) {
 						//Unzip if the folder doesn't exist
-						fetch("http://" + domain + ":" + port + "/Unzip/" + window.location.search.replace("?", "") + "/" + connected).then((response) => {
+						fetch(PDP + "/Unzip/" + window.location.search.replace("?", "") + "/" + connected).then((response) => {
 							console.log("here 3");
 							prepareReader();
 						});
@@ -717,7 +717,7 @@ async function Viewer() {
 									"path": window.decodeURI(window.location.search.replace("?", "").split("&")[0]).replace("%3A", ":")
 								}
 							};
-							await fetch("http://" + domain + ":" + port + "/viewer/view/", options).then(
+							await fetch(PDP + "/viewer/view/", options).then(
 								(response) => {
 									response.json().then(async (data) => {
 											let listofImgLoc = data;
@@ -767,11 +767,11 @@ async function Viewer() {
 						} else {
 							//Else we need to extract it
 							//We test if the path in the path.txt exists
-							fetch("http://" + domain + ":" + port + "/view/exist/" + ((CosmicComicsTempI + "/path.txt").replaceAll("/", "ù").replaceAll("\\", "ù"))).then((response) => {
+							fetch(PDP + "/view/exist/" + ((CosmicComicsTempI + "/path.txt").replaceAll("/", "ù").replaceAll("\\", "ù"))).then((response) => {
 								response.json().then((existCCIP) => {
 									console.log("path : " + existCCIP);
 									if (existCCIP) {
-										fetch("http://" + domain + ":" + port + "/view/readFile/" + ((CosmicComicsTempI + "path.txt").replaceAll("/", "ù").replaceAll("\\", "ù"))).then((response) => {
+										fetch(PDP + "/view/readFile/" + ((CosmicComicsTempI + "path.txt").replaceAll("/", "ù").replaceAll("\\", "ù"))).then((response) => {
 											response.json().then((readCCTIP) => {
 												console.log("read : " + readCCTIP);
 												console.log("path : " + CosmicComicsTempI + "path.txt");
@@ -781,7 +781,7 @@ async function Viewer() {
 													path.includes(".pdf")
 												) {
 													// if it's not the same we need to extract it
-													fetch("http://" + domain + ":" + port + "/Unzip/" + window.location.search.replace("?", "") + "/" + connected).then((response) => {
+													fetch(PDP + "/Unzip/" + window.location.search.replace("?", "") + "/" + connected).then((response) => {
 														console.log(response);
 														console.log("here 2");
 														prepareReader();
@@ -793,7 +793,7 @@ async function Viewer() {
 										});
 									} else {
 										// if don't have a path.txt we extract
-										fetch("http://" + domain + ":" + port + "/Unzip/" + window.location.search.replace("?", "") + "/" + connected).then((response) => {
+										fetch(PDP + "/Unzip/" + window.location.search.replace("?", "") + "/" + connected).then((response) => {
 											return response.text();
 										}).then((data) => {
 											prepareReader();
@@ -825,7 +825,7 @@ function Reader(listOfImg, page) {
 			"page": listOfImg[page]
 		}
 	};
-	fetch("http://" + domain + ":" + port + "/view/readImage", options).then(async (response) => {
+	fetch(PDP + "/view/readImage", options).then(async (response) => {
 		console.log(images);
 		images.push(URL.createObjectURL(await response.blob()));
 		let options = {
@@ -838,7 +838,7 @@ function Reader(listOfImg, page) {
 				"page": listOfImg[page + 1]
 			}
 		};
-		fetch("http://" + domain + ":" + port + "/view/readImage", options).then(async (response) => {
+		fetch(PDP + "/view/readImage", options).then(async (response) => {
 			images.push(URL.createObjectURL(await response.blob()));
 			if (DoublePageMode === true && BlankFirstPage === false) {
 				document.getElementById("imgViewer_0").style.display = "";
@@ -1254,7 +1254,7 @@ function End() {
 
 //get the object by JSON
 async function GetInfoFromJSON(json, name) {
-	return fetch("http://" + domain + ":" + port + "/DB/read/" + json).then(function (response) {
+	return fetch(PDP + "/DB/read/" + json).then(function (response) {
 		return response.text();
 	}).then(function (data) {
 		let info = JSON.parse(data);
@@ -1290,7 +1290,7 @@ async function getFromDB(dbname, request) {
 			"request": request
 		}, null, 2)
 	};
-	return fetch("http://" + domain + ":" + port + '/DB/get/' + connected + "/" + dbname, option).then(function (response) {
+	return fetch(PDP + '/DB/get/' + connected + "/" + dbname, option).then(function (response) {
 		return response.text();
 	}).then(function (data) {
 		return data;
@@ -1361,11 +1361,11 @@ function getCookie(cName) {
 }
 
 async function ModifyDB(dbName, ColName, value, id) {
-	return fetch("http://" + domain + ":" + port + '/DB/update/' + connected + "/" + dbName + "/" + ColName + "/" + value + "/" + id);
+	return fetch(PDP + '/DB/update/' + connected + "/" + dbName + "/" + ColName + "/" + value + "/" + id);
 }
 
 async function DeleteFromDB(dbName, id, option) {
-	return fetch("http://" + domain + ":" + port + '/DB/delete/' + connected + "/" + dbName + "/" + id + "/" + option);
+	return fetch(PDP + '/DB/delete/' + connected + "/" + dbName + "/" + id + "/" + option);
 }
 
 async function InsertIntoDB(dbname, dbinfo, values) {
@@ -1377,7 +1377,7 @@ async function InsertIntoDB(dbname, dbinfo, values) {
 			"val": values
 		}, null, 2)
 	};
-	return fetch("http://" + domain + ":" + port + '/DB/insert/' + connected + "/" + dbname, option);
+	return fetch(PDP + '/DB/insert/' + connected + "/" + dbname, option);
 }
 
 //Send BE
@@ -1543,7 +1543,7 @@ function handleTouchMove(evt) {
 //Modify the JSON for config.json
 function modifyConfigJson(json, tomod, mod) {
 	//check si obj exist pour remplacer valeur
-	fetch("http://" + domain + ":" + port + "/config/getConfig/" + connected).then(function (response) {
+	fetch(PDP + "/config/getConfig/" + connected).then(function (response) {
 		return response.text();
 	}).then(function (data) {
 		let configFile = data;
@@ -1667,7 +1667,7 @@ function AutoBGC() {
 
 //Getting the Background Color by the dominant color of image
 async function GettheBGColor(page) {
-	return fetch("http://" + domain + ":" + port + "/img/getColor/" + page + "/" + connected).then(function (response) {
+	return fetch(PDP + "/img/getColor/" + page + "/" + connected).then(function (response) {
 		return response.text();
 	}).then(function (data) {
 		console.log("ColorThief : ", data);
@@ -1966,7 +1966,7 @@ function preloadImage(listImages) {
 			}
 		};
 		let a = i
-		fetch("http://" + domain + ":" + port + "/view/readImage", options).then(async (response) => {
+		fetch(PDP+ "/view/readImage", options).then(async (response) => {
 			preloadedImages[a].src = URL.createObjectURL(await response.blob());
 		});
 	}
@@ -2199,7 +2199,7 @@ function ConstructSideBar() {
 					"page": image
 				}
 			};
-			fetch("http://" + domain + ":" + port + "/view/readImage", options).then(async (response) => {
+			fetch(PDP+ "/view/readImage", options).then(async (response) => {
 				img.src = URL.createObjectURL(await response.blob());
 			});
 			img.height = "120";
@@ -2301,7 +2301,7 @@ function CreateAllVIV() {
 				"page": listofImg[i]
 			}
 		};
-		fetch("http://" + domain + ":" + port + "/view/readImage", options).then(async (response) => {
+		fetch(PDP + "/view/readImage", options).then(async (response) => {
 			imgel.src = URL.createObjectURL(await response.blob());
 		});
 		div.appendChild(imgel);
@@ -2474,7 +2474,7 @@ function setScrollbar() {
 //Load the parameters
 //Send BE
 function loadParameters() {
-	fetch("http://" + domain + ":" + port + "/config/getConfig/" + connected).then(function (response) {
+	fetch(PDP + "/config/getConfig/" + connected).then(function (response) {
 		return response.text();
 	}).then(function (data) {
 		console.log(data);
