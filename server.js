@@ -2010,7 +2010,8 @@ async function UnZip(zipPath, ExtractDir, name, ext, token) {
                                 console.log(row);
                                 result.push(row);
                             });
-                            console.log(result);
+                            console.log(result); 
+                            if (result.length === 0) {SendTo(0);return 0;}                          
                             SendTo(result[0].last_page);
                             return result[0].last_page;
                         });
