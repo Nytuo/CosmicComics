@@ -1260,16 +1260,28 @@ function LoadImages(numberOf) {
     }
 }
 
+
+
+
 //Open a single file
 function openInViewer() {
-    let file = document.getElementById("fileUp").files[0];
-    if (file) {
-        let url = CosmicComicsTemp + "/uploads/" + file.name;
-        let encoded = encodeURIComponent(url.replaceAll("/", "%C3%B9"));
-        window.location.href = "viewer.html?" + encoded;
-    } else {
-        alert(language["Failedtoloadfile"]);
-    }
+    let form = document.getElementById("uploader");
+    let formData = new FormData(form);
+    let xhr = new XMLHttpRequest();
+    xhr.open("POST", PDP + "/uploadComic", true);
+    xhr.send(formData);
+    xhr.onreadystatechange = function () {
+        if (xhr.readyState === 4 && xhr.status === 200) {
+            let response = xhr.responseText;
+            if (response === "OK") {
+                let url = CosmicComicsTemp + "/uploads/" + document.getElementById("fileUp").files[0].name;
+                let encoded = encodeURIComponent(url.replaceAll("/", "%C3%B9"));
+                window.location.href = "viewer.html?" + encoded;
+            } else {
+                alert(language["Failedtoloadfile"]);
+            }
+        }
+    };
 }
 
 //Open a book in the bookmarks

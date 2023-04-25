@@ -43,10 +43,8 @@ var accountLimiter = RateLimit({
 })
 const isPortable = fs.existsSync(path.join(__dirname, "portable.txt"));
 const isElectron = fs.existsSync(path.join(__dirname, 'portable.txt')) && fs.readFileSync(path.join(__dirname, "portable.txt"), "utf8") === "electron";
-let devMode = false;
-if (devMode) {
-    CosmicComicsTemp = path.join(__dirname, "CosmicData");
-}
+let devMode = true;
+
 
 
 let path2Data;
@@ -66,7 +64,9 @@ if (isPortable) {
     }
 }
 let CosmicComicsTemp = path2Data;
-
+if (devMode) {
+    CosmicComicsTemp = path.join(__dirname, "CosmicData");
+}
 //Creating the folders to the CosmicData's path
 fs.mkdirSync(CosmicComicsTemp, {recursive: true});
 
@@ -2025,7 +2025,7 @@ async function UnZip(zipPath, ExtractDir, name, ext, token) {
                 console.log("An error occured" + err);
             });
         } else if (ext == "rar" || ext == "cbr") {
-            var configFile = fs.readFileSync(CosmicComicsTemp + "/profiles/" + token + "/config.json");
+            var configFile = fs.readFileSync(CosmicComicsTemp + "/profiles/" + resolveToken(token) + "/config.json");
             var parsedJSON = JSON.parse(configFile);
             var provider = GetElFromInforPath("update_provider", parsedJSON);
             if (provider == "msstore") {

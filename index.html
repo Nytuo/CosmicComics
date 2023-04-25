@@ -116,7 +116,7 @@ along with Cosmic-Comics.  If not, see <https://www.gnu.org/licenses/>.--->
             </div>
             <div class="modal-body" style="text-align: center">
                 <iframe name="dummyUpload" id="dummyUpload" style="display: none" title="dummyUpload"></iframe>
-                <form action="/uploadComic" target="dummyUpload" onsubmit="openInViewer();" method="post"
+                <form action="/" target="dummyUpload" onsubmit="openInViewer()" method="post" id="uploader"
                       enctype="multipart/form-data">
 
                     <input type="file" name="ComicTemp" id="fileUp">
