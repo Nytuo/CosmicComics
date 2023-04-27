@@ -35,7 +35,7 @@ var apiGoogleLimiter = RateLimit({
 })
 var viewerLimiter = RateLimit({
     windowMs: 1*60*1000,
-    max: 100
+    max: 200
 })
 var accountLimiter = RateLimit({
     windowMs: 1*60*1000*60,

@@ -2637,7 +2637,7 @@ window.onscroll = function (ev) {
 	} else {
 		Auth_next = false;
 	}
-	if (document.body.scrollTop === 0) {
+	if (window.scrollY === 0) {
 		console.log("You're at the top");
 		Auth_Prev = true;
 	} else {
