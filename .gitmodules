@@ -1,3 +1,6 @@
 [submodule "server"]
 	path = server
 	url = git@github.com:NytuoIndustries/CosmicComicsNodeServer.git
+[submodule "front"]
+	path = front
+	url = git@github.com:NytuoIndustries/CosmicComicsNodeServer.git
