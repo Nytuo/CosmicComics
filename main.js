@@ -1,5 +1,5 @@
-const {app, BrowserWindow} = require('electron');
-const {autoUpdater} = require('electron-updater');
+const { app, BrowserWindow } = require('electron');
+const { autoUpdater } = require('electron-updater');
 const path = require('path');
 const fs = require("fs");
 let path2Data;
@@ -9,10 +9,10 @@ if (isPortable) {
 } else {
 	path2Data = path.join(app.getPath('appData'), 'CosmicComics/CosmicData');
 }
-fs.mkdirSync(path2Data, {recursive: true});
+fs.mkdirSync(path2Data, { recursive: true });
 let serverConfig = path2Data + '/serverconfig.json';
 if (!fs.existsSync(serverConfig)) {
-	fs.writeFileSync(serverConfig, JSON.stringify({"Token": {}, "port": 4696}));
+	fs.writeFileSync(serverConfig, JSON.stringify({ "Token": {}, "port": 4696 }));
 }
 const serverConfigPort = JSON.parse(fs.readFileSync(serverConfig))["port"];
 
@@ -32,7 +32,7 @@ function createWindow() {
 }
 
 function createServer() {
-	app.server = require(__dirname + '/server.js');
+	app.server = require(__dirname + '/server/server.js');
 }
 
 autoUpdater.checkForUpdatesAndNotify();
@@ -63,9 +63,9 @@ function PrepareLaunch() {
 				updateAndLaunch();
 			} else {
 				console.log("No git repository found, initializing...");
-				git.init(false,{},function (err, init) {
+				git.init(false, {}, function (err, init) {
 					console.log(err);
-					git.addRemote('origin', url+ '.git', function (err) {
+					git.addRemote('origin', url + '.git', function (err) {
 						console.log(err);
 						updateAndLaunch();
 					});
@@ -76,10 +76,11 @@ function PrepareLaunch() {
 }
 
 out.on('close', function (code) {
-    console.log('git exit code : ' + code);
+	console.log('git exit code : ' + code);
 	if (code === 0) {
-		PrepareLaunch();
-	}else{
+		//PrepareLaunch();
+		launch();
+	} else {
 		console.log("Git not installed, skipping update");
 		launch();
 	}
@@ -87,7 +88,7 @@ out.on('close', function (code) {
 
 
 
-function launch(){
+function launch() {
 	createServer();
 	createWindow();
 	app.on('activate', () => {
@@ -100,21 +101,21 @@ function launch(){
 app.whenReady().then(() => {
 
 
-	
+
 });
 
 function updateAndLaunch() {
-	git.fetch("origin", branch,[], function (err, fetchResult) {
+	git.fetch("origin", branch, [], function (err, fetchResult) {
 		console.log(err);
 		git.reset(['--hard'], function (err, update) {
 			console.log(err);
-			git.pull("origin", branch, ["--force"],function (err, pull) {
+			git.pull("origin", branch, ["--force"], function (err, pull) {
 				console.log(err);
-				git.checkout(['origin/' + branch,'--force'], function (err, update) {
+				git.checkout(['origin/' + branch, '--force'], function (err, update) {
 					console.log(err);
-					if (err){
+					if (err) {
 						app.quit();
-					}else{
+					} else {
 						launch();
 					}
 
