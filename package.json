@@ -151,7 +151,7 @@
   "private": false,
   "main": "main.js",
   "scripts": {
-    "get-front": "node ./getFront.js",
+    "get-bfe": "node ./get-BFE.js",
     "start": "electron .",
     "dist": "electron-builder"
   },
