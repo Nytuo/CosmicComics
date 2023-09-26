@@ -152,7 +152,8 @@
   "main": "main.js",
   "scripts": {
     "get-bfe": "node ./get-BFE.js",
-    "start": "electron .",
+    "start": "node ./get-BFE.js && electron .",
+    "no-update": "electron .",
     "dist": "electron-builder"
   },
   "devDependencies": {
