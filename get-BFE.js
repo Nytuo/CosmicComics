@@ -92,26 +92,29 @@ const downloadFile = async (url, outputPath) => {
 };
 
 function unZip(zipName, outputPath) {
-    const unzip = require('unzipper')
-    fs.createReadStream(zipName)
-        .pipe(unzip.Extract({ path: outputPath }))
-        .on('close', () => {
-            console.log('Extraction complete')
-            if (zipName === assetNameBack) {
-                const nameOfFolder = fs.readdirSync('./server').filter(fn => fn.startsWith('NytuoIndustries-CosmicComicsNodeServer-')).toString();
-                const moveFrom = './server/' + nameOfFolder
-                console.log(moveFrom)
-                const moveTo = './server'
-                fs.readdirSync(moveFrom).forEach(function (file) {
-                    var currentPath = moveFrom + "/" + file;
-                    var newPath = moveTo + "/" + file;
-                    fs.renameSync(currentPath, newPath);
-                });
-                fs.rmdirSync(moveFrom)
-            }
-
-            deleteZip(zipName)
-        })
+    const Seven = require('node-7z');
+    const SevenBin = require("7zip-bin");
+    const Path27Zip = SevenBin.path7za;
+    const myStream = Seven.extractFull(zipName, outputPath, {
+        recursive: true,
+        $bin: Path27Zip
+    });
+    myStream.on('end', () => {
+        console.log('Extraction done');
+        if (zipName === assetNameBack) {
+            const nameOfFolder = fs.readdirSync('./server').filter(fn => fn.startsWith('NytuoIndustries-CosmicComicsNodeServer-')).toString();
+            const moveFrom = './server/' + nameOfFolder
+            console.log(moveFrom)
+            const moveTo = './server'
+            fs.readdirSync(moveFrom).forEach(function (file) {
+                var currentPath = moveFrom + "/" + file;
+                var newPath = moveTo + "/" + file;
+                fs.renameSync(currentPath, newPath);
+            });
+            fs.rmdirSync(moveFrom)
+        }
+        deleteZip(zipName);
+    });
 }
 
 function deleteZip(zipName) {
