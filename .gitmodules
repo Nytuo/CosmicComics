@@ -1,6 +1,3 @@
 [submodule "server"]
 	path = server
 	url = https://github.com/NytuoIndustries/CosmicComicsNodeServer.git
-[submodule "web"]
-	path = web
-	url = https://github.com/NytuoIndustries/CosmicComicsReactClient.git
