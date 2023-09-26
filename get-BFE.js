@@ -17,6 +17,11 @@ const apiUrlBack = `https://api.github.com/repos/${username}/${repoBack}/release
 
 async function DownloadAsset() {
     console.log('Downloading latest release...');
+    if (fs.existsSync('./server')) {
+        fs.rmSync('./server', { recursive: true }, (err) => {
+            if (err) throw err;
+        });
+    }
     fs.mkdirSync('./server', { recursive: true }, (err) => {
         if (err) throw err;
     });
