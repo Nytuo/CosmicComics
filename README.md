@@ -1,28 +1,94 @@
-<img style="width: 50%;margin-left:auto;margin-right:auto" src="https://nytuo.yo.fr/images/LogoStretch_cc.png">
+<h1 align="center">
+<style>
+  .rotate {
+    animation: rotation 10s;
+}
+.linear {
+    animation-timing-function: linear;
+}
+.infinite {
+    animation-iteration-count: infinite;
+}
+@keyframes rotation {
+    from {
+        transform: rotate(0deg);
+    }
+    to {
+        transform: rotate(359deg);
+    }
+}
+  </style>
+  <a href="https://github.com/Nytuo/CosmicComics">
+    <img class="rotate linear infinite" src="https://nytuo.fr/images/logo_cc.png" alt="Logo" width="auto" height="80">
+    <img src="https://nytuo.fr/images/LogoTxt_cc.png" alt="Logo" width="auto" height="80">
+  </a>
+</h1>
+<div align="center">
+<h2>CosmicComics</h2>
+  Client for CosmicComics using a server and web interface with Electron
+  <br />
+  <br />
+  <a href="https://github.com/Nytuo/CosmicComics/issues/new?assignees=&labels=bug&template=01_BUG_REPORT.md&title=bug%3A+">Report a Bug</a>
+  ·
+  <a href="https://github.com/Nytuo/CosmicComics/issues/new?assignees=&labels=enhancement&template=02_FEATURE_REQUEST.md&title=feat%3A+">Request a Feature</a>
+  .<a href="https://github.com/Nytuo/CosmicComics/discussions">Ask a Question</a>
 
-# Cosmic Comics 
+</div>
 
-## Notice that CosmicComics has been reconstructed, some features may have been deleted or are not yet available.
+<div align="center">
+<br />
+
+[![Project license](https://img.shields.io/github/license/Nytuo/CosmicComics.svg?style=flat-square)](LICENSE)
+
+[![code with love by Nytuo](https://img.shields.io/badge/%3C%2F%3E%20with%20%E2%99%A5%20by-Nytuo-ff1414.svg?style=flat-square)](https://github.com/Nytuo)
 
 [![cosmiccomics](https://snapcraft.io/cosmiccomics/badge.svg)](https://snapcraft.io/cosmiccomics)
+
 [![cosmiccomics](https://snapcraft.io/cosmiccomics/trending.svg?name=0)](https://snapcraft.io/cosmiccomics)
 
+</div>
 
-<a href='//www.microsoft.com/store/apps/9NFN9CG8TGP7?cid=storebadge&ocid=badge'><img src='https://developer.microsoft.com/store/badges/images/English_get-it-from-MS.png' alt='English badge' style='width: 284px; height: auto;'/></a>
+<details open="open">
+<summary>Table of Contents</summary>
 
+- [About](#about)
+  - [Built With](#built-with)
+  - [Related repositories](#related-repositories)
+  - [General Description](#general-description)
+- [Getting Started](#getting-started)
+  - [Prerequisites](#prerequisites)
+  - [Installation](#installation)
+- [Usage](#usage)
+- [Roadmap](#roadmap)
+- [Support](#support)
+- [Contributing](#contributing)
+- [Authors & contributors](#authors--contributors)
+- [Security](#security)
+- [License](#license)
+- [Acknowledgements](#acknowledgements)
 
-<a href="https://snapcraft.io/cosmiccomics">
-  <img alt="Get it from the Snap Store" src="https://snapcraft.io/static/images/badges/en/snap-store-black.svg"  style='width: 284px; height: auto'/>
-</a>
+</details>
 
- Comics and Manga Collectionner & Reader
+---
 
-## Important changes
-This new version of CosmicComics use a server to work, Running on the computer where the comics and mangas are stored.
-For displaying you will need only a browser of your choice. (Chrome is recommanded)
+## About
 
+Cosmic Comics is a Comics and Mangas reader and collectionner.  
 
-## Features:
+### Related repositories
+Cosmic Comics is divided in three categories
+- Server
+- Interface
+- Application
+
+Accross multiple repository
+- [CosmicComics](https://github.com/Nytuo/CosmicComics) (Application)
+- [CosmicComics Node Server](https://github.com/NytuoIndustries/CosmicComicsNodeServer) (Server)
+- [CosmicComics Web Client](https://github.com/NytuoIndustries/CosmicComicsWebClient) (Interface)
+- [CosmicComics React Client](https://github.com/NytuoIndustries/CosmicComicsReactClient) (Interface)
+
+### General description
+The information about the series and books are provided by some API or manually set.
 This is all you can do with this software and more:
 - Read `CBR`, `CBZ`, `CB7`, `CBT`, `ZIP`, `RAR`, `7z`, `TAR`, `PDF`, `EPUB`, `Folder` which contains `PNG`, `JPG`, `JPEG`, `BMP`.
 - Display your books and navigate your folders with custom covers (automaticatly by extraction or manually set)
@@ -33,39 +99,91 @@ This is all you can do with this software and more:
 - Libraries information provided by APIs (Marvel API, Google Books API, Anilist,...)
 - Continue reading where you stopped and more...
 
-## How to install
+### Built With
+#### Servers
+<div style="display: flex; align-item: center">
+  <img src="https://img.shields.io/badge/NPM-black?style=for-the-badge&logo=npm"/>
+<img src="https://img.shields.io/badge/NodeJS-black?style=for-the-badge&logo=node.js"/>
+  <img src="https://img.shields.io/badge/Express-black?style=for-the-badge&logo=express"/>
+  <img src="https://img.shields.io/badge/JavaScript-black?style=for-the-badge&logo=javascript"/>
+
+</div>
+
+#### Interfaces
+<div style="display: flex; align-item: center">
+  <img src="https://img.shields.io/badge/NPM-black?style=for-the-badge&logo=npm"/>
+<img src="https://img.shields.io/badge/NodeJS-black?style=for-the-badge&logo=node.js"/>
+<img src="https://img.shields.io/badge/React-black?style=for-the-badge&logo=React"/>
+<img src="https://img.shields.io/badge/vite-black?style=for-the-badge&logo=vite"/>
+  <img src="https://img.shields.io/badge/typeScript-black?style=for-the-badge&logo=typescript"/>
+  <img src="https://img.shields.io/badge/JavaScript-black?style=for-the-badge&logo=javascript"/>
+<img src="https://img.shields.io/badge/html5-black?style=for-the-badge&logo=html5"/>
+<img src="https://img.shields.io/badge/css3-black?style=for-the-badge&logo=css3"/>
+</div>
+
+#### Applications
+<div style="display: flex; align-item: center">
+  <img src="https://img.shields.io/badge/NPM-black?style=for-the-badge&logo=npm"/>
+<img src="https://img.shields.io/badge/NodeJS-black?style=for-the-badge&logo=node.js"/>
+<img src="https://img.shields.io/badge/ELECTRON-black?style=for-the-badge&logo=electron"/>
+  <img src="https://img.shields.io/badge/JavaScript-black?style=for-the-badge&logo=javascript"/>
+</div>
+
+## Getting Started
+
+### Installation
+
 See the <a href="https://github.com/Nytuo/CosmicComics/wiki/Installation">Installation</a> section of the Wiki
 
-## How to use
+## Usage
+
 See the <a href="https://github.com/Nytuo/CosmicComics/wiki/How-to-use">How to use</a> section of the Wiki
 
+## Roadmap
+
+See the [Trello](https://trello.com/b/7KvcYa8n/cosmiccomics) 
+
+See the [open issues](https://github.com/Nytuo/CosmicComics/issues) for a list of proposed features (and known issues).
+
+- [Top Feature Requests](https://github.com/Nytuo/CosmicComics/issues?q=label%3Aenhancement+is%3Aopen+sort%3Areactions-%2B1-desc) (Add your votes using the 👍 reaction)
+- [Top Bugs](https://github.com/Nytuo/CosmicComics/issues?q=is%3Aissue+is%3Aopen+label%3Abug+sort%3Areactions-%2B1-desc) (Add your votes using the 👍 reaction)
+- [Newest Bugs](https://github.com/Nytuo/CosmicComics/issues?q=is%3Aopen+is%3Aissue+label%3Abug)
+
+## Support
+
+Reach out to the maintainer at one of the following places:
+
+- [GitHub Discussions](https://github.com/Nytuo/CosmicComics/discussions)
+- Contact options listed on [this GitHub profile](https://github.com/Nytuo)
+
+
+## Contributing
+
+First off, thanks for taking the time to contribute! Contributions are what make the open-source community such an amazing place to learn, inspire, and create. Any contributions you make will benefit everybody else and are **greatly appreciated**.
+
+
+Please read [our contribution guidelines](docs/CONTRIBUTING.md), and thank you for being involved!
+
+## Authors & contributors
+
+The original setup of this repository is by [Arnaud BEUX](https://github.com/Nytuo).
+
+For a full list of all authors and contributors, see [the contributors page](https://github.com/Nytuo/CosmicComics/contributors).
+
+## Security
+
+CosmicComics follows good practices of security, but 100% security cannot be assured.
+CosmicComics is provided **"as is"** without any **warranty**. Use at your own risk.
+
+_For more information and to report security issues, please refer to our [security documentation](docs/SECURITY.md)._
+
 ## License
-The Cosmic-Comics is licensed under the `GNU GPL v3` License, You can find info on it on the source code and on the internet.
 
-## How to start Development?
-Run the following on a command prompt (shell)
-Note: Here I use `Yarn` but you can also use  `NPM`
-```shell
-git clone https://github.com/Nytuo/CosmicComics.git
-cd CosmicComics
-yarn install
-yarn upgrade
-yarn start
-```
+This project is licensed under the **GNU General Public License v3**.
 
-## Known Issues and future changes
-See the <a href="https://github.com/users/Nytuo/projects/2">project</a> tab on Github
+See [LICENSE](LICENSE) for more information.
 
-## Mobile Version ?
-Cosmic Comics now runs on a server, that means you can actually connect to any servers within your favorite web browser. No matter if you are on mobile, desktop or console.
-That said, an android and android TV application is in plan to offer a better experience.
+## Acknowledgements
 
-However, you will NEED A RUNNING SERVER on a supported platform (Linux, Windows or macos) in order to access it.
-The application WILL NOT work standalone. The app use many libraries that not work on android like unrar and this will take me too much time to create a dedicated mobile application. For a standalone use I recommand you using TAKIOMI OR CDisplayEX android.
-
-
-## Got an idea of something which could be added or enhanced ?
-Then open an issue on GitHub.
-
-## Got a question ?
-Post it under the discution tab
+- All the NPM libraries authors   
+- Plex and Jellyfin like server based media library for the inspiration
