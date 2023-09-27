@@ -1,25 +1,6 @@
 <h1 align="center">
-<style>
-  .rotate {
-    animation: rotation 10s;
-}
-.linear {
-    animation-timing-function: linear;
-}
-.infinite {
-    animation-iteration-count: infinite;
-}
-@keyframes rotation {
-    from {
-        transform: rotate(0deg);
-    }
-    to {
-        transform: rotate(359deg);
-    }
-}
-  </style>
   <a href="https://github.com/Nytuo/CosmicComics">
-    <img class="rotate linear infinite" src="https://nytuo.fr/images/logo_cc.png" alt="Logo" width="auto" height="80">
+    <img src="https://nytuo.fr/images/logo_cc.png" alt="Logo" width="auto" height="80">
     <img src="https://nytuo.fr/images/LogoTxt_cc.png" alt="Logo" width="auto" height="80">
   </a>
 </h1>
