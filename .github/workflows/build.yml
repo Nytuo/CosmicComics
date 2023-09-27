@@ -10,21 +10,26 @@ jobs:
 
     steps:
       - name: Check out Git repository
-        uses: actions/checkout@v2.2.0
-
-      - name: Install Node.js, NPM and Yarn
-        uses: actions/setup-node@v2.1.5
-        with:
-          node-version: 14
-      - name: Get Package Version
-        uses: nyaa8/package-version@v1
-        with:
-          path: 'package.json'
-          
-      - uses: actions/checkout@v2.2.0
+        uses: actions/checkout@v4.1.0
         with:
           fetch-depth: 0
-      - name: Building the Project
+      - name: Determine Release Version
+        id: determine_version
+        run: |
+          if [[ "${{ github.event_name }}" == "workflow_dispatch" ]]; then
+            latest_tag=$(git describe --tags --abbrev=0)
+            tag_parts=($(echo $latest_tag | tr '.' ' '))
+            patch_version=$((tag_parts[2] + 1))
+            new_version="${tag_parts[0]}.${tag_parts[1]}.$patch_version"
+            echo "new_version=$new_version" >> $GITHUB_ENV
+          else
+            echo "new_version=${{ github.ref_name }}" >> $GITHUB_ENV
+          fi
+      - name: Install Node.js, NPM and Yarn
+        uses: actions/setup-node@v3.8.1
+        with:
+          node-version: 18
+      - name: Installing build dependencies
         working-directory: ./
         run: |
             sudo dpkg --add-architecture i386
@@ -36,18 +41,24 @@ jobs:
             sudo apt install flatpak flatpak-builder
             sudo flatpak remote-add --if-not-exists flathub https://flathub.org/repo/flathub.flatpakrepo
             sudo flatpak install --assumeyes flathub org.freedesktop.Platform//22.08 org.freedesktop.Sdk//22.08 org.electronjs.Electron2.BaseApp//22.08
-            yarn install
-            yarn dist
-            yarn electron-builder --win -p never
-        env:
-          PKGVER: v${{env.PACKAGE_VERSION}}
+      - name: Installing the Node.js dependencies
+        working-directory: ./
+        run: |
+            npm install
+            npm run get-bfe
+            npm install
+      - name: Building the application
+        working-directory: ./
+        run: |
+            npm run dist
+            npm run electron-builder --win -p never
       
-      - name: Publishing...
+      - name: Creating Release and Uploading Artifacts
         uses: "marvinpinto/action-automatic-releases@latest"
         with:
           repo_token: "${{ secrets.GITHUB_TOKEN }}"
           prerelease: false
-          automatic_release_tag: ${{env.PKGVER}}
+          automatic_release_tag: ${{ env.new_version }}
           files: |
             ${{github.workspace}}/dist/*.zip
             ${{github.workspace}}/dist/*.snap
@@ -60,5 +71,3 @@ jobs:
             ${{github.workspace}}/dist/latest-linux.yml
             ${{github.workspace}}/dist/latest-linux-arm64.yml
             ${{github.workspace}}/dist/*.flatpak
-        env:
-          PKGVER: v${{env.PACKAGE_VERSION}}
