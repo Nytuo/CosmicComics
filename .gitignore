@@ -84,3 +84,5 @@ public/FirstImagesOfAll/
 sonar-project.properties
 .scannerwork
 server/
+flatpak/build
+flatpak/.flatpak-builder
