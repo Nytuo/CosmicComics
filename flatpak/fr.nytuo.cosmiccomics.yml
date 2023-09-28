@@ -1,9 +1,9 @@
 app-id: fr.nytuo.cosmiccomics
 runtime: org.freedesktop.Platform
-runtime-version: '22.08'
+runtime-version: "22.08"
 sdk: org.freedesktop.Sdk
 base: org.electronjs.Electron2.BaseApp
-base-version: '22.08'
+base-version: "22.08"
 sdk-extensions:
   - org.freedesktop.Sdk.Extension.node18
 command: run.sh
@@ -13,6 +13,7 @@ finish-args:
   - --socket=x11
   - --socket=pulseaudio
   - --share=network
+  - --filesystem=host
 build-options:
   append-path: /usr/lib/sdk/node18/bin
   env:
@@ -26,7 +27,7 @@ modules:
       env:
         XDG_CACHE_HOME: /run/build/cosmiccomics/flatpak-node/cache
         npm_config_cache: /run/build/cosmiccomics/flatpak-node/npm-cache
-        npm_config_offline: 'true'
+        npm_config_offline: "true"
     build-commands:
       # Install npm dependencies
       - npm install --offline
