@@ -45,6 +45,7 @@ jobs:
         working-directory: ./
         run: |
             npm install
+            chmod a+x /home/runner/work/CosmicComics/CosmicComics/node_modules/7zip-bin/linux/x64/7za
             npm run get-bfe
             npm install
       - name: Building the application
