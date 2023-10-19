@@ -71,14 +71,6 @@
             "ia32",
             "arm64"
           ]
-        },
-        {
-          "target": "appx",
-          "arch": [
-            "x64",
-            "ia32",
-            "arm64"
-          ]
         }
       ],
       "icon": "public/Images/Logo.ico"
