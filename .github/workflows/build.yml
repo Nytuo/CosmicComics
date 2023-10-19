@@ -52,7 +52,7 @@ jobs:
         working-directory: ./
         run: |
             npm run dist
-            npm run electron-builder --win -p never
+            npm run ebw
       
       - name: Creating Release and Uploading Artifacts
         uses: "marvinpinto/action-automatic-releases@latest"
