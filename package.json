@@ -154,7 +154,7 @@
     "get-bfe": "node ./get-BFE.js",
     "start": "node ./get-BFE.js && electron .",
     "no-update": "electron .",
-    "dist": "electron-builder"
+    "dist": "electron-builder -p never"
   },
   "devDependencies": {
     "electron": "^26.2.2",
