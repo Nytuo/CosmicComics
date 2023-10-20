@@ -73,7 +73,7 @@
           ]
         }
       ],
-      "icon": "public/Images/Logo.ico"
+      "icon": "Logo.ico"
     },
     "linux": {
       "publish": [
@@ -115,7 +115,7 @@
           "target": "flatpak"
         }
       ],
-      "icon": "public/Images/Logo.png",
+      "icon": "Logo.png",
       "category": "Utility"
     },
     "mac": {
