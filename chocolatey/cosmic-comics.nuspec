@@ -9,12 +9,11 @@
     <authors>BEUX Arnaud (Nytuo)</authors>
     <projectUrl>https://github.com/Nytuo/CosmicComics</projectUrl>
     <iconUrl>https://pocket.nytuo.fr/api/files/gpmjfgb6ve1gr0u/coxm84pd6nvqn4y/logo_cc_iNZpB7U096.png?token=</iconUrl>
-    <copyright>2024</copyright>
+    <copyright>2024 Arnaud BEUX</copyright>
     <licenseUrl>https://www.gnu.org/licenses/gpl-3.0.fr.html</licenseUrl>
     <requireLicenseAcceptance>true</requireLicenseAcceptance>
-    <projectSourceUrl>https://github.com/Nytuo/CosmicComics</projectSourceUrl>
     <docsUrl>https://github.com/Nytuo/CosmicComics/wiki</docsUrl>
-    <tags>cosmic-comics, comics, comic, manga, reading, reader, e-reader, books, Cosmic Comics</tags>
+    <tags>cosmic-comics comics comic manga reading reader e-reader books Cosmic-Comics</tags>
     <summary>Cosmic Comics is a Comics and Mangas reader and collectionner.</summary>
     <description>The information about the series and books are provided by some API or manually set. This is all you can do with this software and more:
 
@@ -26,6 +25,9 @@ Zoom, Auto Background Color, Double page Mode, Blank first page, No double page 
 Display information about Comics/ Manga
 Libraries information provided by APIs (Marvel API, Google Books API, Anilist,...)
 Continue reading where you stopped and more...</description>
+    <releaseNotes>
+      You can found what have changed between version by going to : https://github.com/Nytuo/CosmicComics/releases and look for the Changelog.
+    </releaseNotes>
   </metadata>
   <files>
     <file src="tools\**" target="tools" />
