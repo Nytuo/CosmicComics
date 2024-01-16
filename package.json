@@ -147,11 +147,16 @@
     "start": "node ./get-BFE.js && electron .",
     "no-update": "electron .",
     "dist": "electron-builder -p never",
-    "ebw": "electron-builder --win -p never"
+    "ebw": "electron-builder --win -p never",
+    "swagger-gen" : "node swagger-gen.js",
+    "server-only" : "nodemon server/server.js"
+
   },
   "devDependencies": {
     "electron": "^26.2.2",
-    "electron-builder": "^24.6.4"
+    "electron-builder": "^24.6.4",
+        "swagger-ui-express": "5.0.0",
+    "swagger-autogen": "2.23.6"
   },
   "dependencies": {
     "electron-updater": "^6.1.4",
