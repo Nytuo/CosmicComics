@@ -1,0 +1,13 @@
+﻿VERIFICATION
+Verification is intended to assist the Chocolatey moderators and community
+in verifying that this package's contents are trustworthy.
+
+<Include details of how to verify checksum contents>
+Go to the official Cosmic Comics repo and download the exe from the release matching the version of the package, the one that do not have any architecture on it.
+Check the checksum (SHA512) of the file with the one downloaded by the script, they should be equals.
+On powershell use : certutil.exe --hashfile <PathToFile> SHA512
+
+https://github.com/Nytuo/CosmicComics/releases
+<If software vendor, explain that here>
+Well idk how to prove you that i'm me...
+I'm the software vendor, creator, maintainer and developer of CosmicComics app related to this repositories : https://github.com/Nytuo/CosmicComics // https://github.com/NytuoIndustries/CosmicComicsNodeServer // https://github.com/NytuoIndustries/CosmicComicsReactClient.

@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="utf-8"?>
+<package xmlns="http://schemas.microsoft.com/packaging/2015/06/nuspec.xsd">
+  <metadata>
+    <id>cosmic-comics</id>
+    <version>2.1.0</version>
+    <packageSourceUrl>https://download.nytuo.fr/CosmicComics/v2.1.0/Cosmic-Comics_2.1.0_win.exe</packageSourceUrl>
+    <owners>BEUX Arnaud</owners>
+    <title>cosmic-comics (Install)</title>
+    <authors>BEUX Arnaud (Nytuo)</authors>
+    <projectUrl>https://github.com/Nytuo/CosmicComics</projectUrl>
+    <iconUrl>https://pocket.nytuo.fr/api/files/gpmjfgb6ve1gr0u/coxm84pd6nvqn4y/logo_cc_iNZpB7U096.png?token=</iconUrl>
+    <copyright>2024</copyright>
+    <licenseUrl>https://www.gnu.org/licenses/gpl-3.0.fr.html</licenseUrl>
+    <requireLicenseAcceptance>true</requireLicenseAcceptance>
+    <projectSourceUrl>https://github.com/Nytuo/CosmicComics</projectSourceUrl>
+    <docsUrl>https://github.com/Nytuo/CosmicComics/wiki</docsUrl>
+    <tags>cosmic-comics, comics, comic, manga, reading, reader, e-reader, books, Cosmic Comics</tags>
+    <summary>Cosmic Comics is a Comics and Mangas reader and collectionner.</summary>
+    <description>The information about the series and books are provided by some API or manually set. This is all you can do with this software and more:
+
+Read CBR, CBZ, CB7, CBT, ZIP, RAR, 7z, TAR, PDF, EPUB, Folder which contains PNG, JPG, JPEG, BMP.
+Display your books and navigate your folders with custom covers (automaticatly by extraction or manually set)
+Set your books as Read, Unread, Reading or favorite and note them.
+Many Customizable parameters
+Zoom, Auto Background Color, Double page Mode, Blank first page, No double page for Horizontal, Manga Mode, Webtoon Mode, fullscreen, rotations, Bookmarks, Slideshow, SideBar, Hide Menu Bar.
+Display information about Comics/ Manga
+Libraries information provided by APIs (Marvel API, Google Books API, Anilist,...)
+Continue reading where you stopped and more...</description>
+  </metadata>
+  <files>
+    <file src="tools\**" target="tools" />
+  </files>
+</package>
