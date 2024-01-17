@@ -37,20 +37,25 @@ modules:
       # Build the app; in this example the `dist` script
       # in package.json runs electron-builder
       - |
-        . ../flatpak-node/electron-builder-arch-args.sh
+        . ./flatpak-node/electron-builder-arch-args.sh
         npm run dist -- $ELECTRON_BUILDER_ARCH_ARGS  --linux --dir
       # Bundle app and dependencies
       - cp -a dist/linux*unpacked /app/main
       # Install app wrapper
-      - install -Dm755 -t /app/bin/ ../run.sh
-    subdir: main
+      - install -Dm755 -t /app/bin/ ./run.sh
     sources:
       #- type: archive
       #  url: https://github.com/flathub/electron-sample-app/archive/1.0.1.tar.gz
       #  sha256: a2feb3f1cf002a2e4e8900f718cc5c54db4ad174e48bfcfbddcd588c7b716d5b
-      - type: dir
-        path: ..
-        dest: main
+      # - type: dir
+      #   path: ..
+      #   dest: main
+      - type: git
+        url: https://github.com/Nytuo/CosmicComics.git
+      - type: file
+        path: fr.nytuo.cosmiccomics.desktop
+      - type: file
+        path: fr.nytuo.cosmiccomics.metainfo.xml
       - generated-sources.json
       # Wrapper to launch the app
       - type: script
