@@ -23,17 +23,14 @@ modules:
   - name: cosmiccomics
     buildsystem: simple
     build-options:
-      build-args:
-        - --share=network
       env:
         XDG_CACHE_HOME: /run/build/cosmiccomics/flatpak-node/cache
         npm_config_cache: /run/build/cosmiccomics/flatpak-node/npm-cache
         npm_config_offline: "true"
+        PUPPETEER_SKIP_DOWNLOAD: "true"
     build-commands:
       # Install npm dependencies
       - npm install --offline
-      - chmod a+x ./node_modules/7zip-bin/linux/x64/7za
-      - npm run get-bfe
       # Build the app; in this example the `dist` script
       # in package.json runs electron-builder
       - |
@@ -43,15 +40,24 @@ modules:
       - cp -a dist/linux*unpacked /app/main
       # Install app wrapper
       - install -Dm755 -t /app/bin/ ./run.sh
+      - install -Dm444 Logo.png ${FLATPAK_DEST}/share/icons/hicolor/512x512/apps/${FLATPAK_ID}.png
+      - install -Dm444 ${FLATPAK_ID}.desktop ${FLATPAK_DEST}/share/applications/${FLATPAK_ID}.desktop
+      - install -Dm444 ${FLATPAK_ID}.metainfo.xml ${FLATPAK_DEST}/share/metainfo/${FLATPAK_ID}.metainfo.xml
     sources:
-      #- type: archive
-      #  url: https://github.com/flathub/electron-sample-app/archive/1.0.1.tar.gz
-      #  sha256: a2feb3f1cf002a2e4e8900f718cc5c54db4ad174e48bfcfbddcd588c7b716d5b
-      # - type: dir
-      #   path: ..
-      #   dest: main
+      # Getting electron
       - type: git
         url: https://github.com/Nytuo/CosmicComics.git
+        commit: 680ca0c022acd6ee481ece5181823740c9af5f62
+        # Getting the server
+      - type: git
+        url: https://github.com/NytuoIndustries/CosmicComicsNodeServer
+        tag: "v2.1.1"
+        dest: "server"
+        #Getting the react version of the client (default)
+      - type: archive
+        url: https://github.com/NytuoIndustries/CosmicComicsReactClient/releases/download/v1.1.2/CC_RC_CONTAINED.zip
+        dest: "server/public"
+        sha512: 95958af66f3888e686d2ac4b8154abe00e91e9fa3939745f3a26f674a84362f9fbfc33fca1eb9302b4bb69c5b9466ee2394d9b48f4ffde904dc41750b40ff111
       - type: file
         path: fr.nytuo.cosmiccomics.desktop
       - type: file

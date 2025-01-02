@@ -1,7 +1,7 @@
 {
   "name": "cosmiccomics",
   "productName": "Cosmic-Comics",
-  "version": "2.1.0",
+  "version": "2.1.1",
   "description": "Server based Books (Comics and Manga) Reader",
   "author": {
     "name": "Nytuo",
@@ -148,14 +148,13 @@
     "no-update": "electron .",
     "dist": "electron-builder -p never",
     "ebw": "electron-builder --win -p never",
-    "swagger-gen" : "node swagger-gen.js",
-    "server-only" : "nodemon server/server.js"
-
+    "swagger-gen": "node swagger-gen.js",
+    "server-only": "nodemon server/server.js"
   },
   "devDependencies": {
     "electron": "^26.2.2",
     "electron-builder": "^24.6.4",
-        "swagger-ui-express": "5.0.0",
+    "swagger-ui-express": "5.0.0",
     "swagger-autogen": "2.23.6"
   },
   "dependencies": {

@@ -75,7 +75,7 @@ To set up a development environment, please follow these steps:
 
 ## Issues and feature requests
 
-You've found a bug in the source code, a mistake in the documentation or maybe you'd like a new feature?Take a look at [GitHub Discussions](https://github.com/Nytuo/CosmicComics/discussions) to see if it's already being discussed.  You can help us by [submitting an issue on GitHub](https://github.com/NytuoIndustries/CosmicComicsNodeServer/issues). Before you create an issue, make sure to search the issue archive -- your issue may have already been addressed!
+You've found a bug in the source code, a mistake in the documentation or maybe you'd like a new feature?Take a look at [GitHub Discussions](https://github.com/Nytuo/CosmicComics/discussions) to see if it's already being discussed.  You can help us by [submitting an issue on GitHub](https://github.com/Nytuo/CosmicComicsNodeServer/issues). Before you create an issue, make sure to search the issue archive -- your issue may have already been addressed!
 
 Please try to create bug reports that are:
 
@@ -89,10 +89,10 @@ Please try to create bug reports that are:
 ### How to submit a Pull Request
 
 1. Search our repository for open or closed
-   [Pull Requests](https://github.com/NytuoIndustries/CosmicComicsNodeServer/pulls)
+   [Pull Requests](https://github.com/Nytuo/CosmicComicsNodeServer/pulls)
    that relate to your submission. You don't want to duplicate effort.
 2. Fork the project
 3. Create your feature branch (`git checkout -b feat/amazing_feature`)
 4. Commit your changes (`git commit -m 'feat: add amazing_feature'`) CosmicComics uses [conventional commits](https://www.conventionalcommits.org), so please follow the specification in your commit messages.
 5. Push to the branch (`git push origin feat/amazing_feature`)
-6. [Open a Pull Request](https://github.com/NytuoIndustries/CosmicComicsNodeServer/compare?expand=1)
+6. [Open a Pull Request](https://github.com/Nytuo/CosmicComicsNodeServer/compare?expand=1)

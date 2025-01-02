@@ -10,4 +10,4 @@ On powershell use : certutil.exe --hashfile <PathToFile> SHA512
 https://github.com/Nytuo/CosmicComics/releases
 <If software vendor, explain that here>
 Well idk how to prove you that i'm me...
-I'm the software vendor, creator, maintainer and developer of CosmicComics app related to this repositories : https://github.com/Nytuo/CosmicComics // https://github.com/NytuoIndustries/CosmicComicsNodeServer // https://github.com/NytuoIndustries/CosmicComicsReactClient.
+I'm the software vendor, creator, maintainer and developer of CosmicComics app related to this repositories : https://github.com/Nytuo/CosmicComics // https://github.com/Nytuo/CosmicComicsNodeServer // https://github.com/Nytuo/CosmicComicsReactClient.

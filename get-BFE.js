@@ -1,9 +1,10 @@
 // GET THE BACKEND AND FRONT END (BFE) FROM GITHUB RELEASES
 const https = require('https');
 const fs = require('fs');
+const url = require('url');
 const { promisify } = require('util');
 
-const username = 'NytuoIndustries';
+const username = 'Nytuo';
 const repoFront = 'CosmicComicsReactClient';
 const repoBack = 'CosmicComicsNodeServer';
 const assetNameFront = 'CC_RC.zip';
@@ -25,32 +26,18 @@ async function DownloadAsset() {
     fs.mkdirSync('./server', { recursive: true }, (err) => {
         if (err) throw err;
     });
-    for (let i = 0; i < 3; i++) {
-        switch (i) {
-            case 1:
-                await downloadLatestRelease(apiUrlFront);
-                if (fs.existsSync(assetNameFront) && fs.statSync(assetNameFront).isFile() && fs.statSync(assetNameFront).size > 0) {
-                    unZip(assetNameFront, extractDestinationFront)
-                } else {
-                    console.log('No file downloaded or file size is 0 (empty)')
-                }
-                break;
-            case 0:
-                await downloadZipBallFromLatestRelease(apiUrlBack);
-                if (fs.existsSync(assetNameBack) && fs.statSync(assetNameBack).isFile() && fs.statSync(assetNameBack).size > 0) {
-                    unZip(assetNameBack, extractDestinationback)
-                } else {
-                    console.log('No file downloaded or file size is 0 (empty)')
-                }
-                break;
-            default:
-                console.log('No more releases to download');
-                break;
-        }
+    await downloadZipBallFromLatestRelease(apiUrlBack);
+    if (fs.existsSync(assetNameBack) && fs.statSync(assetNameBack).isFile() && fs.statSync(assetNameBack).size > 0) {
+        unZip(assetNameBack, extractDestinationback)
+    }
+    await downloadLatestRelease(apiUrlFront);
+    if (fs.existsSync(assetNameFront) && fs.statSync(assetNameFront).isFile() && fs.statSync(assetNameFront).size > 0) {
+        unZip(assetNameFront, extractDestinationFront)
     }
 }
 
 async function downloadZipBallFromLatestRelease(URL) {
+    console.log('URL:', URL);
     const release = await getLatestRelease(URL);
     const zipBallURL = release.zipball_url;
     console.log(`Found release: ${release.tag_name} with zipball URL: ${zipBallURL}`);
@@ -69,15 +56,22 @@ async function downloadLatestRelease(URL) {
 
 function getLatestRelease(URL) {
     return new Promise((resolve, reject) => {
-        https.get(URL, {
-            headers: {
-                'User-Agent': 'node'
-            }
-        }, (res) => {
-            let body = '';
-            res.on('data', (chunk) => body += chunk);
-            res.on('end', () => resolve(JSON.parse(body)));
-        }).on('error', reject);
+        const request = (URL) => {
+            https.get(URL, {
+                headers: {
+                    'User-Agent': 'node'
+                }
+            }, (res) => {
+                if (res.statusCode >= 300 && res.statusCode < 400 && res.headers.location) {
+                    request(url.resolve(URL, res.headers.location));
+                } else {
+                    let body = '';
+                    res.on('data', (chunk) => body += chunk);
+                    res.on('end', () => resolve(JSON.parse(body)));
+                }
+            }).on('error', reject);
+        };
+        request(URL);
     });
 }
 
@@ -107,7 +101,7 @@ function unZip(zipName, outputPath) {
     myStream.on('end', () => {
         console.log('Extraction done');
         if (zipName === assetNameBack) {
-            const nameOfFolder = fs.readdirSync('./server').filter(fn => fn.startsWith('NytuoIndustries-CosmicComicsNodeServer-')).toString();
+            const nameOfFolder = fs.readdirSync('./server').filter(fn => fn.startsWith('Nytuo-CosmicComicsNodeServer-')).toString();
             const moveFrom = './server/' + nameOfFolder
             console.log(moveFrom)
             const moveTo = './server'
