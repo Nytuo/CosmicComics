@@ -2,8 +2,8 @@
 <package xmlns="http://schemas.microsoft.com/packaging/2015/06/nuspec.xsd">
   <metadata>
     <id>cosmic-comics</id>
-    <version>2.1.0</version>
-    <packageSourceUrl>https://download.nytuo.fr/CosmicComics/v2.1.0/Cosmic-Comics_2.1.0_win.exe</packageSourceUrl>
+    <version>2.1.2</version>
+    <packageSourceUrl>https://download.nytuo.fr/CosmicComics/v2.1.1/Cosmic-Comics_2.1.1_win.exe</packageSourceUrl>
     <owners>BEUX Arnaud</owners>
     <title>cosmic-comics (Install)</title>
     <authors>BEUX Arnaud (Nytuo)</authors>
