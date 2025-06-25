@@ -1,0 +1,12 @@
+pub mod ai_model;
+pub mod api;
+pub mod collectionner;
+pub mod common;
+pub mod database;
+pub mod pdfium;
+pub mod profile;
+pub mod settings;
+pub mod state;
+pub mod updater;
+pub mod viewer;
+pub use state::AppState;

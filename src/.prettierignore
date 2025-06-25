@@ -1,0 +1,8 @@
+node_modules
+dist
+build
+coverage
+package-lock.json
+src-tauri
+snapcraft.yaml
+fr.nytuo.cosmiccomics.desktop

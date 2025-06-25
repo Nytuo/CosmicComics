@@ -1,0 +1,14 @@
+pub mod anilist_service;
+mod anilist_service_test;
+pub mod archive_service;
+pub mod collectionner_service;
+pub mod googlebooks_service;
+mod googlebooks_service_test;
+pub mod marvel_service;
+mod marvel_service_test;
+pub mod matching_service;
+pub mod metron_service;
+pub mod openlibrary_service;
+pub mod panel_detection_service;
+pub mod pdfium_service;
+pub mod profile_service;

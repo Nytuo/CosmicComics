@@ -1,70 +1,38 @@
-app-id: fr.nytuo.cosmiccomics
-runtime: org.freedesktop.Platform
-runtime-version: "23.08"
-sdk: org.freedesktop.Sdk
-base: org.electronjs.Electron2.BaseApp
-base-version: "23.08"
-sdk-extensions:
-  - org.freedesktop.Sdk.Extension.node18
-command: run.sh
-separate-locales: false
+id: fr.nytuo.cosmiccomics
+
+runtime: org.gnome.Platform
+runtime-version: '46'
+sdk: org.gnome.Sdk
+
+command: tauri-app
 finish-args:
-  - --share=ipc
-  - --socket=x11
-  - --socket=pulseaudio
-  - --share=network
-  - --filesystem=host
+  - --socket=wayland
+  - --socket=fallback-x11
   - --device=dri
-build-options:
-  append-path: /usr/lib/sdk/node18/bin
-  env:
-    NPM_CONFIG_LOGLEVEL: info
+  - --share=ipc
+  - --talk-name=org.kde.StatusNotifierWatcher
+  - --filesystem=host
+  - --share=network
+
 modules:
-  - name: cosmiccomics
+  - name: binary
     buildsystem: simple
-    build-options:
-      env:
-        XDG_CACHE_HOME: /run/build/cosmiccomics/flatpak-node/cache
-        npm_config_cache: /run/build/cosmiccomics/flatpak-node/npm-cache
-        npm_config_offline: "true"
-        PUPPETEER_SKIP_DOWNLOAD: "true"
-    build-commands:
-      # Install npm dependencies
-      - npm install --offline
-      # Build the app; in this example the `dist` script
-      # in package.json runs electron-builder
-      - |
-        . ./flatpak-node/electron-builder-arch-args.sh
-        npm run dist -- $ELECTRON_BUILDER_ARCH_ARGS  --linux --dir
-      # Bundle app and dependencies
-      - cp -a dist/linux*unpacked /app/main
-      # Install app wrapper
-      - install -Dm755 -t /app/bin/ ./run.sh
-      - install -Dm444 Logo.png ${FLATPAK_DEST}/share/icons/hicolor/512x512/apps/${FLATPAK_ID}.png
-      - install -Dm444 ${FLATPAK_ID}.desktop ${FLATPAK_DEST}/share/applications/${FLATPAK_ID}.desktop
-      - install -Dm444 ${FLATPAK_ID}.metainfo.xml ${FLATPAK_DEST}/share/metainfo/${FLATPAK_ID}.metainfo.xml
     sources:
-      # Getting electron
-      - type: git
-        url: https://github.com/Nytuo/CosmicComics.git
-        commit: 680ca0c022acd6ee481ece5181823740c9af5f62
-        # Getting the server
-      - type: git
-        url: https://github.com/NytuoIndustries/CosmicComicsNodeServer
-        tag: "v2.1.1"
-        dest: "server"
-        #Getting the react version of the client (default)
-      - type: archive
-        url: https://github.com/NytuoIndustries/CosmicComicsReactClient/releases/download/v1.1.2/CC_RC_CONTAINED.zip
-        dest: "server/public"
-        sha512: 95958af66f3888e686d2ac4b8154abe00e91e9fa3939745f3a26f674a84362f9fbfc33fca1eb9302b4bb69c5b9466ee2394d9b48f4ffde904dc41750b40ff111
       - type: file
-        path: fr.nytuo.cosmiccomics.desktop
+        url: https://github.com/Nytuo/CosmicComics/releases/download/v3.0.0/cosmiccomics_3.0.0_amd64.deb
+        sha256: 1234567890abcdef1234567890abcdef1234567890abcdef1234567890abcdef
+        only-arches: [x86_64]
       - type: file
-        path: fr.nytuo.cosmiccomics.metainfo.xml
-      - generated-sources.json
-      # Wrapper to launch the app
-      - type: script
-        dest-filename: run.sh
-        commands:
-          - zypak-wrapper.sh /app/main/cosmiccomics "$@"
+        url: https://github.com/Nytuo/CosmicComics/releases/download/v3.0.0/cosmiccomics_3.0.0_arm.deb
+        sha256: 1234567890abcdef1234567890abcdef1234567890abcdef1234567890abcdef
+        only-arches: [aarch64]
+
+    build-commands:
+      - ar -x *.deb
+      - tar -xf data.tar.gz
+      - 'install -Dm755 usr/bin/tauri-app /app/bin/tauri-app'
+      - install -Dm644 usr/share/applications/${FLATPAK_ID}.desktop /app/share/applications/${FLATPAK_ID}.desktop
+      - install -Dm644 usr/share/icons/hicolor/128x128/apps/${FLATPAK_ID}.png /app/share/icons/hicolor/128x128/apps/${FLATPAK_ID}.png
+      - install -Dm644 usr/share/icons/hicolor/32x32/apps/${FLATPAK_ID}.png /app/share/icons/hicolor/32x32/apps/${FLATPAK_ID}.png
+      - install -Dm644 usr/share/icons/hicolor/256x256@2/apps/${FLATPAK_ID}.png /app/share/icons/hicolor/256x256@2/apps/${FLATPAK_ID}.png
+      - install -Dm644 ${FLATPAK_ID}.metainfo.xml /app/share/metainfo/${FLATPAK_ID}.metainfo.xml

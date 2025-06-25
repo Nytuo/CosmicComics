@@ -6,7 +6,7 @@
 </h1>
 <div align="center">
 <h2>CosmicComics</h2>
-  Client for CosmicComics using a server and web interface with Electron
+  Client for CosmicComics using a server and web interface with Tauri
   <br />
   <br />
   <a href="https://github.com/Nytuo/CosmicComics/issues/new?assignees=&labels=bug&template=01_BUG_REPORT.md&title=bug%3A+">Report a Bug</a>
@@ -54,7 +54,7 @@
 
 ## About
 
-Cosmic Comics is a Comics and Mangas reader and collectionner.  
+Cosmic Comics is a Comics and Mangas reader and collectionner.
 
 ### Related repositories
 Cosmic Comics is divided in three categories
@@ -65,6 +65,7 @@ Cosmic Comics is divided in three categories
 Accross multiple repository
 - [CosmicComics](https://github.com/Nytuo/CosmicComics) (Application)
 - [CosmicComics Node Server](https://github.com/Nytuo/CosmicComicsNodeServer) (Server)
+- [CosmicComics Rust Server](https://github.com/Nytuo/CosmicComicsRustServer) (Server)
 - [CosmicComics Web Client](https://github.com/Nytuo/CosmicComicsWebClient) (Interface)
 - [CosmicComics React Client](https://github.com/Nytuo/CosmicComicsReactClient) (Interface)
 
@@ -82,7 +83,8 @@ This is all you can do with this software and more:
 
 ### Built With
 #### Servers
-<div style="display: flex; align-item: center">
+<div style="display: flex; align-items: center">
+    <img src="https://img.shields.io/badge/Rust-black?style=for-the-badge&logo=rust"/>
   <img src="https://img.shields.io/badge/NPM-black?style=for-the-badge&logo=npm"/>
 <img src="https://img.shields.io/badge/NodeJS-black?style=for-the-badge&logo=node.js"/>
   <img src="https://img.shields.io/badge/Express-black?style=for-the-badge&logo=express"/>
@@ -121,8 +123,6 @@ See the <a href="https://github.com/Nytuo/CosmicComics/wiki/Installation">Instal
 See the <a href="https://github.com/Nytuo/CosmicComics/wiki/How-to-use">How to use</a> section of the Wiki
 
 ## Roadmap
-
-See the [Trello](https://trello.com/b/7KvcYa8n/cosmiccomics) 
 
 See the [open issues](https://github.com/Nytuo/CosmicComics/issues) for a list of proposed features (and known issues).
 
@@ -166,5 +166,6 @@ See [LICENSE](LICENSE) for more information.
 
 ## Acknowledgements
 
-- All the NPM libraries authors   
+- All the NPM libraries authors
+- All the Rust libraries authors
 - Plex and Jellyfin like server based media library for the inspiration

@@ -1,0 +1,34 @@
+name: cosmiccomics
+base: core22
+version: '3.0.0'
+summary: Read Comics, Manga and Ebooks the easy way
+description: |
+  Cosmic Comics offers a user-friendly interface that makes it easy to browse the collection of comics, manga and ebooks. It supports different file formats, offers adaptive page layout, favorite page marking, advanced search and library management.
+
+grade: stable
+confinement: strict
+
+layout:
+  /usr/lib/$SNAPCRAFT_ARCH_TRIPLET/webkit2gtk-4.1:
+    bind: $SNAP/usr/lib/$SNAPCRAFT_ARCH_TRIPLET/webkit2gtk-4.1
+
+apps:
+  cosmiccomics:
+    command: usr/bin/cosmiccomics
+    desktop: usr/share/applications/fr.nytuo.cosmiccomics.desktop
+    extensions: [gnome]
+    plugs:
+      - network
+
+parts:
+  build-app:
+    plugin: dump
+    source: https://github.com/Nytuo/CosmicComics/releases/latest/download/cosmiccomics_3.0.0_amd64.deb
+    stage-packages:
+      - libwebkit2gtk-4.1-0
+      - libayatana-appindicator3-1
+    source: .
+    override-build: |
+      set -eu
+      dpkg -x cosmiccomics_3.0.0_amd64.deb $SNAPCRAFT_PART_INSTALL/
+      sed -i -e "s|Icon=appname|Icon=/usr/share/icons/hicolor/32x32/apps/cosmiccomics.png|g" $SNAPCRAFT_PART_INSTALL/usr/share/applications/fr.nytuo.cosmiccomics.desktop

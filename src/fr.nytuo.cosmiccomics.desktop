@@ -1,0 +1,7 @@
+[Desktop Entry]
+Type=Application
+Name=Cosmic Comics
+Comment=Comics and manga reader and collectionner
+Icon=fr.nytuo.cosmiccomics
+Exec=run.sh
+Categories=Utility

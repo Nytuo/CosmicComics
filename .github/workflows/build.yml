@@ -1,74 +1,85 @@
-name: Build/release
-on:
-  push:
-    tags:
-      - "v*"
-  workflow_dispatch:
-jobs:
-  release_linux_win:
-    runs-on: ubuntu-latest
+name: 'publish'
 
+on:
+  workflow_dispatch:
+    inputs:
+      platform:
+        description: 'Platform to build for (choose a single target or "all")'
+        required: false
+        type: choice
+        default: 'all'
+        options:
+          - all
+          - macos-aarch64
+          - macos-x86_64
+          - ubuntu
+          - ubuntu-arm
+          - windows
+  push:
+    branches:
+      - master
+
+jobs:
+  publish-tauri:
+    permissions:
+      contents: write
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - id: 'macos-aarch64'
+            runs_on: 'macos-latest'
+            args: '--target aarch64-apple-darwin'
+          - id: 'macos-x86_64'
+            runs_on: 'macos-latest'
+            args: '--target x86_64-apple-darwin'
+          - id: 'ubuntu'
+            runs_on: 'ubuntu-22.04'
+            args: ''
+          - id: 'ubuntu-arm'
+            runs_on: 'ubuntu-22.04-arm'
+            args: ''
+          - id: 'windows'
+            runs_on: 'windows-latest'
+            args: ''
+
+    runs-on: ${{ matrix.runs_on }}
+    if: ${{ github.event_name != 'workflow_dispatch' || github.event.inputs.platform == '' || github.event.inputs.platform == 'all' || github.event.inputs.platform == matrix.id }}
     steps:
-      - name: Check out Git repository
-        uses: actions/checkout@v4.1.0
+      - uses: actions/checkout@v4
+
+      - name: install dependencies (ubuntu only)
+        if: matrix.runs_on == 'ubuntu-22.04'
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y libwebkit2gtk-4.1-dev libappindicator3-dev librsvg2-dev patchelf
+
+      - name: setup node
+        uses: actions/setup-node@v4
         with:
-          fetch-depth: 0
-      - name: Determine Release Version
-        id: determine_version
-        run: |
-          if [[ "${{ github.event_name }}" == "workflow_dispatch" ]]; then
-            latest_tag=$(git describe --tags --abbrev=0)
-            tag_parts=($(echo $latest_tag | tr '.' ' '))
-            patch_version=$((tag_parts[2] + 1))
-            new_version="${tag_parts[0]}.${tag_parts[1]}.$patch_version"
-            echo "new_version=$new_version" >> $GITHUB_ENV
-          else
-            echo "new_version=${{ github.ref_name }}" >> $GITHUB_ENV
-          fi
-      - name: Install Node.js, NPM and Yarn
-        uses: actions/setup-node@v3.8.1
+          node-version: lts/*
+          cache: 'npm'
+          cache-dependency-path: ./src/package-lock.json
+
+      - name: install Rust stable
+        uses: dtolnay/rust-toolchain@stable
         with:
-          node-version: 18
-      - name: Installing build dependencies
-        working-directory: ./
-        run: |
-            sudo dpkg --add-architecture i386
-            sudo apt update
-            sudo apt install wine64
-            sudo apt install wine32
-            sudo apt install rpm
-            sudo apt install build-essential
-            sudo apt install flatpak flatpak-builder
-            sudo flatpak remote-add --if-not-exists flathub https://flathub.org/repo/flathub.flatpakrepo
-            sudo flatpak install --assumeyes flathub org.freedesktop.Platform//22.08 org.freedesktop.Sdk//22.08 org.electronjs.Electron2.BaseApp//22.08
-      - name: Installing the Node.js dependencies
-        working-directory: ./
-        run: |
-            npm install
-            chmod a+x /home/runner/work/CosmicComics/CosmicComics/node_modules/7zip-bin/linux/x64/7za
-            npm run get-bfe
-            npm install
-      - name: Building the application
-        working-directory: ./
-        run: |
-            npm run dist
-            npm run ebw
-      
-      - name: Creating Release and Uploading Artifacts
-        uses: "marvinpinto/action-automatic-releases@latest"
+          targets: ${{ matrix.runs_on == 'macos-latest' && 'aarch64-apple-darwin,x86_64-apple-darwin' || '' }}
+
+      - name: Rust cache
+        uses: swatinem/rust-cache@v2
         with:
-          repo_token: "${{ secrets.GITHUB_TOKEN }}"
+          workspaces: './src/src-tauri -> target'
+
+      - uses: tauri-apps/tauri-action@v0
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          TAURI_SIGNING_PRIVATE_KEY: ${{ secrets.TAURI_SIGNING_PRIVATE_KEY }}
+          TAURI_SIGNING_PRIVATE_KEY_PASSWORD: ${{ secrets.TAURI_SIGNING_PRIVATE_KEY_PASSWORD }}      
+        with:
+          tagName: cosmiccomics-v__VERSION__
+          releaseName: 'CosmicComics v__VERSION__'
+          releaseBody: 'CosmicComics  release v__VERSION__'
+          releaseDraft: true
           prerelease: false
-          automatic_release_tag: ${{ env.new_version }}
-          files: |
-            ${{github.workspace}}/dist/*.zip
-            ${{github.workspace}}/dist/*.snap
-            ${{github.workspace}}/dist/*.exe
-            ${{github.workspace}}/dist/*.blockmap
-            ${{github.workspace}}/dist/latest.yml
-            ${{github.workspace}}/dist/*.deb
-            ${{github.workspace}}/dist/*.AppImage
-            ${{github.workspace}}/dist/*.rpm
-            ${{github.workspace}}/dist/latest-linux.yml
-            ${{github.workspace}}/dist/latest-linux-arm64.yml
-            ${{github.workspace}}/dist/*.flatpak
+          args: ${{ matrix.args }}
