@@ -6,11 +6,12 @@ use serde_json::Value;
 use std::{
     fs::{self, File},
     io::{self, Write},
-    os::unix::fs::PermissionsExt,
     path::Path,
     sync::Arc,
     time::Duration,
 };
+#[cfg(unix)]
+use std::os::unix::fs::PermissionsExt;
 use tokio::sync::Mutex;
 use tracing::{error, info};
 use unrar::Archive;
@@ -252,6 +253,7 @@ pub async fn extract_all_images_from_zip<P: AsRef<Path>>(
         if is_image {
             let out_path = extract_dir.as_ref().join(format!("{:05}.jpg", image_count));
             let t_perm = std::time::Instant::now();
+            #[cfg(unix)]
             fs::set_permissions(&out_path, fs::Permissions::from_mode(0o777))?;
             info!("[zip] set_permissions in {:.2?}", t_perm.elapsed());
             image_count += 1;
@@ -338,6 +340,7 @@ pub(crate) async fn extract_all_images_from_rar<P: AsRef<Path>>(
                     fs::rename(&extracted_file_path, &renamed_path)?;
                     info!("[rar] rename in {:.2?}", t_rename.elapsed());
                     let t_perm = std::time::Instant::now();
+                    #[cfg(unix)]
                     fs::set_permissions(&renamed_path, fs::Permissions::from_mode(0o777))?;
                     info!("[rar] set_permissions in {:.2?}", t_perm.elapsed());
                     count += 1;

@@ -303,6 +303,7 @@ pub fn run() {
         .build(tauri::generate_context!())
         .expect("error while building tauri application")
         .run(|app, event| {
+            #[cfg(target_os = "macos")]
             if let tauri::RunEvent::Opened { urls } = event {
                 let file_extensions = ["cbz", "cbr", "cbt", "rar", "zip", "7z", "epub", "pdf"];
                 for url in urls {
@@ -320,5 +321,7 @@ pub fn run() {
                     }
                 }
             }
+            #[cfg(not(target_os = "macos"))]
+            let _ = event;
         });
 }

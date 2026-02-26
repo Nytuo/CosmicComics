@@ -22,7 +22,11 @@
       "assetProtocol": {
         "enable": true,
         "scope": [
-          "**"
+          "**",
+          "$HOME/**",
+          "$DATA/**",
+          "$LOCALDATA/**",
+          "$RUNTIME/**"
         ]
       }
     }

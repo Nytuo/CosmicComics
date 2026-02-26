@@ -373,7 +373,7 @@ export default function ReaderSettingsDialog({
         if (!isOpen) onClose();
       }}
     >
-      <DialogContent className="max-w-2xl max-h-[80vh] overflow-y-auto">
+      <DialogContent className="w-2xl h-[80vh] overflow-y-auto">
         <DialogHeader>
           <DialogTitle>{t('book_settings')}</DialogTitle>
         </DialogHeader>
