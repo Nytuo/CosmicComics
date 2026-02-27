@@ -20,31 +20,38 @@ on:
       - master
 
 jobs:
+  setup:
+    runs-on: ubuntu-latest
+    outputs:
+      matrix: ${{ steps.set-matrix.outputs.matrix }}
+    steps:
+      - id: set-matrix
+        shell: bash
+        run: |
+          ALL='[
+            {"id":"macos-aarch64","runs_on":"macos-latest","args":"--target aarch64-apple-darwin"},
+            {"id":"macos-x86_64","runs_on":"macos-latest","args":"--target x86_64-apple-darwin"},
+            {"id":"ubuntu","runs_on":"ubuntu-22.04","args":""},
+            {"id":"ubuntu-arm","runs_on":"ubuntu-22.04-arm","args":""},
+            {"id":"windows","runs_on":"windows-latest","args":""}
+          ]'
+          PLATFORM="${{ github.event.inputs.platform }}"
+          if [[ -z "$PLATFORM" || "$PLATFORM" == "all" ]]; then
+            INCLUDE="$ALL"
+          else
+            INCLUDE=$(echo "$ALL" | jq "[.[] | select(.id == \"$PLATFORM\")]")
+          fi
+          echo "matrix=$(echo "$INCLUDE" | jq -c '{include: .}')" >> "$GITHUB_OUTPUT"
+
   publish-tauri:
+    needs: setup
     permissions:
       contents: write
     strategy:
       fail-fast: false
-      matrix:
-        include:
-          - id: 'macos-aarch64'
-            runs_on: 'macos-latest'
-            args: '--target aarch64-apple-darwin'
-          - id: 'macos-x86_64'
-            runs_on: 'macos-latest'
-            args: '--target x86_64-apple-darwin'
-          - id: 'ubuntu'
-            runs_on: 'ubuntu-22.04'
-            args: ''
-          - id: 'ubuntu-arm'
-            runs_on: 'ubuntu-22.04-arm'
-            args: ''
-          - id: 'windows'
-            runs_on: 'windows-latest'
-            args: ''
+      matrix: ${{ fromJSON(needs.setup.outputs.matrix) }}
 
     runs-on: ${{ matrix.runs_on }}
-    if: ${{ github.event_name != 'workflow_dispatch' || github.event.inputs.platform == '' || github.event.inputs.platform == 'all' || github.event.inputs.platform == matrix.id }}
     steps:
       - uses: actions/checkout@v4
 
@@ -70,6 +77,12 @@ jobs:
         uses: swatinem/rust-cache@v2
         with:
           workspaces: './src/src-tauri -> target'
+
+      - name: Install JS dependencies
+        run: npm ci --prefix src
+
+      - name: Build Vite frontend
+        run: npm run build:vite --prefix src
 
       - uses: tauri-apps/tauri-action@v0
         env:
