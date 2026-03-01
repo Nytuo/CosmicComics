@@ -23,12 +23,27 @@ apps:
 parts:
   build-app:
     plugin: dump
-    source: https://github.com/Nytuo/CosmicComics/releases/latest/download/cosmiccomics_3.0.0_amd64.deb
+    build-snaps:
+      - node/20/stable
+      - rustup/latest/stable
+    build-packages:
+      - libwebkit2gtk-4.1-dev
+      - build-essential
+      - curl
+      - wget
+      - file
+      - libxdo-dev
+      - libssl-dev
+      - libayatana-appindicator3-dev
+      - librsvg2-dev
+      - dpkg
     stage-packages:
       - libwebkit2gtk-4.1-0
       - libayatana-appindicator3-1
     source: .
     override-build: |
       set -eu
-      dpkg -x cosmiccomics_3.0.0_amd64.deb $SNAPCRAFT_PART_INSTALL/
+      npm install
+      npm run tauri build -- --bundles deb
+      dpkg -x src-tauri/target/release/bundle/deb/*.deb $SNAPCRAFT_PART_INSTALL/
       sed -i -e "s|Icon=appname|Icon=/usr/share/icons/hicolor/32x32/apps/cosmiccomics.png|g" $SNAPCRAFT_PART_INSTALL/usr/share/applications/fr.nytuo.cosmiccomics.desktop
