@@ -127,6 +127,8 @@
   "readerSettings": "Reader settings",
   "manual": "MANUAL",
   "Smart_Panel_Mode": "Smart Panel Mode (Guided View)",
+  "smartPanelDebug": "Smart Panel Debug",
+  "showPanelDebugOverlay": "Show panel debug overlay",
   "smart_panel_next": "Next Panel",
   "smart_panel_prev": "Previous Panel",
   "extracting_cover": "Extracting cover...",

@@ -2,6 +2,7 @@ import { PanelRect } from '@/API/TauriAPI';
 
 interface ViewerPanelDebugOverlayProps {
   smartPanelMode: boolean;
+  showDebugOverlay: boolean;
   panels: PanelRect[];
   imageOne: string | null;
   VIV_On: boolean;
@@ -15,6 +16,7 @@ interface ViewerPanelDebugOverlayProps {
 
 export default function ViewerPanelDebugOverlay({
   smartPanelMode,
+  showDebugOverlay,
   panels,
   imageOne,
   VIV_On,
@@ -27,6 +29,7 @@ export default function ViewerPanelDebugOverlay({
 }: ViewerPanelDebugOverlayProps) {
   if (
     !smartPanelMode ||
+    !showDebugOverlay ||
     panels.length === 0 ||
     !imageOne ||
     VIV_On ||

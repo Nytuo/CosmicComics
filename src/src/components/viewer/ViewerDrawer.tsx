@@ -63,6 +63,7 @@ export default function PersistentDrawerLeft() {
   const [innerWidth, setInnerWidth] = React.useState(window.innerWidth);
   const [webToonMode, setWebToonMode] = React.useState(false);
   const [smartPanelMode, setSmartPanelMode] = React.useState(false);
+  const [showPanelDebugOverlay, setShowPanelDebugOverlay] = React.useState(false);
   const [panels, setPanels] = React.useState<PanelRect[]>([]);
   const [currentPanelIndex, setCurrentPanelIndex] = React.useState(-1);
   const [panelTransform, setPanelTransform] = React.useState<string>('');
@@ -1166,9 +1167,9 @@ export default function PersistentDrawerLeft() {
             rotation={rotation}
             preloadedImages={preloadedImages}
           />
-
           <ViewerPanelDebugOverlay
             smartPanelMode={smartPanelMode}
+            showDebugOverlay={showPanelDebugOverlay}
             panels={panels}
             imageOne={imageOne}
             VIV_On={VIV_On}
@@ -1236,6 +1237,8 @@ export default function PersistentDrawerLeft() {
         userSettings={userSettings}
         smartPanelMode={smartPanelMode}
         setSmartPanelMode={setSmartPanelMode}
+        showPanelDebugOverlay={showPanelDebugOverlay}
+        setShowPanelDebugOverlay={setShowPanelDebugOverlay}
       />
     </>
   );

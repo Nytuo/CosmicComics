@@ -127,6 +127,8 @@
   "readerSettings": "dev",
   "manual": "dev",
   "Smart_Panel_Mode": "dev",
+  "smartPanelDebug": "dev",
+  "showPanelDebugOverlay": "dev",
   "smart_panel_next": "dev",
   "smart_panel_prev": "dev",
   "extracting_cover": "dev",

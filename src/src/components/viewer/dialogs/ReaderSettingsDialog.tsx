@@ -80,6 +80,8 @@ export default function ReaderSettingsDialog({
   userSettings,
   smartPanelMode,
   setSmartPanelMode,
+  showPanelDebugOverlay,
+  setShowPanelDebugOverlay,
 }: {
   onClose: any;
   openModal: boolean;
@@ -108,6 +110,8 @@ export default function ReaderSettingsDialog({
   userSettings: IUserSettings;
   smartPanelMode: boolean;
   setSmartPanelMode: any;
+  showPanelDebugOverlay: boolean;
+  setShowPanelDebugOverlay: (v: boolean) => void;
 }): JSX.Element {
   const { t } = useTranslation();
 
@@ -533,6 +537,26 @@ export default function ReaderSettingsDialog({
               );
             })}
           </div>
+
+          {smartPanelMode && (
+            <>
+              <h3 className="text-sm font-medium text-muted-foreground">
+                {t('smartPanelDebug')}
+              </h3>
+              <div className="flex items-center justify-between">
+                <Label htmlFor="id_showPanelDebugOverlay">
+                  {t('showPanelDebugOverlay')}
+                </Label>
+                <Switch
+                  id="id_showPanelDebugOverlay"
+                  checked={showPanelDebugOverlay}
+                  onCheckedChange={(checked) =>
+                    setShowPanelDebugOverlay(checked)
+                  }
+                />
+              </div>
+            </>
+          )}
 
           <h3 className="text-sm font-medium text-muted-foreground">
             {t('slideshowIntervalTime')}
