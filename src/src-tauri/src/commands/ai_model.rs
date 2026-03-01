@@ -82,8 +82,9 @@ pub async fn download_ai_model(
         .ok_or("Model path contains invalid UTF-8")?
         .to_string();
 
-    panel_detection_service::init_model(&model_path_str)
-        .map_err(|e| format!("Failed to initialise AI model: {e}"))?;
+    if let Err(e) = panel_detection_service::init_model(&model_path_str) {
+        return Err(format!("Failed to initialise AI model: {e}"));
+    }
 
     tracing::info!(
         "AI model downloaded and initialised from: {}",

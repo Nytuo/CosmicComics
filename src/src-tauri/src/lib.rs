@@ -118,17 +118,35 @@ pub fn run() {
             }
 
             let model_path = PathBuf::from(&base_path).join("model.onnx");
-            if model_path.exists() {
-                let model_path_str = model_path.to_str().unwrap();
-                match panel_detection_service::init_model(model_path_str) {
-                    Ok(_) => tracing::info!("AI Model initialized from: {:?}", model_path_str),
-                    Err(e) => tracing::warn!("Failed to init AI Model: {}", e),
+            #[cfg(feature = "ai")]
+            {
+                if model_path.exists() {
+                    let model_path_str = model_path.to_str().unwrap();
+                    match panel_detection_service::init_model(model_path_str) {
+                        Ok(_) => tracing::info!("AI Model initialized from: {:?}", model_path_str),
+                        Err(e) => tracing::warn!("Failed to init AI Model: {}", e),
+                    }
+                } else {
+                    tracing::info!(
+                        "AI Model not found at {:?} – will prompt user to download.",
+                        model_path
+                    );
                 }
-            } else {
-                tracing::info!(
-                    "AI Model not found at {:?} – will prompt user to download.",
-                    model_path
-                );
+            }
+
+            #[cfg(not(feature = "ai"))]
+            {
+                if model_path.exists() {
+                    tracing::warn!(
+                        "AI Model found at {:?} but application was compiled without AI support.",
+                        model_path
+                    );
+                } else {
+                    tracing::info!(
+                        "AI Model not found at {:?} – AI support is disabled at compile time.",
+                        model_path
+                    );
+                }
             }
 
             if services::pdfium_service::exists_in(&base_path) {

@@ -1,11 +1,14 @@
 use image::{imageops::FilterType, GenericImageView, Pixel};
 use ndarray::{Array, ArrayView, Axis};
-use ort::session::{builder::GraphOptimizationLevel, Session};
-use ort::value::Tensor;
 use serde::{Deserialize, Serialize};
 use std::collections::HashMap;
 use std::sync::{Mutex, OnceLock};
 use tracing::info;
+
+#[cfg(feature = "ai")]
+use ort::session::{builder::GraphOptimizationLevel, Session};
+#[cfg(feature = "ai")]
+use ort::value::Tensor;
 
 const FRAME_CLASS_INDEX: usize = 2;
 const CONFIDENCE_THRESHOLD: f32 = 0.45;
@@ -25,12 +28,14 @@ pub enum ReadingDirection {
     RTL,
 }
 
+#[cfg(feature = "ai")]
 static MODEL_SESSION: OnceLock<Mutex<Session>> = OnceLock::new();
 
 lazy_static::lazy_static! {
     static ref PANEL_CACHE: Mutex<HashMap<String, Vec<PanelRect>>> = Mutex::new(HashMap::new());
 }
 
+#[cfg(feature = "ai")]
 pub fn init_model(model_path: &str) -> Result<(), Box<dyn std::error::Error>> {
     let model = Session::builder()?
         .with_optimization_level(GraphOptimizationLevel::Level3)?
@@ -45,6 +50,12 @@ pub fn init_model(model_path: &str) -> Result<(), Box<dyn std::error::Error>> {
     Ok(())
 }
 
+#[cfg(not(feature = "ai"))]
+pub fn init_model(_model_path: &str) -> Result<(), Box<dyn std::error::Error>> {
+    Err("AI support disabled at compile time (feature \"ai\").".into())
+}
+
+#[cfg(feature = "ai")]
 pub fn detect_panels(
     image_bytes: &[u8],
     reading_direction: ReadingDirection,
@@ -95,6 +106,14 @@ pub fn detect_panels(
     sort_panels(&mut panels, reading_direction);
 
     Ok(panels)
+}
+
+#[cfg(not(feature = "ai"))]
+pub fn detect_panels(
+    _image_bytes: &[u8],
+    _reading_direction: ReadingDirection,
+) -> Result<Vec<PanelRect>, String> {
+    Err("AI support disabled at compile time (feature \"ai\").".to_string())
 }
 
 struct Detection {
