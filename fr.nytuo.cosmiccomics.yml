@@ -1,0 +1,61 @@
+app-id: fr.nytuo.cosmiccomics
+runtime: org.gnome.Platform
+runtime-version: '47' 
+sdk: org.gnome.Sdk
+sdk-extensions:
+  - org.freedesktop.Sdk.Extension.rust-stable
+  - org.freedesktop.Sdk.Extension.node20
+  - org.freedesktop.Sdk.Extension.llvm18
+command: cosmiccomics
+finish-args:
+  - --share=ipc
+  - --socket=x11
+  - --socket=wayland
+  - --device=dri
+  - --share=network
+  - --talk-name=org.freedesktop.Notifications
+  - --filesystem=xdg-run/app.fr.nytuo.cosmiccomics:create 
+
+build-options:
+  append-path: /usr/lib/sdk/rust-stable/bin:/usr/lib/sdk/node20/bin:/usr/lib/sdk/llvm18/bin
+  env:
+    RUSTFLAGS: "-C target-feature=-crt-static"
+    CARGO_HOME: /run/build/cosmiccomics/cargo-home
+    LIBCLANG_PATH: /usr/lib/sdk/llvm18/lib
+
+modules:
+  - name: node-deps
+    buildsystem: simple
+    sources:
+      - type: dir
+        path: ./src/ 
+      - node-sources.json
+    build-commands:
+      - npm install --offline --cache flatpak-node/npm-cache --frozen-lockfile
+      - npm run build:vite
+      - mkdir -p /app/share/cosmiccomics/frontend
+      - cp -r dist/* /app/share/cosmiccomics/frontend/
+
+  - name: cosmiccomics
+    buildsystem: simple
+    sources:
+      - type: dir
+        path: .
+      - cargo-sources.json # Generated via flatpak-cargo-generator.py
+    build-commands:
+      - mkdir -p src/src-tauri/.cargo
+      - |
+        cat <<EOF > src/src-tauri/.cargo/config.toml
+        [source.crates-io]
+        replace-with = "vendored-sources"
+        [source.vendored-sources]
+        directory = "../../cargo/vendor"
+        EOF
+      
+      - cd src/src-tauri && cargo build --release --frozen --no-default-features
+
+      - install -Dm755 src/src-tauri/target/release/cosmiccomics /app/bin/cosmiccomics
+
+      - install -Dm644 src/src-tauri/icons/128x128.png /app/share/icons/hicolor/128x128/apps/fr.nytuo.cosmiccomics.png
+      - install -Dm644 fr.nytuo.cosmiccomics.metainfo.xml /app/share/metainfo/fr.nytuo.cosmiccomics.metainfo.xml
+      - install -Dm644 fr.nytuo.cosmiccomics.desktop /app/share/applications/fr.nytuo.cosmiccomics.desktop

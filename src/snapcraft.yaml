@@ -1,5 +1,5 @@
 name: cosmiccomics
-base: core22
+base: core24
 version: '3.0.0'
 summary: Read Comics, Manga and Ebooks the easy way
 description: |
@@ -19,6 +19,8 @@ apps:
     extensions: [gnome]
     plugs:
       - network
+      - home
+      - removable-media
 
 parts:
   build-app:
@@ -37,13 +39,19 @@ parts:
       - libayatana-appindicator3-dev
       - librsvg2-dev
       - dpkg
+      - clang
+      - libclang-dev
+      - llvm-dev
     stage-packages:
       - libwebkit2gtk-4.1-0
       - libayatana-appindicator3-1
     source: .
     override-build: |
       set -eu
+      rustup default stable
+      export LIBCLANG_PATH=/usr/lib/llvm-18/lib
+      export CLANG_PATH=/usr/bin/clang-18
       npm install
-      npm run tauri build -- --bundles deb
+      npm run tauri build -- --bundles deb -- --no-default-features
       dpkg -x src-tauri/target/release/bundle/deb/*.deb $SNAPCRAFT_PART_INSTALL/
       sed -i -e "s|Icon=appname|Icon=/usr/share/icons/hicolor/32x32/apps/cosmiccomics.png|g" $SNAPCRAFT_PART_INSTALL/usr/share/applications/fr.nytuo.cosmiccomics.desktop
