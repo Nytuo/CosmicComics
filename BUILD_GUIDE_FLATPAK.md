@@ -21,8 +21,9 @@ source .venv/bin/activate
 ```bash
 pip install aiohttp toml tomlkit
 pip install "git+https://github.com/flatpak/flatpak-builder-tools.git#subdirectory=node"
+curl -O https://raw.githubusercontent.com/flatpak/flatpak-builder-tools/master/cargo/flatpak-cargo-generator.py
 python3 flatpak-cargo-generator.py src/src-tauri/Cargo.lock -o cargo-sources.json
-flatpak-node-generator npm src/package-lock.json -o node-sources.json
+python3 -m flatpak_node_generator npm src/package-lock.json -o node-sources.json
 ```
 
 4) Install required Flatpak SDKs (once):

@@ -63,7 +63,8 @@ export default function PersistentDrawerLeft() {
   const [innerWidth, setInnerWidth] = React.useState(window.innerWidth);
   const [webToonMode, setWebToonMode] = React.useState(false);
   const [smartPanelMode, setSmartPanelMode] = React.useState(false);
-  const [showPanelDebugOverlay, setShowPanelDebugOverlay] = React.useState(false);
+  const [showPanelDebugOverlay, setShowPanelDebugOverlay] =
+    React.useState(false);
   const [panels, setPanels] = React.useState<PanelRect[]>([]);
   const [currentPanelIndex, setCurrentPanelIndex] = React.useState(-1);
   const [panelTransform, setPanelTransform] = React.useState<string>('');

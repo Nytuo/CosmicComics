@@ -3,6 +3,8 @@ use futures::executor;
 use headless_chrome::{Browser, LaunchOptionsBuilder};
 use pdfium_render::prelude::*;
 use serde_json::Value;
+#[cfg(unix)]
+use std::os::unix::fs::PermissionsExt;
 use std::{
     fs::{self, File},
     io::{self, Write},
@@ -10,8 +12,6 @@ use std::{
     sync::Arc,
     time::Duration,
 };
-#[cfg(unix)]
-use std::os::unix::fs::PermissionsExt;
 use tokio::sync::Mutex;
 use tracing::{error, info};
 use unrar::Archive;
