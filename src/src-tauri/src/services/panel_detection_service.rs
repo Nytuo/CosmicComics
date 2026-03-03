@@ -1,14 +1,14 @@
 use image::{imageops::FilterType, GenericImageView, Pixel};
-use ndarray::{Array, ArrayView, Axis};
+use ndarray::{ArrayView, Axis};
 use serde::{Deserialize, Serialize};
 use std::collections::HashMap;
 use std::sync::{Mutex, OnceLock};
 use tracing::info;
 
 #[cfg(feature = "ai")]
-use ort::session::{builder::GraphOptimizationLevel, Session};
+use candle_core::{Device, Tensor};
 #[cfg(feature = "ai")]
-use ort::value::Tensor;
+use candle_onnx::onnx::ModelProto;
 
 const FRAME_CLASS_INDEX: usize = 2;
 const CONFIDENCE_THRESHOLD: f32 = 0.45;
@@ -29,7 +29,7 @@ pub enum ReadingDirection {
 }
 
 #[cfg(feature = "ai")]
-static MODEL_SESSION: OnceLock<Mutex<Session>> = OnceLock::new();
+static MODEL: OnceLock<Mutex<ModelProto>> = OnceLock::new();
 
 lazy_static::lazy_static! {
     static ref PANEL_CACHE: Mutex<HashMap<String, Vec<PanelRect>>> = Mutex::new(HashMap::new());
@@ -37,16 +37,13 @@ lazy_static::lazy_static! {
 
 #[cfg(feature = "ai")]
 pub fn init_model(model_path: &str) -> Result<(), Box<dyn std::error::Error>> {
-    let model = Session::builder()?
-        .with_optimization_level(GraphOptimizationLevel::Level3)?
-        .with_intra_threads(4)?
-        .commit_from_file(model_path)?;
+    let model = candle_onnx::read_file(model_path)?;
 
-    MODEL_SESSION
+    MODEL
         .set(Mutex::new(model))
         .map_err(|_| "Model already initialized")?;
 
-    info!("YOLO Comic Model initialized successfully.");
+    info!("YOLO Comic Model initialized successfully (Candle backend).");
     Ok(())
 }
 
@@ -60,45 +57,70 @@ pub fn detect_panels(
     image_bytes: &[u8],
     reading_direction: ReadingDirection,
 ) -> Result<Vec<PanelRect>, String> {
-    let mutex = MODEL_SESSION
+    let mutex = MODEL
         .get()
         .ok_or("Model not initialized. Call init_model first.")?;
 
-    let mut session = mutex.lock().map_err(|e| e.to_string())?;
+    let model = mutex.lock().map_err(|e| e.to_string())?;
 
     let img =
         image::load_from_memory(image_bytes).map_err(|e| format!("Image load error: {}", e))?;
     let (orig_w, orig_h) = img.dimensions();
 
-    let model_w = 640;
-    let model_h = 640;
+    let model_w: u32 = 640;
+    let model_h: u32 = 640;
     let resized = img.resize_exact(model_w, model_h, FilterType::CatmullRom);
 
-    let mut input_tensor = Array::zeros((1, 3, model_h as usize, model_w as usize));
+    let mut data = vec![0f32; 3 * model_h as usize * model_w as usize];
+    let hw = (model_h * model_w) as usize;
     for (x, y, pixel) in resized.pixels() {
+        let idx = y as usize * model_w as usize + x as usize;
         let rgb = pixel.to_rgb();
-        input_tensor[[0, 0, y as usize, x as usize]] = rgb[0] as f32 / 255.0;
-        input_tensor[[0, 1, y as usize, x as usize]] = rgb[1] as f32 / 255.0;
-        input_tensor[[0, 2, y as usize, x as usize]] = rgb[2] as f32 / 255.0;
+        data[idx] = rgb[0] as f32 / 255.0;          // R channel
+        data[hw + idx] = rgb[1] as f32 / 255.0;     // G channel
+        data[2 * hw + idx] = rgb[2] as f32 / 255.0;  // B channel
     }
 
-    let shape = vec![1, 3, model_h as i64, model_w as i64];
-    let data = input_tensor.into_raw_vec();
-
-    let input_value = Tensor::from_array((shape, data))
+    let device = Device::Cpu;
+    let input_tensor = Tensor::from_vec(data, &[1, 3, model_h as usize, model_w as usize], &device)
         .map_err(|e| format!("Failed to create input tensor: {}", e))?;
 
-    let inputs = ort::inputs!["images" => input_value];
-    let outputs = session
-        .run(inputs)
+    let graph = model
+        .graph
+        .as_ref()
+        .ok_or("ONNX model has no graph")?;
+    let input_name = graph
+        .input
+        .first()
+        .ok_or("ONNX model has no input nodes")?
+        .name
+        .clone();
+
+    let mut inputs = std::collections::HashMap::new();
+    inputs.insert(input_name, input_tensor);
+
+    let outputs = candle_onnx::simple_eval(&model, inputs)
         .map_err(|e| format!("Inference failed: {}", e))?;
 
-    let (output_shape, output_data) = outputs["output0"]
-        .try_extract_tensor::<f32>()
-        .map_err(|e| format!("Extraction failed: {}", e))?;
+    let output_name = graph
+        .output
+        .first()
+        .ok_or("ONNX model has no output nodes")?
+        .name
+        .clone();
 
-    let shape: Vec<usize> = output_shape.iter().map(|&x| x as usize).collect();
-    let output_view = ArrayView::from_shape(shape, output_data)
+    let output_tensor = outputs
+        .get(&output_name)
+        .ok_or_else(|| format!("Output '{}' not found in model results", output_name))?;
+
+    let output_shape: Vec<usize> = output_tensor.dims().to_vec();
+    let output_data = output_tensor
+        .flatten_all()
+        .map_err(|e| format!("Failed to flatten output: {}", e))?
+        .to_vec1::<f32>()
+        .map_err(|e| format!("Failed to extract output data: {}", e))?;
+
+    let output_view = ArrayView::from_shape(output_shape.as_slice(), output_data.as_slice())
         .map_err(|e| format!("Failed to create output view: {}", e))?;
 
     let mut panels = post_process_yolo(output_view.into_dyn(), orig_w, orig_h, model_w, model_h);

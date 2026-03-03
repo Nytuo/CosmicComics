@@ -2,7 +2,7 @@ use anyhow::Result;
 use serde_json::Value;
 use std::collections::HashMap;
 use std::path::Path;
-use surrealdb::engine::local::{Db, RocksDb};
+use surrealdb::engine::local::{Db, SurrealKv};
 use surrealdb::Surreal;
 use tracing::{debug, error, info};
 
@@ -23,8 +23,8 @@ impl SurrealRepo {
         debug!("[SurrealRepo::open] creating dir at {}", db_path);
         std::fs::create_dir_all(Path::new(&db_path))?;
 
-        debug!("[SurrealRepo::open] connecting to RocksDb at {}", db_path);
-        let db = Surreal::new::<RocksDb>(&db_path).await?;
+        debug!("[SurrealRepo::open] connecting to SurrealKv at {}", db_path);
+        let db = Surreal::new::<SurrealKv>(&db_path).await?;
         debug!("[SurrealRepo::open] connected, selecting ns=cosmiccomics db=main");
         db.use_ns("cosmiccomics").use_db("main").await?;
         info!("[SurrealRepo::open] SurrealDB opened at {}", db_path);
