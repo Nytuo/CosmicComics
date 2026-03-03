@@ -29,11 +29,11 @@ jobs:
         shell: bash
         run: |
           ALL='[
-            {"id":"macos-aarch64","runs_on":"macos-latest","args":"--target aarch64-apple-darwin --features ai"},
-            {"id":"macos-x86_64","runs_on":"macos-latest","args":"--target x86_64-apple-darwin -- --no-default-features"},
-            {"id":"ubuntu","runs_on":"ubuntu-24.04","args":"--features ai"},
-            {"id":"ubuntu-arm","runs_on":"ubuntu-24.04-arm","args":"--features ai"},
-            {"id":"windows","runs_on":"windows-latest","args":"--features ai"}
+            {"id":"macos-aarch64","runs_on":"macos-latest","args":"--target aarch64-apple-darwin"},
+            {"id":"macos-x86_64","runs_on":"macos-latest","args":"--target x86_64-apple-darwin"},
+            {"id":"ubuntu","runs_on":"ubuntu-24.04"},
+            {"id":"ubuntu-arm","runs_on":"ubuntu-24.04-arm"},
+            {"id":"windows","runs_on":"windows-latest"}
           ]'
           PLATFORM="${{ github.event.inputs.platform }}"
           if [[ -z "$PLATFORM" || "$PLATFORM" == "all" ]]; then
