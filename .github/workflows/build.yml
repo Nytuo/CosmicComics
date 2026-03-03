@@ -14,7 +14,9 @@ on:
           - macos-x86_64
           - ubuntu
           - ubuntu-arm
+          - ubuntu-cuda
           - windows
+          - windows-cuda
   push:
     branches:
       - master
@@ -33,7 +35,9 @@ jobs:
             {"id":"macos-x86_64","runs_on":"macos-latest","args":"--target x86_64-apple-darwin"},
             {"id":"ubuntu","runs_on":"ubuntu-24.04"},
             {"id":"ubuntu-arm","runs_on":"ubuntu-24.04-arm"},
-            {"id":"windows","runs_on":"windows-2022"}
+            {"id":"ubuntu-cuda","runs_on":"ubuntu-24.04","args":"--features cuda","cuda":true},
+            {"id":"windows","runs_on":"windows-2022"},
+            {"id":"windows-cuda","runs_on":"windows-2022","args":"--features cuda","cuda":true}
           ]'
           PLATFORM="${{ github.event.inputs.platform }}"
           if [[ -z "$PLATFORM" || "$PLATFORM" == "all" ]]; then
@@ -60,6 +64,24 @@ jobs:
         run: |
           sudo apt-get update
           sudo apt-get install -y libwebkit2gtk-4.1-dev libappindicator3-dev librsvg2-dev patchelf xdg-utils protobuf-compiler
+
+      - name: install CUDA toolkit (ubuntu-cuda)
+        if: matrix.cuda == true && startsWith(matrix.runs_on, 'ubuntu')
+        run: |
+          wget https://developer.download.nvidia.com/compute/cuda/repos/ubuntu2404/x86_64/cuda-keyring_1.1-1_all.deb
+          sudo dpkg -i cuda-keyring_1.1-1_all.deb
+          sudo apt-get update
+          sudo apt-get install -y cuda-toolkit
+          echo "/usr/local/cuda/bin" >> $GITHUB_PATH
+          echo "CUDA_PATH=/usr/local/cuda" >> $GITHUB_ENV
+          echo "LD_LIBRARY_PATH=/usr/local/cuda/lib64:$LD_LIBRARY_PATH" >> $GITHUB_ENV
+
+      - name: install CUDA toolkit (windows-cuda)
+        if: matrix.cuda == true && startsWith(matrix.runs_on, 'windows')
+        run: |
+          choco install cuda --version=12.4.0 -y
+          echo "C:\Program Files\NVIDIA GPU Computing Toolkit\CUDA\v12.4\bin" | Out-File -FilePath $env:GITHUB_PATH -Encoding utf8 -Append
+          echo "CUDA_PATH=C:\Program Files\NVIDIA GPU Computing Toolkit\CUDA\v12.4" | Out-File -FilePath $env:GITHUB_ENV -Encoding utf8 -Append
 
       - name: install protoc (macOS)
         if: matrix.runs_on == 'macos-latest'
