@@ -33,7 +33,7 @@ jobs:
             {"id":"macos-x86_64","runs_on":"macos-latest","args":"--target x86_64-apple-darwin"},
             {"id":"ubuntu","runs_on":"ubuntu-24.04"},
             {"id":"ubuntu-arm","runs_on":"ubuntu-24.04-arm"},
-            {"id":"windows","runs_on":"windows-latest"}
+            {"id":"windows","runs_on":"windows-2022"}
           ]'
           PLATFORM="${{ github.event.inputs.platform }}"
           if [[ -z "$PLATFORM" || "$PLATFORM" == "all" ]]; then
@@ -66,7 +66,7 @@ jobs:
         run: brew install protobuf
 
       - name: install protoc (Windows)
-        if: matrix.runs_on == 'windows-latest'
+        if: startsWith(matrix.runs_on, 'windows')
         run: choco install protoc -y
 
       - name: setup node
