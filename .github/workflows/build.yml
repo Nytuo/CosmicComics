@@ -59,7 +59,15 @@ jobs:
         if: startsWith(matrix.runs_on, 'ubuntu')
         run: |
           sudo apt-get update
-          sudo apt-get install -y libwebkit2gtk-4.1-dev libappindicator3-dev librsvg2-dev patchelf xdg-utils
+          sudo apt-get install -y libwebkit2gtk-4.1-dev libappindicator3-dev librsvg2-dev patchelf xdg-utils protobuf-compiler
+
+      - name: install protoc (macOS)
+        if: matrix.runs_on == 'macos-latest'
+        run: brew install protobuf
+
+      - name: install protoc (Windows)
+        if: matrix.runs_on == 'windows-latest'
+        run: choco install protoc -y
 
       - name: setup node
         uses: actions/setup-node@v4
