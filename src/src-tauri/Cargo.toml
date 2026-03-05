@@ -29,7 +29,7 @@ bytes = "1"
 urlencoding = "2.1.3"
 anyhow = "1.0.99"
 image = "0.25"
-candle-onnx = { version = "0.8", optional = true }
+candle-onnx = { version = "0.9", optional = true }
 ndarray = "0.15"
 lazy_static = "1"
 zip = "2.2.2"
