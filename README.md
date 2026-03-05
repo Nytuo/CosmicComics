@@ -1,18 +1,17 @@
 <h1 align="center">
   <a href="https://github.com/Nytuo/CosmicComics">
-    <img src="https://nytuo.fr/images/logo_cc.png" alt="Logo" width="auto" height="80">
-    <img src="https://nytuo.fr/images/LogoTxt_cc.png" alt="Logo" width="auto" height="80">
+    <img src="src/public/Images/LogoBig.png" alt="Logo" width="auto" height="400">
   </a>
 </h1>
 <div align="center">
 <h2>CosmicComics</h2>
-  Client for CosmicComics using a server and web interface with Electron
+Read Comics, Manga and Ebooks the easy way
   <br />
   <br />
   <a href="https://github.com/Nytuo/CosmicComics/issues/new?assignees=&labels=bug&template=01_BUG_REPORT.md&title=bug%3A+">Report a Bug</a>
   ·
   <a href="https://github.com/Nytuo/CosmicComics/issues/new?assignees=&labels=enhancement&template=02_FEATURE_REQUEST.md&title=feat%3A+">Request a Feature</a>
-  .<a href="https://github.com/Nytuo/CosmicComics/discussions">Ask a Question</a>
+    · <a href="https://github.com/Nytuo/CosmicComics/discussions">Ask a Question</a>
 
 </div>
 
@@ -33,20 +32,13 @@
 <summary>Table of Contents</summary>
 
 - [About](#about)
-  - [Built With](#built-with)
-  - [Related repositories](#related-repositories)
-  - [General Description](#general-description)
-- [Getting Started](#getting-started)
-  - [Prerequisites](#prerequisites)
-  - [Installation](#installation)
-- [Usage](#usage)
-- [Roadmap](#roadmap)
-- [Support](#support)
-- [Contributing](#contributing)
-- [Authors & contributors](#authors--contributors)
-- [Security](#security)
+- [What Cosmic Comics Can Do](#what-cosmic-comics-can-do)
+- [Technologies](#technologies)
+- [MacOS Troubleshooting](#macos-troubleshooting)
+  - [Guided Reading Mode](#guided-reading-mode)
+  - [Launching on MacOS](#launching-on-macos)
+- [Authors \& contributors](#authors--contributors)
 - [License](#license)
-- [Acknowledgements](#acknowledgements)
 
 </details>
 
@@ -54,96 +46,69 @@
 
 ## About
 
-Cosmic Comics is a Comics and Mangas reader and collectionner.  
+Cosmic Comics offers a user-friendly interface that makes it easy to browse the collection of comics, manga and ebooks. It supports different file formats, offers adaptive page layout, favorite page marking, advanced search and library management.
 
-### Related repositories
-Cosmic Comics is divided in three categories
-- Server
-- Interface
-- Application
+## What Cosmic Comics Can Do
 
-Accross multiple repository
-- [CosmicComics](https://github.com/Nytuo/CosmicComics) (Application)
-- [CosmicComics Node Server](https://github.com/Nytuo/CosmicComicsNodeServer) (Server)
-- [CosmicComics Web Client](https://github.com/Nytuo/CosmicComicsWebClient) (Interface)
-- [CosmicComics React Client](https://github.com/Nytuo/CosmicComicsReactClient) (Interface)
+- **Read a wide range of formats:**
+  - Archives: `CBR`, `CBZ`, `CB7`, `CBT`, `ZIP`, `RAR`, `7z`, `TAR`
+  - Documents: `PDF`, `EPUB`
+  - Folders containing `PNG`, `JPG`, `JPEG`, `BMP`, and more
 
-### General description
-The information about the series and books are provided by some API or manually set.
-This is all you can do with this software and more:
-- Read `CBR`, `CBZ`, `CB7`, `CBT`, `ZIP`, `RAR`, `7z`, `TAR`, `PDF`, `EPUB`, `Folder` which contains `PNG`, `JPG`, `JPEG`, `BMP`.
-- Display your books and navigate your folders with custom covers (automaticatly by extraction or manually set)
-- Set your books as `Read`, `Unread`, `Reading` or `favorite` and `note` them.
-- Many Customizable parameters
-- Zoom, Auto Background Color, Double page Mode, Blank first page, No double page for Horizontal, Manga Mode, Webtoon Mode, fullscreen, rotations, Bookmarks, Slideshow, SideBar, Hide Menu Bar.
-- Display information about Comics/ Manga
-- Libraries information provided by APIs (Marvel API, Google Books API, Anilist,...)
-- Continue reading where you stopped and more...
+- **Browse your collection** with series and books navigation with api fetched / extracted / custom covers.
 
-### Built With
-#### Servers
-<div style="display: flex; align-item: center">
-  <img src="https://img.shields.io/badge/NPM-black?style=for-the-badge&logo=npm"/>
-<img src="https://img.shields.io/badge/NodeJS-black?style=for-the-badge&logo=node.js"/>
-  <img src="https://img.shields.io/badge/Express-black?style=for-the-badge&logo=express"/>
-  <img src="https://img.shields.io/badge/JavaScript-black?style=for-the-badge&logo=javascript"/>
+- **Track your reading progress** — mark books as `Read`, `Unread`, or `Reading`, add them to `Favorites`, and rate them
 
-</div>
+- **Powerful viewer options:**
+  - Zoom, Auto Background Color
+  - Double Page Mode, Blank First Page, No Double Page for Horizontal images
+  - Manga Mode, Webtoon Mode
+  - Fullscreen, Rotations, Bookmarks, Slideshow
+  - Sidebar, Hide Menu Bar, Magnifier
+  - Guided Reading Mode (Using local AI model)
 
-#### Interfaces
-<div style="display: flex; align-item: center">
+- **Rich metadata** — display detailed information about your Comics, Manga, and Ebooks
+
+- **Downloaders**
+  Cosmic Comics provides some downloaders to get content through the app, you may need subscriptions and credentials to access them.
+  - [Marvel Unlimited](https://www.marvel.com/comics/unlimited/home)
+  - [MangaDex](https://mangadex.org/)
+  - [DC Infinite](https://www.dcuniverseinfinite.com/)
+  - [Viz](https://www.viz.com/)
+  - [GetComics](https://getcomics.org/)
+
+- **Library metadata provided by multiple APIs:**
+  - [Marvel API](https://developer.marvel.com/) (API has shutdown)
+  - [Google Books](https://developers.google.com/books)
+  - [Anilist](https://anilist.co/)
+  - [Metron](https://metron.cloud/)
+  - [Open Library](https://openlibrary.org/)
+  - Manual entry
+
+- **Continue reading** right where you left off
+
+## Technologies
+<div style="display: flex; align-items: center; gap: 10px;">
+    <img src="https://img.shields.io/badge/Rust-black?style=for-the-badge&logo=rust"/>
   <img src="https://img.shields.io/badge/NPM-black?style=for-the-badge&logo=npm"/>
 <img src="https://img.shields.io/badge/NodeJS-black?style=for-the-badge&logo=node.js"/>
 <img src="https://img.shields.io/badge/React-black?style=for-the-badge&logo=React"/>
 <img src="https://img.shields.io/badge/vite-black?style=for-the-badge&logo=vite"/>
   <img src="https://img.shields.io/badge/typeScript-black?style=for-the-badge&logo=typescript"/>
-  <img src="https://img.shields.io/badge/JavaScript-black?style=for-the-badge&logo=javascript"/>
-<img src="https://img.shields.io/badge/html5-black?style=for-the-badge&logo=html5"/>
-<img src="https://img.shields.io/badge/css3-black?style=for-the-badge&logo=css3"/>
+<img src="https://img.shields.io/badge/TAURI-black?style=for-the-badge&logo=tauri"/>
 </div>
 
-#### Applications
-<div style="display: flex; align-item: center">
-  <img src="https://img.shields.io/badge/NPM-black?style=for-the-badge&logo=npm"/>
-<img src="https://img.shields.io/badge/NodeJS-black?style=for-the-badge&logo=node.js"/>
-<img src="https://img.shields.io/badge/ELECTRON-black?style=for-the-badge&logo=electron"/>
-  <img src="https://img.shields.io/badge/JavaScript-black?style=for-the-badge&logo=javascript"/>
-</div>
+## MacOS Troubleshooting
 
-## Getting Started
+### Guided Reading Mode
+Cosmic Comics provides an AI model to enhance the reading experience, however on old macos architecture (intel-based macs), the AI model is not available.
+> ORT, the lib that does the inference is not available on this target platform
 
-### Installation
-
-See the <a href="https://github.com/Nytuo/CosmicComics/wiki/Installation">Installation</a> section of the Wiki
-
-## Usage
-
-See the <a href="https://github.com/Nytuo/CosmicComics/wiki/How-to-use">How to use</a> section of the Wiki
-
-## Roadmap
-
-See the [Trello](https://trello.com/b/7KvcYa8n/cosmiccomics) 
-
-See the [open issues](https://github.com/Nytuo/CosmicComics/issues) for a list of proposed features (and known issues).
-
-- [Top Feature Requests](https://github.com/Nytuo/CosmicComics/issues?q=label%3Aenhancement+is%3Aopen+sort%3Areactions-%2B1-desc) (Add your votes using the 👍 reaction)
-- [Top Bugs](https://github.com/Nytuo/CosmicComics/issues?q=is%3Aissue+is%3Aopen+label%3Abug+sort%3Areactions-%2B1-desc) (Add your votes using the 👍 reaction)
-- [Newest Bugs](https://github.com/Nytuo/CosmicComics/issues?q=is%3Aopen+is%3Aissue+label%3Abug)
-
-## Support
-
-Reach out to the maintainer at one of the following places:
-
-- [GitHub Discussions](https://github.com/Nytuo/CosmicComics/discussions)
-- Contact options listed on [this GitHub profile](https://github.com/Nytuo)
-
-
-## Contributing
-
-First off, thanks for taking the time to contribute! Contributions are what make the open-source community such an amazing place to learn, inspire, and create. Any contributions you make will benefit everybody else and are **greatly appreciated**.
-
-
-Please read [our contribution guidelines](docs/CONTRIBUTING.md), and thank you for being involved!
+### Launching on MacOS
+Since I do not posses a Apple Developper Account, the app is not signed, therefore you may need to allow it in System Preferences > Security & Privacy > General and / or if macos tells you the app is damaged and cannot be openned, open a terminal and run:
+```bash
+xattr -d com.apple.quarantine /Applications/CosmicComics.app
+```
 
 ## Authors & contributors
 
@@ -151,20 +116,8 @@ The original setup of this repository is by [Arnaud BEUX](https://github.com/Nyt
 
 For a full list of all authors and contributors, see [the contributors page](https://github.com/Nytuo/CosmicComics/contributors).
 
-## Security
-
-CosmicComics follows good practices of security, but 100% security cannot be assured.
-CosmicComics is provided **"as is"** without any **warranty**. Use at your own risk.
-
-_For more information and to report security issues, please refer to our [security documentation](docs/SECURITY.md)._
-
 ## License
 
-This project is licensed under the **GNU General Public License v3**.
-
+CosmicComics is licensed under the **GNU General Public License v3**.
+CosmicComics is provided **"as is"** without any **warranty**. Use at your own risk.
 See [LICENSE](LICENSE) for more information.
-
-## Acknowledgements
-
-- All the NPM libraries authors   
-- Plex and Jellyfin like server based media library for the inspiration

@@ -1,0 +1,120 @@
+{
+  "$schema": "https://schema.tauri.app/config/2",
+  "productName": "Cosmic Comics",
+  "version": "3.0.0",
+  "identifier": "fr.nytuo.cosmiccomics",
+  "build": {
+    "beforeDevCommand": "npm run dev:vite",
+    "beforeBuildCommand": "npm run build:vite",
+    "devUrl": "http://localhost:1420",
+    "frontendDist": "../dist"
+  },
+  "app": {
+    "windows": [
+      {
+        "title": "Cosmic Comics",
+        "width": 1280,
+        "height": 720
+      }
+    ],
+    "security": {
+      "csp": null,
+      "assetProtocol": {
+        "enable": true,
+        "scope": [
+          "**",
+          "$HOME/**",
+          "$DATA/**",
+          "$LOCALDATA/**",
+          "$RUNTIME/**"
+        ]
+      }
+    }
+  },
+  "plugins": {
+    "updater": {
+      "pubkey": "dW50cnVzdGVkIGNvbW1lbnQ6IG1pbmlzaWduIHB1YmxpYyBrZXk6IEI2QUE1OTk3NDhDODgxMjkKUldRcGdjaElsMW1xdG9TZ1hpcTZ1ejFlSnpseDZPeHpZbWpWSzIzZytNNFZZU0Z5czVGUFNBazcK",
+      "endpoints": [
+        "https://github.com/Nytuo/CosmicComics/releases/latest/download/latest.json"
+      ]
+    }
+  },
+  "bundle": {
+    "createUpdaterArtifacts": true,
+    "active": true,
+    "targets": ["nsis", "app", "dmg", "deb", "rpm", "appimage"],
+    "icon": [
+      "icons/32x32.png",
+      "icons/128x128.png",
+      "icons/128x128@2x.png",
+      "icons/icon.icns",
+      "icons/icon.ico"
+    ],
+    "fileAssociations": [
+      {
+        "ext": [
+          "cbz"
+        ],
+        "name": "Comic Book Archive (ZIP)",
+        "mimeType": "application/vnd.comicbook+zip",
+        "role": "Viewer"
+      },
+      {
+        "ext": [
+          "cbr"
+        ],
+        "name": "Comic Book Archive (RAR)",
+        "mimeType": "application/vnd.comicbook-rar",
+        "role": "Viewer"
+      },
+      {
+        "ext": [
+          "cbt"
+        ],
+        "name": "Comic Book Archive (TAR)",
+        "mimeType": "application/vnd.comicbook+tar",
+        "role": "Viewer"
+      },
+      {
+        "ext": [
+          "rar"
+        ],
+        "name": "RAR Archive",
+        "mimeType": "application/vnd.rar",
+        "role": "Viewer"
+      },
+      {
+        "ext": [
+          "zip"
+        ],
+        "name": "ZIP Archive",
+        "mimeType": "application/zip",
+        "role": "Viewer"
+      },
+      {
+        "ext": [
+          "7z"
+        ],
+        "name": "7-Zip Archive",
+        "mimeType": "application/x-7z-compressed",
+        "role": "Viewer"
+      },
+      {
+        "ext": [
+          "epub"
+        ],
+        "name": "EPUB Document",
+        "mimeType": "application/epub+zip",
+        "role": "Viewer"
+      },
+      {
+        "ext": [
+          "pdf"
+        ],
+        "name": "PDF Document",
+        "mimeType": "application/pdf",
+        "role": "Viewer"
+      }
+    ]
+  }
+}
