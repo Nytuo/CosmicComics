@@ -98,18 +98,6 @@ Cosmic Comics offers a user-friendly interface that makes it easy to browse the 
 <img src="https://img.shields.io/badge/TAURI-black?style=for-the-badge&logo=tauri"/>
 </div>
 
-## MacOS Troubleshooting
-
-### Guided Reading Mode
-Cosmic Comics provides an AI model to enhance the reading experience, however on old macos architecture (intel-based macs), the AI model is not available.
-> ORT, the lib that does the inference is not available on this target platform
-
-### Launching on MacOS
-Since I do not posses a Apple Developper Account, the app is not signed, therefore you may need to allow it in System Preferences > Security & Privacy > General and / or if macos tells you the app is damaged and cannot be openned, open a terminal and run:
-```bash
-xattr -d com.apple.quarantine /Applications/CosmicComics.app
-```
-
 ## Authors & contributors
 
 The original setup of this repository is by [Arnaud BEUX](https://github.com/Nytuo).
