@@ -62,6 +62,7 @@ export default function PersistentDrawerLeft() {
   const [DoublePageMode, setDoublePageMode] = React.useState(false);
   const [innerWidth, setInnerWidth] = React.useState(window.innerWidth);
   const [webToonMode, setWebToonMode] = React.useState(false);
+  const [isWidthMode, setIsWidthMode] = React.useState(false);
   const [smartPanelMode, setSmartPanelMode] = React.useState(false);
   const [showPanelDebugOverlay, setShowPanelDebugOverlay] =
     React.useState(false);
@@ -586,6 +587,18 @@ export default function PersistentDrawerLeft() {
         setCurrentPage(currentPage + 1);
       }
     } else {
+      if (isWidthMode && !override) {
+        const atBottom =
+          Math.round(window.scrollY) >=
+          Math.round(document.body.scrollHeight - window.innerHeight);
+        if (!atBottom) {
+          window.scrollBy({
+            top: window.innerHeight * 0.5,
+            behavior: 'smooth',
+          });
+          return;
+        }
+      }
       window.scrollTo(0, 0);
       if (currentPage < totalPages) {
         setCurrentPage(currentPage + 1);
@@ -898,12 +911,16 @@ export default function PersistentDrawerLeft() {
   }, [currentPage]);
 
   React.useEffect(() => {
+    if (!VIV_On) {
+      setWebToonMode(false);
+      return;
+    }
     if (parseInt(baseWidth.toString()) >= window.innerWidth - 50) {
       setWebToonMode(true);
     } else {
       setWebToonMode(false);
     }
-  }, [baseWidth]);
+  }, [baseWidth, VIV_On]);
 
   React.useEffect(() => {
     if (!smartPanelMode || !imageOne) return;
@@ -1245,6 +1262,7 @@ export default function PersistentDrawerLeft() {
   );
 
   function recenter() {
+    setIsWidthMode(false);
     setOrigins([
       [0, 0],
       [0, 0],
@@ -1265,6 +1283,7 @@ export default function PersistentDrawerLeft() {
   }
 
   function fixHeight() {
+    setIsWidthMode(false);
     const headers = document.getElementsByTagName('header');
     if (headers.length === 0) return;
     const navbar = headers[0];
@@ -1294,6 +1313,7 @@ export default function PersistentDrawerLeft() {
   }
 
   function fixWidth() {
+    setIsWidthMode(true);
     setBaseWidth(window.innerWidth - 5);
     setBaseHeight('auto');
     setZoomLevel(0);
@@ -1301,6 +1321,7 @@ export default function PersistentDrawerLeft() {
       [0, 0],
       [0, 0],
     ]);
+    window.scrollTo(0, 0);
     if (DoublePageMode) {
       setBaseWidth((window.innerWidth - 5) / 2);
     }
