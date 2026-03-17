@@ -67,7 +67,27 @@ function Home({
 
       try {
         const books = await TauriAPI.getAllBooks();
-        const realBooks = books.filter((b) => b.path && b.path.trim() !== '');
+        console.log(`[Home] getAllBooks returned ${books.length} total books`);
+
+        const realBooks = books.filter(
+          (b) =>
+            (b.path && b.path.trim() !== '') ||
+            (b.cover_url && b.cover_url.trim() !== '')
+        );
+        const dropped = books.filter(
+          (b) =>
+            (!b.path || b.path.trim() === '') &&
+            (!b.cover_url || b.cover_url.trim() === '')
+        );
+        console.log(
+          `[Home] after path/cover filter: ${realBooks.length} kept, ${dropped.length} dropped`,
+          dropped.map((b) => ({
+            id: b.id,
+            title: b.title,
+            path: b.path,
+            cover_url: b.cover_url,
+          }))
+        );
         setAllBooks(realBooks);
         setReadingBooks(realBooks.filter((b) => b.reading));
 
@@ -79,6 +99,7 @@ function Home({
 
       try {
         const series = await TauriAPI.getAllSeries();
+        console.log(`[Home] getAllSeries returned ${series.length} series`);
         setAllSeries(series);
       } catch (e) {
         console.error('Failed to load series:', e);

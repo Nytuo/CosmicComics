@@ -1,4 +1,3 @@
-// Settings-related Tauri commands
 use crate::commands::state::AppState;
 use serde::{Deserialize, Serialize};
 use serde_json::Value;
@@ -81,6 +80,27 @@ fn all_credential_definitions() -> Vec<CredentialDefinition> {
             description: "Your MangaDex account password".into(),
             is_secret: true,
             provider: "MangaDex".into(),
+        },
+        CredentialDefinition {
+            key: "confero_url".into(),
+            label: "Server URL".into(),
+            description: "Your Confero instance URL (e.g. https://confero.example.com)".into(),
+            is_secret: false,
+            provider: "Confero Sync".into(),
+        },
+        CredentialDefinition {
+            key: "confero_email".into(),
+            label: "Email".into(),
+            description: "Your Confero account email".into(),
+            is_secret: false,
+            provider: "Confero Sync".into(),
+        },
+        CredentialDefinition {
+            key: "confero_password".into(),
+            label: "Password".into(),
+            description: "Your Confero account password".into(),
+            is_secret: true,
+            provider: "Confero Sync".into(),
         },
     ]
 }

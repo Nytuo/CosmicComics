@@ -10,7 +10,6 @@ use crate::models::{
     BookRecord, BookmarkRecord, DisplayBook, DisplaySeries, ScanPathRecord, SeriesRecord,
 };
 
-/// Wrapper around the SurrealDB embedded instance.
 #[derive(Clone)]
 pub struct SurrealRepo {
     db: Surreal<Db>,
@@ -137,7 +136,6 @@ impl SurrealRepo {
         Ok(())
     }
 
-    /// Insert a new book. Returns the created record.
     pub async fn create_book(&self, book: BookRecord) -> Result<BookRecord> {
         debug!(
             "[SurrealRepo::create_book] Creating book: title='{}', characters={}, creators={}",
@@ -156,7 +154,6 @@ impl SurrealRepo {
         Ok(created)
     }
 
-    /// Upsert a book by external_id + provider_id. If it exists and is not locked, update it.
     pub async fn upsert_book(&self, book: BookRecord) -> Result<BookRecord> {
         let eid = book.external_id.clone();
         let pid = book.provider_id;
@@ -195,7 +192,6 @@ impl SurrealRepo {
         }
     }
 
-    /// Get all books, ordered by title.
     pub async fn get_all_books(&self) -> Result<Vec<BookRecord>> {
         let books: Vec<BookRecord> = self
             .db
@@ -206,13 +202,11 @@ impl SurrealRepo {
         Ok(books)
     }
 
-    /// Get all books as display-ready objects.
     pub async fn get_all_display_books(&self) -> Result<Vec<DisplayBook>> {
         let books = self.get_all_books().await?;
         Ok(books.into_iter().map(DisplayBook::from).collect())
     }
 
-    /// Get a single book by its SurrealDB record ID string.
     pub async fn get_book_by_id(&self, id: &str) -> Result<Option<BookRecord>> {
         let id_part = if let Some((_table, id)) = id.split_once(':') {
             id
@@ -229,7 +223,6 @@ impl SurrealRepo {
         Ok(books.into_iter().next())
     }
 
-    /// Get a book by external_id + provider_id.
     pub async fn get_book_by_external_id(
         &self,
         external_id: &str,
@@ -246,7 +239,6 @@ impl SurrealRepo {
         Ok(books.into_iter().next())
     }
 
-    /// Get books by path prefix (all books in a given folder).
     pub async fn get_books_by_path(&self, path: &str) -> Result<Vec<BookRecord>> {
         debug!(
             "[SurrealRepo::get_books_by_path] Querying for path: '{}'",
@@ -288,7 +280,6 @@ impl SurrealRepo {
         Ok(books)
     }
 
-    /// Get books linked to a series.
     pub async fn get_books_by_series(&self, series_id: &str) -> Result<Vec<BookRecord>> {
         let books: Vec<BookRecord> = self
             .db
@@ -300,7 +291,6 @@ impl SurrealRepo {
         Ok(books)
     }
 
-    /// Search books by title (partial match).
     pub async fn search_books(&self, query: &str) -> Result<Vec<BookRecord>> {
         let books: Vec<BookRecord> = self
             .db
@@ -314,7 +304,6 @@ impl SurrealRepo {
         Ok(books)
     }
 
-    /// Update specific fields on a book.
     pub async fn update_book_fields(&self, id: &str, fields: HashMap<String, Value>) -> Result<()> {
         let id_part = if let Some((_table, id)) = id.split_once(':') {
             id
@@ -335,7 +324,9 @@ impl SurrealRepo {
             first = false;
         }
 
-        query_str.push_str(", updated_at = time::now()");
+        if !fields.contains_key("updated_at") {
+            query_str.push_str(", updated_at = time::now()");
+        }
 
         let mut q = self.db.query(&query_str);
         for (k, v) in bindings {
@@ -345,7 +336,6 @@ impl SurrealRepo {
         Ok(())
     }
 
-    /// Update reading status for a book.
     pub async fn update_reading_status(
         &self,
         id: &str,
@@ -369,7 +359,6 @@ impl SurrealRepo {
         Ok(())
     }
 
-    /// Update reading progress (last page).
     pub async fn update_reading_progress(&self, id: &str, last_page: i64) -> Result<()> {
         let id_part = if let Some((_table, id)) = id.split_once(':') {
             id
@@ -385,7 +374,6 @@ impl SurrealRepo {
         Ok(())
     }
 
-    /// Delete a book by ID.
     pub async fn delete_book(&self, id: &str) -> Result<()> {
         debug!("[SurrealRepo::delete_book] input id='{}'", id);
         let id_part = if let Some((_table, id)) = id.split_once(':') {
@@ -402,7 +390,6 @@ impl SurrealRepo {
         Ok(())
     }
 
-    /// Delete a book by external_id + provider_id.
     pub async fn delete_book_by_external(&self, external_id: &str, provider_id: u8) -> Result<()> {
         self.db
             .query("DELETE FROM book WHERE external_id = $eid AND provider_id = $pid")
@@ -413,7 +400,6 @@ impl SurrealRepo {
         Ok(())
     }
 
-    /// Count books.
     pub async fn count_books(&self) -> Result<i64> {
         let result: Vec<HashMap<String, Value>> = self
             .db
@@ -487,7 +473,6 @@ impl SurrealRepo {
         Ok(series)
     }
 
-    /// Get all series as display-ready objects (with computed book/read counts).
     pub async fn get_all_display_series(&self) -> Result<Vec<DisplaySeries>> {
         let all_series = self.get_all_series().await?;
         let mut result = Vec::with_capacity(all_series.len());
@@ -589,7 +574,9 @@ impl SurrealRepo {
             first = false;
         }
 
-        query_str.push_str(", updated_at = time::now()");
+        if !fields.contains_key("updated_at") {
+            query_str.push_str(", updated_at = time::now()");
+        }
 
         let mut q = self.db.query(&query_str);
         for (k, v) in bindings {
@@ -649,9 +636,6 @@ impl SurrealRepo {
             .unwrap_or(0))
     }
 
-    /// Count books in a series that have a non-empty file path (i.e., real downloaded files).
-    /// Used to decide whether a series rollback is safe: if this returns 0, all books are
-    /// placeholders and the series can be safely deleted on failure.
     pub async fn count_books_with_real_path_in_series(&self, series_id: &str) -> Result<i64> {
         let result: Vec<HashMap<String, Value>> = self
             .db
@@ -762,7 +746,6 @@ impl SurrealRepo {
         Ok(())
     }
 
-    /// Update an existing scan path's name and path.
     pub async fn update_scan_path(&self, id: &str, name: &str, path: &str) -> Result<()> {
         debug!(
             "[SurrealRepo::update_scan_path] id='{}', name='{}', path='{}'",
@@ -889,7 +872,6 @@ impl SurrealRepo {
         }))
     }
 
-    /// Export the full database as JSON for backup.
     pub async fn export_all(&self) -> Result<Value> {
         let books = self.get_all_books().await?;
         let series = self.get_all_series().await?;
@@ -905,7 +887,6 @@ impl SurrealRepo {
         }))
     }
 
-    /// Return all stored credentials as a key → value map.
     pub async fn get_all_api_credentials(&self) -> Result<HashMap<String, String>> {
         #[derive(serde::Deserialize)]
         struct Row {
@@ -916,15 +897,12 @@ impl SurrealRepo {
         Ok(rows.into_iter().map(|r| (r.key, r.value)).collect())
     }
 
-    /// Run an arbitrary SurrealQL query and return the first result set as JSON values.
-    /// Used by legacy command passthrough.
     pub async fn raw_query(&self, query: &str) -> Result<Vec<Value>> {
         let mut response = self.db.query(query).await?;
         let result: Vec<Value> = response.take(0).unwrap_or_default();
         Ok(result)
     }
 
-    /// Run a parameterised SurrealQL query and deserialise the first result set to `T`.
     pub async fn raw_query_typed<T: serde::de::DeserializeOwned>(
         &self,
         query: &str,
@@ -932,8 +910,6 @@ impl SurrealRepo {
     ) -> Result<Vec<T>> {
         let mut q = self.db.query(query);
         for (k, v) in bindings {
-            // Convert the borrowed key to owned String to satisfy the 'static bound
-            // required by the SurrealDB query builder before it is awaited.
             q = q.bind((k.to_owned(), v));
         }
         let mut response = q.await?;
@@ -941,7 +917,6 @@ impl SurrealRepo {
         Ok(result)
     }
 
-    /// Insert or update a single credential by key.
     pub async fn upsert_api_credential(&self, key: &str, value: &str) -> Result<()> {
         let key_owned = key.to_string();
         let value_owned = value.to_string();

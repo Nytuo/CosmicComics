@@ -1,4 +1,3 @@
-// Database-related Tauri commands — now using SurrealDB
 use crate::commands::state::AppState;
 use crate::models::{build_field_schema, DisplayBook, DisplaySeries, FieldSchema, SeriesRecord};
 use crate::providers::provider_trait::Provider;
@@ -28,17 +27,23 @@ async fn get_repo(state: &State<'_, AppState>) -> Result<SurrealRepo, String> {
     result
 }
 
-/// Get all books as display-ready objects.
 #[tauri::command]
 pub async fn get_all_books(state: State<'_, AppState>) -> Result<Vec<DisplayBook>, String> {
     let repo = get_repo(&state).await?;
-    repo.get_all_display_books().await.map_err(|e| {
+    let books = repo.get_all_display_books().await.map_err(|e| {
         error!("Error getting all books: {}", e);
         format!("Error getting all books: {}", e)
-    })
+    })?;
+    info!("[get_all_books] returning {} books", books.len());
+    for b in &books {
+        info!(
+            "[get_all_books] id={:?} title={:?} path={:?} read={} reading={}",
+            b.id, b.title, b.path, b.read, b.reading
+        );
+    }
+    Ok(books)
 }
 
-/// Get a single book by its SurrealDB ID.
 #[tauri::command]
 pub async fn get_book_by_id(
     state: State<'_, AppState>,
@@ -53,7 +58,6 @@ pub async fn get_book_by_id(
     Ok(DisplayBook::from(book))
 }
 
-/// Search books by title.
 #[tauri::command]
 pub async fn search_books(
     state: State<'_, AppState>,
@@ -67,7 +71,6 @@ pub async fn search_books(
     Ok(books.into_iter().map(DisplayBook::from).collect())
 }
 
-/// Get books in a series.
 #[tauri::command]
 pub async fn get_books_by_series(
     state: State<'_, AppState>,
@@ -132,7 +135,6 @@ pub async fn get_books_by_series(
     Ok(Vec::new())
 }
 
-/// Get books by path (folder).
 #[tauri::command]
 pub async fn get_books_by_path(
     state: State<'_, AppState>,
@@ -148,7 +150,6 @@ pub async fn get_books_by_path(
     Ok(books.into_iter().map(DisplayBook::from).collect())
 }
 
-/// Delete a book by ID.
 #[tauri::command]
 pub async fn delete_book(state: State<'_, AppState>, book_id: String) -> Result<(), String> {
     let repo = get_repo(&state).await?;
@@ -164,7 +165,6 @@ pub struct UpdateBookStatusPayload {
     pub title: String,
 }
 
-/// Update reading status for all books with a given title.
 #[tauri::command]
 pub async fn update_book_status_all(
     state: State<'_, AppState>,
@@ -193,7 +193,6 @@ pub async fn update_book_status_all(
     Ok(())
 }
 
-/// Update reading status for a single book by ID.
 #[tauri::command]
 pub async fn update_book_status_one(
     state: State<'_, AppState>,
@@ -212,7 +211,6 @@ pub async fn update_book_status_one(
         .map_err(|e| format!("{}", e))
 }
 
-/// Update specific fields on a book or series.
 #[derive(Debug, Serialize, Deserialize)]
 pub struct UpdateFieldsPayload {
     pub item_type: String,
@@ -239,7 +237,6 @@ pub async fn update_fields(
     }
 }
 
-/// Toggle favorite status for a book.
 #[tauri::command]
 pub async fn toggle_favorite(
     state: State<'_, AppState>,
@@ -280,7 +277,6 @@ pub async fn toggle_favorite(
     }
 }
 
-/// Update the user rating (note) for a book or series.
 #[tauri::command]
 pub async fn update_rating(
     state: State<'_, AppState>,
@@ -304,7 +300,6 @@ pub async fn update_rating(
     }
 }
 
-/// Get all series as display-ready objects (with computed read counts).
 #[tauri::command]
 pub async fn get_all_series(state: State<'_, AppState>) -> Result<Vec<DisplaySeries>, String> {
     let repo = get_repo(&state).await?;
@@ -314,7 +309,6 @@ pub async fn get_all_series(state: State<'_, AppState>) -> Result<Vec<DisplaySer
     })
 }
 
-/// Get a single series by ID.
 #[tauri::command]
 pub async fn get_series_by_id(
     state: State<'_, AppState>,
@@ -337,7 +331,6 @@ pub async fn get_series_by_id(
     Ok(series.into_display(book_count, read_count))
 }
 
-/// Delete a series (and all its books) by ID.
 #[tauri::command]
 pub async fn delete_series(state: State<'_, AppState>, series_id: String) -> Result<(), String> {
     let repo = get_repo(&state).await?;
@@ -347,7 +340,6 @@ pub async fn delete_series(state: State<'_, AppState>, series_id: String) -> Res
     })
 }
 
-/// Create a new scan path.
 #[tauri::command]
 pub async fn create_scan_path(
     state: State<'_, AppState>,
@@ -381,7 +373,6 @@ pub async fn create_scan_path(
     result
 }
 
-/// Get all scan paths.
 #[tauri::command]
 pub async fn get_all_scan_paths(state: State<'_, AppState>) -> Result<Vec<Value>, String> {
     info!("[get_all_scan_paths] called");
@@ -401,7 +392,6 @@ pub async fn get_all_scan_paths(state: State<'_, AppState>) -> Result<Vec<Value>
         .collect())
 }
 
-/// Delete a scan path.
 #[tauri::command]
 pub async fn delete_scan_path(
     state: State<'_, AppState>,
@@ -420,7 +410,6 @@ pub async fn delete_scan_path(
     Ok(())
 }
 
-/// Update an existing scan path (name and/or path).
 #[tauri::command]
 pub async fn update_scan_path(
     state: State<'_, AppState>,
@@ -443,7 +432,6 @@ pub async fn update_scan_path(
     Ok(())
 }
 
-/// Create a new manual book from form fields.
 #[tauri::command]
 pub async fn create_manual_book(
     state: State<'_, AppState>,
@@ -503,7 +491,6 @@ pub async fn create_manual_book(
     Ok(DisplayBook::from(created))
 }
 
-/// Create a new manual series from form fields.
 #[tauri::command]
 pub async fn create_manual_series(
     state: State<'_, AppState>,
@@ -835,11 +822,11 @@ fn extract_issue_number(filename: &str) -> Option<i32> {
     use regex::Regex;
 
     let patterns = [
-        r"#(\d+)",        // Spider-Man #23
-        r"\s(\d+)\.",     // Spider-Man 23.cbz
-        r"\s(\d+)\s",     // Spider-Man 23 (something)
-        r"v\d+\s#?(\d+)", // Spider-Man v2 #23
-        r"-(\d+)\.",      // Spider-Man-23.cbz
+        r"#(\d+)",
+        r"\s(\d+)\.",
+        r"\s(\d+)\s",
+        r"v\d+\s#?(\d+)",
+        r"-(\d+)\.",
     ];
 
     for pattern in &patterns {
@@ -857,7 +844,6 @@ fn extract_issue_number(filename: &str) -> Option<i32> {
     None
 }
 
-/// Scan all library paths and match books to series.
 #[tauri::command]
 pub async fn scan_all_libraries(
     state: State<'_, AppState>,
@@ -1010,7 +996,6 @@ pub async fn scan_all_libraries(
     }))
 }
 
-/// Export the entire database as JSON for backup.
 #[tauri::command]
 pub async fn export_database(state: State<'_, AppState>) -> Result<Value, String> {
     let repo = get_repo(&state).await?;

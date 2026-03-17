@@ -69,6 +69,7 @@ export default function MiniDrawer({
     },
   ]);
   const [isLoading, setIsLoading] = React.useState(false);
+  const [homeRefreshKey, setHomeRefreshKey] = React.useState(0);
   const [searchOpen, _setSearchOpen] = React.useState(false);
   const [searchOptions, setSearchOptions] = React.useState<ISearchElement[]>(
     []
@@ -226,6 +227,7 @@ export default function MiniDrawer({
       <SettingsDialog
         openModal={openSettings}
         onClose={() => setOpenSettings(false)}
+        onSyncComplete={() => setHomeRefreshKey((k) => k + 1)}
       />
       <APISelectorDialog
         openModal={openAPISelector}
@@ -326,7 +328,7 @@ export default function MiniDrawer({
                 handleOpenSeries={handleOpenSeries}
                 onOpenAPISelector={() => setOpenAPISelector(true)}
                 CosmicComicsTemp={CosmicComicsTemp}
-                refreshKey={0}
+                refreshKey={homeRefreshKey}
               />
             )}
           </div>

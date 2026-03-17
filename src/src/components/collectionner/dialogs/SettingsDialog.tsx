@@ -20,11 +20,23 @@ import { Label } from '@/components/ui/label.tsx';
 import { Input } from '@/components/ui/input.tsx';
 import { setTheme } from '@/utils/Common.ts';
 import { cn } from '@/lib/utils';
-import { Check, Eye, EyeOff, KeyRound, Loader2 } from 'lucide-react';
+import {
+  Check,
+  CheckCircle2,
+  Cloud,
+  Eye,
+  EyeOff,
+  KeyRound,
+  Loader2,
+  RefreshCw,
+  XCircle,
+} from 'lucide-react';
 import {
   getCredentialDefinitions,
   getApiCredentials,
   saveApiCredentials,
+  conferoTestConnection,
+  conferoFullSync,
   type CredentialDefinition,
 } from '@/API/TauriAPI.ts';
 
@@ -90,9 +102,11 @@ const themes: ThemeOption[] = [
 export default function SettingsDialog({
   onClose,
   openModal,
+  onSyncComplete,
 }: {
   onClose: any;
   openModal: boolean;
+  onSyncComplete?: () => void;
 }) {
   const { t } = useTranslation();
   const [language, setLanguage] = React.useState<string>(
@@ -113,6 +127,43 @@ export default function SettingsDialog({
   const [credSaveStatus, setCredSaveStatus] = React.useState<
     'idle' | 'success' | 'error'
   >('idle');
+
+  const [conferoStatus, setConferoStatus] = React.useState<
+    'idle' | 'testing' | 'syncing' | 'ok' | 'error'
+  >('idle');
+  const [conferoMsg, setConferoMsg] = React.useState('');
+
+  const handleTestConfero = async () => {
+    setConferoStatus('testing');
+    setConferoMsg('');
+    try {
+      const msg = await conferoTestConnection();
+      setConferoStatus('ok');
+      setConferoMsg(msg);
+    } catch (e: any) {
+      setConferoStatus('error');
+      setConferoMsg(String(e));
+    }
+  };
+
+  const handleConferoSync = async () => {
+    setConferoStatus('syncing');
+    setConferoMsg('');
+    try {
+      const result = await conferoFullSync();
+      setConferoStatus('ok');
+      setConferoMsg(
+        `Pushed ${result.pushed_books}/${result.pushed_series} books/series · ` +
+          `Pulled ${result.pulled_books}/${result.pulled_series} · ` +
+          `Updated ${result.applied_books}/${result.applied_series} · ` +
+          `Inserted ${result.inserted_books}/${result.inserted_series} new`
+      );
+      onSyncComplete?.();
+    } catch (e: any) {
+      setConferoStatus('error');
+      setConferoMsg(String(e));
+    }
+  };
 
   React.useEffect(() => {
     if (!openModal) return;
@@ -345,6 +396,61 @@ export default function SettingsDialog({
               </div>
             </div>
           )}
+          <div className="space-y-3 rounded-lg border p-4">
+            <div className="flex items-center gap-2">
+              <Cloud className="h-4 w-4 text-muted-foreground" />
+              <p className="text-sm font-medium">Confero Sync</p>
+            </div>
+            <p className="text-xs text-muted-foreground">
+              Configure your Confero credentials above, then test the connection
+              or sync your library.
+            </p>
+            <div className="flex items-center gap-2 flex-wrap">
+              <Button
+                variant="outline"
+                size="sm"
+                className="gap-2"
+                onClick={handleTestConfero}
+                disabled={
+                  conferoStatus === 'testing' || conferoStatus === 'syncing'
+                }
+              >
+                {conferoStatus === 'testing' ? (
+                  <Loader2 className="h-3.5 w-3.5 animate-spin" />
+                ) : (
+                  <CheckCircle2 className="h-3.5 w-3.5" />
+                )}
+                Test Connection
+              </Button>
+              <Button
+                size="sm"
+                className="gap-2"
+                onClick={handleConferoSync}
+                disabled={
+                  conferoStatus === 'testing' || conferoStatus === 'syncing'
+                }
+              >
+                {conferoStatus === 'syncing' ? (
+                  <Loader2 className="h-3.5 w-3.5 animate-spin" />
+                ) : (
+                  <RefreshCw className="h-3.5 w-3.5" />
+                )}
+                Sync Now
+              </Button>
+            </div>
+            {conferoStatus === 'ok' && conferoMsg && (
+              <p className="flex items-center gap-1.5 text-xs text-green-500">
+                <CheckCircle2 className="h-3.5 w-3.5 shrink-0" />
+                {conferoMsg}
+              </p>
+            )}
+            {conferoStatus === 'error' && conferoMsg && (
+              <p className="flex items-center gap-1.5 text-xs text-destructive">
+                <XCircle className="h-3.5 w-3.5 shrink-0" />
+                {conferoMsg}
+              </p>
+            )}
+          </div>
         </div>
         <DialogFooter>
           <Button variant="outline" onClick={onClose}>

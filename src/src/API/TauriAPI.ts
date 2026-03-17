@@ -806,3 +806,25 @@ export const downloadBookFromUrl = async (
 ): Promise<string> => {
   return await invoke('download_book_from_url', { url, name, vol });
 };
+
+export const conferoTestConnection = async (): Promise<string> => {
+  return await invoke('confero_test_connection');
+};
+
+export const conferoFullSync = async (): Promise<{
+  pushed_books: number;
+  pushed_series: number;
+  pulled_books: number;
+  pulled_series: number;
+  applied_books: number;
+  applied_series: number;
+  inserted_books: number;
+  inserted_series: number;
+}> => {
+  const raw: string = await invoke('confero_full_sync');
+  return JSON.parse(raw);
+};
+
+export const conferoFullSyncRaw = async (): Promise<string> => {
+  return await invoke('confero_full_sync');
+};

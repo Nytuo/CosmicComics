@@ -2,6 +2,7 @@ pub mod ai_model;
 pub mod api;
 pub mod collectionner;
 pub mod common;
+pub mod confero;
 pub mod database;
 pub mod pdfium;
 pub mod profile;
