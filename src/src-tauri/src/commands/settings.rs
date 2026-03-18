@@ -82,13 +82,6 @@ fn all_credential_definitions() -> Vec<CredentialDefinition> {
             provider: "MangaDex".into(),
         },
         CredentialDefinition {
-            key: "confero_url".into(),
-            label: "Server URL".into(),
-            description: "Your Confero instance URL (e.g. https://confero.example.com)".into(),
-            is_secret: false,
-            provider: "Confero Sync".into(),
-        },
-        CredentialDefinition {
             key: "confero_email".into(),
             label: "Email".into(),
             description: "Your Confero account email".into(),

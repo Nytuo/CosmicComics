@@ -135,7 +135,7 @@ async fn read_creds(state: &AppState) -> Result<(String, String, String, String)
         .await
         .map_err(|e| e.to_string())?;
 
-    let url = all.get("confero_url").cloned().unwrap_or_default();
+    let url = "https://confero.nytuo.fr";
     let email = all.get("confero_email").cloned().unwrap_or_default();
     let password = all.get("confero_password").cloned().unwrap_or_default();
     let app_secret = all.get("confero_app_secret").cloned().unwrap_or_default();
