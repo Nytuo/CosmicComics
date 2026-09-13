@@ -1,0 +1,121 @@
+name: publish-homebrew
+
+# Updates this app's cask in the Nytuo/homebrew-apps tap whenever a GitHub
+# Release is published. Releases are created as drafts by release.yml, so this
+# fires at the moment you publish the draft — never on a draft itself.
+#
+# Requires the HOMEBREW_TAP_TOKEN repo secret (a PAT with `repo` scope on
+# Nytuo/homebrew-apps). Without it the job no-ops with a notice instead of
+# failing, so the workflow is inert until you add one.
+
+on:
+  release:
+    types: [published]
+  workflow_dispatch:
+    inputs:
+      tag:
+        description: 'Release tag to publish from (defaults to the latest release)'
+        required: false
+        type: string
+
+# Per-app configuration. Everything below this block is identical in every repo.
+env:
+  CASK: cosmic-comics
+  ARM_ASSET: 'Cosmic.Comics_{VERSION}_aarch64.dmg'
+  INTEL_ASSET: 'Cosmic.Comics_{VERSION}_x64.dmg'
+
+jobs:
+  homebrew:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check for tap token
+        id: check
+        run: echo "has=${{ secrets.HOMEBREW_TAP_TOKEN != '' }}" >> "$GITHUB_OUTPUT"
+
+      - name: Skip (no HOMEBREW_TAP_TOKEN)
+        if: steps.check.outputs.has != 'true'
+        run: echo "::notice::HOMEBREW_TAP_TOKEN not set — skipping the Homebrew cask update."
+
+      - name: Check out the tap
+        if: steps.check.outputs.has == 'true'
+        uses: actions/checkout@v4
+        with:
+          repository: Nytuo/homebrew-apps
+          token: ${{ secrets.HOMEBREW_TAP_TOKEN }}
+          path: tap
+
+      - name: Resolve release tag
+        id: rel
+        if: steps.check.outputs.has == 'true'
+        env:
+          GH_TOKEN: ${{ github.token }}
+          INPUT_TAG: ${{ inputs.tag }}
+          EVENT_TAG: ${{ github.event.release.tag_name }}
+        run: |
+          set -euo pipefail
+          TAG="$INPUT_TAG"
+          [ -z "$TAG" ] && TAG="$EVENT_TAG"
+          if [ -z "$TAG" ]; then
+            TAG=$(gh release list --repo "$GITHUB_REPOSITORY" --limit 1 --json tagName -q '.[0].tagName')
+          fi
+          # Accept every tag scheme this repo has used: v1.2.3, app-v1.2.3, 1.2.3.
+          VERSION=$(printf '%s' "$TAG" | sed -E 's/^([A-Za-z][A-Za-z0-9_.-]*-)?v?//')
+          echo "tag=$TAG" >> "$GITHUB_OUTPUT"
+          echo "version=$VERSION" >> "$GITHUB_OUTPUT"
+          echo "Updating cask $CASK to $VERSION (tag $TAG)"
+
+      - name: Update the cask
+        if: steps.check.outputs.has == 'true'
+        env:
+          TAG: ${{ steps.rel.outputs.tag }}
+          VERSION: ${{ steps.rel.outputs.version }}
+        run: |
+          set -euo pipefail
+          BASE="https://github.com/$GITHUB_REPOSITORY/releases/download/$TAG"
+          CASK_FILE="tap/Casks/$CASK.rb"
+          [ -f "$CASK_FILE" ] || { echo "::error::$CASK_FILE not found in the tap"; exit 1; }
+
+          sha_of() {
+            curl -fsSL "$1" | sha256sum | cut -d' ' -f1
+          }
+
+          ARM_NAME="${ARM_ASSET//\{VERSION\}/$VERSION}"
+          ARM_SHA=$(sha_of "$BASE/$ARM_NAME")
+          echo "arm   $ARM_NAME -> $ARM_SHA"
+
+          # Rewrite the version and repoint the URL at this release's tag, so a
+          # cask still pinned to an older tag scheme follows along.
+          sed -i -e "s|^  version \".*\"|  version \"$VERSION\"|" \
+                 -e "s|/releases/download/[^/]*/|/releases/download/$TAG/|" \
+                 "$CASK_FILE"
+
+          if [ -n "$INTEL_ASSET" ]; then
+            INTEL_NAME="${INTEL_ASSET//\{VERSION\}/$VERSION}"
+            INTEL_SHA=$(sha_of "$BASE/$INTEL_NAME")
+            echo "intel $INTEL_NAME -> $INTEL_SHA"
+            sed -i -e "s|arm:   \"[a-f0-9]*\"|arm:   \"$ARM_SHA\"|" \
+                   -e "s|intel: \"[a-f0-9]*\"|intel: \"$INTEL_SHA\"|" \
+                   "$CASK_FILE"
+          else
+            sed -i -e "s|^  sha256 \"[a-f0-9]*\"|  sha256 \"$ARM_SHA\"|" "$CASK_FILE"
+          fi
+
+          echo "---- updated cask ----"
+          cat "$CASK_FILE"
+
+      - name: Commit and push
+        if: steps.check.outputs.has == 'true'
+        working-directory: tap
+        env:
+          VERSION: ${{ steps.rel.outputs.version }}
+        run: |
+          set -euo pipefail
+          git config user.name "nytuo-release-bot"
+          git config user.email "actions@users.noreply.github.com"
+          git add "Casks/$CASK.rb"
+          if git diff --cached --quiet; then
+            echo "::notice::Cask $CASK already up to date — nothing to push."
+            exit 0
+          fi
+          git commit -m "$CASK $VERSION"
+          git push

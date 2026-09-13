@@ -1,0 +1,322 @@
+name: release
+
+# Manual only. Nothing in this file triggers on push, merge or tag — you
+# dispatch it from the Actions tab (and pick the branch there).
+#
+#   1. version  — derive the next semver from the conventional commits since
+#                 the last v* tag, or take the explicit override input.
+#   2. build    — build every platform with that version patched into the
+#                 manifests. The patch happens in the runner workspace only;
+#                 nothing is ever committed or pushed back to the repo.
+#   3. release  — a DRAFT GitHub release tagged v<version>, changelog as the
+#                 body, artifacts attached. The git tag is created by GitHub
+#                 when you publish the draft, so dispatching this is always
+#                 reversible: delete the draft and nothing remains.
+
+on:
+  workflow_dispatch:
+    inputs:
+      bump:
+        description: "Version bump — 'auto' derives it from conventional commits"
+        type: choice
+        default: auto
+        options:
+          - auto
+          - patch
+          - minor
+          - major
+      version:
+        description: 'Explicit version, e.g. 1.4.0 (overrides "bump")'
+        type: string
+        required: false
+      platform:
+        description: 'Platform to build'
+        type: choice
+        default: all
+        options:
+          - all
+          - macos-aarch64
+          - macos-x86_64
+          - ubuntu
+          - ubuntu-arm
+          - ubuntu-cuda
+          - windows
+          - windows-cuda
+      prerelease:
+        description: 'Mark the release as a prerelease'
+        type: boolean
+        default: false
+
+jobs:
+  version:
+    name: Resolve version
+    runs-on: ubuntu-latest
+    outputs:
+      version: ${{ steps.semver.outputs.version }}
+      tag: ${{ steps.semver.outputs.tag }}
+      previous_tag: ${{ steps.semver.outputs.previous_tag }}
+      changelog: ${{ steps.semver.outputs.changelog }}
+      matrix: ${{ steps.matrix.outputs.matrix }}
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Compute version and changelog
+        id: semver
+        shell: bash
+        env:
+          BUMP_INPUT: ${{ inputs.bump }}
+          VERSION_INPUT: ${{ inputs.version }}
+        run: |
+          set -euo pipefail
+
+          D="$RUNNER_TEMP/changelog"
+          mkdir -p "$D"
+
+          # Baseline = the most recently created release tag, accepting every
+          # scheme this repo has used (1.2.3, v1.2.3, app-v1.2.3) so a rename
+          # never makes the next version go backwards. Sorting by date rather
+          # than by version matters for repos that switched schemes: an
+          # abandoned CalVer tag must not outrank the current 4.x line.
+          # Prerelease/test tags are excluded by the anchored pattern.
+          # New tags are always emitted as plain v<semver>.
+          PREV=$(git tag --list --sort=-creatordate \
+            | grep -E '^([A-Za-z][A-Za-z0-9_.-]*-)?v?[0-9]+\.[0-9]+\.[0-9]+$' \
+            | head -n1 || true)
+          if [ -n "$PREV" ]; then
+            RANGE="${PREV}..HEAD"
+            BASE=$(printf '%s' "$PREV" | sed -E 's/^([A-Za-z][A-Za-z0-9_.-]*-)?v?//')
+          else
+            RANGE=""
+            BASE="0.0.0"
+          fi
+          IFS=. read -r MAJOR MINOR PATCH <<<"$BASE"
+          MAJOR=${MAJOR:-0}; MINOR=${MINOR:-0}; PATCH=${PATCH:-0}
+
+          # \x1f separates fields, \x1e terminates each record, so subjects and
+          # bodies containing newlines survive the round trip intact.
+          if [ -n "$RANGE" ]; then
+            git log --no-merges --format='%h%x1f%s%x1f%b%x1e' "$RANGE" > "$D/commits"
+          else
+            git log --no-merges --format='%h%x1f%s%x1f%b%x1e' > "$D/commits"
+          fi
+
+          HAS_FEAT=0; HAS_BREAKING=0; COUNT=0
+          while IFS=$'\x1f' read -r -d $'\x1e' SHA SUBJECT BODY; do
+            SHA="${SHA#$'\n'}"
+            [ -z "$SHA" ] && continue
+            COUNT=$((COUNT + 1))
+
+            if [[ "$SUBJECT" =~ ^([a-zA-Z]+)(\(([^\)]*)\))?(!)?:[[:space:]]*(.*)$ ]]; then
+              TYPE=$(printf '%s' "${BASH_REMATCH[1]}" | tr '[:upper:]' '[:lower:]')
+              SCOPE="${BASH_REMATCH[3]}"
+              BANG="${BASH_REMATCH[4]}"
+              DESC="${BASH_REMATCH[5]}"
+            else
+              TYPE="other"; SCOPE=""; BANG=""; DESC="$SUBJECT"
+            fi
+
+            IS_BREAKING=0
+            [ -n "$BANG" ] && IS_BREAKING=1
+            if printf '%s' "$BODY" | grep -qE '^BREAKING[ -]CHANGE'; then
+              IS_BREAKING=1
+            fi
+
+            if [ -n "$SCOPE" ]; then
+              ENTRY="- **${SCOPE}:** ${DESC} (${SHA})"
+            else
+              ENTRY="- ${DESC} (${SHA})"
+            fi
+
+            case "$TYPE" in
+              feat|feature) HAS_FEAT=1; echo "$ENTRY" >> "$D/feat" ;;
+              fix|bugfix)   echo "$ENTRY" >> "$D/fix" ;;
+              perf)         echo "$ENTRY" >> "$D/perf" ;;
+              refactor)     echo "$ENTRY" >> "$D/refactor" ;;
+              docs)         echo "$ENTRY" >> "$D/docs" ;;
+              *)            echo "$ENTRY" >> "$D/misc" ;;
+            esac
+            [ "$IS_BREAKING" = 1 ] && echo "$ENTRY" >> "$D/breaking"
+          done < "$D/commits"
+
+          if [ -n "$VERSION_INPUT" ]; then
+            VERSION="${VERSION_INPUT#v}"
+            if ! [[ "$VERSION" =~ ^[0-9]+\.[0-9]+\.[0-9]+([-+].*)?$ ]]; then
+              echo "::error::'$VERSION_INPUT' is not a valid semver version (expected e.g. 1.4.0)"
+              exit 1
+            fi
+          else
+            if [ "$COUNT" -eq 0 ]; then
+              echo "::error::No commits since ${PREV:-the start of history} — nothing to release."
+              exit 1
+            fi
+            BUMP="$BUMP_INPUT"
+            if [ "$BUMP" = "auto" ]; then
+              if   [ "$HAS_BREAKING" = 1 ]; then BUMP="major"
+              elif [ "$HAS_FEAT" = 1 ];     then BUMP="minor"
+              else                               BUMP="patch"
+              fi
+            fi
+            case "$BUMP" in
+              major) MAJOR=$((MAJOR + 1)); MINOR=0; PATCH=0 ;;
+              minor) MINOR=$((MINOR + 1)); PATCH=0 ;;
+              patch) PATCH=$((PATCH + 1)) ;;
+            esac
+            VERSION="${MAJOR}.${MINOR}.${PATCH}"
+          fi
+
+          TAG="v${VERSION}"
+          if git rev-parse -q --verify "refs/tags/${TAG}" >/dev/null; then
+            echo "::error::Tag ${TAG} already exists. Pass an explicit 'version' input to pick another."
+            exit 1
+          fi
+
+          {
+            if [ -s "$D/breaking" ]; then echo "### ⚠ BREAKING CHANGES"; echo; cat "$D/breaking"; echo; fi
+            if [ -s "$D/feat" ];     then echo "### Features";           echo; cat "$D/feat";     echo; fi
+            if [ -s "$D/fix" ];      then echo "### Bug Fixes";          echo; cat "$D/fix";      echo; fi
+            if [ -s "$D/perf" ];     then echo "### Performance";        echo; cat "$D/perf";     echo; fi
+            if [ -s "$D/refactor" ]; then echo "### Refactoring";        echo; cat "$D/refactor"; echo; fi
+            if [ -s "$D/docs" ];     then echo "### Documentation";      echo; cat "$D/docs";     echo; fi
+            if [ -s "$D/misc" ];     then echo "### Other";              echo; cat "$D/misc";     echo; fi
+            if [ -n "$PREV" ]; then
+              echo "**Full changelog**: https://github.com/${GITHUB_REPOSITORY}/compare/${PREV}...${TAG}"
+            else
+              echo "**Full changelog**: https://github.com/${GITHUB_REPOSITORY}/commits/${TAG}"
+            fi
+          } > "$D/changelog.md"
+
+          {
+            echo "version=${VERSION}"
+            echo "tag=${TAG}"
+            echo "previous_tag=${PREV}"
+            echo "changelog<<__CHANGELOG_EOF__"
+            cat "$D/changelog.md"
+            echo "__CHANGELOG_EOF__"
+          } >> "$GITHUB_OUTPUT"
+
+          {
+            echo "## ${TAG}"
+            echo
+            echo "Previous tag: \`${PREV:-none}\` · commits analysed: ${COUNT}"
+            echo
+            cat "$D/changelog.md"
+          } >> "$GITHUB_STEP_SUMMARY"
+
+      - name: Build platform matrix
+        id: matrix
+        shell: bash
+        run: |
+          set -euo pipefail
+          ALL='[
+            {"id":"macos-aarch64","runs_on":"macos-latest","args":"--target aarch64-apple-darwin"},
+            {"id":"macos-x86_64","runs_on":"macos-latest","args":"--target x86_64-apple-darwin"},
+            {"id":"ubuntu","runs_on":"ubuntu-24.04"},
+            {"id":"ubuntu-arm","runs_on":"ubuntu-24.04-arm"},
+            {"id":"ubuntu-cuda","runs_on":"ubuntu-24.04","args":"--features cuda","cuda":true},
+            {"id":"windows","runs_on":"windows-2022"},
+            {"id":"windows-cuda","runs_on":"windows-2022","args":"--features cuda","cuda":true}
+          ]'
+          PLATFORM="${{ inputs.platform }}"
+          if [ -z "$PLATFORM" ] || [ "$PLATFORM" = "all" ]; then
+            INCLUDE="$ALL"
+          else
+            INCLUDE=$(echo "$ALL" | jq "[.[] | select(.id == \"$PLATFORM\")]")
+          fi
+          echo "matrix=$(echo "$INCLUDE" | jq -c '{include: .}')" >> "$GITHUB_OUTPUT"
+
+  build:
+    name: Build ${{ matrix.id }}
+    needs: version
+    permissions:
+      contents: write
+    strategy:
+      fail-fast: false
+      matrix: ${{ fromJSON(needs.version.outputs.matrix) }}
+    runs-on: ${{ matrix.runs_on }}
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: install dependencies (ubuntu only)
+        if: startsWith(matrix.runs_on, 'ubuntu')
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y libwebkit2gtk-4.1-dev libappindicator3-dev librsvg2-dev patchelf xdg-utils protobuf-compiler
+      - name: install CUDA toolkit (ubuntu-cuda)
+        if: matrix.cuda == true && startsWith(matrix.runs_on, 'ubuntu')
+        run: |
+          wget https://developer.download.nvidia.com/compute/cuda/repos/ubuntu2404/x86_64/cuda-keyring_1.1-1_all.deb
+          sudo dpkg -i cuda-keyring_1.1-1_all.deb
+          sudo apt-get update
+          sudo apt-get install -y cuda-toolkit-12-9
+          echo "/usr/local/cuda/bin" >> $GITHUB_PATH
+          echo "CUDA_PATH=/usr/local/cuda" >> $GITHUB_ENV
+          echo "LD_LIBRARY_PATH=/usr/local/cuda/lib64:$LD_LIBRARY_PATH" >> $GITHUB_ENV
+
+      - name: install CUDA toolkit (windows-cuda)
+        if: matrix.cuda == true && startsWith(matrix.runs_on, 'windows')
+        run: |
+          choco install cuda --version=12.9.1.576 -y
+          echo "C:\Program Files\NVIDIA GPU Computing Toolkit\CUDA\v12.9\bin" | Out-File -FilePath $env:GITHUB_PATH -Encoding utf8 -Append
+          echo "CUDA_PATH=C:\Program Files\NVIDIA GPU Computing Toolkit\CUDA\v12.9" | Out-File -FilePath $env:GITHUB_ENV -Encoding utf8 -Append
+      
+      - name: install protoc (macOS)
+        if: matrix.runs_on == 'macos-latest'
+        run: brew install protobuf
+
+      - name: install protoc (Windows)
+        if: startsWith(matrix.runs_on, 'windows')
+        run: choco install protoc -y
+
+      - name: setup node
+        uses: actions/setup-node@v4
+        with:
+          node-version: lts/*
+          cache: 'npm'
+          cache-dependency-path: ./src/package-lock.json
+
+      - name: install Rust stable
+        uses: dtolnay/rust-toolchain@stable
+        with:
+          targets: ${{ matrix.runs_on == 'macos-latest' && 'aarch64-apple-darwin,x86_64-apple-darwin' || '' }}
+
+      - name: Rust cache
+        uses: swatinem/rust-cache@v2
+        with:
+          workspaces: './src/src-tauri -> target'
+
+      - name: Install JS dependencies
+        run: npm ci --prefix src
+
+      - name: Build Vite frontend
+        run: npm run build:vite --prefix src
+
+      # Runs after the dependency install so the lockfile is never left out of
+      # sync with package.json. The edits live only in the runner workspace —
+      # they are never committed back to the repo.
+      - name: Apply release version
+        shell: bash
+        env:
+          VERSION: ${{ needs.version.outputs.version }}
+        run: |
+          set -euo pipefail
+          jq --arg v "$VERSION" '.version = $v' src/src-tauri/tauri.conf.json > conf.tmp
+          mv conf.tmp src/src-tauri/tauri.conf.json
+          jq --arg v "$VERSION" '.version = $v' src/package.json > pkg.tmp
+          mv pkg.tmp src/package.json
+          perl -0pi -e 's/^(\[package\](?:[^\[]*?)\nversion\s*=\s*")[^"]*(")/${1}'"$VERSION"'${2}/ms' src/src-tauri/Cargo.toml
+          echo "Building version $VERSION"
+
+      - uses: tauri-apps/tauri-action@v0
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          TAURI_SIGNING_PRIVATE_KEY: ${{ secrets.TAURI_SIGNING_PRIVATE_KEY }}
+          TAURI_SIGNING_PRIVATE_KEY_PASSWORD: ${{ secrets.TAURI_SIGNING_PRIVATE_KEY_PASSWORD }}      
+        with:
+          tagName: ${{ needs.version.outputs.tag }}
+          releaseName: 'CosmicComics ${{ needs.version.outputs.tag }}'
+          releaseBody: ${{ needs.version.outputs.changelog }}
+          releaseDraft: true
+          prerelease: ${{ inputs.prerelease }}
+          args: ${{ matrix.args }}
