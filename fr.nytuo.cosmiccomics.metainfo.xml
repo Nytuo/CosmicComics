@@ -1,10 +1,10 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <component type="desktop-application">
   <id>fr.nytuo.cosmiccomics</id>
-  
+
   <name>Cosmic Comics</name>
-  <summary>Comics and manga reader and collectionner</summary>
-  
+  <summary>Read Comics, Manga and Ebooks the easy way</summary>
+
   <metadata_license>CC0-1.0</metadata_license>
   <project_license>GPL-3.0-only</project_license>
 
@@ -14,7 +14,7 @@
     <name>Nytuo (Arnaud BEUX)</name>
   </developer>
 
-  <url type="homepage">https://nytuo.fr</url>
+  <url type="homepage">https://nytuo.fr/software/cosmicComics</url>
   <url type="donation">https://ko-fi.com/nytuo</url>
   <url type="bugtracker">https://github.com/Nytuo/CosmicComics/issues</url>
   <url type="help">https://github.com/Nytuo/CosmicComics/wiki</url>
@@ -26,29 +26,70 @@
     <control>keyboard</control>
     <control>touch</control>
   </recommends>
-  
+
   <description>
     <p>
-      Cosmic Comics is a comics and manga reader and collection manager. Series and book information is fetched from online APIs or set manually.
+      Cosmic Comics offers a user-friendly interface that makes it easy to browse the collection of comics, manga and ebooks. It supports different file formats, offers adaptive page layout, favorite page marking, advanced search and library management.
     </p>
+    <p>What Cosmic Comics can do:</p>
     <ul>
-      <li>Read CBR, CBZ, CB7, CBT, ZIP, RAR, 7z, TAR, PDF, EPUB and folders of PNG, JPG, JPEG or BMP images</li>
-      <li>Browse your books and folders with custom covers, extracted automatically or set manually</li>
-      <li>Mark books as read, unread, reading or favorite, and rate them</li>
-      <li>Zoom, auto background color, double page mode, blank first page, manga mode, webtoon mode, fullscreen, rotations, bookmarks and slideshow</li>
-      <li>Library metadata from Marvel API, Google Books API, AniList and more</li>
-      <li>Continue reading where you stopped</li>
+      <li>Read a wide range of formats: CBR, CBZ, CB7, CBT, ZIP, RAR, 7z and TAR archives, PDF and EPUB documents, and folders of PNG, JPG, JPEG or BMP images</li>
+      <li>Browse your collection by series and books, with covers fetched from APIs, extracted from files or set manually</li>
+      <li>Track your reading progress: mark books as read, unread or reading, add them to favorites and rate them</li>
+      <li>Powerful viewer options: zoom, auto background color, double page mode, blank first page, manga mode, webtoon mode, fullscreen, rotations, bookmarks, slideshow, sidebar and magnifier</li>
+      <li>Rich metadata about your comics, manga and ebooks</li>
+      <li>Downloaders for Marvel Unlimited, MangaDex, DC Infinite, Viz and GetComics (some require a subscription)</li>
+      <li>Library metadata from Google Books, AniList, Metron, Open Library or manual entry</li>
+      <li>Continue reading right where you left off</li>
     </ul>
   </description>
+
   <launchable type="desktop-id">fr.nytuo.cosmiccomics.desktop</launchable>
+
   <screenshots>
     <screenshot type="default">
-      <image>https://pocket.nytuo.fr/api/files/gpmjfgb6ve1gr0u/coxm84pd6nvqn4y/ccbanner_CuzE0qK1NK.png?token=</image>
+      <image>https://pocket.nytuo.fr/api/files/gpmjfgb6ve1gr0u/coxm84pd6nvqn4y/clean_shot_2026_03_01_at_13_26_46_2x_9ZU53bh8Mr.webp</image>
+    </screenshot>
+    <screenshot>
+      <image>https://pocket.nytuo.fr/api/files/gpmjfgb6ve1gr0u/coxm84pd6nvqn4y/clean_shot_2026_03_01_at_13_13_35_2x_zjuDuJ2Awh.webp</image>
+    </screenshot>
+    <screenshot>
+      <image>https://pocket.nytuo.fr/api/files/gpmjfgb6ve1gr0u/coxm84pd6nvqn4y/clean_shot_2026_03_01_at_13_15_42_2x_pGo0xfe89W.webp</image>
+    </screenshot>
+    <screenshot>
+      <image>https://pocket.nytuo.fr/api/files/gpmjfgb6ve1gr0u/coxm84pd6nvqn4y/clean_shot_2026_03_01_at_13_16_04_2x_QcEtuqnHpF.webp</image>
+    </screenshot>
+    <screenshot>
+      <image>https://pocket.nytuo.fr/api/files/gpmjfgb6ve1gr0u/coxm84pd6nvqn4y/clean_shot_2026_03_01_at_13_16_42_2x_z5MpP9e0hA.webp</image>
+    </screenshot>
+    <screenshot>
+      <image>https://pocket.nytuo.fr/api/files/gpmjfgb6ve1gr0u/coxm84pd6nvqn4y/clean_shot_2026_03_01_at_13_17_49_2x_KjfCjEbESD.webp</image>
+    </screenshot>
+    <screenshot>
+      <image>https://pocket.nytuo.fr/api/files/gpmjfgb6ve1gr0u/coxm84pd6nvqn4y/clean_shot_2026_03_01_at_13_21_08_2x_e4GrftkUta.webp</image>
+    </screenshot>
+    <screenshot>
+      <image>https://pocket.nytuo.fr/api/files/gpmjfgb6ve1gr0u/coxm84pd6nvqn4y/clean_shot_2026_03_01_at_13_22_34_2x_Usb6GXOUDA.webp</image>
+    </screenshot>
+    <screenshot>
+      <image>https://pocket.nytuo.fr/api/files/gpmjfgb6ve1gr0u/coxm84pd6nvqn4y/clean_shot_2026_03_01_at_13_22_50_2x_PchmhyuSUi.webp</image>
+    </screenshot>
+    <screenshot>
+      <image>https://pocket.nytuo.fr/api/files/gpmjfgb6ve1gr0u/coxm84pd6nvqn4y/clean_shot_2026_03_01_at_13_23_47_2x_yuBaII1AOu.webp</image>
+    </screenshot>
+    <screenshot>
+      <image>https://pocket.nytuo.fr/api/files/gpmjfgb6ve1gr0u/coxm84pd6nvqn4y/clean_shot_2026_03_01_at_13_33_40_2x_2l4XGFChBI.webp</image>
+    </screenshot>
+    <screenshot>
+      <image>https://pocket.nytuo.fr/api/files/gpmjfgb6ve1gr0u/coxm84pd6nvqn4y/ccbanner_CuzE0qK1NK.png</image>
     </screenshot>
   </screenshots>
+
   <categories>
-  <category>Utility</category>
+    <category>Graphics</category>
+    <category>Viewer</category>
   </categories>
+
   <releases>
     <release version="3.0.0" date="2026-03-07"/>
     <release version="2.1.0" date="2023-10-19"/>

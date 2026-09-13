@@ -1,0 +1,56 @@
+name: flatpak-check
+
+on:
+  pull_request:
+    paths:
+      - 'src/package.json'
+      - 'src/package-lock.json'
+      - 'src/src-tauri/Cargo.toml'
+      - 'src/src-tauri/Cargo.lock'
+      - 'cargo-sources.json'
+      - 'node-sources.json'
+      - 'fr.nytuo.cosmiccomics.*'
+      - '.github/workflows/flatpak-check.yml'
+  workflow_dispatch:
+
+jobs:
+  sources:
+    name: Generated sources are up to date
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+
+      - name: Regenerate and compare
+        run: |
+          set -euo pipefail
+          pip install --quiet aiohttp toml tomlkit \
+            "git+https://github.com/flatpak/flatpak-builder-tools.git#subdirectory=node"
+          curl -fsSLO https://raw.githubusercontent.com/flatpak/flatpak-builder-tools/master/cargo/flatpak-cargo-generator.py
+          python3 flatpak-cargo-generator.py src/src-tauri/Cargo.lock -o cargo-sources.json
+          python3 -m flatpak_node_generator npm src/package-lock.json -o node-sources.json
+          if ! git diff --quiet -- cargo-sources.json node-sources.json; then
+            git diff --stat -- cargo-sources.json node-sources.json
+            echo "::error::cargo-sources.json / node-sources.json are stale. Regenerate them (see BUILD_GUIDE_FLATPAK.md step 3) and commit."
+            exit 1
+          fi
+
+  build:
+    name: Build Flatpak
+    needs: sources
+    runs-on: ubuntu-latest
+    container:
+      image: ghcr.io/flathub-infra/flatpak-github-actions:gnome-50
+      options: --privileged
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: flatpak/flatpak-github-actions/flatpak-builder@v6
+        with:
+          manifest-path: fr.nytuo.cosmiccomics.yml
+          bundle: cosmiccomics.flatpak
+          cache-key: flatpak-builder-${{ github.sha }}
+          upload-artifact: false
