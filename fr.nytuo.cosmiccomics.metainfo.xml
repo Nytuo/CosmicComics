@@ -10,14 +10,16 @@
 
   <content_rating type="oars-1.1" />
 
-  <developer_name>Nytuo (Arnaud BEUX)</developer_name>
+  <developer id="fr.nytuo">
+    <name>Nytuo (Arnaud BEUX)</name>
+  </developer>
 
   <url type="homepage">https://nytuo.fr</url>
   <url type="donation">https://ko-fi.com/nytuo</url>
   <url type="bugtracker">https://github.com/Nytuo/CosmicComics/issues</url>
   <url type="help">https://github.com/Nytuo/CosmicComics/wiki</url>
   <url type="contact">https://nytuo.fr/contact</url>
-  <url type="contribute">https://github.com/Nytuo/CosmicComics/blob/master/docs/CONTRIBUTING.md</url>
+  <url type="vcs-browser">https://github.com/Nytuo/CosmicComics</url>
 
   <recommends>
     <control>pointing</control>
@@ -27,34 +29,28 @@
   
   <description>
     <p>
-      The information about the series and books are provided by some API or manually set. This is all you can do with this software and more: <br/>
-
-      Read CBR, CBZ, CB7, CBT, ZIP, RAR, 7z, TAR, PDF, EPUB, Folder which contains PNG, JPG, JPEG, BMP.<br/>
-      Display your books and navigate your folders with custom covers (automaticatly by extraction or manually set)<br/>
-      Set your books as Read, Unread, Reading or favorite and note them.<br/>
-      Many Customizable parameters<br/>
-      Zoom, Auto Background Color, Double page Mode, Blank first page, No double page for Horizontal, Manga Mode, Webtoon Mode, fullscreen, rotations, Bookmarks, Slideshow, SideBar, Hide Menu Bar.<br/>
-      Display information about Comics / Manga<br/>
-      Libraries information provided by APIs (Marvel API, Google Books API, Anilist,...)<br/>
-      Continue reading where you stopped and more...<br/>
+      Cosmic Comics is a comics and manga reader and collection manager. Series and book information is fetched from online APIs or set manually.
     </p>
+    <ul>
+      <li>Read CBR, CBZ, CB7, CBT, ZIP, RAR, 7z, TAR, PDF, EPUB and folders of PNG, JPG, JPEG or BMP images</li>
+      <li>Browse your books and folders with custom covers, extracted automatically or set manually</li>
+      <li>Mark books as read, unread, reading or favorite, and rate them</li>
+      <li>Zoom, auto background color, double page mode, blank first page, manga mode, webtoon mode, fullscreen, rotations, bookmarks and slideshow</li>
+      <li>Library metadata from Marvel API, Google Books API, AniList and more</li>
+      <li>Continue reading where you stopped</li>
+    </ul>
   </description>
   <launchable type="desktop-id">fr.nytuo.cosmiccomics.desktop</launchable>
   <screenshots>
     <screenshot type="default">
       <image>https://pocket.nytuo.fr/api/files/gpmjfgb6ve1gr0u/coxm84pd6nvqn4y/ccbanner_CuzE0qK1NK.png?token=</image>
     </screenshot>
-    <screenshot>
-      <image>https://pocket.nytuo.fr/api/files/gpmjfgb6ve1gr0u/coxm84pd6nvqn4y/cc_img1_C4Y8jwH5mS.png?token=</image>
-    </screenshot>
-    <screenshot>
-      <image>https://pocket.nytuo.fr/api/files/gpmjfgb6ve1gr0u/coxm84pd6nvqn4y/cc_img3_xdvpB1Elvy.png?token=</image>
-    </screenshot>
   </screenshots>
   <categories>
   <category>Utility</category>
   </categories>
   <releases>
-    <release version="v2.1.0" date="2023-10-19"/>
+    <release version="3.0.0" date="2026-03-07"/>
+    <release version="2.1.0" date="2023-10-19"/>
   </releases>
 </component>

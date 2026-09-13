@@ -10,6 +10,10 @@ pub struct UpdateInfo {
     pub date: Option<String>,
 }
 
+fn is_flatpak() -> bool {
+    std::env::var_os("FLATPAK_ID").is_some()
+}
+
 fn build_updater(app: &AppHandle) -> Result<tauri_plugin_updater::Updater, String> {
     let mut builder = app.updater_builder();
 
@@ -34,6 +38,10 @@ fn build_updater(app: &AppHandle) -> Result<tauri_plugin_updater::Updater, Strin
 
 #[tauri::command]
 pub async fn check_for_update(app: AppHandle) -> Result<Option<UpdateInfo>, String> {
+    if is_flatpak() {
+        return Ok(None);
+    }
+
     let updater = build_updater(&app)?;
 
     let update = updater
@@ -57,6 +65,10 @@ pub async fn check_for_update(app: AppHandle) -> Result<Option<UpdateInfo>, Stri
 
 #[tauri::command]
 pub async fn install_update(app: AppHandle) -> Result<(), String> {
+    if is_flatpak() {
+        return Err("Updates are managed by Flatpak".to_string());
+    }
+
     let updater = build_updater(&app)?;
 
     let update = updater

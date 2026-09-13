@@ -115,3 +115,10 @@ src/frontend/
 
 src/src-tauri/bin/
 src/src-tauri/resources/model.onnx
+
+# Flatpak builds need the lockfile to vendor crates offline
+!src/src-tauri/Cargo.lock
+
+# Flatpak build output
+build-dir/
+.flatpak-builder/

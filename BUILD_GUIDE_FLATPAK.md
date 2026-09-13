@@ -29,10 +29,9 @@ python3 -m flatpak_node_generator npm src/package-lock.json -o node-sources.json
 4) Install required Flatpak SDKs (once):
 
 ```bash
-flatpak install flathub org.gnome.Sdk//47 org.gnome.Platform//47
-flatpak install flathub org.freedesktop.Sdk.Extension.rust-stable//24.08
-flatpak install flathub org.freedesktop.Sdk.Extension.node20//24.08
-flatpak install flathub org.freedesktop.Sdk.Extension.llvm18//24.08
+flatpak install flathub org.gnome.Sdk//50 org.gnome.Platform//50
+flatpak install flathub org.freedesktop.Sdk.Extension.rust-stable//25.08
+flatpak install flathub org.freedesktop.Sdk.Extension.node24//25.08
 ```
 
 5) Build and install the Flatpak locally (from project root):
