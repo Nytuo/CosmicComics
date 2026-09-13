@@ -53,5 +53,5 @@ parts:
       export CLANG_PATH=/usr/bin/clang-18
       npm install
       npm run tauri build -- --bundles deb -- --no-default-features
-      dpkg -x src-tauri/target/release/bundle/deb/*.deb $SNAPCRAFT_PART_INSTALL/
+      dpkg -x src/src-tauri/target/release/bundle/deb/*.deb $SNAPCRAFT_PART_INSTALL/
       sed -i -e "s|Icon=appname|Icon=/usr/share/icons/hicolor/32x32/apps/cosmiccomics.png|g" $SNAPCRAFT_PART_INSTALL/usr/share/applications/fr.nytuo.cosmiccomics.desktop

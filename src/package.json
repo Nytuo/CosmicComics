@@ -43,10 +43,10 @@
     "@radix-ui/react-tabs": "^1.1.13",
     "@radix-ui/react-tooltip": "^1.2.8",
     "@tailwindcss/vite": "^4.2.1",
-    "@tauri-apps/api": "^2.10.1",
-    "@tauri-apps/plugin-dialog": "^2.6.0",
-    "@tauri-apps/plugin-opener": "^2.5.3",
-    "@tauri-apps/plugin-updater": "^2.10.0",
+    "@tauri-apps/api": "^2.11.1",
+    "@tauri-apps/plugin-dialog": "^2.7.3",
+    "@tauri-apps/plugin-opener": "^2.5.5",
+    "@tauri-apps/plugin-updater": "^2.11.0",
     "class-variance-authority": "^0.7.1",
     "clsx": "^2.1.1",
     "cmdk": "^1.1.1",
@@ -78,7 +78,7 @@
     "zod": "^4.3.6"
   },
   "devDependencies": {
-    "@tauri-apps/cli": "^2.10.0",
+    "@tauri-apps/cli": "^2.11.4",
     "@types/react": "^19.2.14",
     "@types/react-dom": "^19.2.3",
     "@typescript-eslint/eslint-plugin": "^8.56.1",
