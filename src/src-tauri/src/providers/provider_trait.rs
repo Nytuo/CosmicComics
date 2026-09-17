@@ -13,6 +13,7 @@ pub struct ApiCredentials {
     pub marvel_private_key: String,
     pub google_books_api_key: String,
     pub open_library_api_key: String,
+    pub metron_api_key: String,
     pub metron_username: String,
     pub metron_password: String,
 }

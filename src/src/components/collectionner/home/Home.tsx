@@ -1,10 +1,8 @@
 import * as TauriAPI from '@/API/TauriAPI.ts';
-import CardWrapper from '@/components/collectionner/card/CardWrapper.tsx';
+import VirtualizedCardGrid from '@/components/collectionner/card/VirtualizedCardGrid.tsx';
 import { useEffect, useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import type { DisplayBook, DisplaySeries } from '@/interfaces/IDisplayBook.ts';
-
-type BookOrSeries = DisplayBook | DisplaySeries;
 import {
   Tabs,
   TabsContent,
@@ -40,6 +38,8 @@ function Home({
   const [isLoading, setIsLoading] = useState(true);
   const [filterState, setFilterState] =
     useState<SearchFilterState>(defaultFilterState);
+  const [activeTab, setActiveTab] = useState('reading');
+  const [activeAllSubTab, setActiveAllSubTab] = useState('series');
 
   const filteredBooks = useMemo(
     () => applySearchFilterSort(allBooks, filterState),
@@ -57,6 +57,30 @@ function Home({
     () => applySearchFilterSort(downloadBooks, filterState),
     [downloadBooks, filterState]
   );
+
+  const activeCounts = useMemo(() => {
+    if (activeTab === 'reading') {
+      return { total: readingBooks.length, filtered: filteredReadingBooks.length };
+    }
+    if (activeTab === 'downloads') {
+      return { total: downloadBooks.length, filtered: filteredDownloadBooks.length };
+    }
+    if (activeAllSubTab === 'books') {
+      return { total: allBooks.length, filtered: filteredBooks.length };
+    }
+    return { total: allSeries.length, filtered: filteredSeries.length };
+  }, [
+    activeTab,
+    activeAllSubTab,
+    readingBooks.length,
+    filteredReadingBooks.length,
+    downloadBooks.length,
+    filteredDownloadBooks.length,
+    allBooks.length,
+    filteredBooks.length,
+    allSeries.length,
+    filteredSeries.length,
+  ]);
 
   useEffect(() => {
     document.getElementsByTagName('body')[0].style.background =
@@ -92,7 +116,7 @@ function Home({
 
   return (
     <div id="home">
-      <Tabs defaultValue="reading">
+      <Tabs value={activeTab} onValueChange={setActiveTab}>
         <div className="flex items-center justify-between mb-4">
           <TabsList>
             <TabsTrigger value="reading">{t('continue_reading')}</TabsTrigger>
@@ -105,14 +129,19 @@ function Home({
           </Button>
         </div>
 
-        <SearchFilterBar state={filterState} onChange={setFilterState} />
+        <SearchFilterBar
+          state={filterState}
+          onChange={setFilterState}
+          totalCount={activeCounts.total}
+          filteredCount={activeCounts.filtered}
+        />
 
         <TabsContent value="all">
           <div className="p-3">
             {isLoading ? (
               <p>{t('loading')}...</p>
             ) : (
-              <Tabs defaultValue="series">
+              <Tabs value={activeAllSubTab} onValueChange={setActiveAllSubTab}>
                 <TabsList>
                   <TabsTrigger value="series">{t('series')}</TabsTrigger>
                   <TabsTrigger value="books">{t('books')}</TabsTrigger>
@@ -124,23 +153,12 @@ function Home({
                       {t('nothingHere')}
                     </p>
                   ) : (
-                    <div className="cards-list">
-                      {filteredSeries.map((series, index) => (
-                        <CardWrapper
-                          provider={series.provider_id}
-                          handleOpenDetails={(
-                            _open: boolean,
-                            _s: BookOrSeries,
-                            _id: string | number
-                          ) => {
-                            handleOpenSeries(true, series, series.provider_id);
-                          }}
-                          book={series}
-                          key={index}
-                          type="book"
-                        />
-                      ))}
-                    </div>
+                    <VirtualizedCardGrid
+                      items={filteredSeries}
+                      handleOpenDetails={(_isBook, item) => {
+                        handleOpenSeries(true, item, item.provider_id);
+                      }}
+                    />
                   )}
                 </TabsContent>
 
@@ -150,17 +168,10 @@ function Home({
                       {t('nothingHere')}
                     </p>
                   ) : (
-                    <div className="cards-list">
-                      {filteredBooks.map((book, index) => (
-                        <CardWrapper
-                          provider={book.provider_id}
-                          handleOpenDetails={handleOpenDetails}
-                          book={book}
-                          key={index}
-                          type="book"
-                        />
-                      ))}
-                    </div>
+                    <VirtualizedCardGrid
+                      items={filteredBooks}
+                      handleOpenDetails={handleOpenDetails}
+                    />
                   )}
                 </TabsContent>
               </Tabs>
@@ -180,17 +191,10 @@ function Home({
                 {filteredReadingBooks.length === 0 ? (
                   <p className="text-muted-foreground">{t('nothingHere')}</p>
                 ) : (
-                  <div className="cards-list">
-                    {filteredReadingBooks.map((book, index) => (
-                      <CardWrapper
-                        provider={book.provider_id}
-                        handleOpenDetails={handleOpenDetails}
-                        book={book}
-                        key={index}
-                        type="book"
-                      />
-                    ))}
-                  </div>
+                  <VirtualizedCardGrid
+                    items={filteredReadingBooks}
+                    handleOpenDetails={handleOpenDetails}
+                  />
                 )}
               </>
             )}
@@ -204,17 +208,10 @@ function Home({
             ) : filteredDownloadBooks.length === 0 ? (
               <p className="text-muted-foreground">{t('nothingHere')}</p>
             ) : (
-              <div className="cards-list">
-                {filteredDownloadBooks.map((book, index) => (
-                  <CardWrapper
-                    provider={book.provider_id}
-                    handleOpenDetails={handleOpenDetails}
-                    book={book}
-                    key={index}
-                    type="book"
-                  />
-                ))}
-              </div>
+              <VirtualizedCardGrid
+                items={filteredDownloadBooks}
+                handleOpenDetails={handleOpenDetails}
+              />
             )}
           </div>
         </TabsContent>

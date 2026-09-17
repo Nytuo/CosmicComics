@@ -15,7 +15,7 @@ export function resolveImageUrl(
     return url;
   }
 
-  if (url.startsWith('/')) {
+  if (url.startsWith('/') || /^[a-zA-Z]:[\\/]/.test(url)) {
     return convertFileSrc(url);
   }
 

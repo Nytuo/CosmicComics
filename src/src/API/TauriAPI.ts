@@ -736,13 +736,14 @@ export const clearPanelCache = async (): Promise<void> => {
 
 export const createScanPath = async (
   name: string,
-  path: string
+  path: string,
+  localOnly: boolean
 ): Promise<string> => {
-  return await invoke('create_scan_path', { name, path });
+  return await invoke('create_scan_path', { name, path, localOnly });
 };
 
 export const getAllScanPaths = async (): Promise<
-  { id: string; name: string; path: string }[]
+  { id: string; name: string; path: string; local_only: boolean }[]
 > => {
   return await invoke('get_all_scan_paths', {});
 };
@@ -754,9 +755,15 @@ export const deleteScanPath = async (scanPathId: string): Promise<void> => {
 export const updateScanPath = async (
   scanPathId: string,
   name: string,
-  path: string
+  path: string,
+  localOnly: boolean
 ): Promise<void> => {
-  return await invoke('update_scan_path', { scanPathId, name, path });
+  return await invoke('update_scan_path', {
+    scanPathId,
+    name,
+    path,
+    localOnly,
+  });
 };
 
 export const scanAllLibraries = async (): Promise<void> => {

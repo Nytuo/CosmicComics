@@ -30,6 +30,7 @@ fn strip_year(s: &str) -> String {
 impl MetronProvider {
     fn creds_from_api(creds: &ApiCredentials) -> MetronCredentials {
         MetronCredentials {
+            api_key: creds.metron_api_key.clone(),
             username: creds.metron_username.clone(),
             password: creds.metron_password.clone(),
         }

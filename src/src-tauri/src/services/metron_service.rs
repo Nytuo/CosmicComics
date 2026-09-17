@@ -1,26 +1,130 @@
 use anyhow::{anyhow, Result};
 use base64::{engine::general_purpose::STANDARD, Engine as _};
+use once_cell::sync::Lazy;
 use serde::{Deserialize, Serialize};
 use serde_json::Value;
-use tracing::{debug, error, info};
+use std::collections::VecDeque;
+use std::time::Duration;
+use tokio::sync::Mutex as AsyncMutex;
+use tokio::time::{sleep, Instant};
+use tracing::{debug, error, info, warn};
 
 const METRON_BASE_URL: &str = "https://metron.cloud/api";
 
-/// Credentials for Metron Basic Auth.
+const BURST_LIMIT: usize = 20;
+const BURST_WINDOW: Duration = Duration::from_secs(60);
+
+const MAX_RATE_LIMIT_RETRIES: u32 = 3;
+const DEFAULT_RATE_LIMIT_RETRY_SECS: u64 = 5;
+const MAX_RATE_LIMIT_RETRY_SECS: u64 = 120;
+
+static REQUEST_TIMESTAMPS: Lazy<AsyncMutex<VecDeque<Instant>>> =
+    Lazy::new(|| AsyncMutex::new(VecDeque::with_capacity(BURST_LIMIT)));
+
+async fn wait_for_rate_limit_slot() {
+    loop {
+        let wait = {
+            let mut timestamps = REQUEST_TIMESTAMPS.lock().await;
+            let now = Instant::now();
+            while let Some(&oldest) = timestamps.front() {
+                if now.duration_since(oldest) >= BURST_WINDOW {
+                    timestamps.pop_front();
+                } else {
+                    break;
+                }
+            }
+
+            if timestamps.len() < BURST_LIMIT {
+                timestamps.push_back(now);
+                None
+            } else {
+                Some(BURST_WINDOW - now.duration_since(timestamps[0]))
+            }
+        };
+
+        match wait {
+            None => return,
+            Some(duration) => {
+                debug!(
+                    "Metron local rate limit reached, waiting {:.1}s before next request",
+                    duration.as_secs_f64()
+                );
+                sleep(duration).await;
+            }
+        }
+    }
+}
+
+fn parse_retry_after_from_body(body: &str) -> Option<u64> {
+    let marker = "available in ";
+    let idx = body.find(marker)?;
+    let rest = &body[idx + marker.len()..];
+    let digits: String = rest.chars().take_while(|c| c.is_ascii_digit()).collect();
+    digits.parse().ok()
+}
+
+async fn get_with_retry(
+    client: &reqwest::Client,
+    url: &str,
+    creds: &MetronCredentials,
+) -> Result<reqwest::Response> {
+    let mut attempt = 0u32;
+    loop {
+        wait_for_rate_limit_slot().await;
+
+        let response = client
+            .get(url)
+            .header("Authorization", creds.auth_header())
+            .send()
+            .await?;
+
+        if response.status() == reqwest::StatusCode::TOO_MANY_REQUESTS
+            && attempt < MAX_RATE_LIMIT_RETRIES
+        {
+            let header_wait = response
+                .headers()
+                .get(reqwest::header::RETRY_AFTER)
+                .and_then(|v| v.to_str().ok())
+                .and_then(|v| v.parse::<u64>().ok());
+            let body = response.text().await.unwrap_or_default();
+            let wait = header_wait
+                .or_else(|| parse_retry_after_from_body(&body))
+                .unwrap_or(DEFAULT_RATE_LIMIT_RETRY_SECS)
+                .min(MAX_RATE_LIMIT_RETRY_SECS);
+
+            attempt += 1;
+            warn!(
+                "Metron API rate limited (attempt {}/{}), waiting {}s: {}",
+                attempt, MAX_RATE_LIMIT_RETRIES, wait, body
+            );
+            sleep(Duration::from_secs(wait)).await;
+            continue;
+        }
+
+        return Ok(response);
+    }
+}
+
+/// Credentials for the Metron API — either a Bearer API token (preferred) or
+/// HTTP Basic Auth (username/password).
 #[derive(Debug, Clone, Default)]
 pub struct MetronCredentials {
+    pub api_key: String,
     pub username: String,
     pub password: String,
 }
 
 impl MetronCredentials {
     pub fn auth_header(&self) -> String {
+        if !self.api_key.is_empty() {
+            return format!("Bearer {}", self.api_key);
+        }
         let encoded = STANDARD.encode(format!("{}:{}", self.username, self.password));
         format!("Basic {}", encoded)
     }
 
     pub fn is_valid(&self) -> bool {
-        !self.username.is_empty() && !self.password.is_empty()
+        !self.api_key.is_empty() || (!self.username.is_empty() && !self.password.is_empty())
     }
 }
 
@@ -198,7 +302,7 @@ pub struct MetronRole {
 
 fn build_client(creds: &MetronCredentials) -> Result<reqwest::Client> {
     if !creds.is_valid() {
-        return Err(anyhow!("Metron credentials not configured. Set METRON_USERNAME and METRON_PASSWORD environment variables."));
+        return Err(anyhow!("Metron credentials not configured. Set METRON_API_KEY, or METRON_USERNAME and METRON_PASSWORD, environment variables."));
     }
 
     let client = reqwest::Client::builder()
@@ -224,11 +328,7 @@ pub async fn search_issues(
     );
     info!("Metron search issues: {}", url);
 
-    let response = client
-        .get(&url)
-        .header("Authorization", creds.auth_header())
-        .send()
-        .await?;
+    let response = get_with_retry(&client, &url, creds).await?;
 
     if !response.status().is_success() {
         let status = response.status();
@@ -259,11 +359,7 @@ pub async fn search_series(
     );
     info!("Metron search series: {}", url);
 
-    let response = client
-        .get(&url)
-        .header("Authorization", creds.auth_header())
-        .send()
-        .await?;
+    let response = get_with_retry(&client, &url, creds).await?;
 
     if !response.status().is_success() {
         let status = response.status();
@@ -286,11 +382,7 @@ pub async fn get_issue_detail(
     let url = format!("{}/issue/{}/", METRON_BASE_URL, issue_id);
     info!("Metron get issue: {}", url);
 
-    let response = client
-        .get(&url)
-        .header("Authorization", creds.auth_header())
-        .send()
-        .await?;
+    let response = get_with_retry(&client, &url, creds).await?;
 
     if !response.status().is_success() {
         let status = response.status();
@@ -313,11 +405,7 @@ pub async fn get_series_detail(
     let url = format!("{}/series/{}/", METRON_BASE_URL, series_id);
     info!("Metron get series: {}", url);
 
-    let response = client
-        .get(&url)
-        .header("Authorization", creds.auth_header())
-        .send()
-        .await?;
+    let response = get_with_retry(&client, &url, creds).await?;
 
     if !response.status().is_success() {
         let status = response.status();
@@ -347,12 +435,7 @@ pub async fn get_series_first_issue(
         series_id, list_url
     );
 
-    let list_resp = client
-        .get(&list_url)
-        .header("Authorization", creds.auth_header())
-        .send()
-        .await
-        .ok()?;
+    let list_resp = get_with_retry(&client, &list_url, creds).await.ok()?;
 
     if !list_resp.status().is_success() {
         error!(
@@ -386,12 +469,7 @@ pub async fn get_series_first_issue(
     let detail_url = format!("{}/issue/{}/", METRON_BASE_URL, first_issue_id);
     debug!("Metron get issue detail for cover: {}", detail_url);
 
-    let detail_resp = client
-        .get(&detail_url)
-        .header("Authorization", creds.auth_header())
-        .send()
-        .await
-        .ok()?;
+    let detail_resp = get_with_retry(&client, &detail_url, creds).await.ok()?;
 
     if !detail_resp.status().is_success() {
         error!(
@@ -436,11 +514,7 @@ pub async fn get_series_issues(
     let url = format!("{}/series/{}/issue_list/", METRON_BASE_URL, series_id);
     info!("Metron get series issues: {}", url);
 
-    let response = client
-        .get(&url)
-        .header("Authorization", creds.auth_header())
-        .send()
-        .await?;
+    let response = get_with_retry(&client, &url, creds).await?;
 
     if !response.status().is_success() {
         let status = response.status();
@@ -470,11 +544,7 @@ pub async fn get_issue_by_series_and_number(
     );
     info!("Metron get issue by series+number: {}", url);
 
-    let response = client
-        .get(&url)
-        .header("Authorization", creds.auth_header())
-        .send()
-        .await?;
+    let response = get_with_retry(&client, &url, creds).await?;
 
     if !response.status().is_success() {
         let status = response.status();
@@ -511,11 +581,7 @@ pub async fn search_issues_by_series_and_year(
     }
     info!("Metron search issues: {}", url);
 
-    let response = client
-        .get(&url)
-        .header("Authorization", creds.auth_header())
-        .send()
-        .await?;
+    let response = get_with_retry(&client, &url, creds).await?;
 
     if !response.status().is_success() {
         let status = response.status();
@@ -526,4 +592,36 @@ pub async fn search_issues_by_series_and_year(
 
     let data: Value = response.json().await?;
     Ok(data)
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    #[test]
+    fn parses_retry_after_from_throttle_body() {
+        let body = r#"{"detail":"Request was throttled. Expected available in 18 seconds."}"#;
+        assert_eq!(parse_retry_after_from_body(body), Some(18));
+    }
+
+    #[test]
+    fn parses_retry_after_missing_when_not_throttled() {
+        let body = r#"{"detail":"Not found."}"#;
+        assert_eq!(parse_retry_after_from_body(body), None);
+    }
+
+    #[tokio::test]
+    async fn burst_tracker_fills_up_to_the_cap_without_blocking() {
+        {
+            let mut timestamps = REQUEST_TIMESTAMPS.lock().await;
+            timestamps.clear();
+        }
+
+        for _ in 0..BURST_LIMIT {
+            wait_for_rate_limit_slot().await;
+        }
+
+        let timestamps = REQUEST_TIMESTAMPS.lock().await;
+        assert_eq!(timestamps.len(), BURST_LIMIT);
+    }
 }

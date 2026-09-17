@@ -16,6 +16,7 @@ pub struct ApiTokens {
     pub marvel_private_key: String,
     pub google_books_api_key: String,
     pub open_library_api_key: String,
+    pub metron_api_key: String,
     pub metron_username: String,
     pub metron_password: String,
     pub mangadex_client_id: String,
@@ -112,6 +113,7 @@ impl AppState {
         let marvel_private_key = std::env::var("MARVEL_PRIVATE_KEY").unwrap_or_default();
         let google_books_api_key = std::env::var("GOOGLE_BOOKS_API_KEY").unwrap_or_default();
         let open_library_api_key = std::env::var("OPEN_LIBRARY_API_KEY").unwrap_or_default();
+        let metron_api_key = std::env::var("METRON_API_KEY").unwrap_or_default();
         let metron_username = std::env::var("METRON_USERNAME").unwrap_or_default();
         let metron_password = std::env::var("METRON_PASSWORD").unwrap_or_default();
         let mangadex_client_id = std::env::var("MANGADEX_CLIENT_ID").unwrap_or_default();
@@ -126,6 +128,7 @@ impl AppState {
                 marvel_private_key,
                 google_books_api_key,
                 open_library_api_key,
+                metron_api_key,
                 metron_username,
                 metron_password,
                 mangadex_client_id,

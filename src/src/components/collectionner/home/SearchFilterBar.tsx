@@ -150,9 +150,16 @@ function activeFilterCount(state: SearchFilterState): number {
 interface SearchFilterBarProps {
   state: SearchFilterState;
   onChange: (next: SearchFilterState) => void;
+  totalCount: number;
+  filteredCount: number;
 }
 
-function SearchFilterBar({ state, onChange }: SearchFilterBarProps) {
+function SearchFilterBar({
+  state,
+  onChange,
+  totalCount,
+  filteredCount,
+}: SearchFilterBarProps) {
   const { t } = useTranslation();
 
   const set = <K extends keyof SearchFilterState>(
@@ -288,6 +295,12 @@ function SearchFilterBar({ state, onChange }: SearchFilterBarProps) {
           {t('reset')}
         </Button>
       )}
+
+      <span className="ml-auto text-sm text-muted-foreground whitespace-nowrap">
+        {filteredCount === totalCount
+          ? t('totalCount', { count: totalCount })
+          : t('filteredCount', { filtered: filteredCount, count: totalCount })}
+      </span>
     </div>
   );
 }

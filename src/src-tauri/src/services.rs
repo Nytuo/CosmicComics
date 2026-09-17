@@ -4,6 +4,7 @@ pub mod archive_service;
 pub mod collectionner_service;
 pub mod googlebooks_service;
 mod googlebooks_service_test;
+pub mod local_metadata_service;
 pub mod marvel_service;
 mod marvel_service_test;
 pub mod matching_service;

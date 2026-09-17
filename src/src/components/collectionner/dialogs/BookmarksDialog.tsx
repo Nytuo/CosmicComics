@@ -2,6 +2,7 @@ import * as React from 'react';
 import { useTranslation } from 'react-i18next';
 import * as TauriAPI from '@/API/TauriAPI';
 import { openBOOKM } from '@/utils/utils.ts';
+import { resolveImageUrl } from '@/utils/imageUrl.ts';
 import { Ban } from 'lucide-react';
 import {
   Dialog,
@@ -33,7 +34,7 @@ export default function BookmarksDialog({
           setBookmarks((prev) => [
             ...prev,
             {
-              URLCover: book.cover_url,
+              URLCover: resolveImageUrl(book.cover_url),
               page: file['page'],
               path: book.path,
               title: book.title,

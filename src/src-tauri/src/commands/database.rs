@@ -353,17 +353,21 @@ pub async fn create_scan_path(
     state: State<'_, AppState>,
     name: String,
     path: String,
+    local_only: bool,
 ) -> Result<(), String> {
     info!(
-        "[create_scan_path] called with name='{}', path='{}'",
-        name, path
+        "[create_scan_path] called with name='{}', path='{}', local_only={}",
+        name, path, local_only
     );
     let repo = get_repo(&state).await?;
     info!("[create_scan_path] got repo, calling repo.create_scan_path");
-    let result = repo.create_scan_path(&name, &path).await.map_err(|e| {
-        error!("[create_scan_path] repo.create_scan_path FAILED: {}", e);
-        format!("{}", e)
-    });
+    let result = repo
+        .create_scan_path(&name, &path, local_only)
+        .await
+        .map_err(|e| {
+            error!("[create_scan_path] repo.create_scan_path FAILED: {}", e);
+            format!("{}", e)
+        });
     info!("[create_scan_path] result ok={}", result.is_ok());
 
     match repo.get_all_scan_paths().await {
@@ -420,20 +424,21 @@ pub async fn delete_scan_path(
     Ok(())
 }
 
-/// Update an existing scan path (name and/or path).
+/// Update an existing scan path (name, path, and local-only flag).
 #[tauri::command]
 pub async fn update_scan_path(
     state: State<'_, AppState>,
     scan_path_id: String,
     name: String,
     path: String,
+    local_only: bool,
 ) -> Result<(), String> {
     info!(
-        "[update_scan_path] id='{}', name='{}', path='{}'",
-        scan_path_id, name, path
+        "[update_scan_path] id='{}', name='{}', path='{}', local_only={}",
+        scan_path_id, name, path, local_only
     );
     let repo = get_repo(&state).await?;
-    repo.update_scan_path(&scan_path_id, &name, &path)
+    repo.update_scan_path(&scan_path_id, &name, &path, local_only)
         .await
         .map_err(|e| {
             error!("[update_scan_path] Error: {}", e);
@@ -565,6 +570,7 @@ pub async fn insert_new_book_by_provider(
         marvel_private_key: creds_lock.marvel_private_key.clone(),
         google_books_api_key: creds_lock.google_books_api_key.clone(),
         open_library_api_key: creds_lock.open_library_api_key.clone(),
+        metron_api_key: creds_lock.metron_api_key.clone(),
         metron_username: creds_lock.metron_username.clone(),
         metron_password: creds_lock.metron_password.clone(),
     };
@@ -693,7 +699,6 @@ fn calculate_series_match_score(search_name: &str, candidate_title: &str) -> f64
 
 async fn scan_books_in_folder(folder_path: &str, series: &SeriesRecord, repo: &SurrealRepo) {
     use crate::models::book::BookRecord;
-    use crate::utils::VALID_BOOK_EXTENSION;
 
     let entries = match std::fs::read_dir(folder_path) {
         Ok(e) => e,
@@ -732,55 +737,11 @@ async fn scan_books_in_folder(folder_path: &str, series: &SeriesRecord, repo: &S
             .unwrap_or("Unknown")
             .to_string();
 
-        let is_valid_book = if is_file {
-            let extension = match entry_path.extension().and_then(|e| e.to_str()) {
-                Some(ext) => ext.to_lowercase(),
-                None => {
-                    continue;
-                }
-            };
-
-            VALID_BOOK_EXTENSION
-                .iter()
-                .any(|valid| valid.eq_ignore_ascii_case(&extension))
-        } else if is_dir {
-            use crate::utils::VALID_IMAGE_EXTENSION;
-            let has_images = match std::fs::read_dir(&entry_path) {
-                Ok(dir_entries) => dir_entries
-                    .flatten()
-                    .filter(|e| e.path().is_file())
-                    .any(|e| {
-                        e.path()
-                            .extension()
-                            .and_then(|ext| ext.to_str())
-                            .map(|ext| {
-                                VALID_IMAGE_EXTENSION
-                                    .iter()
-                                    .any(|v| v.eq_ignore_ascii_case(ext))
-                            })
-                            .unwrap_or(false)
-                    }),
-                Err(_) => false,
-            };
-
-            if has_images {
-                debug!(
-                    "[scan_books_in_folder] Found folder-based book: {}",
-                    file_name
-                );
-            } else {
-                debug!(
-                    "[scan_books_in_folder] Skipping folder (no images): {}",
-                    file_name
-                );
-            }
-
-            has_images
-        } else {
-            false
-        };
-
-        if !is_valid_book {
+        if !crate::utils::is_valid_book_entry(&entry_path) {
+            debug!(
+                "[scan_books_in_folder] Skipping non-book entry: {}",
+                file_name
+            );
             continue;
         }
 
@@ -797,24 +758,32 @@ async fn scan_books_in_folder(folder_path: &str, series: &SeriesRecord, repo: &S
             _ => {}
         }
 
+        let local = crate::services::local_metadata_service::extract_local_metadata(&entry_path);
+
         let book = BookRecord {
             id: None,
             external_id: format!("manual_book_{}", rand::random::<u32>()),
             provider_id: series.provider_id,
             provider_name: series.provider_name.clone(),
             series_id: Some(series_id.to_string()),
-            title: file_name.clone(),
-            issue_number: issue_number.map(|n| n.to_string()),
+            title: local.title.unwrap_or_else(|| file_name.clone()),
+            issue_number: local
+                .issue_number
+                .or_else(|| issue_number.map(|n| n.to_string())),
+            description: local.description,
+            format: local.format,
+            page_count: local.page_count.unwrap_or(0),
             path: file_path,
-            characters: Vec::new(),
-            creators: Vec::new(),
+            characters: local.characters,
+            creators: local.creators,
             ..Default::default()
         };
 
         match repo.create_book(book).await {
-            Ok(_) => {
+            Ok(created) => {
                 books_created += 1;
                 debug!("[scan_books_in_folder] Created book: {}", file_name);
+                extract_and_save_book_cover(&created, &entry_path, repo).await;
             }
             Err(e) => {
                 error!(
@@ -829,6 +798,40 @@ async fn scan_books_in_folder(folder_path: &str, series: &SeriesRecord, repo: &S
         "[scan_books_in_folder] Created {} books for series: {}",
         books_created, series.title
     );
+}
+
+async fn extract_and_save_book_cover(
+    book: &crate::models::book::BookRecord,
+    entry_path: &std::path::Path,
+    repo: &SurrealRepo,
+) {
+    let Some(id) = book.id.as_ref() else {
+        return;
+    };
+    let book_path = entry_path.to_string_lossy();
+
+    let Ok(img_data) =
+        crate::services::archive_service::extract_first_image_from_path(&book_path).await
+    else {
+        return;
+    };
+
+    let id_str = id.to_string();
+    let filename = format!("fill_{}", id_str.replace(':', "_"));
+    if let Ok(path) = crate::services::archive_service::save_image_bytes_to_disk(
+        &img_data,
+        &repo.covers_dir,
+        &filename,
+    ) {
+        let mut fields = HashMap::new();
+        fields.insert("cover_url".into(), Value::String(path));
+        if let Err(e) = repo.update_book_fields(&id_str, fields).await {
+            error!(
+                "[scan_books_in_folder] Failed to save cover for book {}: {}",
+                id_str, e
+            );
+        }
+    }
 }
 
 fn extract_issue_number(filename: &str) -> Option<i32> {
@@ -869,6 +872,7 @@ pub async fn scan_all_libraries(
     let marvel_pub = creds.marvel_public_key.clone();
     let marvel_priv = creds.marvel_private_key.clone();
     let google_key = creds.google_books_api_key.clone();
+    let metron_key = creds.metron_api_key.clone();
     let metron_user = creds.metron_username.clone();
     let metron_pass = creds.metron_password.clone();
     drop(config);
@@ -886,6 +890,7 @@ pub async fn scan_all_libraries(
         marvel_private_key: marvel_priv,
         google_books_api_key: google_key,
         open_library_api_key: String::new(),
+        metron_api_key: metron_key,
         metron_username: metron_user,
         metron_password: metron_pass,
     };
@@ -919,50 +924,60 @@ pub async fn scan_all_libraries(
                 continue;
             }
 
-            let searchable = crate::providers::searchable_series_providers();
             let mut best: Option<(std::sync::Arc<dyn Provider>, SearchCandidate)> = None;
-            let mut all_candidates = Vec::new();
 
-            debug!("[scan] Searching providers for folder: {}", folder_name);
-            for provider in searchable {
-                if let Ok(mut candidates) = provider.search_series(&folder_name, None, &creds).await
-                {
-                    debug!(
-                        "[scan]   {} returned {} candidates",
-                        provider.kind().name(),
-                        candidates.len()
-                    );
-                    for candidate in &mut candidates {
-                        candidate.confidence_score =
-                            calculate_series_match_score(&folder_name, &candidate.title);
+            if sp.local_only {
+                debug!(
+                    "[scan] Library is local-only, skipping provider search for folder: {}",
+                    folder_name
+                );
+            } else {
+                let searchable = crate::providers::searchable_series_providers();
+                let mut all_candidates = Vec::new();
+
+                debug!("[scan] Searching providers for folder: {}", folder_name);
+                for provider in searchable {
+                    if let Ok(mut candidates) =
+                        provider.search_series(&folder_name, None, &creds).await
+                    {
                         debug!(
-                            "[scan]     '{}' score: {:.3}",
-                            candidate.title, candidate.confidence_score
+                            "[scan]   {} returned {} candidates",
+                            provider.kind().name(),
+                            candidates.len()
+                        );
+                        for candidate in &mut candidates {
+                            candidate.confidence_score =
+                                calculate_series_match_score(&folder_name, &candidate.title);
+                            debug!(
+                                "[scan]     '{}' score: {:.3}",
+                                candidate.title, candidate.confidence_score
+                            );
+                        }
+                        all_candidates.append(&mut candidates);
+                    }
+                }
+
+                if !all_candidates.is_empty() {
+                    all_candidates.sort_by(|a, b| {
+                        b.confidence_score.partial_cmp(&a.confidence_score).unwrap()
+                    });
+                    let top = &all_candidates[0];
+                    if top.confidence_score > 0.3 {
+                        debug!(
+                            "[scan] MATCH: '{}' from {} (score: {:.3})",
+                            top.title,
+                            top.provider_id.name(),
+                            top.confidence_score
+                        );
+                        if let Some(provider) = get_provider(top.provider_id) {
+                            best = Some((provider, top.clone()));
+                        }
+                    } else {
+                        debug!(
+                            "[scan] NO MATCH: Best score {:.3} < threshold 0.3",
+                            top.confidence_score
                         );
                     }
-                    all_candidates.append(&mut candidates);
-                }
-            }
-
-            if !all_candidates.is_empty() {
-                all_candidates
-                    .sort_by(|a, b| b.confidence_score.partial_cmp(&a.confidence_score).unwrap());
-                let top = &all_candidates[0];
-                if top.confidence_score > 0.3 {
-                    debug!(
-                        "[scan] MATCH: '{}' from {} (score: {:.3})",
-                        top.title,
-                        top.provider_id.name(),
-                        top.confidence_score
-                    );
-                    if let Some(provider) = get_provider(top.provider_id) {
-                        best = Some((provider, top.clone()));
-                    }
-                } else {
-                    debug!(
-                        "[scan] NO MATCH: Best score {:.3} < threshold 0.3",
-                        top.confidence_score
-                    );
                 }
             }
 
@@ -987,18 +1002,29 @@ pub async fn scan_all_libraries(
                     Err(e) => error!("Failed to build series record {}: {}", folder_name, e),
                 }
             } else {
+                let local = crate::services::local_metadata_service::extract_local_series_metadata(
+                    &entry_path,
+                );
                 let record = SeriesRecord {
                     external_id: format!("manual_{}", rand::random::<u32>()),
                     provider_id: 0,
                     provider_name: "Manual".into(),
-                    title: folder_name.clone(),
+                    title: local.series_title.unwrap_or_else(|| folder_name.clone()),
+                    description: local.description,
+                    genres: local.genres,
+                    start_date: local.year,
                     path: folder_path,
                     ..Default::default()
                 };
-                if let Err(e) = repo.create_series(record).await {
-                    error!("Failed to insert manual series {}: {}", folder_name, e);
-                } else {
-                    added_count += 1;
+                match repo.create_series(record).await {
+                    Ok(created) => {
+                        added_count += 1;
+                        if sp.local_only {
+                            let book_folder = entry_path.to_string_lossy().to_string();
+                            scan_books_in_folder(&book_folder, &created, &repo).await;
+                        }
+                    }
+                    Err(e) => error!("Failed to insert manual series {}: {}", folder_name, e),
                 }
             }
         }

@@ -5,6 +5,8 @@ import { ToasterHandler } from '../common/ToasterHandler.tsx';
 import { Button } from '@/components/ui/button.tsx';
 import { Input } from '@/components/ui/input.tsx';
 import { Label } from '@/components/ui/label.tsx';
+import { Switch } from '@/components/ui/switch.tsx';
+import { Badge } from '@/components/ui/badge.tsx';
 import {
   Card,
   CardContent,
@@ -20,24 +22,36 @@ import {
   DialogTitle,
 } from '@/components/ui/dialog.tsx';
 import {
+  BookOpen,
   Folder,
   FolderOpen,
+  Library,
   Pencil,
   Plus,
   RefreshCw,
   Trash2,
 } from 'lucide-react';
 import { open } from '@tauri-apps/plugin-dialog';
+import type { DisplaySeries } from '@/interfaces/IDisplayBook.ts';
 
 interface ScanPath {
   id: string;
   name: string;
   path: string;
+  local_only: boolean;
+}
+
+function isUnderScanPath(seriesPath: string, scanPath: string): boolean {
+  const normalize = (p: string) => p.replace(/\\/g, '/').replace(/\/+$/, '');
+  const s = normalize(seriesPath);
+  const root = normalize(scanPath);
+  return s === root || s.startsWith(root + '/');
 }
 
 export default function LibrariesPage() {
   const { t } = useTranslation();
   const [scanPaths, setScanPaths] = React.useState<ScanPath[]>([]);
+  const [allSeries, setAllSeries] = React.useState<DisplaySeries[]>([]);
   const [isLoading, setIsLoading] = React.useState(true);
 
   const [dialogOpen, setDialogOpen] = React.useState(false);
@@ -45,6 +59,7 @@ export default function LibrariesPage() {
   const [editingId, setEditingId] = React.useState<string | null>(null);
   const [formName, setFormName] = React.useState('');
   const [formPath, setFormPath] = React.useState('');
+  const [formLocalOnly, setFormLocalOnly] = React.useState(false);
   const [isSaving, setIsSaving] = React.useState(false);
   const [isScanning, setIsScanning] = React.useState(false);
 
@@ -72,8 +87,12 @@ export default function LibrariesPage() {
   const loadScanPaths = React.useCallback(async () => {
     setIsLoading(true);
     try {
-      const paths = await TauriAPI.getAllScanPaths();
+      const [paths, series] = await Promise.all([
+        TauriAPI.getAllScanPaths(),
+        TauriAPI.getAllSeries(),
+      ]);
       setScanPaths(paths as ScanPath[]);
+      setAllSeries(series);
     } catch (error) {
       console.error('Failed to load scan paths:', error);
       ToasterHandler(t('error'), 'error');
@@ -85,11 +104,26 @@ export default function LibrariesPage() {
     loadScanPaths();
   }, [loadScanPaths]);
 
+  const libraryStats = React.useMemo(() => {
+    const stats = new Map<string, { seriesCount: number; bookCount: number }>();
+    for (const sp of scanPaths) {
+      const seriesInLibrary = allSeries.filter((s) =>
+        isUnderScanPath(s.path, sp.path)
+      );
+      stats.set(sp.id, {
+        seriesCount: seriesInLibrary.length,
+        bookCount: seriesInLibrary.reduce((sum, s) => sum + s.book_count, 0),
+      });
+    }
+    return stats;
+  }, [scanPaths, allSeries]);
+
   const openAddDialog = () => {
     setDialogMode('add');
     setEditingId(null);
     setFormName('');
     setFormPath('');
+    setFormLocalOnly(false);
     setDialogOpen(true);
   };
 
@@ -98,6 +132,7 @@ export default function LibrariesPage() {
     setEditingId(sp.id);
     setFormName(sp.name);
     setFormPath(sp.path);
+    setFormLocalOnly(sp.local_only);
     setDialogOpen(true);
   };
 
@@ -125,10 +160,15 @@ export default function LibrariesPage() {
     setIsSaving(true);
     try {
       if (dialogMode === 'add') {
-        await TauriAPI.createScanPath(formName, formPath);
+        await TauriAPI.createScanPath(formName, formPath, formLocalOnly);
         ToasterHandler(t('scanPathAdded'), 'success');
       } else if (editingId) {
-        await TauriAPI.updateScanPath(editingId, formName, formPath);
+        await TauriAPI.updateScanPath(
+          editingId,
+          formName,
+          formPath,
+          formLocalOnly
+        );
         ToasterHandler(t('scanPathUpdated'), 'success');
       }
       setDialogOpen(false);
@@ -192,16 +232,21 @@ export default function LibrariesPage() {
           </CardContent>
         </Card>
       ) : (
-        <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
+        <div className="grid gap-4 xl:grid-cols-2 2xl:grid-cols-3">
           {scanPaths.map((sp) => (
             <Card key={sp.id}>
               <CardHeader className="pb-3">
-                <div className="flex items-start justify-between">
+                <div className="flex items-start justify-between gap-2 flex-wrap">
                   <div className="flex items-center gap-2 min-w-0">
                     <Folder className="h-5 w-5 text-muted-foreground shrink-0" />
                     <CardTitle className="text-base truncate">
                       {sp.name}
                     </CardTitle>
+                    {sp.local_only && (
+                      <Badge variant="secondary" className="shrink-0">
+                        {t('forceLocalOnly')}
+                      </Badge>
+                    )}
                   </div>
                   <div className="flex gap-1 shrink-0">
                     <Button
@@ -225,10 +270,20 @@ export default function LibrariesPage() {
                   </div>
                 </div>
               </CardHeader>
-              <CardContent>
+              <CardContent className="space-y-2">
                 <CardDescription className="truncate" title={sp.path}>
                   {sp.path}
                 </CardDescription>
+                <div className="flex items-center gap-3 text-sm text-muted-foreground">
+                  <span className="flex items-center gap-1">
+                    <Library className="h-3.5 w-3.5" />
+                    {libraryStats.get(sp.id)?.seriesCount ?? 0} {t('series')}
+                  </span>
+                  <span className="flex items-center gap-1">
+                    <BookOpen className="h-3.5 w-3.5" />
+                    {libraryStats.get(sp.id)?.bookCount ?? 0} {t('books')}
+                  </span>
+                </div>
               </CardContent>
             </Card>
           ))}
@@ -276,6 +331,19 @@ export default function LibrariesPage() {
                   <FolderOpen className="h-4 w-4" />
                 </Button>
               </div>
+            </div>
+            <div className="flex items-center justify-between gap-4 rounded-lg border p-3">
+              <div className="space-y-0.5">
+                <Label htmlFor="lib-local-only">{t('forceLocalOnly')}</Label>
+                <p className="text-sm text-muted-foreground">
+                  {t('forceLocalOnlyDescription')}
+                </p>
+              </div>
+              <Switch
+                id="lib-local-only"
+                checked={formLocalOnly}
+                onCheckedChange={(checked) => setFormLocalOnly(checked)}
+              />
             </div>
           </div>
           <DialogFooter>

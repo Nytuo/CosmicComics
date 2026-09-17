@@ -40,6 +40,36 @@ pub fn is_image_file(name: &str) -> bool {
         .any(|ext| name.to_lowercase().ends_with(ext))
 }
 
+pub fn is_valid_book_entry(path: &std::path::Path) -> bool {
+    if path.is_file() {
+        return match path.extension().and_then(|e| e.to_str()) {
+            Some(ext) => VALID_BOOK_EXTENSION
+                .iter()
+                .any(|valid| valid.eq_ignore_ascii_case(ext)),
+            None => false,
+        };
+    }
+
+    if path.is_dir() {
+        return match std::fs::read_dir(path) {
+            Ok(entries) => entries.flatten().filter(|e| e.path().is_file()).any(|e| {
+                e.path()
+                    .extension()
+                    .and_then(|ext| ext.to_str())
+                    .map(|ext| {
+                        VALID_IMAGE_EXTENSION
+                            .iter()
+                            .any(|v| v.eq_ignore_ascii_case(ext))
+                    })
+                    .unwrap_or(false)
+            }),
+            Err(_) => false,
+        };
+    }
+
+    false
+}
+
 pub fn strip_outer_quotes(s: &str) -> &str {
     if s.starts_with('"') && s.ends_with('"') && s.len() >= 2 {
         &s[1..s.len() - 1]

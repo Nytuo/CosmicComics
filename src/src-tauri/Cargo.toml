@@ -51,6 +51,7 @@ base64 = "0.22"
 sha2 = "0.10"
 aes = "0.8"
 cbc = "0.1"
+quick-xml = { version = "0.36", features = ["serialize"] }
 
 [target.'cfg(target_os = "macos")'.dependencies]
 candle-core = { version = "0.9", optional = true, features = ["metal", "accelerate"] }

@@ -61,6 +61,7 @@ pub async fn insert_dc_infinite_book_to_db(
         marvel_private_key: creds_lock.marvel_private_key.clone(),
         google_books_api_key: creds_lock.google_books_api_key.clone(),
         open_library_api_key: creds_lock.open_library_api_key.clone(),
+        metron_api_key: creds_lock.metron_api_key.clone(),
         metron_username: creds_lock.metron_username.clone(),
         metron_password: creds_lock.metron_password.clone(),
     };

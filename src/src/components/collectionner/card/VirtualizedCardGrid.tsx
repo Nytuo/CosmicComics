@@ -1,0 +1,109 @@
+import * as React from 'react';
+import { useWindowVirtualizer } from '@tanstack/react-virtual';
+import CardWrapper from './CardWrapper.tsx';
+import type { DisplayBook, DisplaySeries } from '@/interfaces/IDisplayBook.ts';
+
+type BookOrSeries = DisplayBook | DisplaySeries;
+
+// Mirrors Card.tsx's actual footprint: `w-3xs` (256px) + `m-2` (16px horizontal
+// margin on each side), so the computed column count matches what the plain
+// flex-wrap layout would have produced at the same container width.
+const ITEM_SLOT_WIDTH = 288;
+
+// A rough initial guess for a row's height before it has been measured for
+// real.
+const ROW_HEIGHT_ESTIMATE = 420;
+
+interface VirtualizedCardGridProps {
+  items: BookOrSeries[];
+  handleOpenDetails: (
+    isBook: boolean,
+    item: BookOrSeries,
+    id: string | number
+  ) => void;
+}
+
+/**
+ * Windowed replacement for the `.cards-list` + `.map(CardWrapper)` pattern.
+ * Only renders the rows of cards currently near the viewport
+ */
+function VirtualizedCardGrid({
+  items,
+  handleOpenDetails,
+}: VirtualizedCardGridProps) {
+  const containerRef = React.useRef<HTMLDivElement>(null);
+  const [columns, setColumns] = React.useState(1);
+  const [scrollMargin, setScrollMargin] = React.useState(0);
+
+  React.useLayoutEffect(() => {
+    const el = containerRef.current;
+    if (!el) return;
+
+    const measure = () => {
+      setColumns(Math.max(1, Math.floor(el.clientWidth / ITEM_SLOT_WIDTH)));
+      setScrollMargin(el.getBoundingClientRect().top + window.scrollY);
+    };
+
+    measure();
+    const observer = new ResizeObserver(measure);
+    observer.observe(el);
+    window.addEventListener('resize', measure);
+    return () => {
+      observer.disconnect();
+      window.removeEventListener('resize', measure);
+    };
+  }, []);
+
+  const rowCount = Math.ceil(items.length / columns);
+
+  const virtualizer = useWindowVirtualizer({
+    count: rowCount,
+    estimateSize: () => ROW_HEIGHT_ESTIMATE,
+    overscan: 3,
+    scrollMargin,
+  });
+
+  return (
+    <div
+      ref={containerRef}
+      style={{
+        position: 'relative',
+        width: '100%',
+        height: virtualizer.getTotalSize(),
+      }}
+    >
+      {virtualizer.getVirtualItems().map((virtualRow) => {
+        const startIndex = virtualRow.index * columns;
+        const rowItems = items.slice(startIndex, startIndex + columns);
+
+        return (
+          <div
+            key={virtualRow.key}
+            data-index={virtualRow.index}
+            ref={virtualizer.measureElement}
+            className="cards-list"
+            style={{
+              position: 'absolute',
+              top: 0,
+              left: 0,
+              width: '100%',
+              transform: `translateY(${virtualRow.start - scrollMargin}px)`,
+            }}
+          >
+            {rowItems.map((item, i) => (
+              <CardWrapper
+                key={startIndex + i}
+                provider={item.provider_id}
+                handleOpenDetails={handleOpenDetails}
+                book={item}
+                type="book"
+              />
+            ))}
+          </div>
+        );
+      })}
+    </div>
+  );
+}
+
+export default VirtualizedCardGrid;

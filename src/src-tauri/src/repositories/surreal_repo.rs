@@ -19,6 +19,8 @@ pub struct SurrealRepo {
 
 impl SurrealRepo {
     pub async fn open(base_path: &str) -> Result<Self> {
+        let base_path = base_path.replace('\\', "/");
+        let base_path = base_path.as_str();
         let db_path = format!("{}/cosmiccomics_surreal", base_path);
         debug!("[SurrealRepo::open] creating dir at {}", db_path);
         std::fs::create_dir_all(Path::new(&db_path))?;
@@ -687,16 +689,17 @@ impl SurrealRepo {
             .unwrap_or(0))
     }
 
-    pub async fn create_scan_path(&self, name: &str, path: &str) -> Result<()> {
+    pub async fn create_scan_path(&self, name: &str, path: &str, local_only: bool) -> Result<()> {
         debug!(
-            "[SurrealRepo::create_scan_path] name='{}', path='{}'",
-            name, path
+            "[SurrealRepo::create_scan_path] name='{}', path='{}', local_only={}",
+            name, path, local_only
         );
         let response = self
             .db
-            .query("CREATE scan_path SET name = $name, path = $path")
+            .query("CREATE scan_path SET name = $name, path = $path, local_only = $local_only")
             .bind(("name", name.to_string()))
             .bind(("path", path.to_string()))
+            .bind(("local_only", local_only))
             .await;
         debug!(
             "[SurrealRepo::create_scan_path] query .await result ok={}",
@@ -762,11 +765,17 @@ impl SurrealRepo {
         Ok(())
     }
 
-    /// Update an existing scan path's name and path.
-    pub async fn update_scan_path(&self, id: &str, name: &str, path: &str) -> Result<()> {
+    /// Update an existing scan path's name, path, and local-only flag.
+    pub async fn update_scan_path(
+        &self,
+        id: &str,
+        name: &str,
+        path: &str,
+        local_only: bool,
+    ) -> Result<()> {
         debug!(
-            "[SurrealRepo::update_scan_path] id='{}', name='{}', path='{}'",
-            id, name, path
+            "[SurrealRepo::update_scan_path] id='{}', name='{}', path='{}', local_only={}",
+            id, name, path, local_only
         );
         let id_part = if let Some((_table, id)) = id.split_once(':') {
             id
@@ -775,10 +784,13 @@ impl SurrealRepo {
         };
 
         self.db
-            .query("UPDATE type::thing('scan_path', $id) SET name = $name, path = $path")
+            .query(
+                "UPDATE type::thing('scan_path', $id) SET name = $name, path = $path, local_only = $local_only",
+            )
             .bind(("id", id_part.to_string()))
             .bind(("name", name.to_string()))
             .bind(("path", path.to_string()))
+            .bind(("local_only", local_only))
             .await?
             .check()?;
 

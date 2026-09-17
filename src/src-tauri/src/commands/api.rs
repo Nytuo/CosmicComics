@@ -28,6 +28,7 @@ async fn get_creds(state: &State<'_, AppState>) -> ApiCredentials {
         marvel_private_key: creds_lock.marvel_private_key.clone(),
         google_books_api_key: creds_lock.google_books_api_key.clone(),
         open_library_api_key: creds_lock.open_library_api_key.clone(),
+        metron_api_key: creds_lock.metron_api_key.clone(),
         metron_username: creds_lock.metron_username.clone(),
         metron_password: creds_lock.metron_password.clone(),
     }
@@ -166,6 +167,7 @@ pub async fn metron_search_issues(
 ) -> Result<Value, String> {
     let creds_lock = state.creds.lock().await;
     let metron_creds = metron_service::MetronCredentials {
+        api_key: creds_lock.metron_api_key.clone(),
         username: creds_lock.metron_username.clone(),
         password: creds_lock.metron_password.clone(),
     };
@@ -187,6 +189,7 @@ pub async fn metron_search_series(
 ) -> Result<Value, String> {
     let creds_lock = state.creds.lock().await;
     let metron_creds = metron_service::MetronCredentials {
+        api_key: creds_lock.metron_api_key.clone(),
         username: creds_lock.metron_username.clone(),
         password: creds_lock.metron_password.clone(),
     };
@@ -209,6 +212,7 @@ pub async fn metron_get_comics(
 ) -> Result<Value, String> {
     let creds_lock = state.creds.lock().await;
     let metron_creds = metron_service::MetronCredentials {
+        api_key: creds_lock.metron_api_key.clone(),
         username: creds_lock.metron_username.clone(),
         password: creds_lock.metron_password.clone(),
     };
@@ -281,6 +285,7 @@ pub async fn metron_link_placeholder_to_path(
     );
 
     let metron_creds = metron_service::MetronCredentials {
+        api_key: creds.metron_api_key.clone(),
         username: creds.metron_username.clone(),
         password: creds.metron_password.clone(),
     };

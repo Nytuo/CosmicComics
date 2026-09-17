@@ -115,7 +115,7 @@ export const Card: React.FC<CardProps> = ({
         </div>
       )}
       <div className={styles.content}>
-        <h3 className="text-foreground">{title}</h3>
+        <h3 className="text-foreground line-clamp-1">{title}</h3>
         <p className="text-gray-400 m-0 break-keep line-clamp-2">
           {description ? description.trim() : t('no-description-available')}
         </p>

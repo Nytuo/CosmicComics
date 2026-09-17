@@ -52,6 +52,8 @@ pub struct ScanPathRecord {
     pub id: Option<RecordId>,
     pub name: String,
     pub path: String,
+    #[serde(default)]
+    pub local_only: bool,
 }
 
 /// A bookmark record.

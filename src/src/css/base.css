@@ -482,6 +482,19 @@ img {
   height: 10px;
 }
 
+::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+::-webkit-scrollbar-thumb {
+  background-color: var(--border, #6b7280);
+  border-radius: 6px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background-color: var(--muted-foreground, #9ca3af);
+}
+
 .circle-small {
   display: inline-block;
   position: relative;
