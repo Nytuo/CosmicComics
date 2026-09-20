@@ -24,7 +24,8 @@
     "prebuild:vite": "npm run sync:ios-icons",
     "tauri": "tauri",
     "format": "prettier . --write",
-    "format:check": "prettier . --check"
+    "format:check": "prettier . --check",
+    "lint": "eslint src"
   },
   "dependencies": {
     "@base-ui/react": "^1.2.0",
@@ -84,6 +85,7 @@
     "zod": "^4.3.6"
   },
   "devDependencies": {
+    "@eslint/js": "^9.39.3",
     "@tauri-apps/cli": "^2.11.4",
     "@types/react": "^19.2.14",
     "@types/react-dom": "^19.2.3",

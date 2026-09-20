@@ -1,4 +1,3 @@
-/* eslint-disable react-hooks/exhaustive-deps */
 import CollectionnerDrawer from '@/components/collectionner/CollectionnerManager.tsx';
 import React, { useEffect } from 'react';
 import * as TauriAPI from '@/API/TauriAPI';
