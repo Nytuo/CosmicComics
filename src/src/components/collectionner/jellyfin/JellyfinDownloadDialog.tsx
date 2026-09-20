@@ -29,7 +29,7 @@ export default function JellyfinDownloadDialog({
   const preparing = !state.total || percent >= 100;
 
   return (
-    <Dialog open={open}>
+    <Dialog open={open} adaptive={false}>
       <DialogContent
         showCloseButton={false}
         className="sm:max-w-md"
@@ -37,7 +37,7 @@ export default function JellyfinDownloadDialog({
         onPointerDownOutside={(e) => e.preventDefault()}
         onInteractOutside={(e) => e.preventDefault()}
       >
-        <DialogHeader>
+        <DialogHeader className="min-w-0">
           <DialogTitle className="truncate">{title}</DialogTitle>
           <DialogDescription>
             {preparing

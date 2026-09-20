@@ -30,11 +30,23 @@ import { useReadingSession } from './hooks/useReadingSession.ts';
 import { useTouchNavigation } from './hooks/useTouchNavigation.ts';
 import { usePlatform } from '@/hooks/use-platform.ts';
 import { extractBook } from '@/utils/bookPages.ts';
-
-const appWindow = Window.getCurrent();
+import { ReaderFilterOverlay } from './shared/ReaderFilterOverlay.tsx';
+import {
+  loadSeriesMemory,
+  saveSeriesMemory,
+  useReaderPrefs,
+  type ReaderPrefs,
+} from './shared/readerPrefs.ts';
+import { useWakeLock } from './shared/useWakeLock.ts';
+import { useProgressSaver } from './shared/useProgressSaver.ts';
+import { useBookContext } from './shared/useBookContext.ts';
+import EndOfBookDialog from './EndOfBookDialog.tsx';
+import ShortcutsDialog from './ShortcutsDialog.tsx';
+import ViewerProgressBar from './ViewerProgressBar.tsx';
 
 const preloadedImages: string[] = [];
 let bookID = 'NaID_' + Math.random() * 100500;
+let seriesID: string | null = null;
 let listofImg: any[] = [];
 let sessionCacheBust = Date.now();
 
@@ -70,6 +82,13 @@ export default function PersistentDrawerLeft() {
   const [isWidthMode, setIsWidthMode] = React.useState(false);
   const [smartPanelMode, setSmartPanelModeRaw] = React.useState(false);
   const platform = usePlatform();
+  const context = useBookContext(localStorage.getItem('currentBook'));
+  const { prefs: readerPrefs, update: updateReaderPrefs } = useReaderPrefs(
+    context.seriesId
+  );
+  const [endOpen, setEndOpen] = React.useState(false);
+  const [helpOpen, setHelpOpen] = React.useState(false);
+  const [libraryBookId, setLibraryBookId] = React.useState<string | null>(null);
   const setSmartPanelMode = React.useCallback(
     (value: boolean) => setSmartPanelModeRaw(platform.ai && value),
     [platform.ai]
@@ -251,9 +270,31 @@ export default function PersistentDrawerLeft() {
     const books = await TauriAPI.getBooksByPath(currentPath);
     if (books.length > 0) {
       bookID = books[0].id;
+      seriesID = books[0].series_id;
+      setLibraryBookId(bookID);
     } else {
       bookID = 'NaID_' + Math.random() * 100500;
+      seriesID = null;
     }
+    applySeriesMemory();
+  }
+
+  /** Re-opens the series the way it was last read (manga / double page / vertical). */
+  function applySeriesMemory() {
+    const memory = loadSeriesMemory(seriesID);
+    if (memory.readingMode === undefined && memory.spread === undefined) return;
+    setUserSettings((previous: any) => ({
+      ...previous,
+      ...(memory.readingMode !== undefined && {
+        Manga_Mode: memory.readingMode === 'rtl',
+        Vertical_Reader_Mode: memory.readingMode === 'vertical',
+      }),
+      ...(memory.spread !== undefined && { Double_Page_Mode: memory.spread }),
+    }));
+  }
+
+  function rememberForSeries(patch: Partial<ReaderPrefs>) {
+    saveSeriesMemory(seriesID, patch);
   }
 
   async function getFromDBLastPage(): Promise<number> {
@@ -610,6 +651,9 @@ export default function PersistentDrawerLeft() {
         }
       }
       window.scrollTo(0, 0);
+      if (currentPage >= totalPages && totalPages > 0) {
+        setEndOpen(true);
+      }
       if (currentPage < totalPages) {
         setCurrentPage(currentPage + 1);
         if (currentPage === totalPages - 1) {
@@ -748,9 +792,18 @@ export default function PersistentDrawerLeft() {
     PreviousPanel,
     NextPanel,
     Reader,
+    onToggleBookmark: () => TBM(),
+    onOpenSettings: () => setOpenBookSettings(true),
+    onShowHelp: () => setHelpOpen(true),
   });
   useJellyfinProgress(currentPage, imageTwo !== null, totalPages);
   useReadingSession(currentPage, imageTwo !== null, totalPages);
+  useWakeLock(readerPrefs.keepAwake);
+  useProgressSaver(
+    imageOne !== null || VIV_On ? libraryBookId : null,
+    Math.max(0, Math.min(currentPage, totalPages)),
+    totalPages
+  );
 
   useTouchNavigation({
     enabled: platform.mobile,
@@ -1144,8 +1197,20 @@ export default function PersistentDrawerLeft() {
     }, 500);
   }, [unzipStatus]);
 
+  const goToPage = (i: number) => {
+    setCurrentPage(i);
+    if (!VIV_On) {
+      Reader(listofImg, i);
+    } else {
+      document
+        .getElementById('imgViewer_' + i)
+        ?.scrollIntoView({ block: 'center' });
+    }
+  };
+
   return (
     <>
+      <ReaderFilterOverlay prefs={readerPrefs} />
       <div className="flex">
         <ViewerHeader
           open={open}
@@ -1157,6 +1222,7 @@ export default function PersistentDrawerLeft() {
           onRecenter={recenter}
           onToggleFullscreen={async () => {
             if (platform.mobile) return;
+            const appWindow = Window.getCurrent();
             if (await appWindow.isFullscreen()) {
               await appWindow.setFullscreen(false);
               setIsFullscreen(false);
@@ -1183,14 +1249,7 @@ export default function PersistentDrawerLeft() {
           currentPage={currentPage}
           onPageClick={(i) => {
             if (window.innerWidth < 768) handleDrawerClose();
-            setCurrentPage(i);
-            if (!VIV_On) {
-              Reader(listofImg, i);
-            } else {
-              const imgViewer = document.getElementById('imgViewer_' + i);
-              if (imgViewer === null) return;
-              imgViewer.scrollIntoView({ block: 'center' });
-            }
+            goToPage(i);
           }}
         />
         <main
@@ -1213,6 +1272,7 @@ export default function PersistentDrawerLeft() {
             zoomLevel={zoomLevel}
             rotation={rotation}
             preloadedImages={preloadedImages}
+            cropBorders={readerPrefs.cropBorders && !smartPanelMode}
           />
           <ViewerPanelDebugOverlay
             smartPanelMode={smartPanelMode}
@@ -1256,6 +1316,21 @@ export default function PersistentDrawerLeft() {
         </main>
       </div>
 
+      <ViewerProgressBar
+        page={Math.max(0, Math.min(currentPage, totalPages))}
+        lastIndex={totalPages}
+        reversed={mangaMode}
+        onSeek={goToPage}
+      />
+      <EndOfBookDialog
+        open={endOpen}
+        onOpenChange={setEndOpen}
+        title={context.book?.title ?? ''}
+        next={context.next}
+        onReadAgain={() => goToPage(0)}
+      />
+      <ShortcutsDialog open={helpOpen} onOpenChange={setHelpOpen} />
+
       <ReaderSettingsDialog
         openModal={openBookSettings}
         onClose={handleCloseBookSettings}
@@ -1286,6 +1361,10 @@ export default function PersistentDrawerLeft() {
         setSmartPanelMode={setSmartPanelMode}
         showPanelDebugOverlay={showPanelDebugOverlay}
         setShowPanelDebugOverlay={setShowPanelDebugOverlay}
+        readerPrefs={readerPrefs}
+        updateReaderPrefs={updateReaderPrefs}
+        onRememberMode={rememberForSeries}
+        onShowShortcuts={() => setHelpOpen(true)}
       />
     </>
   );
@@ -1327,7 +1406,7 @@ export default function PersistentDrawerLeft() {
     } else {
       setBaseHeight(window.innerHeight - navbar.offsetHeight - 15);
       const tempOrigin = origins;
-      if (origins[0][0] !== 0 || origins[1][0] !== 0) {
+      if (origins[0][0] !== 0 || (origins[1]?.[0] ?? 0) !== 0) {
         setOrigins([
           [0, 0],
           [0, 0],

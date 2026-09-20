@@ -4,7 +4,7 @@ import {
   type PlatformCapabilities,
 } from '@/API/TauriAPI';
 
-const looksMobile =
+export const looksMobile =
   typeof navigator !== 'undefined' &&
   /Android|iPhone|iPad|iPod/i.test(navigator.userAgent);
 

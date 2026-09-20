@@ -1,5 +1,6 @@
 import MovableImage from './MovableImage.tsx';
 import Magnifier from './Magnifier.tsx';
+import { useCroppedSrc } from './shared/useCroppedSrc.ts';
 
 interface ViewerImageDisplayProps {
   VIV_On: boolean;
@@ -16,6 +17,7 @@ interface ViewerImageDisplayProps {
   zoomLevel: number;
   rotation: number;
   preloadedImages: string[];
+  cropBorders?: boolean;
 }
 
 export default function ViewerImageDisplay({
@@ -25,15 +27,18 @@ export default function ViewerImageDisplay({
   isPanelZoomed,
   isTransitioning,
   panelTransform,
-  imageOne,
-  imageTwo,
+  imageOne: rawImageOne,
+  imageTwo: rawImageTwo,
   origins,
   baseWidth,
   baseHeight,
   zoomLevel,
   rotation,
   preloadedImages,
+  cropBorders = false,
 }: ViewerImageDisplayProps) {
+  const imageOne = useCroppedSrc(rawImageOne, cropBorders);
+  const imageTwo = useCroppedSrc(rawImageTwo, cropBorders);
   const resolvedWidth =
     typeof baseWidth === 'number' ? baseWidth + zoomLevel + 'px' : 'auto';
   const resolvedHeight =

@@ -2,12 +2,23 @@ import ViewerDrawer from '@/components/viewer/ViewerDrawer.tsx';
 import { lazy, Suspense } from 'react';
 
 const EpubReader = lazy(() => import('@/components/viewer/EpubReader.tsx'));
-import { useEffect } from 'react';
+const MobileViewer = lazy(
+  () => import('@/components/viewer/mobile/MobileViewer.tsx')
+);
+import { useEffect, useState } from 'react';
 import * as TauriAPI from '@/API/TauriAPI';
+import { loadPlatform } from '@/hooks/use-platform.ts';
+import { useMobileLayout } from '@/hooks/use-mobile-layout.ts';
 
 function Viewer() {
   const book = localStorage.getItem('currentBook') ?? '';
   const isEpub = book.toLowerCase().endsWith('.epub');
+  const mobile = useMobileLayout();
+  const [platformKnown, setPlatformKnown] = useState(false);
+
+  useEffect(() => {
+    loadPlatform().then(() => setPlatformKnown(true));
+  }, []);
 
   useEffect(() => {
     document.title = 'Viewer';
@@ -30,11 +41,17 @@ function Viewer() {
     fetchLocation();
   }, []);
 
+  if (!platformKnown) return null;
+
   return (
     <>
       {isEpub ? (
         <Suspense fallback={null}>
           <EpubReader path={book} />
+        </Suspense>
+      ) : mobile ? (
+        <Suspense fallback={null}>
+          <MobileViewer />
         </Suspense>
       ) : (
         <ViewerDrawer />

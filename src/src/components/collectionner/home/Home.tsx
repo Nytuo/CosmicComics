@@ -1,8 +1,6 @@
-import * as TauriAPI from '@/API/TauriAPI.ts';
 import VirtualizedCardGrid from '@/components/collectionner/card/VirtualizedCardGrid.tsx';
 import { useEffect, useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import type { DisplayBook, DisplaySeries } from '@/interfaces/IDisplayBook.ts';
 import {
   Tabs,
   TabsContent,
@@ -13,11 +11,10 @@ import { Button } from '@/components/ui/button.tsx';
 import { Plus } from 'lucide-react';
 import {
   jellyfinRef,
-  loadJellyfinLibrary,
   navFor,
-  type JellyfinLibraryData,
   type JellyfinNav,
 } from '@/API/jellyfinLibrary.ts';
+import { useLibraryData } from '@/components/collectionner/home/useLibraryData.ts';
 import SearchFilterBar, {
   applySearchFilterSort,
   defaultFilterState,
@@ -42,29 +39,19 @@ function Home({
   onOpenLibraries: () => void;
 }) {
   const { t } = useTranslation();
-  const [allBooks, setAllBooks] = useState<DisplayBook[]>([]);
-  const [allSeries, setAllSeries] = useState<DisplaySeries[]>([]);
-  const [readingBooks, setReadingBooks] = useState<DisplayBook[]>([]);
-  const [downloadBooks, setDownloadBooks] = useState<DisplayBook[]>([]);
-  const [jellyfin, setJellyfin] = useState<JellyfinLibraryData | null>(null);
-  const [isLoading, setIsLoading] = useState(true);
+  const {
+    books: mergedBooks,
+    series: mergedSeries,
+    reading: mergedReading,
+    downloads: downloadBooks,
+    jellyfin,
+    isLoading,
+    expiredServers,
+  } = useLibraryData(CosmicComicsTemp, refreshKey);
   const [filterState, setFilterState] =
     useState<SearchFilterState>(defaultFilterState);
   const [activeTab, setActiveTab] = useState('reading');
   const [activeAllSubTab, setActiveAllSubTab] = useState('series');
-
-  const mergedBooks = useMemo(
-    () => [...allBooks, ...(jellyfin?.books ?? [])],
-    [allBooks, jellyfin]
-  );
-  const mergedSeries = useMemo(
-    () => [...allSeries, ...(jellyfin?.series ?? [])],
-    [allSeries, jellyfin]
-  );
-  const mergedReading = useMemo(
-    () => [...readingBooks, ...(jellyfin?.reading ?? [])],
-    [readingBooks, jellyfin]
-  );
 
   const filteredBooks = useMemo(
     () => applySearchFilterSort(mergedBooks, filterState),
@@ -116,44 +103,7 @@ function Home({
   useEffect(() => {
     document.getElementsByTagName('body')[0].style.background =
       'var(--theme-gradient, var(--background))';
-
-    const loadData = async () => {
-      setIsLoading(true);
-
-      try {
-        const books = await TauriAPI.getAllBooks();
-        const realBooks = books.filter((b) => b.path && b.path.trim() !== '');
-        setAllBooks(realBooks);
-        setReadingBooks(realBooks.filter((b) => b.reading));
-
-        const downloadPath = CosmicComicsTemp + '/downloads';
-        setDownloadBooks(books.filter((b) => b.path?.includes(downloadPath)));
-      } catch (e) {
-        console.error('Failed to load books:', e);
-      }
-
-      try {
-        const series = await TauriAPI.getAllSeries();
-        setAllSeries(series);
-      } catch (e) {
-        console.error('Failed to load series:', e);
-      }
-
-      setIsLoading(false);
-    };
-
-    loadData();
-
-    let alive = true;
-    loadJellyfinLibrary(!!refreshKey)
-      .then((data) => alive && setJellyfin(data))
-      .catch((e) => console.error('Failed to load Jellyfin:', e));
-    return () => {
-      alive = false;
-    };
-  }, [CosmicComicsTemp, refreshKey]);
-
-  const expiredServers = (jellyfin?.sources ?? []).filter((s) => s.expired);
+  }, []);
 
   const openBook = (isBook: boolean, item: any, id: any) => {
     const ref = jellyfinRef(item);

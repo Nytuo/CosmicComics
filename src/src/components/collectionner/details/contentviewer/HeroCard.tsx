@@ -7,7 +7,6 @@ import {
   ExternalLink,
   RefreshCw,
   SearchCheck,
-  CloudDownload,
   Star,
   Calendar,
   Trash2,
@@ -17,53 +16,16 @@ import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Card, CardContent } from '@/components/ui/card';
 import { Separator } from '@/components/ui/separator';
-import { Progress } from '@/components/ui/progress';
-import { Spinner } from '@/components/ui/spinner';
 import { ActionButton } from '../../../common/ActionButton.tsx';
-import type { BookOrSeries } from './useContentViewer';
 import type { DisplayBook, DisplaySeries } from '@/interfaces/IDisplayBook.ts';
 import { providerEnum } from '@/utils/utils.ts';
-import type { IMarvelUnlimitedDownloadProgress } from '@/interfaces/IMarvelUnlimited';
-import type { IDCInfiniteDownloadProgress } from '@/interfaces/IDCInfinite';
-import type { IVizDownloadProgress } from '@/interfaces/IViz';
 import { openPath } from '@tauri-apps/plugin-opener';
 import { ToasterHandler } from '../../../common/ToasterHandler.tsx';
-import { getProvider } from '@/API/providers/ProviderRegistry.ts';
+import { useMobileLayout } from '@/hooks/use-mobile-layout.ts';
+import MobileHeroCard from '@/components/mobile/MobileHeroCard.tsx';
+import { DownloaderAction, type HeroCardProps } from './heroShared.tsx';
 
-interface HeroCardProps {
-  TheBook: BookOrSeries;
-  type: 'series' | 'volume';
-  provider: number;
-  externalUrl: string | null;
-  coverUrl: string;
-  title: string;
-  dateDisplay: React.ReactNode;
-  rating: number | null;
-  favorite: boolean;
-  hasFile: boolean | string | null;
-  downloadProgress?:
-    | IMarvelUnlimitedDownloadProgress
-    | IDCInfiniteDownloadProgress
-    | IVizDownloadProgress;
-  onDownloaderDetailPage?: (comic: any) => void;
-  onPlay: () => void;
-  onFavoriteToggle: () => void;
-  onStatusRead: () => void;
-  onStatusReading?: () => void;
-  onStatusUnread: () => void;
-  onRatingChange: (star: number) => void;
-  onEditClick?: () => void;
-  onRefreshMeta?: () => void;
-  onRematchClick?: () => void;
-  onDelete?: () => void;
-  onBack?: () => void;
-  statusBadge: React.ReactNode;
-  remote?: boolean;
-  playLabel?: string;
-  extraActions?: React.ReactNode;
-}
-
-export function HeroCard({
+function DesktopHeroCard({
   TheBook,
   type,
   provider,
@@ -152,59 +114,12 @@ export function HeroCard({
                   )}
                 </h1>
 
-                {(provider === providerEnum.MarvelUnlimited ||
-                  provider === providerEnum.DCInfinite ||
-                  provider === providerEnum.Viz) &&
-                  onDownloaderDetailPage && (
-                    <div className="mt-2">
-                      {downloadProgress?.status === 'downloading' ? (
-                        <Badge variant="outline" className="gap-1">
-                          <Spinner size="sm" />
-                          {`${downloadProgress.currentPage}/${downloadProgress.totalPages}`}
-                        </Badge>
-                      ) : downloadProgress?.status === 'archiving' ||
-                        downloadProgress?.status === 'db_inserting' ? (
-                        <div className="flex flex-col gap-1">
-                          <Badge
-                            variant="outline"
-                            className="gap-1 whitespace-nowrap w-fit"
-                          >
-                            <Spinner size="sm" />
-                            {downloadProgress.message || t('Saving…')}
-                          </Badge>
-                          <Progress
-                            value={100}
-                            className="h-1 w-full animate-pulse"
-                          />
-                        </div>
-                      ) : downloadProgress?.status === 'completed' ? (
-                        <Badge className="bg-green-500/10 text-green-500 border-green-500/20">
-                          {t('downloaded')}
-                        </Badge>
-                      ) : downloadProgress?.status === 'error' ? (
-                        <Button
-                          size="sm"
-                          variant="destructive"
-                          onClick={() => onDownloaderDetailPage(TheBook)}
-                        >
-                          <CloudDownload className="h-4 w-4 mr-2" />
-                          {t('retry-download')}
-                        </Button>
-                      ) : (
-                        <Button
-                          onClick={() => onDownloaderDetailPage(TheBook)}
-                          size="sm"
-                        >
-                          <CloudDownload className="h-4 w-4 mr-2" />
-                          {t(
-                            'Download from ' +
-                              getProvider(provider)?.badgeName ||
-                              'unknown-provider'
-                          )}
-                        </Button>
-                      )}
-                    </div>
-                  )}
+                <DownloaderAction
+                  TheBook={TheBook}
+                  provider={provider}
+                  downloadProgress={downloadProgress}
+                  onDownloaderDetailPage={onDownloaderDetailPage}
+                />
               </div>
 
               <div className="flex flex-wrap items-center gap-2">
@@ -437,5 +352,14 @@ export function HeroCard({
         </CardContent>
       </Card>
     </>
+  );
+}
+
+export function HeroCard(props: HeroCardProps) {
+  const mobile = useMobileLayout();
+  return mobile ? (
+    <MobileHeroCard {...props} />
+  ) : (
+    <DesktopHeroCard {...props} />
   );
 }

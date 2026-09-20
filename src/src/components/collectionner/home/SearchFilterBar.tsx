@@ -153,7 +153,7 @@ export function applySearchFilterSort<T extends Filterable>(
     .sort((a, b) => compareItems(a, b, state.sort, state.order));
 }
 
-function activeFilterCount(state: SearchFilterState): number {
+export function activeFilterCount(state: SearchFilterState): number {
   let count = 0;
   const rs = state.readingStatus;
   if (rs.read) count++;
@@ -176,21 +176,21 @@ interface SearchFilterBarProps {
 
 const ALL = '__all__';
 
-function SearchFilterBar({
+/** Status / source / favourite filters; used in a popover on desktop and a drawer on phones. */
+export function FilterPanel({
   state,
   onChange,
-  totalCount,
-  filteredCount,
   jellyfinSources = [],
-}: SearchFilterBarProps) {
+}: {
+  state: SearchFilterState;
+  onChange: (next: SearchFilterState) => void;
+  jellyfinSources?: JellyfinSource[];
+}) {
   const { t } = useTranslation();
-
   const set = <K extends keyof SearchFilterState>(
     key: K,
     value: SearchFilterState[K]
   ) => onChange({ ...state, [key]: value });
-
-  const filterCount = activeFilterCount(state);
   const selectedSource = jellyfinSources.find(
     (source) => source.server.id === state.serverId
   );
@@ -208,6 +208,143 @@ function SearchFilterBar({
       }))
   );
 
+  return (
+    <div className="space-y-4">
+      <div className="space-y-2">
+        <p className="text-xs font-medium text-muted-foreground">
+          {t('status')}
+        </p>
+        {(['read', 'reading', 'unread'] as const).map((key) => (
+          <label key={key} className="flex items-center gap-2 cursor-pointer">
+            <Checkbox
+              checked={state.readingStatus[key]}
+              onCheckedChange={(v) =>
+                set('readingStatus', {
+                  ...state.readingStatus,
+                  [key]: !!v,
+                })
+              }
+            />
+            <Label className="cursor-pointer text-sm">
+              {t(
+                key === 'read'
+                  ? 'mkread'
+                  : key === 'reading'
+                    ? 'mkreading'
+                    : 'mkunread'
+              )}
+            </Label>
+          </label>
+        ))}
+      </div>
+
+      {jellyfinSources.length > 0 && (
+        <div className="space-y-2">
+          <p className="text-xs font-medium text-muted-foreground">
+            {t('filter_source')}
+          </p>
+          <Select
+            value={state.source}
+            onValueChange={(v) =>
+              onChange({
+                ...state,
+                source: v as SearchFilterState['source'],
+                serverId: '',
+                libraryId: '',
+              })
+            }
+          >
+            <SelectTrigger size="sm" className="w-full">
+              <SelectValue />
+            </SelectTrigger>
+            <SelectContent>
+              <SelectItem value="all">{t('filter_source_all')}</SelectItem>
+              <SelectItem value="local">{t('filter_source_local')}</SelectItem>
+              <SelectItem value="jellyfin">Jellyfin</SelectItem>
+            </SelectContent>
+          </Select>
+
+          {state.source === 'jellyfin' && (
+            <>
+              {jellyfinSources.length > 1 && (
+                <Select
+                  value={state.serverId || ALL}
+                  onValueChange={(v) =>
+                    onChange({
+                      ...state,
+                      serverId: v === ALL ? '' : v,
+                      libraryId: '',
+                    })
+                  }
+                >
+                  <SelectTrigger size="sm" className="w-full">
+                    <SelectValue />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value={ALL}>
+                      {t('filter_all_servers')}
+                    </SelectItem>
+                    {jellyfinSources.map((source) => (
+                      <SelectItem
+                        key={source.server.id}
+                        value={source.server.id}
+                      >
+                        {source.server.name} · {source.server.user_name}
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+              )}
+              <Select
+                value={state.libraryId || ALL}
+                onValueChange={(v) => set('libraryId', v === ALL ? '' : v)}
+              >
+                <SelectTrigger size="sm" className="w-full">
+                  <SelectValue />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value={ALL}>
+                    {t('filter_all_libraries')}
+                  </SelectItem>
+                  {libraryChoices.map((library) => (
+                    <SelectItem key={library.id} value={library.id}>
+                      {library.label}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+            </>
+          )}
+        </div>
+      )}
+
+      <label className="flex items-center gap-2 cursor-pointer">
+        <Checkbox
+          checked={state.favoriteOnly}
+          onCheckedChange={(v) => set('favoriteOnly', !!v)}
+        />
+        <Star className="h-3.5 w-3.5 text-yellow-500" />
+        <Label className="cursor-pointer text-sm">{t('favorite')}</Label>
+      </label>
+    </div>
+  );
+}
+
+function SearchFilterBar({
+  state,
+  onChange,
+  totalCount,
+  filteredCount,
+  jellyfinSources = [],
+}: SearchFilterBarProps) {
+  const { t } = useTranslation();
+
+  const set = <K extends keyof SearchFilterState>(
+    key: K,
+    value: SearchFilterState[K]
+  ) => onChange({ ...state, [key]: value });
+
+  const filterCount = activeFilterCount(state);
   const hasAnyFilter =
     state.query !== '' ||
     filterCount > 0 ||
@@ -250,128 +387,12 @@ function SearchFilterBar({
           </Button>
         </PopoverTrigger>
 
-        <PopoverContent align="start" className="w-56 space-y-4">
-          <div className="space-y-2">
-            <p className="text-xs font-medium text-muted-foreground">
-              {t('status')}
-            </p>
-            {(['read', 'reading', 'unread'] as const).map((key) => (
-              <label
-                key={key}
-                className="flex items-center gap-2 cursor-pointer"
-              >
-                <Checkbox
-                  checked={state.readingStatus[key]}
-                  onCheckedChange={(v) =>
-                    set('readingStatus', {
-                      ...state.readingStatus,
-                      [key]: !!v,
-                    })
-                  }
-                />
-                <Label className="cursor-pointer text-sm">
-                  {t(
-                    key === 'read'
-                      ? 'mkread'
-                      : key === 'reading'
-                        ? 'mkreading'
-                        : 'mkunread'
-                  )}
-                </Label>
-              </label>
-            ))}
-          </div>
-
-          {jellyfinSources.length > 0 && (
-            <div className="space-y-2">
-              <p className="text-xs font-medium text-muted-foreground">
-                {t('filter_source')}
-              </p>
-              <Select
-                value={state.source}
-                onValueChange={(v) =>
-                  onChange({
-                    ...state,
-                    source: v as SearchFilterState['source'],
-                    serverId: '',
-                    libraryId: '',
-                  })
-                }
-              >
-                <SelectTrigger size="sm" className="w-full">
-                  <SelectValue />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="all">{t('filter_source_all')}</SelectItem>
-                  <SelectItem value="local">
-                    {t('filter_source_local')}
-                  </SelectItem>
-                  <SelectItem value="jellyfin">Jellyfin</SelectItem>
-                </SelectContent>
-              </Select>
-
-              {state.source === 'jellyfin' && (
-                <>
-                  {jellyfinSources.length > 1 && (
-                    <Select
-                      value={state.serverId || ALL}
-                      onValueChange={(v) =>
-                        onChange({
-                          ...state,
-                          serverId: v === ALL ? '' : v,
-                          libraryId: '',
-                        })
-                      }
-                    >
-                      <SelectTrigger size="sm" className="w-full">
-                        <SelectValue />
-                      </SelectTrigger>
-                      <SelectContent>
-                        <SelectItem value={ALL}>
-                          {t('filter_all_servers')}
-                        </SelectItem>
-                        {jellyfinSources.map((source) => (
-                          <SelectItem
-                            key={source.server.id}
-                            value={source.server.id}
-                          >
-                            {source.server.name} · {source.server.user_name}
-                          </SelectItem>
-                        ))}
-                      </SelectContent>
-                    </Select>
-                  )}
-                  <Select
-                    value={state.libraryId || ALL}
-                    onValueChange={(v) => set('libraryId', v === ALL ? '' : v)}
-                  >
-                    <SelectTrigger size="sm" className="w-full">
-                      <SelectValue />
-                    </SelectTrigger>
-                    <SelectContent>
-                      <SelectItem value={ALL}>
-                        {t('filter_all_libraries')}
-                      </SelectItem>
-                      {libraryChoices.map((library) => (
-                        <SelectItem key={library.id} value={library.id}>
-                          {library.label}
-                        </SelectItem>
-                      ))}
-                    </SelectContent>
-                  </Select>
-                </>
-              )}
-            </div>
-          )}
-
-          <label className="flex items-center gap-2 cursor-pointer">
-            <Checkbox
-              checked={state.favoriteOnly}
-              onCheckedChange={(v) => set('favoriteOnly', !!v)}
-            />
-            <Star className="h-3.5 w-3.5 text-yellow-500" />
-            <Label className="cursor-pointer text-sm">{t('favorite')}</Label>
-          </label>
+        <PopoverContent align="start" className="w-56">
+          <FilterPanel
+            state={state}
+            onChange={onChange}
+            jellyfinSources={jellyfinSources}
+          />
         </PopoverContent>
       </Popover>
 

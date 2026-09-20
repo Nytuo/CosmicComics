@@ -17,6 +17,18 @@ export interface KeyboardShortcutsParams {
   PreviousPanel: () => void;
   NextPanel: () => void;
   Reader: (imgs: any[], page: number) => void;
+  onToggleBookmark?: () => void;
+  onOpenSettings?: () => void;
+  onShowHelp?: () => void;
+}
+
+/** Keys pressed while typing or with a dialog open must not turn pages. */
+function shouldIgnore(target: EventTarget | null): boolean {
+  const el = target as HTMLElement | null;
+  if (el?.closest?.('input, textarea, select, [contenteditable="true"]')) {
+    return true;
+  }
+  return !!document.querySelector('[role="dialog"][data-state="open"]');
 }
 
 export function useKeyboardShortcuts(params: KeyboardShortcutsParams) {
@@ -37,11 +49,42 @@ export function useKeyboardShortcuts(params: KeyboardShortcutsParams) {
     PreviousPanel,
     NextPanel,
     Reader,
+    onToggleBookmark,
+    onOpenSettings,
+    onShowHelp,
   } = params;
 
   React.useLayoutEffect(() => {
-    function keyListener(e: { ctrlKey: any; shiftKey: any; key: string }) {
-      if (!e.ctrlKey && !e.shiftKey && e.key === 'ArrowLeft') {
+    function keyListener(e: {
+      ctrlKey: any;
+      shiftKey: any;
+      key: string;
+      target: EventTarget | null;
+    }) {
+      if (shouldIgnore(e.target)) return;
+      if (
+        !e.ctrlKey &&
+        !e.shiftKey &&
+        (e.key === ' ' || e.key === 'PageDown')
+      ) {
+        // eslint-disable-next-line @typescript-eslint/no-unused-expressions
+        smartPanelMode ? NextPanel() : NextPage();
+      } else if (!e.ctrlKey && !e.shiftKey && e.key === 'PageUp') {
+        // eslint-disable-next-line @typescript-eslint/no-unused-expressions
+        smartPanelMode ? PreviousPanel() : PreviousPage();
+      } else if (!e.ctrlKey && !e.shiftKey && e.key === 'Home') {
+        setCurrentPage(0);
+        Reader(listofImgState, 0);
+      } else if (!e.ctrlKey && !e.shiftKey && e.key === 'End') {
+        setCurrentPage(listofImgState.length - 1);
+        Reader(listofImgState, listofImgState.length - 1);
+      } else if (!e.ctrlKey && !e.shiftKey && e.key === 'b') {
+        onToggleBookmark?.();
+      } else if (!e.ctrlKey && !e.shiftKey && e.key === 's') {
+        onOpenSettings?.();
+      } else if (e.key === '?') {
+        onShowHelp?.();
+      } else if (!e.ctrlKey && !e.shiftKey && e.key === 'ArrowLeft') {
         // eslint-disable-next-line @typescript-eslint/no-unused-expressions
         smartPanelMode ? PreviousPanel() : PreviousPage();
       } else if (!e.ctrlKey && !e.shiftKey && e.key === 'ArrowRight') {

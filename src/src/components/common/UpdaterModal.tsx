@@ -151,6 +151,7 @@ export default function UpdaterModal() {
       />
 
       <Dialog
+        adaptive={false}
         open={open}
         onOpenChange={(next) => {
           if (!isBlocked) setOpen(next);

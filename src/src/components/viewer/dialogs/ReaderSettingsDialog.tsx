@@ -18,13 +18,16 @@ import {
   TooltipContent,
   TooltipTrigger,
 } from '@/components/ui/tooltip';
-import { BookOpen, Check, X, Heart, HeartOff, Palette } from 'lucide-react';
-import { ToasterHandler } from '../../common/ToasterHandler.tsx';
-import * as TauriAPI from '@/API/TauriAPI';
+import { Keyboard, Palette } from 'lucide-react';
 import { modifyConfigJson } from '@/utils/Fetchers.ts';
 import { IUserSettings } from '@/interfaces/IUserSettings.ts';
 import { JSX } from 'react';
 import { usePlatform } from '@/hooks/use-platform.ts';
+import BookQuickActions from '../shared/BookQuickActions.tsx';
+import ReaderFilterControls, {
+  SwitchRow,
+} from '../shared/ReaderFilterControls.tsx';
+import type { ReaderPrefs } from '../shared/readerPrefs.ts';
 
 /**
  * A dialog component for creating a new account (used in the login screen for first setup).
@@ -83,6 +86,10 @@ export default function ReaderSettingsDialog({
   setSmartPanelMode,
   showPanelDebugOverlay,
   setShowPanelDebugOverlay,
+  readerPrefs,
+  updateReaderPrefs,
+  onRememberMode,
+  onShowShortcuts,
 }: {
   onClose: any;
   openModal: boolean;
@@ -113,6 +120,11 @@ export default function ReaderSettingsDialog({
   setSmartPanelMode: any;
   showPanelDebugOverlay: boolean;
   setShowPanelDebugOverlay: (v: boolean) => void;
+  readerPrefs: ReaderPrefs;
+  updateReaderPrefs: (patch: Partial<ReaderPrefs>) => void;
+  /** Persist the reading mode for the current series. */
+  onRememberMode: (patch: Partial<ReaderPrefs>) => void;
+  onShowShortcuts: () => void;
 }): JSX.Element {
   const { t } = useTranslation();
   const platform = usePlatform();
@@ -214,6 +226,7 @@ export default function ReaderSettingsDialog({
         if (event.target.checked) {
           setDoublePageMode(true);
           setDoublePage(true);
+          onRememberMode({ spread: true });
           try {
             modifyConfigJson('Double_Page_Mode', 'true');
           } catch (e) {
@@ -222,6 +235,7 @@ export default function ReaderSettingsDialog({
         } else {
           setDoublePageMode(false);
           setDoublePage(false);
+          onRememberMode({ spread: false });
           try {
             modifyConfigJson('Double_Page_Mode', 'false');
           } catch (e) {
@@ -282,30 +296,36 @@ export default function ReaderSettingsDialog({
       case 'Manga_Mode':
         if (event.target.checked) {
           setMangaMode(true);
+          onRememberMode({ readingMode: 'rtl' });
           modifyConfigJson('Manga_Mode', 'true');
         } else {
           setMangaMode(false);
+          onRememberMode({ readingMode: 'ltr' });
           modifyConfigJson('Manga_Mode', 'false');
         }
         break;
       case 'Vertical_Reader_Mode':
         if (event.target.checked) {
           setVIVOn(true);
+          onRememberMode({ readingMode: 'vertical' });
           modifyConfigJson('Vertical_Reader_Mode', 'true');
         } else {
           setVIVOn(false);
+          onRememberMode({ readingMode: 'ltr' });
           modifyConfigJson('Vertical_Reader_Mode', 'false');
         }
         break;
       case 'webToonMode':
         if (event.target.checked) {
           modifyConfigJson('WebToonMode', 'true');
+          onRememberMode({ readingMode: 'vertical' });
           setVIVOn(true);
           setWebToonMode(true);
           fixWidth();
           state[7] = { Vertical_Reader_Mode: true };
         } else {
           modifyConfigJson('WebToonMode', 'false');
+          onRememberMode({ readingMode: 'ltr' });
           setVIVOn(false);
           setWebToonMode(false);
           fixHeight();
@@ -370,8 +390,6 @@ export default function ReaderSettingsDialog({
     }
   };
 
-  const [isFavorite, setIsFavorite] = React.useState(false);
-
   return (
     <Dialog
       open={openModal}
@@ -383,101 +401,8 @@ export default function ReaderSettingsDialog({
         <DialogHeader>
           <DialogTitle>{t('book_settings')}</DialogTitle>
         </DialogHeader>
-        <div className="flex justify-center">
-          <Tooltip>
-            <TooltipTrigger asChild>
-              <Button
-                variant="ghost"
-                size="icon"
-                onClick={async () => {
-                  ToasterHandler(t('marked_as_read'), 'success');
-                  const books = await TauriAPI.getBooksByPath(
-                    localStorage.getItem('currentBook') ?? ''
-                  );
-                  if (books.length > 0) {
-                    await TauriAPI.updateBookStatusOne('read', books[0].id);
-                  }
-                }}
-              >
-                <Check className="h-5 w-5" />
-              </Button>
-            </TooltipTrigger>
-            <TooltipContent>{t('mkread')}</TooltipContent>
-          </Tooltip>
-          <Tooltip>
-            <TooltipTrigger asChild>
-              <Button
-                variant="ghost"
-                size="icon"
-                id="readingbtndetails"
-                onClick={async () => {
-                  ToasterHandler(t('marked_as_reading'), 'success');
-                  const books = await TauriAPI.getBooksByPath(
-                    localStorage.getItem('currentBook') ?? ''
-                  );
-                  if (books.length > 0) {
-                    await TauriAPI.updateBookStatusOne('reading', books[0].id);
-                  }
-                }}
-              >
-                <BookOpen className="h-5 w-5" />
-              </Button>
-            </TooltipTrigger>
-            <TooltipContent>{t('mkreading')}</TooltipContent>
-          </Tooltip>
-          <Tooltip>
-            <TooltipTrigger asChild>
-              <Button
-                variant="ghost"
-                size="icon"
-                id="decheckbtn"
-                onClick={async () => {
-                  ToasterHandler(t('marked_as_unread'), 'success');
-                  const books = await TauriAPI.getBooksByPath(
-                    localStorage.getItem('currentBook') ?? ''
-                  );
-                  if (books.length > 0) {
-                    await TauriAPI.updateBookStatusOne('unread', books[0].id);
-                  }
-                }}
-              >
-                <X className="h-5 w-5" />
-              </Button>
-            </TooltipTrigger>
-            <TooltipContent>{t('mkunread')}</TooltipContent>
-          </Tooltip>
-          <Tooltip>
-            <TooltipTrigger asChild>
-              <Button
-                variant="ghost"
-                size="icon"
-                id="favoritebtn"
-                onClick={async () => {
-                  const books = await TauriAPI.getBooksByPath(
-                    localStorage.getItem('currentBook') ?? ''
-                  );
-                  if (books.length > 0) {
-                    const nowFav = await TauriAPI.toggleFavorite(
-                      'book',
-                      books[0].id
-                    );
-                    setIsFavorite(nowFav);
-                    ToasterHandler(
-                      nowFav ? t('add_fav') : t('remove_fav'),
-                      'success'
-                    );
-                  }
-                }}
-              >
-                {isFavorite ? (
-                  <Heart className="h-5 w-5 fill-current" />
-                ) : (
-                  <HeartOff className="h-5 w-5" />
-                )}
-              </Button>
-            </TooltipTrigger>
-            <TooltipContent>{t('toogle_fav')}</TooltipContent>
-          </Tooltip>
+        <BookQuickActions />
+        <div className="flex justify-center gap-1">
           <Tooltip>
             <TooltipTrigger asChild>
               <Button
@@ -498,6 +423,19 @@ export default function ReaderSettingsDialog({
               </Button>
             </TooltipTrigger>
             <TooltipContent>{t('auto_bg_color')}</TooltipContent>
+          </Tooltip>
+          <Tooltip>
+            <TooltipTrigger asChild>
+              <Button
+                variant="ghost"
+                size="icon"
+                aria-label={t('shortcuts_title')}
+                onClick={onShowShortcuts}
+              >
+                <Keyboard className="h-5 w-5" />
+              </Button>
+            </TooltipTrigger>
+            <TooltipContent>{t('shortcuts_title')}</TooltipContent>
           </Tooltip>
         </div>
         <div className="w-full space-y-4">
@@ -575,6 +513,21 @@ export default function ReaderSettingsDialog({
             min={1}
             max={60}
           />
+          <h3 className="text-sm font-medium text-muted-foreground">
+            {t('reader_filters')}
+          </h3>
+          <ReaderFilterControls
+            prefs={readerPrefs}
+            update={updateReaderPrefs}
+            showCrop={!smartPanelMode}
+          />
+          <SwitchRow
+            id="reader-awake"
+            label={t('reader_keep_awake')}
+            checked={readerPrefs.keepAwake}
+            onChange={(keepAwake) => updateReaderPrefs({ keepAwake })}
+          />
+
           <h3 className="text-sm font-medium text-muted-foreground">
             {t('pageSlider')}
           </h3>

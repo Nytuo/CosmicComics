@@ -96,6 +96,7 @@ export default function ModelDownloadModal() {
 
   return (
     <Dialog
+      adaptive={false}
       open={open}
       onOpenChange={(next) => {
         if (isDone) setOpen(next);

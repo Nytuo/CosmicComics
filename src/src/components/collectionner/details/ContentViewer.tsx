@@ -18,6 +18,7 @@ import { DetailsCard } from './contentviewer/DetailsCard.tsx';
 import { VolumesSection } from './contentviewer/VolumesSection.tsx';
 import { TabsSection } from './contentviewer/TabsSection.tsx';
 import { ReadingProgressCard } from './contentviewer/ReadingProgressCard.tsx';
+import { useMobileLayout } from '@/hooks/use-mobile-layout.ts';
 
 function ContentViewer(props: ContentViewerProps) {
   const {
@@ -32,6 +33,7 @@ function ContentViewer(props: ContentViewerProps) {
   } = props;
 
   const cv = useContentViewer(props);
+  const mobile = useMobileLayout();
   const { t } = useTranslation();
 
   const statusBadgeInfo = cv.getStatusBadgeInfo();
@@ -103,7 +105,13 @@ function ContentViewer(props: ContentViewerProps) {
 
       <img id="imageBGOV2" src="#" alt="#" className="hidden" />
 
-      <div className="mx-auto w-full max-w-6xl px-4 py-6 space-y-6">
+      <div
+        className={
+          mobile
+            ? 'w-full space-y-5'
+            : 'mx-auto w-full max-w-6xl px-4 py-6 space-y-6'
+        }
+      >
         <HeroCard
           TheBook={TheBook}
           type={type}

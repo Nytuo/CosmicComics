@@ -116,6 +116,7 @@ export default function PdfiumDownloadModal() {
 
   return (
     <Dialog
+      adaptive={false}
       open={open}
       onOpenChange={(next) => {
         if (isDone) setOpen(next);

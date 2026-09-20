@@ -7,10 +7,27 @@ import { SuspensePage } from './pages/SuspensePage.tsx';
 const savedTheme = localStorage.getItem('theme') || 'dark';
 document.documentElement.classList.add(`theme-${savedTheme}`);
 
-ReactDOM.createRoot(document.getElementById('root')!).render(
-  <React.StrictMode>
-    <Suspense fallback={<SuspensePage />}>
-      <App />
-    </Suspense>
-  </React.StrictMode>
-);
+async function start() {
+  if (import.meta.env.DEV) {
+    // `?mock=mobile|desktop` runs the UI against fake data (see dev/mockTauri.ts).
+    const asked = new URLSearchParams(window.location.search).get('mock');
+    if (asked === 'off') sessionStorage.removeItem('mockTauri');
+    else if (asked) sessionStorage.setItem('mockTauri', asked);
+    if (
+      sessionStorage.getItem('mockTauri') &&
+      !('__TAURI_INTERNALS__' in window)
+    ) {
+      (await import('./dev/mockTauri.ts')).installTauriMock();
+    }
+  }
+
+  ReactDOM.createRoot(document.getElementById('root')!).render(
+    <React.StrictMode>
+      <Suspense fallback={<SuspensePage />}>
+        <App />
+      </Suspense>
+    </React.StrictMode>
+  );
+}
+
+start();

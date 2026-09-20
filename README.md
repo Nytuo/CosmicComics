@@ -68,6 +68,9 @@ Cosmic Comics offers a user-friendly interface that makes it easy to browse the 
   - Fullscreen, Rotations, Bookmarks, Slideshow
   - Sidebar, Hide Menu Bar, Magnifier
   - Guided Reading Mode (Using local AI model)
+  - Image filters (brightness, contrast, warm night light, grayscale, invert) and *Crop margins* to trim blank scan borders
+  - Reading mode remembered per series, resume where you stopped, and a *Next volume* prompt at the end of a book
+  - Progress bar you can click to seek, keyboard shortcuts (press `?` in the reader), keep-screen-awake
 
 - **Rich metadata** — display detailed information about your Comics, Manga, and Ebooks
 
@@ -93,7 +96,7 @@ Cosmic Comics offers a user-friendly interface that makes it easy to browse the 
 
 - **Statistics:** a dashboard (charts built with Recharts) of your library and reading — time and pages per day, streaks, finished books per month, reading by weekday and hour, formats, genres, authors, ratings and the most read series. Reading sessions are recorded in the local database; for Jellyfin, the library, read status and last-read dates come from the server itself. Filter by local files, all Jellyfin servers or one server. The history can be cleared from the page.
 
-- **Android & iOS:** the app runs on phones and tablets with touch reading (swipe or tap the edges to turn pages) and supports `CBZ`, `CBR`, `CB7` and `CBT` from Jellyfin and from files imported on the device. the downloaders and the Smart Panel AI are desktop only. PDF and EPUB work everywhere.
+- **Android & iOS:** a dedicated touch UI — bottom navigation, bottom-sheet dialogs, and a reader built for phones and tablets (swipe or tap the edges, pinch / double-tap zoom, left-to-right, right-to-left and vertical scroll modes, fit screen / width / height, two-page spreads in landscape, page scrubber with preview, thumbnail grid, per-book bookmarks). It supports `CBZ`, `CBR`, `CB7` and `CBT` from Jellyfin and from files imported on the device. the downloaders and the Smart Panel AI are desktop only. PDF and EPUB work everywhere.
 
 ## Jellyfin
 
@@ -120,6 +123,10 @@ Notes:
 - Not available on mobile: the Marvel/MangaDex/DC/Viz/GetComics downloaders (need a desktop browser), the Smart Panel AI and the auto-updater.
 - Jellyfin book formats: CBZ, CBR, CB7, CBT, ZIP, RAR, 7z, TAR, PDF and EPUB. Others (MOBI, AZW3, ...) are reported as unsupported.
 - See `.github/workflows/mobile.yml` for the CI build steps.
+
+### Working on the UI without a device
+
+`npm run dev:vite` serves the front end alone; open `http://localhost:1420/?mock=mobile` (or `?mock=desktop`) to run it against fake library data (`src/src/dev/mockTauri.ts`, dev builds only) and check layouts at any viewport size. The flag sticks for the browser tab; use `?mock=off` to leave it.
 
 ## Technologies
 <div style="display: flex; align-items: center; gap: 10px;">
