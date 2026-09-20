@@ -10,8 +10,10 @@ import { listen } from '@tauri-apps/api/event';
 import ModelDownloadModal from './components/common/ModelDownloadModal.tsx';
 import PdfiumDownloadModal from './components/common/PdfiumDownloadModal.tsx';
 import UpdaterModal from './components/common/UpdaterModal.tsx';
+import { usePlatform } from './hooks/use-platform.ts';
 
 function App() {
+  const platform = usePlatform();
   useEffect(() => {
     const unlisten = listen<string>('open-file', (event) => {
       const filePath = event.payload;
@@ -28,9 +30,9 @@ function App() {
   return (
     <TooltipProvider>
       <Toaster position="bottom-left" richColors />
-      <ModelDownloadModal />
-      <PdfiumDownloadModal />
-      <UpdaterModal />
+      {platform.ai && <ModelDownloadModal />}
+      {platform.pdf && <PdfiumDownloadModal />}
+      {platform.updater && <UpdaterModal />}
       <BrowserRouter>
         <Routes>
           <Route path="/" element={<Navigate to="/collectionner" replace />} />

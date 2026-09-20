@@ -11,6 +11,13 @@ import {
 } from '@/components/ui/tabs.tsx';
 import { Button } from '@/components/ui/button.tsx';
 import { Plus } from 'lucide-react';
+import {
+  jellyfinRef,
+  loadJellyfinLibrary,
+  navFor,
+  type JellyfinLibraryData,
+  type JellyfinNav,
+} from '@/API/jellyfinLibrary.ts';
 import SearchFilterBar, {
   applySearchFilterSort,
   defaultFilterState,
@@ -23,35 +30,53 @@ function Home({
   onOpenAPISelector,
   CosmicComicsTemp,
   refreshKey,
+  onOpenJellyfin,
+  onOpenLibraries,
 }: {
   handleOpenDetails: any;
   handleOpenSeries: any;
   onOpenAPISelector: () => void;
   CosmicComicsTemp: string;
   refreshKey?: number;
+  onOpenJellyfin: (nav: JellyfinNav) => void;
+  onOpenLibraries: () => void;
 }) {
   const { t } = useTranslation();
   const [allBooks, setAllBooks] = useState<DisplayBook[]>([]);
   const [allSeries, setAllSeries] = useState<DisplaySeries[]>([]);
   const [readingBooks, setReadingBooks] = useState<DisplayBook[]>([]);
   const [downloadBooks, setDownloadBooks] = useState<DisplayBook[]>([]);
+  const [jellyfin, setJellyfin] = useState<JellyfinLibraryData | null>(null);
   const [isLoading, setIsLoading] = useState(true);
   const [filterState, setFilterState] =
     useState<SearchFilterState>(defaultFilterState);
   const [activeTab, setActiveTab] = useState('reading');
   const [activeAllSubTab, setActiveAllSubTab] = useState('series');
 
+  const mergedBooks = useMemo(
+    () => [...allBooks, ...(jellyfin?.books ?? [])],
+    [allBooks, jellyfin]
+  );
+  const mergedSeries = useMemo(
+    () => [...allSeries, ...(jellyfin?.series ?? [])],
+    [allSeries, jellyfin]
+  );
+  const mergedReading = useMemo(
+    () => [...readingBooks, ...(jellyfin?.reading ?? [])],
+    [readingBooks, jellyfin]
+  );
+
   const filteredBooks = useMemo(
-    () => applySearchFilterSort(allBooks, filterState),
-    [allBooks, filterState]
+    () => applySearchFilterSort(mergedBooks, filterState),
+    [mergedBooks, filterState]
   );
   const filteredSeries = useMemo(
-    () => applySearchFilterSort(allSeries, filterState),
-    [allSeries, filterState]
+    () => applySearchFilterSort(mergedSeries, filterState),
+    [mergedSeries, filterState]
   );
   const filteredReadingBooks = useMemo(
-    () => applySearchFilterSort(readingBooks, filterState),
-    [readingBooks, filterState]
+    () => applySearchFilterSort(mergedReading, filterState),
+    [mergedReading, filterState]
   );
   const filteredDownloadBooks = useMemo(
     () => applySearchFilterSort(downloadBooks, filterState),
@@ -60,25 +85,31 @@ function Home({
 
   const activeCounts = useMemo(() => {
     if (activeTab === 'reading') {
-      return { total: readingBooks.length, filtered: filteredReadingBooks.length };
+      return {
+        total: mergedReading.length,
+        filtered: filteredReadingBooks.length,
+      };
     }
     if (activeTab === 'downloads') {
-      return { total: downloadBooks.length, filtered: filteredDownloadBooks.length };
+      return {
+        total: downloadBooks.length,
+        filtered: filteredDownloadBooks.length,
+      };
     }
     if (activeAllSubTab === 'books') {
-      return { total: allBooks.length, filtered: filteredBooks.length };
+      return { total: mergedBooks.length, filtered: filteredBooks.length };
     }
-    return { total: allSeries.length, filtered: filteredSeries.length };
+    return { total: mergedSeries.length, filtered: filteredSeries.length };
   }, [
     activeTab,
     activeAllSubTab,
-    readingBooks.length,
+    mergedReading.length,
     filteredReadingBooks.length,
     downloadBooks.length,
     filteredDownloadBooks.length,
-    allBooks.length,
+    mergedBooks.length,
     filteredBooks.length,
-    allSeries.length,
+    mergedSeries.length,
     filteredSeries.length,
   ]);
 
@@ -112,7 +143,28 @@ function Home({
     };
 
     loadData();
+
+    let alive = true;
+    loadJellyfinLibrary(!!refreshKey)
+      .then((data) => alive && setJellyfin(data))
+      .catch((e) => console.error('Failed to load Jellyfin:', e));
+    return () => {
+      alive = false;
+    };
   }, [CosmicComicsTemp, refreshKey]);
+
+  const expiredServers = (jellyfin?.sources ?? []).filter((s) => s.expired);
+
+  const openBook = (isBook: boolean, item: any, id: any) => {
+    const ref = jellyfinRef(item);
+    if (ref) onOpenJellyfin(navFor(ref, item.title));
+    else handleOpenDetails(isBook, item, id);
+  };
+  const openSeries = (_isBook: boolean, item: any) => {
+    const ref = jellyfinRef(item);
+    if (ref) onOpenJellyfin(navFor(ref, item.title));
+    else handleOpenSeries(true, item, item.provider_id);
+  };
 
   return (
     <div id="home">
@@ -134,7 +186,21 @@ function Home({
           onChange={setFilterState}
           totalCount={activeCounts.total}
           filteredCount={activeCounts.filtered}
+          jellyfinSources={jellyfin?.sources}
         />
+
+        {expiredServers.length > 0 && (
+          <div className="mb-4 flex flex-wrap items-center gap-3 rounded-md border border-destructive/40 bg-destructive/10 p-3 text-sm">
+            <span className="flex-1">
+              {t('jellyfin_expired_home', {
+                name: expiredServers.map((s) => s.server.name).join(', '),
+              })}
+            </span>
+            <Button size="sm" variant="outline" onClick={onOpenLibraries}>
+              {t('libraries')}
+            </Button>
+          </div>
+        )}
 
         <TabsContent value="all">
           <div className="p-3">
@@ -155,9 +221,7 @@ function Home({
                   ) : (
                     <VirtualizedCardGrid
                       items={filteredSeries}
-                      handleOpenDetails={(_isBook, item) => {
-                        handleOpenSeries(true, item, item.provider_id);
-                      }}
+                      handleOpenDetails={openSeries}
                     />
                   )}
                 </TabsContent>
@@ -170,7 +234,7 @@ function Home({
                   ) : (
                     <VirtualizedCardGrid
                       items={filteredBooks}
-                      handleOpenDetails={handleOpenDetails}
+                      handleOpenDetails={openBook}
                     />
                   )}
                 </TabsContent>
@@ -193,7 +257,7 @@ function Home({
                 ) : (
                   <VirtualizedCardGrid
                     items={filteredReadingBooks}
-                    handleOpenDetails={handleOpenDetails}
+                    handleOpenDetails={openBook}
                   />
                 )}
               </>

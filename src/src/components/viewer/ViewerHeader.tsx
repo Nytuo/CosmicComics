@@ -16,6 +16,7 @@ import {
 } from '@/components/ui/tooltip';
 import { useTranslation } from 'react-i18next';
 import SubMenu from './SubMenu.tsx';
+import { usePlatform } from '@/hooks/use-platform.ts';
 
 interface ViewerHeaderProps {
   open: boolean;
@@ -57,10 +58,11 @@ export default function ViewerHeader({
   setIsMagnifierOn,
 }: ViewerHeaderProps) {
   const { t } = useTranslation();
+  const { mobile } = usePlatform();
 
   return (
     <header
-      className={`fixed top-0 z-50 flex items-center h-16 border-b border-border bg-background/80 backdrop-blur transition-all duration-200 ${
+      className={`fixed top-0 z-50 flex items-center h-16 pt-[env(safe-area-inset-top)] box-content border-b border-border bg-background/80 backdrop-blur transition-all duration-200 ${
         open ? 'ml-60 w-[calc(100%-240px)]' : 'ml-0 w-full'
       }`}
     >
@@ -95,16 +97,25 @@ export default function ViewerHeader({
         </Tooltip>
 
         <div
-          style={{
-            position: 'absolute',
-            left: '50%',
-            transform: 'translate(-50%, 0)',
-            width: 'auto',
-            height: 'auto',
-            display: 'flex',
-            justifyContent: 'center',
-            alignItems: 'center',
-          }}
+          className={
+            mobile
+              ? 'ml-auto flex min-w-0 items-center overflow-x-auto'
+              : undefined
+          }
+          style={
+            mobile
+              ? undefined
+              : {
+                  position: 'absolute',
+                  left: '50%',
+                  transform: 'translate(-50%, 0)',
+                  width: 'auto',
+                  height: 'auto',
+                  display: 'flex',
+                  justifyContent: 'center',
+                  alignItems: 'center',
+                }
+          }
         >
           <Tooltip>
             <TooltipTrigger asChild>
@@ -148,23 +159,25 @@ export default function ViewerHeader({
             <TooltipContent>{t('recenter')}</TooltipContent>
           </Tooltip>
 
-          <Tooltip>
-            <TooltipTrigger asChild>
-              <Button
-                variant="ghost"
-                size="icon"
-                className="mr-2"
-                onClick={onToggleFullscreen}
-              >
-                {isFullscreen ? (
-                  <Minimize className="h-5 w-5" />
-                ) : (
-                  <Maximize className="h-5 w-5" />
-                )}
-              </Button>
-            </TooltipTrigger>
-            <TooltipContent>{t('full_screen')}</TooltipContent>
-          </Tooltip>
+          {!mobile && (
+            <Tooltip>
+              <TooltipTrigger asChild>
+                <Button
+                  variant="ghost"
+                  size="icon"
+                  className="mr-2"
+                  onClick={onToggleFullscreen}
+                >
+                  {isFullscreen ? (
+                    <Minimize className="h-5 w-5" />
+                  ) : (
+                    <Maximize className="h-5 w-5" />
+                  )}
+                </Button>
+              </TooltipTrigger>
+              <TooltipContent>{t('full_screen')}</TooltipContent>
+            </Tooltip>
+          )}
 
           <Tooltip>
             <TooltipTrigger asChild>

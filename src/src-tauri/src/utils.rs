@@ -1,8 +1,13 @@
+#[cfg(desktop)]
 pub const VALID_BOOK_EXTENSION: &[&str] = &[
     "cbr", "cbz", "pdf", "zip", "7z", "cb7", "rar", "tar", "cbt", "epub", "ebook",
 ];
+#[cfg(mobile)]
+pub const VALID_BOOK_EXTENSION: &[&str] = &[
+    "cbr", "cbz", "pdf", "zip", "7z", "cb7", "rar", "tar", "cbt", "epub",
+];
 pub const VALID_IMAGE_EXTENSION: &[&str] = &[
-    "png", "jpg", "jpeg", "bmp", "apng", "svg", "ico", "webp", "gif", "tiff",
+    "png", "jpg", "jpeg", "jpe", "jfif", "bmp", "apng", "svg", "ico", "webp", "gif", "tiff", "avif",
 ];
 
 pub fn replace_html_address_path(path: &str) -> String {

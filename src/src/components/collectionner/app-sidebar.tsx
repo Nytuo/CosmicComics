@@ -9,6 +9,7 @@ import {
   Wrench,
   Home,
   LibraryBig,
+  BarChart3,
 } from 'lucide-react';
 import {
   Sidebar,
@@ -20,6 +21,7 @@ import {
   SidebarMenu,
   SidebarMenuButton,
   SidebarMenuItem,
+  useSidebar,
 } from '@/components/ui/sidebar';
 import {
   DropdownMenu,
@@ -30,6 +32,7 @@ import {
 } from '@/components/ui/dropdown-menu';
 import { useTranslation } from 'react-i18next';
 import { openUrl } from '@tauri-apps/plugin-opener';
+import { usePlatform } from '@/hooks/use-platform.ts';
 
 export function AppSidebar({
   sidebarActions,
@@ -39,6 +42,7 @@ export function AppSidebar({
   onOpenAbout,
   onOpenHome,
   onOpenLibraries,
+  onOpenStats,
   onExtractMissingImages,
   ...props
 }: React.ComponentProps<typeof Sidebar> & {
@@ -53,17 +57,29 @@ export function AppSidebar({
   onOpenAbout: () => void;
   onOpenHome: () => void;
   onOpenLibraries: () => void;
+  onOpenStats: () => void;
   onExtractMissingImages: () => void;
 }) {
   const { t } = useTranslation();
+  const platform = usePlatform();
+  const { isMobile, setOpenMobile } = useSidebar();
+  const closing = (action: () => void) => () => {
+    if (isMobile) setOpenMobile(false);
+    action();
+  };
 
   return (
-    <Sidebar side="left" variant="sidebar" collapsible="none" {...props}>
+    <Sidebar
+      side="left"
+      variant="sidebar"
+      collapsible={isMobile ? 'offcanvas' : 'none'}
+      {...props}
+    >
       <SidebarHeader>
         <SidebarMenu>
           <SidebarMenuItem>
             <SidebarMenuButton size="lg" asChild>
-              <a href="#" onClick={onOpenHome}>
+              <a href="#" onClick={closing(onOpenHome)}>
                 <div className="w-full flex items-center justify-center">
                   <div className="aspect-square size-12">
                     <img
@@ -91,14 +107,17 @@ export function AppSidebar({
           <SidebarGroupContent>
             <SidebarMenu>
               <SidebarMenuItem>
-                <SidebarMenuButton onClick={onOpenHome} tooltip={t('HOME')}>
+                <SidebarMenuButton
+                  onClick={closing(onOpenHome)}
+                  tooltip={t('HOME')}
+                >
                   <Home />
                   <span>{t('HOME')}</span>
                 </SidebarMenuButton>
               </SidebarMenuItem>
               <SidebarMenuItem>
                 <SidebarMenuButton
-                  onClick={onOpenLibraries}
+                  onClick={closing(onOpenLibraries)}
                   tooltip={t('libraries')}
                 >
                   <LibraryBig />
@@ -107,19 +126,33 @@ export function AppSidebar({
               </SidebarMenuItem>
               <SidebarMenuItem>
                 <SidebarMenuButton
-                  onClick={onOpenDownloaders}
-                  tooltip={t('downloaders')}
+                  onClick={closing(onOpenStats)}
+                  tooltip={t('stats_title')}
                 >
-                  <CloudDownload />
-                  <span>{t('downloaders')}</span>
+                  <BarChart3 />
+                  <span>{t('stats_title')}</span>
                 </SidebarMenuButton>
               </SidebarMenuItem>
+              {platform.downloaders && (
+                <SidebarMenuItem>
+                  <SidebarMenuButton
+                    onClick={closing(onOpenDownloaders)}
+                    tooltip={t('downloaders')}
+                  >
+                    <CloudDownload />
+                    <span>{t('downloaders')}</span>
+                  </SidebarMenuButton>
+                </SidebarMenuItem>
+              )}
             </SidebarMenu>
 
             <SidebarMenu>
               {sidebarActions.map((item) => (
                 <SidebarMenuItem key={item.label}>
-                  <SidebarMenuButton onClick={item.action} tooltip={item.label}>
+                  <SidebarMenuButton
+                    onClick={closing(item.action)}
+                    tooltip={item.label}
+                  >
                     <item.icon />
                     <span>{item.label}</span>
                   </SidebarMenuButton>
@@ -141,16 +174,16 @@ export function AppSidebar({
                 </SidebarMenuButton>
               </DropdownMenuTrigger>
               <DropdownMenuContent side="top" align="start" className="w-56">
-                <DropdownMenuItem onClick={onOpenBookmarks}>
+                <DropdownMenuItem onClick={closing(onOpenBookmarks)}>
                   <Bookmark className="mr-2 h-4 w-4" />
                   {t('Bookmark')}
                 </DropdownMenuItem>
-                <DropdownMenuItem onClick={onOpenSettings}>
+                <DropdownMenuItem onClick={closing(onOpenSettings)}>
                   <Settings className="mr-2 h-4 w-4" />
                   {t('settings')}
                 </DropdownMenuItem>
                 <DropdownMenuSeparator />
-                <DropdownMenuItem onClick={onExtractMissingImages}>
+                <DropdownMenuItem onClick={closing(onExtractMissingImages)}>
                   <ImageIcon className="mr-2 h-4 w-4" />
                   {t('ExtractMissingImg')}
                 </DropdownMenuItem>
@@ -163,7 +196,7 @@ export function AppSidebar({
                   <Lightbulb className="mr-2 h-4 w-4" />
                   {t('wiki')}
                 </DropdownMenuItem>
-                <DropdownMenuItem onClick={onOpenAbout}>
+                <DropdownMenuItem onClick={closing(onOpenAbout)}>
                   <Info className="mr-2 h-4 w-4" />
                   {t('about')}
                 </DropdownMenuItem>

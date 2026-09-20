@@ -97,7 +97,7 @@ export function DetailsCard({
           </div>
         )}
 
-        {type === 'volume' && (
+        {type === 'volume' && getSeriesName() && (
           <div className="flex items-center gap-2">
             <BookCopy className="h-3.5 w-3.5 text-muted-foreground" />
             <span className="text-sm">

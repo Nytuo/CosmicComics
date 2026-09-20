@@ -3,6 +3,7 @@ import { Card } from './Card.tsx';
 import type { DisplayBook, DisplaySeries } from '@/interfaces/IDisplayBook.ts';
 import { getProvider } from '@/API/providers';
 import { t } from 'i18next';
+import { jellyfinRef } from '@/API/jellyfinLibrary.ts';
 
 type BookOrSeries = DisplayBook | DisplaySeries;
 
@@ -16,6 +17,7 @@ interface BookCardProps {
   ) => void;
   onClick?: () => void;
   type: 'book' | 'lite' | 'volume';
+  className?: string;
 }
 
 const CardWrapper: React.FC<BookCardProps> = ({
@@ -23,6 +25,7 @@ const CardWrapper: React.FC<BookCardProps> = ({
   provider,
   handleOpenDetails,
   onClick,
+  className,
 }) => {
   const handleClick = () => {
     if (onClick) {
@@ -45,6 +48,7 @@ const CardWrapper: React.FC<BookCardProps> = ({
   };
 
   const getApiName = (providerId: number | string): string | undefined => {
+    if (jellyfinRef(book)) return 'Jellyfin';
     const id =
       typeof providerId === 'string' ? parseInt(providerId, 10) : providerId;
     const prov = getProvider(id);
@@ -59,6 +63,7 @@ const CardWrapper: React.FC<BookCardProps> = ({
       onClick={handleClick}
       apiName={getApiName(provider)}
       favorite={book.favorite}
+      className={className}
     />
   );
 };

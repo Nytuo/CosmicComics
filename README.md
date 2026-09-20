@@ -33,6 +33,8 @@ Read Comics, Manga and Ebooks the easy way
 
 - [About](#about)
 - [What Cosmic Comics Can Do](#what-cosmic-comics-can-do)
+- [Jellyfin](#jellyfin)
+- [Mobile (Android & iOS)](#mobile-android--ios)
 - [Technologies](#technologies)
 - [MacOS Troubleshooting](#macos-troubleshooting)
   - [Guided Reading Mode](#guided-reading-mode)
@@ -86,6 +88,38 @@ Cosmic Comics offers a user-friendly interface that makes it easy to browse the 
   - Manual entry
 
 - **Continue reading** right where you left off
+
+- **Jellyfin:** sign in to your [Jellyfin](https://jellyfin.org/) server (password or Quick Connect), browse your *Books* libraries, and read them in the same viewer. Books are downloaded on demand (and cached), and your reading position is synced back to the server, so you can pick up where you stopped in another Jellyfin reader.
+
+- **Statistics:** a dashboard (charts built with Recharts) of your library and reading — time and pages per day, streaks, finished books per month, reading by weekday and hour, formats, genres, authors, ratings and the most read series. Reading sessions are recorded in the local database; for Jellyfin, the library, read status and last-read dates come from the server itself. Filter by local files, all Jellyfin servers or one server. The history can be cleared from the page.
+
+- **Android & iOS:** the app runs on phones and tablets with touch reading (swipe or tap the edges to turn pages) and supports `CBZ`, `CBR`, `CB7` and `CBT` from Jellyfin and from files imported on the device. the downloaders and the Smart Panel AI are desktop only. PDF and EPUB work everywhere.
+
+## Jellyfin
+
+1. Open **Jellyfin** in the sidebar and choose *Add a Jellyfin server*.
+2. Enter the address (`https://jellyfin.example.com` or `192.168.1.10:8096`), then sign in with your username and password, or use **Quick Connect** (approve the code in another signed-in Jellyfin app). Tick *Trust a self-signed certificate* for a server with a private certificate.
+3. Browse the *Books* libraries; open a book to read it. Only the access token is stored, never your password.
+
+Reading position uses the same convention as other Jellyfin book readers (`PlaybackPositionTicks = page × 10 000`; the last page marks the book as read). Downloaded books are cached (the 8 most recent are kept) — *Clear downloaded books* frees the space.
+
+## Mobile (Android & iOS)
+
+Built with Tauri 2 mobile from the same code base. The local library is a folder inside the app: use **Import files** to pick comics from the device, they are copied in and grouped by series.
+
+```bash
+cd src
+npm install
+npx tauri android init && npx tauri android dev      # needs the Android SDK + NDK
+npx tauri ios init && npx tauri ios dev "iPhone 17"  # needs Xcode and xcodegen
+```
+
+Notes:
+
+- `CBR` uses the bundled `unrar` library and `CB7` a pure-Rust 7z decoder; archives are recognised by content, so a `.cbr` that is really a ZIP still opens.
+- Not available on mobile: the Marvel/MangaDex/DC/Viz/GetComics downloaders (need a desktop browser), the Smart Panel AI and the auto-updater.
+- Jellyfin book formats: CBZ, CBR, CB7, CBT, ZIP, RAR, 7z, TAR, PDF and EPUB. Others (MOBI, AZW3, ...) are reported as unsupported.
+- See `.github/workflows/mobile.yml` for the CI build steps.
 
 ## Technologies
 <div style="display: flex; align-items: center; gap: 10px;">

@@ -4,7 +4,11 @@ import * as React from 'react';
 import { FileUp } from 'lucide-react';
 import { Spinner } from '@/components/ui/spinner';
 import { Progress } from '@/components/ui/progress';
-import { SidebarInset, SidebarProvider } from '@/components/ui/sidebar';
+import {
+  SidebarInset,
+  SidebarProvider,
+  SidebarTrigger,
+} from '@/components/ui/sidebar';
 import { useTranslation } from 'react-i18next';
 import HomeContainer from '@/components/collectionner/home/Home.tsx';
 import * as TauriAPI from '@/API/TauriAPI';
@@ -21,6 +25,10 @@ import BookmarksDialog from './dialogs/BookmarksDialog.tsx';
 import SettingsDialog from './dialogs/SettingsDialog.tsx';
 import { AppSidebar } from './app-sidebar.tsx';
 import LibrariesPage from './LibrariesPage.tsx';
+import JellyfinBrowser, { NAV_KEY } from './jellyfin/JellyfinBrowser.tsx';
+import type { JellyfinNav } from '@/API/jellyfinLibrary.ts';
+
+const StatsPage = React.lazy(() => import('./stats/StatsPage.tsx'));
 
 type BookOrSeries = DisplayBook | DisplaySeries;
 
@@ -45,6 +53,18 @@ export default function MiniDrawer({
   const [openAbout, setOpenAbout] = React.useState(false);
   const [showLibraries, setShowLibraries] = React.useState(false);
   const [downloadersOpen, setDownloadersOpen] = React.useState(false);
+  const [jellyfinNav, setJellyfinNav] = React.useState<JellyfinNav | null>(
+    () => {
+      if (localStorage.getItem('collectionnerView') !== 'jellyfin') return null;
+      try {
+        return JSON.parse(sessionStorage.getItem(NAV_KEY) ?? 'null');
+      } catch {
+        return null;
+      }
+    }
+  );
+  const [showStats, setShowStats] = React.useState(false);
+  const [refreshKey, setRefreshKey] = React.useState(0);
   const [openDetails, setOpenDetails] = React.useState<{
     open: boolean;
     book: BookOrSeries;
@@ -93,6 +113,8 @@ export default function MiniDrawer({
     provider: any
   ) => {
     setShowLibraries(false);
+    setJellyfinNav(null);
+    setShowStats(false);
     setDownloadersOpen(false);
     setOpenSeries(null);
     setOpenDetails({ open: open, book: book, provider: provider });
@@ -104,6 +126,8 @@ export default function MiniDrawer({
     provider: any
   ) => {
     setShowLibraries(false);
+    setJellyfinNav(null);
+    setShowStats(false);
     setDownloadersOpen(false);
     setOpenDetails(null);
     setOpenSeries({
@@ -146,8 +170,14 @@ export default function MiniDrawer({
     setOpenDetails(null);
     setOpenSeries(null);
     setShowLibraries(false);
+    setJellyfinNav(null);
+    setShowStats(false);
     setDownloadersOpen(true);
   };
+
+  React.useEffect(() => {
+    localStorage.removeItem('collectionnerView');
+  }, []);
 
   React.useEffect(() => {
     if (!searchLoading) {
@@ -202,6 +232,8 @@ export default function MiniDrawer({
     setOpenDetails(null);
     setOpenSeries(null);
     setShowLibraries(false);
+    setJellyfinNav(null);
+    setShowStats(false);
     setDownloadersOpen(false);
     setIsLoading(false);
     handleRemoveBreadcrumbsTo(1);
@@ -211,13 +243,42 @@ export default function MiniDrawer({
     setOpenDetails(null);
     setOpenSeries(null);
     setShowLibraries(true);
+    setJellyfinNav(null);
+    setShowStats(false);
+    setDownloadersOpen(false);
+    setIsLoading(false);
+  }
+
+  function setOpenStats() {
+    setOpenDetails(null);
+    setOpenSeries(null);
+    setShowLibraries(false);
+    setJellyfinNav(null);
+    setDownloadersOpen(false);
+    setIsLoading(false);
+    setShowStats(true);
+  }
+
+  function setOpenJellyfin(nav: JellyfinNav) {
+    setOpenDetails(null);
+    setOpenSeries(null);
+    setShowLibraries(false);
+    setJellyfinNav(nav);
+    setShowStats(false);
     setDownloadersOpen(false);
     setIsLoading(false);
   }
 
   return (
     <>
-      <UploadDialog openModal={uploadOpen} onClose={handleCloseUpload} />
+      <UploadDialog
+        openModal={uploadOpen}
+        onClose={handleCloseUpload}
+        onImported={() => {
+          setOpenHome();
+          setRefreshKey((k) => k + 1);
+        }}
+      />
       <AboutDialog openModal={openAbout} onClose={() => setOpenAbout(false)} />
       <BookmarksDialog
         openModal={openBookmarks}
@@ -244,6 +305,7 @@ export default function MiniDrawer({
           onOpenAbout={() => setOpenAbout(true)}
           onOpenHome={() => setOpenHome()}
           onOpenLibraries={() => setOpenLibraries()}
+          onOpenStats={() => setOpenStats()}
           onExtractMissingImages={() => {
             const promise = TauriAPI.fillBlankImages();
             ToasterHandlerPromise(
@@ -256,7 +318,15 @@ export default function MiniDrawer({
         />
 
         <SidebarInset>
-          <div className="p-2"></div>
+          <div className="flex items-center gap-2 p-2 pt-[max(0.5rem,env(safe-area-inset-top))] md:hidden">
+            <SidebarTrigger className="size-9" />
+            <img
+              src="Images/LogoTxt.png"
+              alt="Cosmic Comics"
+              className="h-7 w-auto"
+            />
+          </div>
+          <div className="hidden p-2 md:block"></div>
 
           <div className="flex flex-1 flex-col gap-4 p-4 pt-0">
             {isLoading && bookDiscoverProgress.of !== 0 ? (
@@ -316,6 +386,25 @@ export default function MiniDrawer({
                   }
                 }}
               />
+            ) : showStats ? (
+              <React.Suspense
+                fallback={
+                  <div className="flex justify-center p-10">
+                    <Spinner className="size-8" />
+                  </div>
+                }
+              >
+                <StatsPage />
+              </React.Suspense>
+            ) : jellyfinNav ? (
+              <JellyfinBrowser
+                key={`${jellyfinNav.serverId}:${jellyfinNav.trail[jellyfinNav.trail.length - 1]?.id ?? ''}:${jellyfinNav.bookId ?? ''}`}
+                nav={jellyfinNav}
+                onExit={() => {
+                  sessionStorage.removeItem(NAV_KEY);
+                  setOpenHome();
+                }}
+              />
             ) : showLibraries ? (
               <LibrariesPage />
             ) : downloadersOpen ? (
@@ -326,7 +415,9 @@ export default function MiniDrawer({
                 handleOpenSeries={handleOpenSeries}
                 onOpenAPISelector={() => setOpenAPISelector(true)}
                 CosmicComicsTemp={CosmicComicsTemp}
-                refreshKey={0}
+                refreshKey={refreshKey}
+                onOpenJellyfin={setOpenJellyfin}
+                onOpenLibraries={() => setOpenLibraries()}
               />
             )}
           </div>

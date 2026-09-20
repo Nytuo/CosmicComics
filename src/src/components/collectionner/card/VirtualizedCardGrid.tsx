@@ -1,6 +1,7 @@
 import * as React from 'react';
 import { useWindowVirtualizer } from '@tanstack/react-virtual';
 import CardWrapper from './CardWrapper.tsx';
+import { GRID_CARD_CLASS } from './Card.tsx';
 import type { DisplayBook, DisplaySeries } from '@/interfaces/IDisplayBook.ts';
 
 type BookOrSeries = DisplayBook | DisplaySeries;
@@ -9,6 +10,8 @@ type BookOrSeries = DisplayBook | DisplaySeries;
 // margin on each side), so the computed column count matches what the plain
 // flex-wrap layout would have produced at the same container width.
 const ITEM_SLOT_WIDTH = 288;
+
+const NARROW_BREAKPOINT = 640;
 
 // A rough initial guess for a row's height before it has been measured for
 // real.
@@ -40,7 +43,11 @@ function VirtualizedCardGrid({
     if (!el) return;
 
     const measure = () => {
-      setColumns(Math.max(1, Math.floor(el.clientWidth / ITEM_SLOT_WIDTH)));
+      setColumns(
+        el.clientWidth < NARROW_BREAKPOINT
+          ? 2
+          : Math.max(1, Math.floor(el.clientWidth / ITEM_SLOT_WIDTH))
+      );
       setScrollMargin(el.getBoundingClientRect().top + window.scrollY);
     };
 
@@ -97,6 +104,7 @@ function VirtualizedCardGrid({
                 handleOpenDetails={handleOpenDetails}
                 book={item}
                 type="book"
+                className={GRID_CARD_CLASS}
               />
             ))}
           </div>

@@ -33,6 +33,8 @@ import {
 } from 'lucide-react';
 import { open } from '@tauri-apps/plugin-dialog';
 import type { DisplaySeries } from '@/interfaces/IDisplayBook.ts';
+import { usePlatform } from '@/hooks/use-platform.ts';
+import JellyfinServersSection from './jellyfin/JellyfinServersSection.tsx';
 
 interface ScanPath {
   id: string;
@@ -50,6 +52,7 @@ function isUnderScanPath(seriesPath: string, scanPath: string): boolean {
 
 export default function LibrariesPage() {
   const { t } = useTranslation();
+  const { local_import: importOnly } = usePlatform();
   const [scanPaths, setScanPaths] = React.useState<ScanPath[]>([]);
   const [allSeries, setAllSeries] = React.useState<DisplaySeries[]>([]);
   const [isLoading, setIsLoading] = React.useState(true);
@@ -196,7 +199,11 @@ export default function LibrariesPage() {
           <h2 className="text-2xl font-bold tracking-tight">
             {t('libraries')}
           </h2>
-          <p className="text-muted-foreground">{t('librariesDescription')}</p>
+          <p className="text-muted-foreground">
+            {importOnly
+              ? t('libraries_mobile_hint')
+              : t('librariesDescription')}
+          </p>
         </div>
         <div className="flex gap-2">
           <Button
@@ -209,10 +216,12 @@ export default function LibrariesPage() {
             />
             {isScanning ? t('loading') + '...' : t('scanAll')}
           </Button>
-          <Button onClick={openAddDialog}>
-            <Plus className="h-4 w-4 mr-2" />
-            {t('addScanPath')}
-          </Button>
+          {!importOnly && (
+            <Button onClick={openAddDialog}>
+              <Plus className="h-4 w-4 mr-2" />
+              {t('addScanPath')}
+            </Button>
+          )}
         </div>
       </div>
 
@@ -225,10 +234,16 @@ export default function LibrariesPage() {
             <p className="text-muted-foreground text-center">
               {t('no-libraries-configured-yet')}
             </p>
-            <Button className="mt-4" variant="outline" onClick={openAddDialog}>
-              <Plus className="h-4 w-4 mr-2" />
-              {t('add-your-first-library')}
-            </Button>
+            {!importOnly && (
+              <Button
+                className="mt-4"
+                variant="outline"
+                onClick={openAddDialog}
+              >
+                <Plus className="h-4 w-4 mr-2" />
+                {t('add-your-first-library')}
+              </Button>
+            )}
           </CardContent>
         </Card>
       ) : (
@@ -249,15 +264,17 @@ export default function LibrariesPage() {
                     )}
                   </div>
                   <div className="flex gap-1 shrink-0">
-                    <Button
-                      variant="ghost"
-                      size="icon"
-                      className="h-8 w-8"
-                      onClick={() => openEditDialog(sp)}
-                      title={t('EDIT')}
-                    >
-                      <Pencil className="h-4 w-4" />
-                    </Button>
+                    {!importOnly && (
+                      <Button
+                        variant="ghost"
+                        size="icon"
+                        className="h-8 w-8"
+                        onClick={() => openEditDialog(sp)}
+                        title={t('EDIT')}
+                      >
+                        <Pencil className="h-4 w-4" />
+                      </Button>
+                    )}
                     <Button
                       variant="ghost"
                       size="icon"
@@ -271,9 +288,11 @@ export default function LibrariesPage() {
                 </div>
               </CardHeader>
               <CardContent className="space-y-2">
-                <CardDescription className="truncate" title={sp.path}>
-                  {sp.path}
-                </CardDescription>
+                {!importOnly && (
+                  <CardDescription className="truncate" title={sp.path}>
+                    {sp.path}
+                  </CardDescription>
+                )}
                 <div className="flex items-center gap-3 text-sm text-muted-foreground">
                   <span className="flex items-center gap-1">
                     <Library className="h-3.5 w-3.5" />
@@ -289,6 +308,8 @@ export default function LibrariesPage() {
           ))}
         </div>
       )}
+
+      <JellyfinServersSection />
 
       <Dialog
         open={dialogOpen}

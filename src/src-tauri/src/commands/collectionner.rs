@@ -220,6 +220,7 @@ pub async fn get_files_and_folders_list(
         .map_err(|e| format!("Error getting files and folders list: {}", e))
 }
 
+#[cfg(desktop)]
 #[tauri::command]
 pub async fn download_book_from_url(
     state: State<'_, AppState>,

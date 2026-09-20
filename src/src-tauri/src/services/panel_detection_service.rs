@@ -1,13 +1,21 @@
+#![cfg_attr(not(all(feature = "ai", desktop)), allow(dead_code))]
+
+#[cfg(all(feature = "ai", desktop))]
 use image::{imageops::FilterType, GenericImageView, Pixel};
-use ndarray::{ArrayView, Axis};
+use ndarray::Axis;
+#[cfg(all(feature = "ai", desktop))]
+use ndarray::ArrayView;
 use serde::{Deserialize, Serialize};
 use std::collections::HashMap;
-use std::sync::{Mutex, OnceLock};
+use std::sync::Mutex;
+#[cfg(all(feature = "ai", desktop))]
+use std::sync::OnceLock;
+#[cfg(all(feature = "ai", desktop))]
 use tracing::info;
 
-#[cfg(feature = "ai")]
+#[cfg(all(feature = "ai", desktop))]
 use candle_core::{Device, Tensor};
-#[cfg(feature = "ai")]
+#[cfg(all(feature = "ai", desktop))]
 use candle_onnx::onnx::ModelProto;
 
 const FRAME_CLASS_INDEX: usize = 2;
@@ -28,7 +36,7 @@ pub enum ReadingDirection {
     RTL,
 }
 
-#[cfg(feature = "ai")]
+#[cfg(all(feature = "ai", desktop))]
 struct ComputeModel {
     proto: ModelProto,
 
@@ -36,14 +44,14 @@ struct ComputeModel {
     device: Device,
 }
 
-#[cfg(feature = "ai")]
+#[cfg(all(feature = "ai", desktop))]
 static MODEL: OnceLock<Mutex<ComputeModel>> = OnceLock::new();
 
 lazy_static::lazy_static! {
     static ref PANEL_CACHE: Mutex<HashMap<String, Vec<PanelRect>>> = Mutex::new(HashMap::new());
 }
 
-#[cfg(feature = "ai")]
+#[cfg(all(feature = "ai", desktop))]
 fn eval_graph(
     model: &ComputeModel,
     initial_inputs: std::collections::HashMap<String, Tensor>,
@@ -285,7 +293,7 @@ fn eval_graph(
         .collect()
 }
 
-#[cfg(feature = "ai")]
+#[cfg(all(feature = "ai", desktop))]
 pub fn init_model(model_path: &str) -> Result<(), Box<dyn std::error::Error>> {
     let proto = candle_onnx::read_file(model_path)?;
 
@@ -339,12 +347,12 @@ pub fn init_model(model_path: &str) -> Result<(), Box<dyn std::error::Error>> {
     Ok(())
 }
 
-#[cfg(not(feature = "ai"))]
+#[cfg(not(all(feature = "ai", desktop)))]
 pub fn init_model(_model_path: &str) -> Result<(), Box<dyn std::error::Error>> {
     Err("AI support disabled at compile time (feature \"ai\").".into())
 }
 
-#[cfg(feature = "ai")]
+#[cfg(all(feature = "ai", desktop))]
 pub fn detect_panels(
     image_bytes: &[u8],
     reading_direction: ReadingDirection,
@@ -424,7 +432,7 @@ pub fn detect_panels(
     Ok(panels)
 }
 
-#[cfg(not(feature = "ai"))]
+#[cfg(not(all(feature = "ai", desktop)))]
 pub fn detect_panels(
     _image_bytes: &[u8],
     _reading_direction: ReadingDirection,

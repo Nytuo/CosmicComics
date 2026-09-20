@@ -1,8 +1,14 @@
 import ViewerDrawer from '@/components/viewer/ViewerDrawer.tsx';
+import { lazy, Suspense } from 'react';
+
+const EpubReader = lazy(() => import('@/components/viewer/EpubReader.tsx'));
 import { useEffect } from 'react';
 import * as TauriAPI from '@/API/TauriAPI';
 
 function Viewer() {
+  const book = localStorage.getItem('currentBook') ?? '';
+  const isEpub = book.toLowerCase().endsWith('.epub');
+
   useEffect(() => {
     document.title = 'Viewer';
   }, []);
@@ -26,7 +32,13 @@ function Viewer() {
 
   return (
     <>
-      <ViewerDrawer />
+      {isEpub ? (
+        <Suspense fallback={null}>
+          <EpubReader path={book} />
+        </Suspense>
+      ) : (
+        <ViewerDrawer />
+      )}
     </>
   );
 }

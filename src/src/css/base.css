@@ -967,3 +967,20 @@ img {
 .magnifier-container:hover {
   cursor: move;
 }
+
+body {
+  padding-left: env(safe-area-inset-left);
+  padding-right: env(safe-area-inset-right);
+  -webkit-tap-highlight-color: transparent;
+  overscroll-behavior-y: none;
+}
+
+#pagecount {
+  padding-bottom: env(safe-area-inset-bottom);
+}
+
+button,
+a,
+[role='button'] {
+  touch-action: manipulation;
+}

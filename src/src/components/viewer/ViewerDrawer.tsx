@@ -25,6 +25,11 @@ import ViewerImageDisplay from './ViewerImageDisplay.tsx';
 import ReaderSettingsDialog from './dialogs/ReaderSettingsDialog.tsx';
 import { useKeyboardShortcuts } from './hooks/useKeyboardShortcuts.ts';
 import { useSlideShow } from './hooks/useSlideShow.ts';
+import { useJellyfinProgress } from './hooks/useJellyfinProgress.ts';
+import { useReadingSession } from './hooks/useReadingSession.ts';
+import { useTouchNavigation } from './hooks/useTouchNavigation.ts';
+import { usePlatform } from '@/hooks/use-platform.ts';
+import { extractBook } from '@/utils/bookPages.ts';
 
 const appWindow = Window.getCurrent();
 
@@ -63,7 +68,12 @@ export default function PersistentDrawerLeft() {
   const [innerWidth, setInnerWidth] = React.useState(window.innerWidth);
   const [webToonMode, setWebToonMode] = React.useState(false);
   const [isWidthMode, setIsWidthMode] = React.useState(false);
-  const [smartPanelMode, setSmartPanelMode] = React.useState(false);
+  const [smartPanelMode, setSmartPanelModeRaw] = React.useState(false);
+  const platform = usePlatform();
+  const setSmartPanelMode = React.useCallback(
+    (value: boolean) => setSmartPanelModeRaw(platform.ai && value),
+    [platform.ai]
+  );
   const [showPanelDebugOverlay, setShowPanelDebugOverlay] =
     React.useState(false);
   const [panels, setPanels] = React.useState<PanelRect[]>([]);
@@ -739,6 +749,17 @@ export default function PersistentDrawerLeft() {
     NextPanel,
     Reader,
   });
+  useJellyfinProgress(currentPage, imageTwo !== null, totalPages);
+  useReadingSession(currentPage, imageTwo !== null, totalPages);
+
+  useTouchNavigation({
+    enabled: platform.mobile,
+    continuous: VIV_On || webToonMode,
+    onNext: () => (smartPanelMode ? NextPanel() : NextPage()),
+    onPrev: () => (smartPanelMode ? PreviousPanel() : PreviousPage()),
+    onToggleBar: () => setActionbarON((visible) => !visible),
+  });
+
   useEffect(() => {
     const LaunchViewer = async () => {
       const curBook = localStorage.getItem('currentBook');
@@ -768,7 +789,9 @@ export default function PersistentDrawerLeft() {
         Logger.info("CCI doesn't exist");
 
         listenForUnzipProgress();
-        await TauriAPI.unzipBook(path);
+        await extractBook(path, (percentage, current_file) =>
+          setUnzipStatus({ status: 'loading', percentage, current_file })
+        );
         const images = (await TauriAPI.listExtractedImages()) as string[];
         listofImg = images.length === 0 ? [] : images;
         setListofImgState(images as any);
@@ -800,7 +823,9 @@ export default function PersistentDrawerLeft() {
           ) {
             Logger.info('path.txt is not equal to path, Unzipping');
             listenForUnzipProgress();
-            await TauriAPI.unzipBook(path);
+            await extractBook(path, (percentage, current_file) =>
+              setUnzipStatus({ status: 'loading', percentage, current_file })
+            );
             const images = (await TauriAPI.listExtractedImages()) as string[];
             listofImg = images.length === 0 ? [] : images;
             setListofImgState(images as any);
@@ -819,7 +844,9 @@ export default function PersistentDrawerLeft() {
         } else {
           Logger.info("path.txt doesn't exist, Unzipping");
           listenForUnzipProgress();
-          await TauriAPI.unzipBook(path);
+          await extractBook(path, (percentage, current_file) =>
+            setUnzipStatus({ status: 'loading', percentage, current_file })
+          );
           const images = (await TauriAPI.listExtractedImages()) as string[];
           listofImg = images.length === 0 ? [] : images;
           setListofImgState(images as any);
@@ -1129,6 +1156,7 @@ export default function PersistentDrawerLeft() {
           onFixHeight={fixHeight}
           onRecenter={recenter}
           onToggleFullscreen={async () => {
+            if (platform.mobile) return;
             if (await appWindow.isFullscreen()) {
               await appWindow.setFullscreen(false);
               setIsFullscreen(false);

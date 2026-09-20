@@ -36,6 +36,16 @@ pub fn init(base_path: &str) -> Result<(), String> {
 }
 
 pub fn create_instance() -> Result<Pdfium, String> {
+    #[cfg(mobile)]
+    {
+        return Err("The PDF rendering library is not available on this platform".to_string());
+    }
+    #[cfg(desktop)]
+    create_desktop_instance()
+}
+
+#[cfg(desktop)]
+fn create_desktop_instance() -> Result<Pdfium, String> {
     if let Some(path) = PDFIUM_LIB_PATH.get() {
         Pdfium::bind_to_library(path)
             .map(Pdfium::new)

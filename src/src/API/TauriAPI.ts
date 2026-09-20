@@ -813,3 +813,39 @@ export const downloadBookFromUrl = async (
 ): Promise<string> => {
   return await invoke('download_book_from_url', { url, name, vol });
 };
+
+export interface PlatformCapabilities {
+  platform: 'android' | 'ios' | 'macos' | 'windows' | 'linux' | string;
+  mobile: boolean;
+  ai: boolean;
+  downloaders: boolean;
+  pdf: boolean;
+  documents: boolean;
+  updater: boolean;
+  local_import: boolean;
+  extensions: string[];
+}
+
+export const getPlatformCapabilities =
+  async (): Promise<PlatformCapabilities> => {
+    return await invoke('get_platform_capabilities', {});
+  };
+
+export interface ImportedBook {
+  name: string;
+  series: string;
+  path: string;
+}
+
+export interface ImportResult {
+  imported: ImportedBook[];
+  failed: { name: string; error: string }[];
+  library_path: string;
+}
+
+export const importLocalFiles = async (
+  paths: string[],
+  series?: string
+): Promise<ImportResult> => {
+  return await invoke('import_local_files', { paths, series });
+};

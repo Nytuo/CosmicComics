@@ -57,10 +57,12 @@ pub async fn unzip_book(
     let current_path = replace_html_address_path(&path);
 
     let output_dir = format!("{}/current_book", base_path);
-    let ext = std::path::Path::new(&current_path)
+    let ext_owned = std::path::Path::new(&current_path)
         .extension()
         .and_then(|e| e.to_str())
-        .unwrap_or_default();
+        .unwrap_or_default()
+        .to_ascii_lowercase();
+    let ext = ext_owned.as_str();
 
     if !VALID_BOOK_EXTENSION.contains(&ext) {
         return Err("This extension is not (yet) supported".to_string());
@@ -118,7 +120,7 @@ pub async fn list_extracted_images(state: State<'_, AppState>) -> Result<Vec<Str
 pub async fn list_images_in_directory(path: String) -> Result<Vec<String>, String> {
     let sanitized = replace_html_address_path(&path);
     let mut images = get_list_of_images(sanitized.as_ref(), VALID_IMAGE_EXTENSION);
-    images.sort();
+    images.sort_by(|a, b| crate::services::comic_archive::natural_cmp(a, b));
     Ok(images)
 }
 
@@ -267,4 +269,46 @@ pub async fn detect_panels_batch(
 pub async fn clear_panel_cache() -> Result<(), String> {
     crate::services::panel_detection_service::clear_cache();
     Ok(())
+}
+
+#[tauri::command]
+pub async fn begin_book_pages(state: State<'_, AppState>, path: String) -> Result<(), String> {
+    let base_path = state.config.lock().await.base_path.clone();
+    let output_dir = PathBuf::from(&base_path).join("current_book");
+    if output_dir.exists() {
+        std::fs::remove_dir_all(&output_dir).map_err(|e| e.to_string())?;
+    }
+    std::fs::create_dir_all(&output_dir).map_err(|e| e.to_string())?;
+    std::fs::write(
+        output_dir.join("path.txt"),
+        format!("{}\n", replace_html_address_path(&path)),
+    )
+    .map_err(|e| e.to_string())
+}
+
+#[tauri::command]
+pub async fn save_book_page(
+    state: State<'_, AppState>,
+    request: tauri::ipc::Request<'_>,
+) -> Result<(), String> {
+    let tauri::ipc::InvokeBody::Raw(bytes) = request.body() else {
+        return Err("Expected the page image as the raw request body".into());
+    };
+    let index: usize = request
+        .headers()
+        .get("x-page-index")
+        .and_then(|v| v.to_str().ok())
+        .and_then(|v| v.parse().ok())
+        .ok_or("Missing page index")?;
+    if index >= 100_000 || bytes.is_empty() {
+        return Err("Invalid page".into());
+    }
+    let base_path = state.config.lock().await.base_path.clone();
+    let dir = PathBuf::from(base_path).join("current_book");
+    tokio::fs::write(
+        dir.join(crate::services::comic_archive::extracted_page_name(index)),
+        bytes,
+    )
+    .await
+    .map_err(|e| e.to_string())
 }

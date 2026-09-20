@@ -49,15 +49,18 @@ interface HeroCardProps {
   onPlay: () => void;
   onFavoriteToggle: () => void;
   onStatusRead: () => void;
-  onStatusReading: () => void;
+  onStatusReading?: () => void;
   onStatusUnread: () => void;
   onRatingChange: (star: number) => void;
-  onEditClick: () => void;
-  onRefreshMeta: () => void;
-  onRematchClick: () => void;
+  onEditClick?: () => void;
+  onRefreshMeta?: () => void;
+  onRematchClick?: () => void;
   onDelete?: () => void;
   onBack?: () => void;
   statusBadge: React.ReactNode;
+  remote?: boolean;
+  playLabel?: string;
+  extraActions?: React.ReactNode;
 }
 
 export function HeroCard({
@@ -85,6 +88,9 @@ export function HeroCard({
   onDelete,
   onBack,
   statusBadge,
+  remote,
+  playLabel,
+  extraActions,
 }: HeroCardProps) {
   const { t } = useTranslation();
   const isVolume = type === 'volume';
@@ -98,7 +104,7 @@ export function HeroCard({
           variant="ghost"
           size="sm"
           onClick={onBack}
-          className="fixed top-0 m-2 z-50 gap-1.5 bg-background/80 backdrop-blur-sm hover:bg-background/90 shadow-md mb-4 w-fit"
+          className="fixed top-[calc(env(safe-area-inset-top)+3.5rem)] md:top-0 m-2 z-50 gap-1.5 bg-background/80 backdrop-blur-sm hover:bg-background/90 shadow-md mb-4 w-fit"
         >
           <ArrowLeft className="h-4 w-4" />
           <span className="text-sm">{t('back')}</span>
@@ -216,19 +222,21 @@ export function HeroCard({
                 <span>{dateDisplay}</span>
               </div>
 
-              <div className="flex items-center gap-1.5">
-                {[1, 2, 3, 4, 5].map((star) => (
-                  <Star
-                    key={star}
-                    className={`h-5 w-5 cursor-pointer transition-colors ${
-                      rating !== null && star <= rating
-                        ? 'fill-yellow-400 text-yellow-400'
-                        : 'text-muted-foreground hover:text-yellow-300'
-                    }`}
-                    onClick={() => onRatingChange(star)}
-                  />
-                ))}
-              </div>
+              {!remote && (
+                <div className="flex items-center gap-1.5">
+                  {[1, 2, 3, 4, 5].map((star) => (
+                    <Star
+                      key={star}
+                      className={`h-5 w-5 cursor-pointer transition-colors ${
+                        rating !== null && star <= rating
+                          ? 'fill-yellow-400 text-yellow-400'
+                          : 'text-muted-foreground hover:text-yellow-300'
+                      }`}
+                      onClick={() => onRatingChange(star)}
+                    />
+                  ))}
+                </div>
+              )}
 
               {type === 'series' &&
                 provider !== providerEnum.Marvel &&
@@ -280,8 +288,9 @@ export function HeroCard({
                       className="gap-1.5"
                     >
                       <BookOpen className="h-4 w-4" />
-                      {hasFile ? t('mkread') : t('noFile')}
+                      {playLabel ?? (hasFile ? t('mkread') : t('noFile'))}
                     </Button>
+                    {extraActions}
                     <Separator orientation="vertical" className="h-6" />
                     <ActionButton
                       type="done"
@@ -290,13 +299,15 @@ export function HeroCard({
                       unsettext={t('mkread')}
                       settext={t('READ')}
                     />
-                    <ActionButton
-                      type="doing"
-                      status={book.reading}
-                      onClick={onStatusReading}
-                      unsettext={t('mkreading')}
-                      settext={t('READING')}
-                    />
+                    {onStatusReading && (
+                      <ActionButton
+                        type="doing"
+                        status={book.reading}
+                        onClick={onStatusReading}
+                        unsettext={t('mkreading')}
+                        settext={t('READING')}
+                      />
+                    )}
                     <ActionButton
                       type="todo"
                       status={book.unread}
@@ -333,91 +344,93 @@ export function HeroCard({
                   </>
                 )}
 
-                <div className="flex items-center gap-1 rounded-md border border-border bg-muted/40 p-1 w-fit">
-                  <Button
-                    variant="ghost"
-                    size="sm"
-                    onClick={onEditClick}
-                    className="gap-1.5 h-8 px-2.5"
-                  >
-                    <Pencil className="h-3.5 w-3.5" />
-                    <span className="hidden sm:inline text-xs">
-                      {t('EDIT')}
-                    </span>
-                  </Button>
+                {!remote && (
+                  <div className="flex items-center gap-1 rounded-md border border-border bg-muted/40 p-1 w-fit">
+                    <Button
+                      variant="ghost"
+                      size="sm"
+                      onClick={onEditClick}
+                      className="gap-1.5 h-8 px-2.5"
+                    >
+                      <Pencil className="h-3.5 w-3.5" />
+                      <span className="hidden sm:inline text-xs">
+                        {t('EDIT')}
+                      </span>
+                    </Button>
 
-                  <Separator orientation="vertical" className="h-5" />
-                  <Button
-                    variant="ghost"
-                    size="sm"
-                    onClick={async () => {
-                      try {
-                        await openPath(TheBook.path);
-                      } catch (error) {
-                        console.error(error);
-                        ToasterHandler(t('errorOpeningFolder'), 'error');
-                      }
-                    }}
-                    className="gap-1.5 h-8 px-2.5"
-                  >
-                    <FolderOpen className="h-3.5 w-3.5" />
-                    <span className="hidden sm:inline text-xs">
-                      {t('open-folder')}
-                    </span>
-                  </Button>
+                    <Separator orientation="vertical" className="h-5" />
+                    <Button
+                      variant="ghost"
+                      size="sm"
+                      onClick={async () => {
+                        try {
+                          await openPath(TheBook.path);
+                        } catch (error) {
+                          console.error(error);
+                          ToasterHandler(t('errorOpeningFolder'), 'error');
+                        }
+                      }}
+                      className="gap-1.5 h-8 px-2.5"
+                    >
+                      <FolderOpen className="h-3.5 w-3.5" />
+                      <span className="hidden sm:inline text-xs">
+                        {t('open-folder')}
+                      </span>
+                    </Button>
 
-                  {provider !== providerEnum.MANUAL && !isNaN(provider) && (
-                    <>
-                      <Separator orientation="vertical" className="h-5" />
-                      <Button
-                        variant="ghost"
-                        size="sm"
-                        onClick={onRefreshMeta}
-                        className="gap-1.5 h-8 px-2.5"
-                      >
-                        <RefreshCw className="h-3.5 w-3.5" />
-                        <span className="hidden sm:inline text-xs">
-                          {t('refreshMetadata')}
-                        </span>
-                      </Button>
-                    </>
-                  )}
-
-                  {provider !== providerEnum.MANUAL && !isNaN(provider) && (
-                    <>
-                      <Separator orientation="vertical" className="h-5" />
-                      <Button
-                        variant="ghost"
-                        size="sm"
-                        onClick={onRematchClick}
-                        className="gap-1.5 h-8 px-2.5"
-                      >
-                        <SearchCheck className="h-3.5 w-3.5" />
-                        <span className="hidden sm:inline text-xs">
-                          {t('rematch')}
-                        </span>
-                      </Button>
-                    </>
-                  )}
-
-                  {(provider === providerEnum.MANUAL || isNaN(provider)) &&
-                    onDelete && (
+                    {provider !== providerEnum.MANUAL && !isNaN(provider) && (
                       <>
                         <Separator orientation="vertical" className="h-5" />
                         <Button
                           variant="ghost"
                           size="sm"
-                          className="gap-1.5 h-8 px-2.5 text-destructive hover:text-destructive hover:bg-destructive/10"
-                          onClick={onDelete}
+                          onClick={onRefreshMeta}
+                          className="gap-1.5 h-8 px-2.5"
                         >
-                          <Trash2 className="h-3.5 w-3.5" />
+                          <RefreshCw className="h-3.5 w-3.5" />
                           <span className="hidden sm:inline text-xs">
-                            {t('DELETE')}
+                            {t('refreshMetadata')}
                           </span>
                         </Button>
                       </>
                     )}
-                </div>
+
+                    {provider !== providerEnum.MANUAL && !isNaN(provider) && (
+                      <>
+                        <Separator orientation="vertical" className="h-5" />
+                        <Button
+                          variant="ghost"
+                          size="sm"
+                          onClick={onRematchClick}
+                          className="gap-1.5 h-8 px-2.5"
+                        >
+                          <SearchCheck className="h-3.5 w-3.5" />
+                          <span className="hidden sm:inline text-xs">
+                            {t('rematch')}
+                          </span>
+                        </Button>
+                      </>
+                    )}
+
+                    {(provider === providerEnum.MANUAL || isNaN(provider)) &&
+                      onDelete && (
+                        <>
+                          <Separator orientation="vertical" className="h-5" />
+                          <Button
+                            variant="ghost"
+                            size="sm"
+                            className="gap-1.5 h-8 px-2.5 text-destructive hover:text-destructive hover:bg-destructive/10"
+                            onClick={onDelete}
+                          >
+                            <Trash2 className="h-3.5 w-3.5" />
+                            <span className="hidden sm:inline text-xs">
+                              {t('DELETE')}
+                            </span>
+                          </Button>
+                        </>
+                      )}
+                  </div>
+                )}
               </div>
             </div>
           </div>

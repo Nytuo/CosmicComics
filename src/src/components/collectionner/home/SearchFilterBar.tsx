@@ -23,6 +23,7 @@ import {
   DisplayCharacter,
 } from '@/interfaces/IDisplayBook.ts';
 import type { DisplaySeries } from '@/interfaces/IDisplayBook.ts';
+import { jellyfinRef, type JellyfinSource } from '@/API/jellyfinLibrary.ts';
 
 export type SortField = 'name' | 'note' | 'date' | 'favorite' | 'trending';
 export type SortOrder = 'asc' | 'desc';
@@ -39,6 +40,9 @@ export interface SearchFilterState {
   order: SortOrder;
   readingStatus: ReadingStatusFilter;
   favoriteOnly: boolean;
+  source: 'all' | 'local' | 'jellyfin';
+  serverId: string;
+  libraryId: string;
 }
 
 export const defaultFilterState: SearchFilterState = {
@@ -47,6 +51,9 @@ export const defaultFilterState: SearchFilterState = {
   order: 'asc',
   readingStatus: { read: false, reading: false, unread: false },
   favoriteOnly: false,
+  source: 'all',
+  serverId: '',
+  libraryId: '',
 };
 
 type Filterable = DisplayBook | DisplaySeries;
@@ -82,7 +89,16 @@ function matchesFilters(item: Filterable, filters: SearchFilterState): boolean {
     if (!pass) return false;
   }
 
-  return !(filters.favoriteOnly && !item.favorite);
+  if (filters.favoriteOnly && !item.favorite) return false;
+
+  const ref = jellyfinRef(item);
+  if (filters.source === 'local' && ref) return false;
+  if (filters.source === 'jellyfin') {
+    if (!ref) return false;
+    if (filters.serverId && ref.serverId !== filters.serverId) return false;
+    if (filters.libraryId && ref.libraryId !== filters.libraryId) return false;
+  }
+  return true;
 }
 
 function compareItems(
@@ -144,6 +160,9 @@ function activeFilterCount(state: SearchFilterState): number {
   if (rs.reading) count++;
   if (rs.unread) count++;
   if (state.favoriteOnly) count++;
+  if (state.source !== 'all') count++;
+  if (state.serverId) count++;
+  if (state.libraryId) count++;
   return count;
 }
 
@@ -152,13 +171,17 @@ interface SearchFilterBarProps {
   onChange: (next: SearchFilterState) => void;
   totalCount: number;
   filteredCount: number;
+  jellyfinSources?: JellyfinSource[];
 }
+
+const ALL = '__all__';
 
 function SearchFilterBar({
   state,
   onChange,
   totalCount,
   filteredCount,
+  jellyfinSources = [],
 }: SearchFilterBarProps) {
   const { t } = useTranslation();
 
@@ -168,6 +191,22 @@ function SearchFilterBar({
   ) => onChange({ ...state, [key]: value });
 
   const filterCount = activeFilterCount(state);
+  const selectedSource = jellyfinSources.find(
+    (source) => source.server.id === state.serverId
+  );
+  const libraryChoices = (
+    selectedSource ? [selectedSource] : jellyfinSources
+  ).flatMap((source) =>
+    source.libraries
+      .filter((library) => !library.hidden)
+      .map((library) => ({
+        ...library,
+        label:
+          jellyfinSources.length > 1 && !selectedSource
+            ? `${library.name} (${source.server.name})`
+            : library.name,
+      }))
+  );
 
   const hasAnyFilter =
     state.query !== '' ||
@@ -242,6 +281,88 @@ function SearchFilterBar({
               </label>
             ))}
           </div>
+
+          {jellyfinSources.length > 0 && (
+            <div className="space-y-2">
+              <p className="text-xs font-medium text-muted-foreground">
+                {t('filter_source')}
+              </p>
+              <Select
+                value={state.source}
+                onValueChange={(v) =>
+                  onChange({
+                    ...state,
+                    source: v as SearchFilterState['source'],
+                    serverId: '',
+                    libraryId: '',
+                  })
+                }
+              >
+                <SelectTrigger size="sm" className="w-full">
+                  <SelectValue />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="all">{t('filter_source_all')}</SelectItem>
+                  <SelectItem value="local">
+                    {t('filter_source_local')}
+                  </SelectItem>
+                  <SelectItem value="jellyfin">Jellyfin</SelectItem>
+                </SelectContent>
+              </Select>
+
+              {state.source === 'jellyfin' && (
+                <>
+                  {jellyfinSources.length > 1 && (
+                    <Select
+                      value={state.serverId || ALL}
+                      onValueChange={(v) =>
+                        onChange({
+                          ...state,
+                          serverId: v === ALL ? '' : v,
+                          libraryId: '',
+                        })
+                      }
+                    >
+                      <SelectTrigger size="sm" className="w-full">
+                        <SelectValue />
+                      </SelectTrigger>
+                      <SelectContent>
+                        <SelectItem value={ALL}>
+                          {t('filter_all_servers')}
+                        </SelectItem>
+                        {jellyfinSources.map((source) => (
+                          <SelectItem
+                            key={source.server.id}
+                            value={source.server.id}
+                          >
+                            {source.server.name} · {source.server.user_name}
+                          </SelectItem>
+                        ))}
+                      </SelectContent>
+                    </Select>
+                  )}
+                  <Select
+                    value={state.libraryId || ALL}
+                    onValueChange={(v) => set('libraryId', v === ALL ? '' : v)}
+                  >
+                    <SelectTrigger size="sm" className="w-full">
+                      <SelectValue />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value={ALL}>
+                        {t('filter_all_libraries')}
+                      </SelectItem>
+                      {libraryChoices.map((library) => (
+                        <SelectItem key={library.id} value={library.id}>
+                          {library.label}
+                        </SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
+                </>
+              )}
+            </div>
+          )}
 
           <label className="flex items-center gap-2 cursor-pointer">
             <Checkbox

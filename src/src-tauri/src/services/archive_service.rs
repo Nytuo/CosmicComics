@@ -1,20 +1,22 @@
+use crate::services::comic_archive::ComicArchive;
 use crate::utils::is_image_file;
 use futures::executor;
+#[cfg(desktop)]
 use headless_chrome::{Browser, LaunchOptionsBuilder};
 use pdfium_render::prelude::*;
+#[cfg(desktop)]
 use serde_json::Value;
-#[cfg(unix)]
-use std::os::unix::fs::PermissionsExt;
 use std::{
     fs::{self, File},
     io::{self, Write},
     path::Path,
     sync::Arc,
-    time::Duration,
 };
 use tokio::sync::Mutex;
 use tracing::{error, info};
-use unrar::Archive;
+#[cfg(desktop)]
+use std::time::Duration;
+#[cfg(desktop)]
 use zip::ZipArchive;
 
 pub async fn unzip_and_process(
@@ -43,32 +45,6 @@ pub async fn unzip_and_process(
     writeln!(file, "{}", zip_path)?;
 
     match ext {
-        "zip" | "cbz" | "7z" | "cb7" | "tar" | "cbt" => {
-            info!(
-                "[unzip_and_process] Processing zip-based archive: {}",
-                zip_path
-            );
-            let t = std::time::Instant::now();
-            extract_all_images_from_zip(zip_path, extract_dir, progress_status).await?;
-            info!(
-                "[unzip_and_process] zip extraction finished in {:.2?}",
-                t.elapsed()
-            );
-        }
-
-        "rar" | "cbr" => {
-            info!(
-                "[unzip_and_process] Processing rar-based archive: {}",
-                zip_path
-            );
-            let t = std::time::Instant::now();
-            extract_all_images_from_rar(zip_path, extract_dir, progress_status).await?;
-            info!(
-                "[unzip_and_process] rar extraction finished in {:.2?}",
-                t.elapsed()
-            );
-        }
-
         "pdf" => {
             info!("[unzip_and_process] Processing PDF: {}", zip_path);
             let t = std::time::Instant::now();
@@ -79,6 +55,7 @@ pub async fn unzip_and_process(
             );
         }
 
+        #[cfg(desktop)]
         "epub" | "ebook" => {
             info!("[unzip_and_process] Processing EPUB: {}", zip_path);
             let t = std::time::Instant::now();
@@ -90,8 +67,16 @@ pub async fn unzip_and_process(
         }
 
         _ => {
-            error!("[unzip_and_process] Unsupported extension: {}", ext);
-            return Err(format!("Extension {} is not supported.", ext).into());
+            info!(
+                "[unzip_and_process] Processing comic archive: {}",
+                zip_path
+            );
+            let t = std::time::Instant::now();
+            extract_comic_pages(zip_path, extract_dir, progress_status).await?;
+            info!(
+                "[unzip_and_process] comic extraction finished in {:.2?}",
+                t.elapsed()
+            );
         }
     }
 
@@ -101,181 +86,37 @@ pub async fn unzip_and_process(
     );
     Ok(())
 }
-pub async fn extract_first_image(
-    zip_path: String,
-    extract_dir: String,
-    extension: &str,
-    file_name: &str,
-) -> Result<(), Box<dyn std::error::Error + Send + Sync>> {
-    match extension {
-        "zip" | "cbz" | "7z" | "cb7" | "tar" | "cbt" => {
-            extract_first_image_from_zip(zip_path, extract_dir, file_name)
-        }
-        "rar" | "cbr" => extract_first_image_from_rar(zip_path, extract_dir, file_name),
-        _ => Err(format!("Unsupported extension: {}", extension).into()),
-    }
-}
-fn extract_first_image_from_zip<P: AsRef<Path>>(
-    zip_path: P,
-    extract_dir: P,
-    file_name: &str,
-) -> Result<(), Box<dyn std::error::Error + Send + Sync>> {
-    let file = File::open(&zip_path)?;
-    let mut archive = ZipArchive::new(file)?;
-
-    let mut image_file_index = None;
-
-    for i in 0..archive.len() {
-        let file = archive.by_index(i)?;
-        if is_image_file(file.name()) {
-            image_file_index = Some(i);
-            break;
-        }
-    }
-
-    if let Some(index) = image_file_index {
-        let mut img_file = archive.by_index(index)?;
-        let out_path = extract_dir.as_ref().join(format!("{}.jpg", file_name));
-        let mut out_file = File::create(out_path)?;
-        io::copy(&mut img_file, &mut out_file)?;
-        info!("Image extracted from ZIP.");
-        Ok(())
-    } else {
-        error!("No image file found in ZIP.");
-        Ok(())
-    }
-}
-
-fn extract_first_image_from_rar<P: AsRef<Path>>(
-    rar_path: P,
-    extract_dir: P,
-    file_name: &str,
-) -> Result<(), Box<dyn std::error::Error + Send + Sync>> {
-    let rar_path_str = rar_path.as_ref().to_str().unwrap_or_default();
-    info!("[RAR] Opening for first-image extraction: {}", rar_path_str);
-    let mut archive = Archive::new(rar_path_str).open_for_processing()?;
-
-    while let Some(header) = archive.read_header()? {
-        let filename = header.entry().filename.to_string_lossy().to_string();
-        let is_file = header.entry().is_file();
-        let is_img = is_image_file(&filename);
-        info!(
-            "[RAR] Entry: '{}' is_file={} is_image={}",
-            filename, is_file, is_img
-        );
-
-        if is_file && is_img {
-            info!("[RAR] First image found: {}", filename);
-            let extracted_file_path = extract_dir.as_ref().join(&*filename);
-
-            if let Some(parent) = extracted_file_path.parent() {
-                if let Err(e) = fs::create_dir_all(parent) {
-                    error!("[RAR] Failed to create parent dirs {:?}: {}", parent, e);
-                }
-            }
-
-            archive = header.extract_to(&extracted_file_path)?;
-            info!(
-                "[RAR] extract_to done; path exists: {}",
-                extracted_file_path.exists()
-            );
-
-            let renamed_path = extract_dir.as_ref().join(format!("{}.jpg", file_name));
-
-            if extracted_file_path.exists() {
-                fs::rename(&extracted_file_path, &renamed_path)?;
-                info!("[RAR] Renamed to: {:?}", renamed_path);
-                return Ok(());
-            } else {
-                error!(
-                    "[RAR] File missing after extraction: {:?}",
-                    extracted_file_path
-                );
-                if let Ok(entries) = fs::read_dir(extract_dir.as_ref()) {
-                    for e in entries.flatten() {
-                        info!("[RAR] Found in extract_dir: {:?}", e.path());
-                    }
-                }
-            }
-        } else {
-            archive = header.skip()?;
-        }
-    }
-
-    info!("[RAR] No image found in archive: {}", rar_path_str);
-    Ok(())
-}
-
-pub async fn extract_all_images_from_zip<P: AsRef<Path>>(
-    zip_path: P,
-    extract_dir: P,
-
+pub async fn extract_comic_pages(
+    archive_path: &str,
+    extract_dir: &str,
     progress_status: &Arc<Mutex<crate::commands::state::AppGlobalVariables>>,
-) -> Result<(), Box<dyn std::error::Error + Send + Sync>> {
-    let fn_start = std::time::Instant::now();
+) -> Result<usize, Box<dyn std::error::Error + Send + Sync>> {
+    let (tx, mut rx) = tokio::sync::mpsc::unbounded_channel::<(usize, usize, String)>();
+    let path = archive_path.to_string();
+    let dest = extract_dir.to_string();
+    let worker = tokio::task::spawn_blocking(move || -> Result<usize, String> {
+        let archive = ComicArchive::open(Path::new(&path)).map_err(|e| e.to_string())?;
+        archive
+            .extract_pages(Path::new(&dest), &mut |done, total, name| {
+                let _ = tx.send((done, total, name.to_string()));
+            })
+            .map_err(|e| e.to_string())
+    });
 
-    let t = std::time::Instant::now();
-    let file = File::open(&zip_path)?;
-    let mut archive = ZipArchive::new(file)?;
-    info!(
-        "[zip] Archive opened in {:.2?} ({} entries)",
-        t.elapsed(),
-        archive.len()
-    );
-
-    fs::create_dir_all(&extract_dir)?;
-    let mut image_count = 0;
-    let total_files = archive.len() as u32;
-    for i in 0..archive.len() {
-        let file_name: String;
-        let is_image: bool;
-        {
-            let mut file = archive.by_index(i)?;
-            file_name = file.name().to_string();
-            is_image = is_image_file(&file_name);
-
-            if is_image {
-                let t_copy = std::time::Instant::now();
-                let out_path = extract_dir.as_ref().join(format!("{:05}.jpg", image_count));
-                let mut out_file = File::create(&out_path)?;
-                let bytes_copied = io::copy(&mut file, &mut out_file)?;
-                info!(
-                    "[zip] [{}/{}] Copied '{}' ({} bytes) in {:.2?}",
-                    i + 1,
-                    total_files,
-                    file_name,
-                    bytes_copied,
-                    t_copy.elapsed()
-                );
-            }
-        }
-
-        if is_image {
-            let out_path = extract_dir.as_ref().join(format!("{:05}.jpg", image_count));
-            let t_perm = std::time::Instant::now();
-            #[cfg(unix)]
-            fs::set_permissions(&out_path, fs::Permissions::from_mode(0o777))?;
-            info!("[zip] set_permissions in {:.2?}", t_perm.elapsed());
-            image_count += 1;
-            let t_progress = std::time::Instant::now();
-            progress_status
-                .lock()
-                .await
-                .set_progress_status(
-                    "unzip".to_string(),
-                    "loading".to_string(),
-                    ((image_count * 100) / total_files).to_string(),
-                    file_name,
-                )
-                .await;
-            info!(
-                "[zip] progress_status update in {:.2?}",
-                t_progress.elapsed()
-            );
-        }
+    while let Some((done, total, name)) = rx.recv().await {
+        progress_status
+            .lock()
+            .await
+            .set_progress_status(
+                "unzip".to_string(),
+                "loading".to_string(),
+                ((done * 100) / total.max(1)).to_string(),
+                name,
+            )
+            .await;
     }
+    let count = worker.await??;
 
-    let t_done = std::time::Instant::now();
     progress_status
         .lock()
         .await
@@ -286,112 +127,15 @@ pub async fn extract_all_images_from_zip<P: AsRef<Path>>(
             "All images extracted.".to_string(),
         )
         .await;
-    info!(
-        "[zip] final progress_status update in {:.2?}",
-        t_done.elapsed()
-    );
-
-    if image_count == 0 {
-        info!("[zip] No images found in ZIP archive.");
+    if count == 0 {
+        info!("[comic] No images found in {}", archive_path);
     } else {
-        info!(
-            "[zip] Extracted {} images from ZIP archive in {:.2?} total.",
-            image_count,
-            fn_start.elapsed()
-        );
+        info!("[comic] Extracted {} pages from {}", count, archive_path);
     }
-
-    Ok(())
+    Ok(count)
 }
 
-pub(crate) async fn extract_all_images_from_rar<P: AsRef<Path>>(
-    rar_path: P,
-    extract_dir: P,
-
-    progress_status: &Arc<Mutex<crate::commands::state::AppGlobalVariables>>,
-) -> Result<(), Box<dyn std::error::Error + Send + Sync>> {
-    let fn_start = std::time::Instant::now();
-    fs::create_dir_all(&extract_dir)?;
-    let image_count;
-
-    {
-        let t = std::time::Instant::now();
-        let mut archive =
-            Archive::new(rar_path.as_ref().to_str().unwrap()).open_for_processing()?;
-        info!("[rar] Archive opened in {:.2?}", t.elapsed());
-        let mut count = 0;
-
-        while let Some(header) = archive.read_header()? {
-            let file_path = header.entry().filename.to_string_lossy().to_string();
-
-            if header.entry().is_file() && is_image_file(&file_path) {
-                let t_extract = std::time::Instant::now();
-                let extracted_file_path = extract_dir.as_ref().join(&file_path);
-                archive = header.extract_to(&extracted_file_path)?;
-                info!(
-                    "[rar] extract_to '{}' in {:.2?}",
-                    file_path,
-                    t_extract.elapsed()
-                );
-
-                if extracted_file_path.exists() {
-                    let renamed_path = extract_dir.as_ref().join(format!("{:05}.jpg", count));
-                    let t_rename = std::time::Instant::now();
-                    fs::rename(&extracted_file_path, &renamed_path)?;
-                    info!("[rar] rename in {:.2?}", t_rename.elapsed());
-                    let t_perm = std::time::Instant::now();
-                    #[cfg(unix)]
-                    fs::set_permissions(&renamed_path, fs::Permissions::from_mode(0o777))?;
-                    info!("[rar] set_permissions in {:.2?}", t_perm.elapsed());
-                    count += 1;
-                    info!("[rar] image #{} extracted: '{}'", count, file_path);
-                } else {
-                    error!(
-                        "[rar] extracted file missing after extract_to: {:?}",
-                        extracted_file_path
-                    );
-                }
-            } else {
-                archive = header.skip()?;
-            }
-        }
-        image_count = count;
-        info!(
-            "[rar] All entries processed: {} images, loop took {:.2?}",
-            image_count,
-            fn_start.elapsed()
-        );
-    }
-
-    let t_done = std::time::Instant::now();
-    progress_status
-        .lock()
-        .await
-        .set_progress_status(
-            "unzip".to_string(),
-            "done".to_string(),
-            "100".to_string(),
-            "All images extracted.".to_string(),
-        )
-        .await;
-    info!(
-        "[rar] final progress_status update in {:.2?}",
-        t_done.elapsed()
-    );
-
-    if image_count == 0 {
-        info!("[rar] No images found in RAR archive.");
-    } else {
-        info!(
-            "[rar] Extracted {} images from RAR archive in {:.2?} total.",
-            image_count,
-            fn_start.elapsed()
-        );
-    }
-
-    Ok(())
-}
-
+#[cfg(desktop)]
 pub async fn extract_pdf_from_epub(
     epub_path: &str,
     extract_dir: &str,
@@ -558,6 +302,7 @@ pub async fn convert_pdf_to_images(
     .await?
 }
 
+#[cfg(desktop)]
 fn merge_pdfs(
     input_paths: Vec<&str>,
     output_path: &str,
@@ -578,6 +323,7 @@ fn merge_pdfs(
     Ok(())
 }
 
+#[cfg(desktop)]
 pub async fn scrape_images_from_webpage(
     url: &str,
     output_dir: &str,
@@ -749,19 +495,8 @@ pub async fn extract_first_image_from_path(
         return extract_first_image_bytes_from_directory(book_path);
     }
 
-    let ext = path
-        .extension()
-        .and_then(|e| e.to_str())
-        .unwrap_or_default()
-        .to_lowercase();
-
-    match ext.as_str() {
-        "zip" | "cbz" | "7z" | "cb7" | "tar" | "cbt" => {
-            extract_first_image_bytes_from_zip(book_path)
-        }
-        "rar" | "cbr" => extract_first_image_bytes_from_rar(book_path),
-        _ => Err(format!("Unsupported extension for image extraction: {}", ext).into()),
-    }
+    let owned = book_path.to_string();
+    tokio::task::spawn_blocking(move || ComicArchive::open(Path::new(&owned))?.read_page(0)).await?
 }
 
 /// Read the first image from a directory of image files and return its bytes.
@@ -893,87 +628,6 @@ pub fn save_image_bytes_to_disk(
     Ok(file_path)
 }
 
-/// Read the first image from a zip-based archive and return its bytes.
-fn extract_first_image_bytes_from_zip(
-    zip_path: &str,
-) -> Result<Vec<u8>, Box<dyn std::error::Error + Send + Sync>> {
-    let file = File::open(zip_path)?;
-    let mut archive = ZipArchive::new(file)?;
-
-    for i in 0..archive.len() {
-        let mut entry = archive.by_index(i)?;
-        if is_image_file(entry.name()) {
-            let mut buf = Vec::new();
-            io::Read::read_to_end(&mut entry, &mut buf)?;
-            return Ok(buf);
-        }
-    }
-    Err("No image file found in ZIP archive".into())
-}
-
-/// Read the first image from a RAR archive and return its bytes.
-fn extract_first_image_bytes_from_rar(
-    rar_path: &str,
-) -> Result<Vec<u8>, Box<dyn std::error::Error + Send + Sync>> {
-    info!("[RAR] extract_first_image_bytes_from_rar: {}", rar_path);
-    let ts = std::time::SystemTime::now()
-        .duration_since(std::time::UNIX_EPOCH)
-        .unwrap_or_default()
-        .as_nanos();
-    let tmp_dir = std::env::temp_dir().join(format!("cosmic_rar_tmp_{}", ts));
-    info!("[RAR] Temp dir: {:?}", tmp_dir);
-    fs::create_dir_all(&tmp_dir)?;
-
-    let mut archive = Archive::new(rar_path).open_for_processing()?;
-
-    while let Some(header) = archive.read_header()? {
-        let filename = header.entry().filename.to_string_lossy().to_string();
-        let is_file = header.entry().is_file();
-        let is_img = is_image_file(&filename);
-        info!(
-            "[RAR] Entry: '{}' is_file={} is_image={}",
-            filename, is_file, is_img
-        );
-
-        if is_file && is_img {
-            let extracted_file_path = tmp_dir.join(&filename);
-
-            if let Some(parent) = extracted_file_path.parent() {
-                if let Err(e) = fs::create_dir_all(parent) {
-                    error!("[RAR] Cannot create parent {:?}: {}", parent, e);
-                }
-            }
-
-            info!("[RAR] Extracting to: {:?}", extracted_file_path);
-            archive = header.extract_to(&extracted_file_path)?;
-            info!(
-                "[RAR] File exists after extract_to: {}",
-                extracted_file_path.exists()
-            );
-
-            if extracted_file_path.exists() {
-                let data = fs::read(&extracted_file_path)?;
-                info!("[RAR] Read {} bytes from extracted image", data.len());
-                let _ = fs::remove_dir_all(&tmp_dir);
-                return Ok(data);
-            } else {
-                error!("[RAR] Expected file not found: {:?}", extracted_file_path);
-                if let Ok(entries) = fs::read_dir(&tmp_dir) {
-                    for e in entries.flatten() {
-                        info!("[RAR] Found in tmp_dir: {:?}", e.path());
-                    }
-                }
-            }
-        } else {
-            archive = header.skip()?;
-        }
-    }
-
-    let _ = fs::remove_dir_all(&tmp_dir);
-    error!("[RAR] No image file found in: {}", rar_path);
-    Err("No image file found in RAR archive".into())
-}
-
 /// Get a specific page (0-indexed) from an archive at the given path.
 /// Returns the image bytes for that page.
 pub async fn get_page_from_path(
@@ -1002,14 +656,13 @@ pub async fn get_page_from_path(
     );
     let t = std::time::Instant::now();
     let result = match ext.as_str() {
-        "zip" | "cbz" | "7z" | "cb7" | "tar" | "cbt" => {
-            get_page_from_zip(book_path, page_number as usize)
-        }
-        "rar" | "cbr" => get_page_from_rar(book_path, page_number as usize),
         "pdf" => get_page_from_pdf(book_path, page_number as usize).await,
         _ => {
-            error!("[get_page_from_path] Unsupported extension: {}", ext);
-            Err(format!("Unsupported extension for page extraction: {}", ext).into())
+            let owned = book_path.to_string();
+            tokio::task::spawn_blocking(move || {
+                ComicArchive::open(Path::new(&owned))?.read_page(page_number as usize)
+            })
+            .await?
         }
     };
     info!(
@@ -1070,99 +723,6 @@ fn get_page_from_directory(
         fn_start.elapsed()
     );
     Ok(data)
-}
-
-/// Get a specific page from a zip-based archive.
-fn get_page_from_zip(
-    zip_path: &str,
-    page_number: usize,
-) -> Result<Vec<u8>, Box<dyn std::error::Error + Send + Sync>> {
-    let file = File::open(zip_path)?;
-    let mut archive = ZipArchive::new(file)?;
-
-    let mut image_indices: Vec<usize> = Vec::new();
-    for i in 0..archive.len() {
-        let entry = archive.by_index(i)?;
-        if is_image_file(entry.name()) {
-            image_indices.push(i);
-        }
-    }
-
-    image_indices.sort_by(|a, b| {
-        let name_a = archive
-            .by_index(*a)
-            .map(|e| e.name().to_string())
-            .unwrap_or_default();
-        let name_b = archive
-            .by_index(*b)
-            .map(|e| e.name().to_string())
-            .unwrap_or_default();
-        name_a.cmp(&name_b)
-    });
-
-    let idx = image_indices.get(page_number).ok_or_else(|| {
-        format!(
-            "Page {} out of range (total: {})",
-            page_number,
-            image_indices.len()
-        )
-    })?;
-
-    let mut entry = archive.by_index(*idx)?;
-    let mut buf = Vec::new();
-    io::Read::read_to_end(&mut entry, &mut buf)?;
-    Ok(buf)
-}
-
-/// Get a specific page from a RAR archive.
-fn get_page_from_rar(
-    rar_path: &str,
-    page_number: usize,
-) -> Result<Vec<u8>, Box<dyn std::error::Error + Send + Sync>> {
-    let list_archive = Archive::new(rar_path).open_for_listing()?;
-    let mut image_names: Vec<String> = Vec::new();
-    for entry in list_archive {
-        let entry = entry?;
-        if entry.is_file() && is_image_file(&entry.filename.to_string_lossy()) {
-            image_names.push(entry.filename.to_string_lossy().to_string());
-        }
-    }
-    image_names.sort();
-
-    let target_name = image_names
-        .get(page_number)
-        .ok_or_else(|| {
-            format!(
-                "Page {} out of range (total: {})",
-                page_number,
-                image_names.len()
-            )
-        })?
-        .clone();
-
-    let ts = std::time::SystemTime::now()
-        .duration_since(std::time::UNIX_EPOCH)
-        .unwrap_or_default()
-        .as_nanos();
-    let tmp_dir = std::env::temp_dir().join(format!("cosmic_rar_page_{}", ts));
-    fs::create_dir_all(&tmp_dir)?;
-
-    let mut archive = Archive::new(rar_path).open_for_processing()?;
-    while let Some(header) = archive.read_header()? {
-        let filename = header.entry().filename.to_string_lossy().to_string();
-        if filename == target_name {
-            let extracted = tmp_dir.join(&filename);
-            let _archive = header.extract_to(&extracted)?;
-            let data = fs::read(&extracted)?;
-            let _ = fs::remove_dir_all(&tmp_dir);
-            return Ok(data);
-        } else {
-            archive = header.skip()?;
-        }
-    }
-
-    let _ = fs::remove_dir_all(&tmp_dir);
-    Err(format!("Page {} not found in RAR archive", page_number).into())
 }
 
 /// Get a specific page from a PDF rendered as a WebP image.
@@ -1228,29 +788,6 @@ pub async fn get_pages_count_from_path(
     info!("[get_pages_count_from_path] ext={} path={}", ext, book_path);
     let t = std::time::Instant::now();
     let result = match ext.as_str() {
-        "zip" | "cbz" | "7z" | "cb7" | "tar" | "cbt" => {
-            let file = File::open(book_path)?;
-            let mut archive = ZipArchive::new(file)?;
-            let mut count = 0i64;
-            for i in 0..archive.len() {
-                let entry = archive.by_index(i)?;
-                if is_image_file(entry.name()) {
-                    count += 1;
-                }
-            }
-            Ok(count)
-        }
-        "rar" | "cbr" => {
-            let archive = Archive::new(book_path).open_for_listing()?;
-            let mut count = 0i64;
-            for entry in archive {
-                let entry = entry?;
-                if entry.is_file() && is_image_file(&entry.filename.to_string_lossy()) {
-                    count += 1;
-                }
-            }
-            Ok(count)
-        }
         "pdf" => {
             let pdf_path = book_path.to_string();
             let count = tokio::task::spawn_blocking(move || {
@@ -1262,8 +799,13 @@ pub async fn get_pages_count_from_path(
             Ok(count)
         }
         _ => {
-            error!("[get_pages_count_from_path] Unsupported extension: {}", ext);
-            Err(format!("Unsupported extension: {}", ext).into())
+            let owned = book_path.to_string();
+            tokio::task::spawn_blocking(move || {
+                ComicArchive::open(Path::new(&owned))?
+                    .page_count()
+                    .map(|count| count as i64)
+            })
+            .await?
         }
     };
     info!(

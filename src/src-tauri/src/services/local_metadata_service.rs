@@ -3,7 +3,7 @@
 use serde::Deserialize;
 use std::fs;
 use std::path::Path;
-use zip::ZipArchive;
+use crate::services::comic_archive::ComicArchive;
 
 use crate::models::common::{DisplayCharacter, DisplayCreator};
 
@@ -294,55 +294,9 @@ fn parse_metron_info_xml(xml: &str) -> Option<LocalMetadata> {
         .map(LocalMetadata::from)
 }
 
-fn read_xml_text_from_zip(path: &Path, filename: &str) -> Option<String> {
-    let file = fs::File::open(path).ok()?;
-    let mut archive = ZipArchive::new(file).ok()?;
-
-    let index = (0..archive.len()).find(|&i| {
-        archive
-            .by_index(i)
-            .ok()
-            .map(|f| f.name().eq_ignore_ascii_case(filename))
-            .unwrap_or(false)
-    })?;
-
-    let mut entry = archive.by_index(index).ok()?;
-    let mut xml = String::new();
-    std::io::Read::read_to_string(&mut entry, &mut xml).ok()?;
-    Some(xml)
-}
-
-fn read_xml_text_from_rar(path: &Path, filename: &str) -> Option<String> {
-    use unrar::Archive;
-
-    let path_str = path.to_str()?;
-    let mut archive = Archive::new(path_str).open_for_processing().ok()?;
-
-    while let Some(header) = archive.read_header().ok()? {
-        let entry_filename = header.entry().filename.to_string_lossy().to_string();
-        let is_match = header.entry().is_file()
-            && Path::new(&entry_filename)
-                .file_name()
-                .and_then(|n| n.to_str())
-                .map(|n| n.eq_ignore_ascii_case(filename))
-                .unwrap_or(false);
-
-        if is_match {
-            let temp_path = std::env::temp_dir().join(format!(
-                "cosmiccomics_sidecar_{}.xml",
-                rand::random::<u32>()
-            ));
-            let extracted = header.extract_to(&temp_path).ok()?;
-            let _ = extracted;
-            let xml = fs::read_to_string(&temp_path).ok();
-            let _ = fs::remove_file(&temp_path);
-            return xml;
-        } else {
-            archive = header.skip().ok()?;
-        }
-    }
-
-    None
+fn read_xml_text_from_archive(path: &Path, filename: &str) -> Option<String> {
+    let bytes = ComicArchive::open(path).ok()?.read_named(filename)?;
+    String::from_utf8(bytes).ok()
 }
 
 fn read_xml_text_from_folder(path: &Path, filename: &str) -> Option<String> {
@@ -359,8 +313,9 @@ fn read_sidecar_metadata(path: &Path) -> LocalMetadata {
             .map(|e| e.to_lowercase())
             .as_deref()
         {
-            Some("cbz") | Some("zip") => read_xml_text_from_zip,
-            Some("cbr") | Some("rar") => read_xml_text_from_rar,
+            Some("cbz" | "zip" | "cbr" | "rar" | "cb7" | "7z" | "cbt" | "tar") => {
+                read_xml_text_from_archive
+            }
             _ => return LocalMetadata::default(),
         }
     };
@@ -449,7 +404,7 @@ pub fn extract_local_metadata(path: &Path) -> LocalMetadata {
         .unwrap_or_default();
 
     match ext.as_str() {
-        "cbz" | "zip" | "cbr" | "rar" => read_sidecar_metadata(path),
+        "cbz" | "zip" | "cbr" | "rar" | "cb7" | "7z" | "cbt" | "tar" => read_sidecar_metadata(path),
         "pdf" => read_pdf_metadata(path).unwrap_or_default(),
         _ => LocalMetadata::default(),
     }

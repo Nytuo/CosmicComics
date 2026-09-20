@@ -24,6 +24,7 @@ import * as TauriAPI from '@/API/TauriAPI';
 import { modifyConfigJson } from '@/utils/Fetchers.ts';
 import { IUserSettings } from '@/interfaces/IUserSettings.ts';
 import { JSX } from 'react';
+import { usePlatform } from '@/hooks/use-platform.ts';
 
 /**
  * A dialog component for creating a new account (used in the login screen for first setup).
@@ -114,6 +115,7 @@ export default function ReaderSettingsDialog({
   setShowPanelDebugOverlay: (v: boolean) => void;
 }): JSX.Element {
   const { t } = useTranslation();
+  const platform = usePlatform();
 
   const handleClose = () => {
     onClose();
@@ -147,7 +149,7 @@ export default function ReaderSettingsDialog({
       fixWidth();
       state[7] = { Vertical_Reader_Mode: true };
     }
-    setSmartPanelMode(userSettings.Smart_Panel_Mode);
+    setSmartPanelMode(platform.ai && userSettings.Smart_Panel_Mode);
     setActionbarON(!userSettings.NoBar);
     setDoublePageMode(userSettings.Double_Page_Mode);
     setDoublePage(userSettings.Double_Page_Mode);
@@ -506,6 +508,7 @@ export default function ReaderSettingsDialog({
             {state.map((item: any, index: number) => {
               const itemKey = Object.keys(item)[0];
               const itemValue = item[itemKey];
+              if (itemKey === 'Smart_Panel_Mode' && !platform.ai) return null;
               return (
                 <div key={index} className="flex items-center justify-between">
                   <Label htmlFor={`id_${itemKey}`}>{t(itemKey)}</Label>

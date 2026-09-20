@@ -6,6 +6,7 @@ use surrealdb::engine::local::{Db, SurrealKv};
 use surrealdb::Surreal;
 use tracing::{debug, error, info};
 
+use crate::models::stats::ReadingSessionRecord;
 use crate::models::{
     BookRecord, BookmarkRecord, DisplayBook, DisplaySeries, ScanPathRecord, SeriesRecord,
 };
@@ -80,7 +81,20 @@ impl SurrealRepo {
             })?;
         debug!("[ensure_schema] table 'bookmark' OK");
 
-        info!("[ensure_schema] all 4 tables defined");
+        self.db
+            .query("DEFINE TABLE IF NOT EXISTS reading_session SCHEMALESS")
+            .await?
+            .check()
+            .map_err(|e| {
+                error!("[ensure_schema] DEFINE TABLE reading_session failed: {}", e);
+                e
+            })?;
+        self.db
+            .query("DEFINE INDEX IF NOT EXISTS idx_session_book ON TABLE reading_session COLUMNS book_ref")
+            .await?
+            .check()?;
+
+        info!("[ensure_schema] all tables defined");
 
         self.db
             .query("DEFINE INDEX IF NOT EXISTS idx_book_provider ON TABLE book COLUMNS provider_id")
@@ -809,6 +823,31 @@ impl SurrealRepo {
         Ok(())
     }
 
+    pub async fn upsert_reading_session(&self, session: &ReadingSessionRecord) -> Result<()> {
+        self.db
+            .query("UPSERT type::thing('reading_session', $id) CONTENT $rec")
+            .bind(("id", session.session_id.clone()))
+            .bind(("rec", session.clone()))
+            .await?
+            .check()?;
+        Ok(())
+    }
+
+    pub async fn get_reading_sessions(&self) -> Result<Vec<ReadingSessionRecord>> {
+        let sessions: Vec<ReadingSessionRecord> = self
+            .db
+            .query("SELECT * OMIT id FROM reading_session")
+            .await?
+            .check()?
+            .take(0)?;
+        Ok(sessions)
+    }
+
+    pub async fn clear_reading_sessions(&self) -> Result<()> {
+        self.db.query("DELETE reading_session").await?.check()?;
+        Ok(())
+    }
+
     pub async fn get_all_bookmarks(&self) -> Result<Vec<BookmarkRecord>> {
         let bookmarks: Vec<BookmarkRecord> = self
             .db
@@ -964,5 +1003,48 @@ impl SurrealRepo {
             .await?
             .check()?;
         Ok(())
+    }
+}
+
+#[cfg(test)]
+mod session_tests {
+    use super::*;
+
+    fn session(id: &str, secs: i64) -> ReadingSessionRecord {
+        ReadingSessionRecord {
+            session_id: id.into(),
+            source: "local".into(),
+            server_id: None,
+            book_ref: "book:abc".into(),
+            title: "Saga 01".into(),
+            series_title: Some("Saga".into()),
+            format: Some("cbz".into()),
+            started_at: "2026-09-20T10:00:00Z".into(),
+            ended_at: "2026-09-20T10:10:00Z".into(),
+            duration_secs: secs,
+            pages_read: 4,
+            page_count: 20,
+            completed: false,
+        }
+    }
+
+    #[tokio::test]
+    async fn a_session_is_updated_in_place_then_cleared() {
+        let dir = tempfile::tempdir().unwrap();
+        let repo = SurrealRepo::open(dir.path().to_str().unwrap()).await.unwrap();
+
+        repo.upsert_reading_session(&session("s-1", 30)).await.unwrap();
+        repo.upsert_reading_session(&session("s-1", 90)).await.unwrap();
+        repo.upsert_reading_session(&session("s-2", 10)).await.unwrap();
+
+        let mut sessions = repo.get_reading_sessions().await.unwrap();
+        sessions.sort_by(|a, b| a.session_id.cmp(&b.session_id));
+        assert_eq!(sessions.len(), 2, "the same session id is one record");
+        assert_eq!(sessions[0].duration_secs, 90, "the heartbeat overwrites");
+        assert_eq!(sessions[0].series_title.as_deref(), Some("Saga"));
+        assert_eq!(sessions[1].session_id, "s-2");
+
+        repo.clear_reading_sessions().await.unwrap();
+        assert!(repo.get_reading_sessions().await.unwrap().is_empty());
     }
 }

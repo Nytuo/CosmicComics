@@ -3,7 +3,7 @@ import { useTranslation } from 'react-i18next';
 import { resolveImageUrl } from '@/utils/imageUrl.ts';
 import styles from './card.module.css';
 import { Badge } from '../../ui/badge.tsx';
-import { Heart } from 'lucide-react';
+import { CheckCircle2, Heart } from 'lucide-react';
 
 interface CardProps {
   title: string;
@@ -12,7 +12,12 @@ interface CardProps {
   onClick?: () => void;
   apiName?: string;
   favorite?: boolean;
+  read?: boolean;
+  className?: string;
 }
+
+export const GRID_CARD_CLASS =
+  'm-2 w-[calc(50%-1rem)] sm:w-3xs decoration-none block cursor-pointer bg-card overflow-hidden rounded-md shadow-md';
 
 export const Card: React.FC<CardProps> = ({
   title,
@@ -21,6 +26,8 @@ export const Card: React.FC<CardProps> = ({
   onClick,
   apiName,
   favorite,
+  read,
+  className,
 }) => {
   const { t } = useTranslation();
   const resolvedImage = resolveImageUrl(image);
@@ -38,6 +45,8 @@ export const Card: React.FC<CardProps> = ({
         return styles.apiMangadex;
       case 'manual':
         return styles.apiManual;
+      case 'jellyfin':
+        return styles.apiJellyfin;
       default:
         return styles.apiDefault;
     }
@@ -54,6 +63,8 @@ export const Card: React.FC<CardProps> = ({
         return 'ANILIST';
       case 'manual':
         return 'Manual';
+      case 'jellyfin':
+        return 'Jellyfin';
       case 'mangadex':
         return 'Mangadex';
       default:
@@ -63,7 +74,10 @@ export const Card: React.FC<CardProps> = ({
 
   return (
     <div
-      className="m-2 w-3xs decoration-none block cursor-pointer bg-card overflow-hidden rounded-md shadow-md"
+      className={
+        className ??
+        'm-2 w-3xs decoration-none block cursor-pointer bg-card overflow-hidden rounded-md shadow-md'
+      }
       onClick={() => {
         onClick?.();
       }}
@@ -96,6 +110,9 @@ export const Card: React.FC<CardProps> = ({
               </Badge>
             )}
           </div>
+          {read && (
+            <CheckCircle2 className="absolute bottom-2 right-2 z-20 h-5 w-5 text-green-500 drop-shadow" />
+          )}
         </div>
       ) : (
         <div className={styles.placeholder}>
