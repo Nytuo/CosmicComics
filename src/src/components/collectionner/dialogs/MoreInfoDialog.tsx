@@ -42,7 +42,7 @@ export default function MoreInfoDialog({
         if (!isOpen) onClose();
       }}
     >
-      <DialogContent className="sm:w-150 w-lg">
+      <DialogContent className="sm:w-150">
         <DialogHeader>
           <DialogTitle>{t('seeMore')}</DialogTitle>
         </DialogHeader>

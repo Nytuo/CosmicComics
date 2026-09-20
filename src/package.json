@@ -13,12 +13,15 @@
   "type": "module",
   "scripts": {
     "dev": "tauri dev",
+    "sync:ios-icons": "node scripts/sync-ios-icons.cjs",
+    "predev:vite": "npm run sync:ios-icons",
     "dev:vite": "vite dev",
     "dev:update": "UPDATER_ENDPOINT=http://localhost:8765/latest.json npm run dev",
     "mock-server": "node scripts/mock-update-server.cjs",
     "mock-server:version": "node scripts/mock-update-server.cjs",
     "build": "tauri build",
     "build:vite": "vite build",
+    "prebuild:vite": "npm run sync:ios-icons",
     "tauri": "tauri",
     "format": "prettier . --write",
     "format:check": "prettier . --check"

@@ -1,6 +1,12 @@
 import './App.css';
 import './css/tailwind.css';
-import { BrowserRouter, Navigate, Route, Routes } from 'react-router-dom';
+import {
+  BrowserRouter,
+  Navigate,
+  Route,
+  Routes,
+  useLocation,
+} from 'react-router-dom';
 import Collectionner from './pages/Collectionner.tsx';
 import Viewer from './pages/Viewer.tsx';
 import { Toaster } from 'sonner';
@@ -11,6 +17,33 @@ import ModelDownloadModal from './components/common/ModelDownloadModal.tsx';
 import PdfiumDownloadModal from './components/common/PdfiumDownloadModal.tsx';
 import UpdaterModal from './components/common/UpdaterModal.tsx';
 import { usePlatform } from './hooks/use-platform.ts';
+
+const LOCKED_VIEWPORT =
+  'width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, viewport-fit=cover';
+const ZOOMABLE_VIEWPORT =
+  'width=device-width, initial-scale=1, maximum-scale=5, viewport-fit=cover';
+
+function ZoomGuard() {
+  const { pathname } = useLocation();
+  const zoomable = pathname.startsWith('/viewer');
+
+  useEffect(() => {
+    document
+      .querySelector('meta[name="viewport"]')
+      ?.setAttribute('content', zoomable ? ZOOMABLE_VIEWPORT : LOCKED_VIEWPORT);
+    document.documentElement.classList.toggle('zoom-locked', !zoomable);
+    if (zoomable) return;
+    const block = (e: Event) => e.preventDefault();
+    document.addEventListener('gesturestart', block);
+    document.addEventListener('gesturechange', block);
+    return () => {
+      document.removeEventListener('gesturestart', block);
+      document.removeEventListener('gesturechange', block);
+    };
+  }, [zoomable]);
+
+  return null;
+}
 
 function App() {
   const platform = usePlatform();
@@ -34,6 +67,7 @@ function App() {
       {platform.pdf && <PdfiumDownloadModal />}
       {platform.updater && <UpdaterModal />}
       <BrowserRouter>
+        <ZoomGuard />
         <Routes>
           <Route path="/" element={<Navigate to="/collectionner" replace />} />
           <Route path="/collectionner" element={<Collectionner />} />

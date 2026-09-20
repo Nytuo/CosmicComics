@@ -63,7 +63,7 @@ export default function ViewerHeader({
   return (
     <header
       className={`fixed top-0 z-50 flex items-center h-16 pt-[env(safe-area-inset-top)] box-content border-b border-border bg-background/80 backdrop-blur transition-all duration-200 ${
-        open ? 'ml-60 w-[calc(100%-240px)]' : 'ml-0 w-full'
+        open ? 'md:ml-60 md:w-[calc(100%-240px)] w-full' : 'ml-0 w-full'
       }`}
     >
       <div className="flex items-center w-full px-4">

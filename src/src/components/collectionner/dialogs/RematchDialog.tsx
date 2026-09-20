@@ -33,7 +33,7 @@ export default function RematchDialog({
         if (!isOpen) onClose();
       }}
     >
-      <DialogContent className="sm:w-200 max-h-[85vh] overflow-y-auto">
+      <DialogContent className="sm:w-200 max-h-[85dvh] overflow-y-auto">
         <DialogHeader>
           <DialogTitle>{t('rematchTitle')}</DialogTitle>
         </DialogHeader>

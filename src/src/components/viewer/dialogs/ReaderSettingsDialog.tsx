@@ -379,7 +379,7 @@ export default function ReaderSettingsDialog({
         if (!isOpen) onClose();
       }}
     >
-      <DialogContent className="w-2xl h-[80vh] overflow-y-auto">
+      <DialogContent className="sm:w-2xl h-[80dvh] overflow-y-auto">
         <DialogHeader>
           <DialogTitle>{t('book_settings')}</DialogTitle>
         </DialogHeader>

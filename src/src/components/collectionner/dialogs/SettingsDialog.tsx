@@ -180,14 +180,14 @@ export default function SettingsDialog({
         if (!isOpen) onClose();
       }}
     >
-      <DialogContent className="sm:w-160 max-h-[85vh] overflow-y-auto">
+      <DialogContent className="sm:w-160 max-h-[85dvh] overflow-y-auto">
         <DialogHeader>
           <DialogTitle>{t('settings')}</DialogTitle>
         </DialogHeader>
         <div className="space-y-8 py-4">
           <div className="space-y-3">
             <Label>{t('select_a_theme')}</Label>
-            <div className="grid grid-cols-5 gap-2">
+            <div className="grid grid-cols-3 gap-2 sm:grid-cols-5">
               {themes.map((theme) => (
                 <button
                   key={theme.id}

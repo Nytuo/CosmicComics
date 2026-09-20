@@ -984,3 +984,8 @@ a,
 [role='button'] {
   touch-action: manipulation;
 }
+
+html.zoom-locked {
+  touch-action: pan-x pan-y;
+  -webkit-text-size-adjust: 100%;
+}

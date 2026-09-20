@@ -1,0 +1,738 @@
+// !$*UTF8*$!
+{
+	archiveVersion = 1;
+	classes = {
+	};
+	objectVersion = 77;
+	objects = {
+
+/* Begin PBXBuildFile section */
+		0B1A58ABA8A60159EE8C9F89 /* UIKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 41E871A9CC6F701969ACF03C /* UIKit.framework */; };
+		35465023C5F79D9EA0668ED1 /* WebKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 3AA2E725FCF7A643BAAC81C4 /* WebKit.framework */; };
+		5C8AB0680B708F0C76A309AF /* LaunchScreen.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = B72DA3AAE1DDFC5F766BB4AD /* LaunchScreen.storyboard */; };
+		6514E872E67051956C9D51E6 /* CoreGraphics.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 93C426B651899D568DA9AC5B /* CoreGraphics.framework */; };
+		6CCC65439E54BBF94BCFE433 /* main.mm in Sources */ = {isa = PBXBuildFile; fileRef = 4D6E439951D3EDCF5541BA0B /* main.mm */; };
+		7DDC953179F06CF9564B0211 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 6D9DDCA54B0406143CA5FB5C /* Assets.xcassets */; };
+		8A4C1F9487F4D7AF2A86DA35 /* Metal.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = E072EA60763229B34CB0F0DC /* Metal.framework */; };
+		A5D3300CD78736CE6CAE06E3 /* Security.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 83D675AEE4F0025AED5BE154 /* Security.framework */; };
+		AFD6227F27D77B783CAEF9BC /* QuartzCore.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 26F7574D48166001E3297071 /* QuartzCore.framework */; };
+		C3DABD1841D236A33E036536 /* libapp.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 3EE8EB12696A7140A0A859E6 /* libapp.a */; };
+		E36FC94822B32A95894A9CDB /* MetalKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 75B095ACAEB100B571ADCD7C /* MetalKit.framework */; };
+		F9AA791C4A3831625E241548 /* assets in Resources */ = {isa = PBXBuildFile; fileRef = 82E80AF5E4F5FEC91CBC02DA /* assets */; };
+/* End PBXBuildFile section */
+
+/* Begin PBXFileReference section */
+		02BF5A3005A9F1BF1D4039D2 /* models.rs */ = {isa = PBXFileReference; lastKnownFileType = text; path = models.rs; sourceTree = "<group>"; };
+		08454331C4AB7E0D4715A42E /* collectionner.rs */ = {isa = PBXFileReference; lastKnownFileType = text; path = collectionner.rs; sourceTree = "<group>"; };
+		0DD315D203388D0C2A8D4A72 /* archive_service.rs */ = {isa = PBXFileReference; lastKnownFileType = text; path = archive_service.rs; sourceTree = "<group>"; };
+		1138513230D1916F49DCDB71 /* search.rs */ = {isa = PBXFileReference; lastKnownFileType = text; path = search.rs; sourceTree = "<group>"; };
+		13A4A2D8537D13833C5DE01D /* download.rs */ = {isa = PBXFileReference; lastKnownFileType = text; path = download.rs; sourceTree = "<group>"; };
+		147867BEDAD5F1F726F7E3E9 /* googlebooks_service_test.rs */ = {isa = PBXFileReference; lastKnownFileType = text; path = googlebooks_service_test.rs; sourceTree = "<group>"; };
+		16050C91D05FF1BAEDA3EECE /* panel_detection_service.rs */ = {isa = PBXFileReference; lastKnownFileType = text; path = panel_detection_service.rs; sourceTree = "<group>"; };
+		1616DEC2896360052B7DB0FC /* search.rs */ = {isa = PBXFileReference; lastKnownFileType = text; path = search.rs; sourceTree = "<group>"; };
+		19F5EB6FCAF697E860E449DB /* comic_archive.rs */ = {isa = PBXFileReference; lastKnownFileType = text; path = comic_archive.rs; sourceTree = "<group>"; };
+		1A36B61B5B3E11A29B84AF2F /* models.rs */ = {isa = PBXFileReference; lastKnownFileType = text; path = models.rs; sourceTree = "<group>"; };
+		1B9ED06DD56AA44532C9DEB5 /* cosmiccomics_iOS.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = cosmiccomics_iOS.entitlements; sourceTree = "<group>"; };
+		1BCC6FEADDEC323C12C8F036 /* utils.rs */ = {isa = PBXFileReference; lastKnownFileType = text; path = utils.rs; sourceTree = "<group>"; };
+		1D0DE794581F27A85AF80372 /* ai_model.rs */ = {isa = PBXFileReference; lastKnownFileType = text; path = ai_model.rs; sourceTree = "<group>"; };
+		1D3AE4029F4A368651983180 /* openlibrary_provider.rs */ = {isa = PBXFileReference; lastKnownFileType = text; path = openlibrary_provider.rs; sourceTree = "<group>"; };
+		22D98285D5A3E23B97D3A81D /* mod.rs */ = {isa = PBXFileReference; lastKnownFileType = text; path = mod.rs; sourceTree = "<group>"; };
+		26920E2D1DBC3EF1C63A2130 /* stats.rs */ = {isa = PBXFileReference; lastKnownFileType = text; path = stats.rs; sourceTree = "<group>"; };
+		26F7574D48166001E3297071 /* QuartzCore.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = QuartzCore.framework; path = System/Library/Frameworks/QuartzCore.framework; sourceTree = SDKROOT; };
+		29A11F44F87EF24481A59683 /* viewer.rs */ = {isa = PBXFileReference; lastKnownFileType = text; path = viewer.rs; sourceTree = "<group>"; };
+		2DCB09358ED41596FF85A6F5 /* series.rs */ = {isa = PBXFileReference; lastKnownFileType = text; path = series.rs; sourceTree = "<group>"; };
+		2F8912086E1CB1D831073048 /* latest.rs */ = {isa = PBXFileReference; lastKnownFileType = text; path = latest.rs; sourceTree = "<group>"; };
+		31B34674631AC28697576103 /* db.rs */ = {isa = PBXFileReference; lastKnownFileType = text; path = db.rs; sourceTree = "<group>"; };
+		373F112E1A3FBB82A4C6F083 /* auth.rs */ = {isa = PBXFileReference; lastKnownFileType = text; path = auth.rs; sourceTree = "<group>"; };
+		3AA2E725FCF7A643BAAC81C4 /* WebKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = WebKit.framework; path = System/Library/Frameworks/WebKit.framework; sourceTree = SDKROOT; };
+		3AB664C520CDD7836B2EC58F /* search.rs */ = {isa = PBXFileReference; lastKnownFileType = text; path = search.rs; sourceTree = "<group>"; };
+		3DB435A24C3B1A53D5D24238 /* mod.rs */ = {isa = PBXFileReference; lastKnownFileType = text; path = mod.rs; sourceTree = "<group>"; };
+		3EE8EB12696A7140A0A859E6 /* libapp.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; path = libapp.a; sourceTree = "<group>"; };
+		41E871A9CC6F701969ACF03C /* UIKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = UIKit.framework; path = System/Library/Frameworks/UIKit.framework; sourceTree = SDKROOT; };
+		43DDBD047FA41152A50A64FC /* anilist_service_test.rs */ = {isa = PBXFileReference; lastKnownFileType = text; path = anilist_service_test.rs; sourceTree = "<group>"; };
+		4433F42AE47FA1465509AEED /* settings.rs */ = {isa = PBXFileReference; lastKnownFileType = text; path = settings.rs; sourceTree = "<group>"; };
+		4D6E439951D3EDCF5541BA0B /* main.mm */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.objcpp; path = main.mm; sourceTree = "<group>"; };
+		4E9E9FEFCD7B8C3DCF0E0782 /* main.rs */ = {isa = PBXFileReference; lastKnownFileType = text; path = main.rs; sourceTree = "<group>"; };
+		522AB29750913C04ACAF2DCA /* book.rs */ = {isa = PBXFileReference; lastKnownFileType = text; path = book.rs; sourceTree = "<group>"; };
+		54C3903AA5566CF9049384B9 /* profile_service.rs */ = {isa = PBXFileReference; lastKnownFileType = text; path = profile_service.rs; sourceTree = "<group>"; };
+		55337E41DDA1404AEBC58218 /* marvel_service.rs */ = {isa = PBXFileReference; lastKnownFileType = text; path = marvel_service.rs; sourceTree = "<group>"; };
+		5A571973E6B8986BA785F9D8 /* openlibrary_service.rs */ = {isa = PBXFileReference; lastKnownFileType = text; path = openlibrary_service.rs; sourceTree = "<group>"; };
+		5D9752C58A35812DCA02FD7F /* latest.rs */ = {isa = PBXFileReference; lastKnownFileType = text; path = latest.rs; sourceTree = "<group>"; };
+		61516DE50CD5C2F8B5F6918D /* mod.rs */ = {isa = PBXFileReference; lastKnownFileType = text; path = mod.rs; sourceTree = "<group>"; };
+		64DE58299F1DB4FE9429A915 /* auth.rs */ = {isa = PBXFileReference; lastKnownFileType = text; path = auth.rs; sourceTree = "<group>"; };
+		66E4877E2366BFBF79F021BE /* marvel_provider.rs */ = {isa = PBXFileReference; lastKnownFileType = text; path = marvel_provider.rs; sourceTree = "<group>"; };
+		6AAAA0545AF386F157E557EE /* stats.rs */ = {isa = PBXFileReference; lastKnownFileType = text; path = stats.rs; sourceTree = "<group>"; };
+		6D9DDCA54B0406143CA5FB5C /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
+		6E3EA76A79DD370CF9F6EB5E /* pdfium.rs */ = {isa = PBXFileReference; lastKnownFileType = text; path = pdfium.rs; sourceTree = "<group>"; };
+		70E173F984FE213FE421C841 /* search.rs */ = {isa = PBXFileReference; lastKnownFileType = text; path = search.rs; sourceTree = "<group>"; };
+		7198B1B36BDCE5B6DEDB426C /* collectionner_service.rs */ = {isa = PBXFileReference; lastKnownFileType = text; path = collectionner_service.rs; sourceTree = "<group>"; };
+		73536B2573ED75CECF75C9ED /* local_metadata_service.rs */ = {isa = PBXFileReference; lastKnownFileType = text; path = local_metadata_service.rs; sourceTree = "<group>"; };
+		75B095ACAEB100B571ADCD7C /* MetalKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = MetalKit.framework; path = System/Library/Frameworks/MetalKit.framework; sourceTree = SDKROOT; };
+		796393946C651CF1FA9A06C4 /* db.rs */ = {isa = PBXFileReference; lastKnownFileType = text; path = db.rs; sourceTree = "<group>"; };
+		79971E6C0908EA70E9F57B86 /* platform.rs */ = {isa = PBXFileReference; lastKnownFileType = text; path = platform.rs; sourceTree = "<group>"; };
+		79B881BA7EAB5BF23E5618E4 /* anilist_service.rs */ = {isa = PBXFileReference; lastKnownFileType = text; path = anilist_service.rs; sourceTree = "<group>"; };
+		7B171EEE68067284A73FE370 /* repositories.rs */ = {isa = PBXFileReference; lastKnownFileType = text; path = repositories.rs; sourceTree = "<group>"; };
+		7D147BAB844E50ABA67D493C /* surreal_repo.rs */ = {isa = PBXFileReference; lastKnownFileType = text; path = surreal_repo.rs; sourceTree = "<group>"; };
+		7EE69319476857E57BCC7E1B /* models.rs */ = {isa = PBXFileReference; lastKnownFileType = text; path = models.rs; sourceTree = "<group>"; };
+		802804D40AB8921301F8098E /* auth.rs */ = {isa = PBXFileReference; lastKnownFileType = text; path = auth.rs; sourceTree = "<group>"; };
+		80D1A619E80F830BDFC5E0B9 /* download.rs */ = {isa = PBXFileReference; lastKnownFileType = text; path = download.rs; sourceTree = "<group>"; };
+		80D7BA345F7CFEF9B6C0DCDF /* db.rs */ = {isa = PBXFileReference; lastKnownFileType = text; path = db.rs; sourceTree = "<group>"; };
+		82E80AF5E4F5FEC91CBC02DA /* assets */ = {isa = PBXFileReference; lastKnownFileType = folder; path = assets; sourceTree = SOURCE_ROOT; };
+		83D675AEE4F0025AED5BE154 /* Security.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Security.framework; path = System/Library/Frameworks/Security.framework; sourceTree = SDKROOT; };
+		8DA24A2D8ED92091DCB87814 /* googlebooks_service.rs */ = {isa = PBXFileReference; lastKnownFileType = text; path = googlebooks_service.rs; sourceTree = "<group>"; };
+		8E391006FD85986C7240B645 /* googlebooks_provider.rs */ = {isa = PBXFileReference; lastKnownFileType = text; path = googlebooks_provider.rs; sourceTree = "<group>"; };
+		8EFAA24267090283EEED0CC0 /* stats_service.rs */ = {isa = PBXFileReference; lastKnownFileType = text; path = stats_service.rs; sourceTree = "<group>"; };
+		9169EAA4F4716293F74C6110 /* bindings.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = bindings.h; sourceTree = "<group>"; };
+		9174B13A8259BCB61A39C8EE /* registry.rs */ = {isa = PBXFileReference; lastKnownFileType = text; path = registry.rs; sourceTree = "<group>"; };
+		9191A1BFA2F50E413AAC3067 /* mod.rs */ = {isa = PBXFileReference; lastKnownFileType = text; path = mod.rs; sourceTree = "<group>"; };
+		9327924A0717036403FDEFCF /* search.rs */ = {isa = PBXFileReference; lastKnownFileType = text; path = search.rs; sourceTree = "<group>"; };
+		93C426B651899D568DA9AC5B /* CoreGraphics.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = CoreGraphics.framework; path = System/Library/Frameworks/CoreGraphics.framework; sourceTree = SDKROOT; };
+		93E80858F363BF0C9432EDAC /* mod.rs */ = {isa = PBXFileReference; lastKnownFileType = text; path = mod.rs; sourceTree = "<group>"; };
+		9500C8AA149A2B78E95026EE /* models.rs */ = {isa = PBXFileReference; lastKnownFileType = text; path = models.rs; sourceTree = "<group>"; };
+		95F66CA7FA0EB6BBE238A35F /* matching_service.rs */ = {isa = PBXFileReference; lastKnownFileType = text; path = matching_service.rs; sourceTree = "<group>"; };
+		997FEDD06E8CCC05502B042F /* provider_trait.rs */ = {isa = PBXFileReference; lastKnownFileType = text; path = provider_trait.rs; sourceTree = "<group>"; };
+		9C097DF0DC2AEAEEC7CA6078 /* marvel_service_test.rs */ = {isa = PBXFileReference; lastKnownFileType = text; path = marvel_service_test.rs; sourceTree = "<group>"; };
+		A2CE19A36C03F5817547AB0A /* common.rs */ = {isa = PBXFileReference; lastKnownFileType = text; path = common.rs; sourceTree = "<group>"; };
+		A598532EF294CB4F0A75E964 /* state.rs */ = {isa = PBXFileReference; lastKnownFileType = text; path = state.rs; sourceTree = "<group>"; };
+		A9D7F3E6873E1992348F5942 /* db.rs */ = {isa = PBXFileReference; lastKnownFileType = text; path = db.rs; sourceTree = "<group>"; };
+		AC9AB766A7A8B93A3B1ADFAF /* latest.rs */ = {isa = PBXFileReference; lastKnownFileType = text; path = latest.rs; sourceTree = "<group>"; };
+		AD6BD4DC08491E352FF2B0C6 /* api.rs */ = {isa = PBXFileReference; lastKnownFileType = text; path = api.rs; sourceTree = "<group>"; };
+		ADAA2D7A62EDCE3160EFFC49 /* mod.rs */ = {isa = PBXFileReference; lastKnownFileType = text; path = mod.rs; sourceTree = "<group>"; };
+		B00E6D740CE290E0CE40BE6C /* auth.rs */ = {isa = PBXFileReference; lastKnownFileType = text; path = auth.rs; sourceTree = "<group>"; };
+		B1192D6B3D03CD8E37909DD9 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist; path = Info.plist; sourceTree = "<group>"; };
+		B19700AD90EAC087C5D54B0A /* updater.rs */ = {isa = PBXFileReference; lastKnownFileType = text; path = updater.rs; sourceTree = "<group>"; };
+		B1D2F5FA802B502D04B2DEB4 /* db.rs */ = {isa = PBXFileReference; lastKnownFileType = text; path = db.rs; sourceTree = "<group>"; };
+		B211646434DBC50569C2F499 /* database.rs */ = {isa = PBXFileReference; lastKnownFileType = text; path = database.rs; sourceTree = "<group>"; };
+		B39185E1925F8D9070323891 /* lib.rs */ = {isa = PBXFileReference; lastKnownFileType = text; path = lib.rs; sourceTree = "<group>"; };
+		B3C3914DBB07C1A521955B4E /* pdfium_service.rs */ = {isa = PBXFileReference; lastKnownFileType = text; path = pdfium_service.rs; sourceTree = "<group>"; };
+		B72DA3AAE1DDFC5F766BB4AD /* LaunchScreen.storyboard */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; path = LaunchScreen.storyboard; sourceTree = "<group>"; };
+		C36F0F13E4F6E43EA0B64ED4 /* metron_service.rs */ = {isa = PBXFileReference; lastKnownFileType = text; path = metron_service.rs; sourceTree = "<group>"; };
+		C47F034071E4D6041D28199B /* common.rs */ = {isa = PBXFileReference; lastKnownFileType = text; path = common.rs; sourceTree = "<group>"; };
+		CB0DCA3D9040541BFE47387B /* models.rs */ = {isa = PBXFileReference; lastKnownFileType = text; path = models.rs; sourceTree = "<group>"; };
+		D17E3E26B9AEF0274211338E /* jellyfin_service.rs */ = {isa = PBXFileReference; lastKnownFileType = text; path = jellyfin_service.rs; sourceTree = "<group>"; };
+		D4B6505A9A004C276952D907 /* download.rs */ = {isa = PBXFileReference; lastKnownFileType = text; path = download.rs; sourceTree = "<group>"; };
+		D595A6B17AF4738647329F6B /* services.rs */ = {isa = PBXFileReference; lastKnownFileType = text; path = services.rs; sourceTree = "<group>"; };
+		DB66D5291125C8FC4CEF48FB /* download.rs */ = {isa = PBXFileReference; lastKnownFileType = text; path = download.rs; sourceTree = "<group>"; };
+		E0080C7F8BE00B4E8BAE9F56 /* download.rs */ = {isa = PBXFileReference; lastKnownFileType = text; path = download.rs; sourceTree = "<group>"; };
+		E072EA60763229B34CB0F0DC /* Metal.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Metal.framework; path = System/Library/Frameworks/Metal.framework; sourceTree = SDKROOT; };
+		E217B0017C5633086B998BD6 /* profile.rs */ = {isa = PBXFileReference; lastKnownFileType = text; path = profile.rs; sourceTree = "<group>"; };
+		E8E5DF8188DC3B65B381B762 /* anilist_provider.rs */ = {isa = PBXFileReference; lastKnownFileType = text; path = anilist_provider.rs; sourceTree = "<group>"; };
+		EA5D4E6E208D9BBC100AB9C2 /* mod.rs */ = {isa = PBXFileReference; lastKnownFileType = text; path = mod.rs; sourceTree = "<group>"; };
+		EEB485A517D0499CF0C05267 /* latest.rs */ = {isa = PBXFileReference; lastKnownFileType = text; path = latest.rs; sourceTree = "<group>"; };
+		F062843EA69BC93CE5DB0D1A /* field_schema.rs */ = {isa = PBXFileReference; lastKnownFileType = text; path = field_schema.rs; sourceTree = "<group>"; };
+		F4F54C33101384716C2B8971 /* Cosmic Comics.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = "Cosmic Comics.app"; sourceTree = BUILT_PRODUCTS_DIR; };
+		F5493F9CE4E3A3264E09BC9D /* mod.rs */ = {isa = PBXFileReference; lastKnownFileType = text; path = mod.rs; sourceTree = "<group>"; };
+		FB3C92D98077826CBB7E4368 /* mod.rs */ = {isa = PBXFileReference; lastKnownFileType = text; path = mod.rs; sourceTree = "<group>"; };
+		FC324CF78A6C5FE03306A4AC /* jellyfin.rs */ = {isa = PBXFileReference; lastKnownFileType = text; path = jellyfin.rs; sourceTree = "<group>"; };
+		FD39F32B71A0D383A4297D06 /* metron_provider.rs */ = {isa = PBXFileReference; lastKnownFileType = text; path = metron_provider.rs; sourceTree = "<group>"; };
+/* End PBXFileReference section */
+
+/* Begin PBXFrameworksBuildPhase section */
+		6A648863F6FB10181E7C2515 /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				C3DABD1841D236A33E036536 /* libapp.a in Frameworks */,
+				6514E872E67051956C9D51E6 /* CoreGraphics.framework in Frameworks */,
+				8A4C1F9487F4D7AF2A86DA35 /* Metal.framework in Frameworks */,
+				E36FC94822B32A95894A9CDB /* MetalKit.framework in Frameworks */,
+				AFD6227F27D77B783CAEF9BC /* QuartzCore.framework in Frameworks */,
+				A5D3300CD78736CE6CAE06E3 /* Security.framework in Frameworks */,
+				0B1A58ABA8A60159EE8C9F89 /* UIKit.framework in Frameworks */,
+				35465023C5F79D9EA0668ED1 /* WebKit.framework in Frameworks */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXFrameworksBuildPhase section */
+
+/* Begin PBXGroup section */
+		04AC3272B861369B90B332CC /* services */ = {
+			isa = PBXGroup;
+			children = (
+				43DDBD047FA41152A50A64FC /* anilist_service_test.rs */,
+				79B881BA7EAB5BF23E5618E4 /* anilist_service.rs */,
+				0DD315D203388D0C2A8D4A72 /* archive_service.rs */,
+				7198B1B36BDCE5B6DEDB426C /* collectionner_service.rs */,
+				19F5EB6FCAF697E860E449DB /* comic_archive.rs */,
+				147867BEDAD5F1F726F7E3E9 /* googlebooks_service_test.rs */,
+				8DA24A2D8ED92091DCB87814 /* googlebooks_service.rs */,
+				D17E3E26B9AEF0274211338E /* jellyfin_service.rs */,
+				73536B2573ED75CECF75C9ED /* local_metadata_service.rs */,
+				9C097DF0DC2AEAEEC7CA6078 /* marvel_service_test.rs */,
+				55337E41DDA1404AEBC58218 /* marvel_service.rs */,
+				95F66CA7FA0EB6BBE238A35F /* matching_service.rs */,
+				C36F0F13E4F6E43EA0B64ED4 /* metron_service.rs */,
+				5A571973E6B8986BA785F9D8 /* openlibrary_service.rs */,
+				16050C91D05FF1BAEDA3EECE /* panel_detection_service.rs */,
+				B3C3914DBB07C1A521955B4E /* pdfium_service.rs */,
+				54C3903AA5566CF9049384B9 /* profile_service.rs */,
+				8EFAA24267090283EEED0CC0 /* stats_service.rs */,
+			);
+			path = services;
+			sourceTree = "<group>";
+		};
+		058A1AD01B1EBE13ED06428A /* bindings */ = {
+			isa = PBXGroup;
+			children = (
+				9169EAA4F4716293F74C6110 /* bindings.h */,
+			);
+			path = bindings;
+			sourceTree = "<group>";
+		};
+		14B47953A1F4DBB98443291A /* providers */ = {
+			isa = PBXGroup;
+			children = (
+				E8E5DF8188DC3B65B381B762 /* anilist_provider.rs */,
+				8E391006FD85986C7240B645 /* googlebooks_provider.rs */,
+				66E4877E2366BFBF79F021BE /* marvel_provider.rs */,
+				FD39F32B71A0D383A4297D06 /* metron_provider.rs */,
+				9191A1BFA2F50E413AAC3067 /* mod.rs */,
+				1D3AE4029F4A368651983180 /* openlibrary_provider.rs */,
+				997FEDD06E8CCC05502B042F /* provider_trait.rs */,
+				9174B13A8259BCB61A39C8EE /* registry.rs */,
+			);
+			path = providers;
+			sourceTree = "<group>";
+		};
+		1B0B359A6C2796B3C536A81B /* Products */ = {
+			isa = PBXGroup;
+			children = (
+				F4F54C33101384716C2B8971 /* Cosmic Comics.app */,
+			);
+			name = Products;
+			sourceTree = "<group>";
+		};
+		2E6931EBB86F63E07E6AE01D /* getcomics */ = {
+			isa = PBXGroup;
+			children = (
+				796393946C651CF1FA9A06C4 /* db.rs */,
+				D4B6505A9A004C276952D907 /* download.rs */,
+				AC9AB766A7A8B93A3B1ADFAF /* latest.rs */,
+				F5493F9CE4E3A3264E09BC9D /* mod.rs */,
+				7EE69319476857E57BCC7E1B /* models.rs */,
+				9327924A0717036403FDEFCF /* search.rs */,
+			);
+			path = getcomics;
+			sourceTree = "<group>";
+		};
+		302D5B0FDFA87D51E595306F /* cosmiccomics_iOS */ = {
+			isa = PBXGroup;
+			children = (
+				1B9ED06DD56AA44532C9DEB5 /* cosmiccomics_iOS.entitlements */,
+				B1192D6B3D03CD8E37909DD9 /* Info.plist */,
+			);
+			path = cosmiccomics_iOS;
+			sourceTree = "<group>";
+		};
+		360B1A24942E18007CBCF537 /* mangadex */ = {
+			isa = PBXGroup;
+			children = (
+				802804D40AB8921301F8098E /* auth.rs */,
+				B1D2F5FA802B502D04B2DEB4 /* db.rs */,
+				E0080C7F8BE00B4E8BAE9F56 /* download.rs */,
+				ADAA2D7A62EDCE3160EFFC49 /* mod.rs */,
+				CB0DCA3D9040541BFE47387B /* models.rs */,
+				3AB664C520CDD7836B2EC58F /* search.rs */,
+			);
+			path = mangadex;
+			sourceTree = "<group>";
+		};
+		5102C069DCFAF9DF079B7EF9 /* viz */ = {
+			isa = PBXGroup;
+			children = (
+				373F112E1A3FBB82A4C6F083 /* auth.rs */,
+				31B34674631AC28697576103 /* db.rs */,
+				80D1A619E80F830BDFC5E0B9 /* download.rs */,
+				EEB485A517D0499CF0C05267 /* latest.rs */,
+				FB3C92D98077826CBB7E4368 /* mod.rs */,
+				1A36B61B5B3E11A29B84AF2F /* models.rs */,
+				1138513230D1916F49DCDB71 /* search.rs */,
+			);
+			path = viz;
+			sourceTree = "<group>";
+		};
+		69D80AAFF3180A8695F3ED75 /* Frameworks */ = {
+			isa = PBXGroup;
+			children = (
+				93C426B651899D568DA9AC5B /* CoreGraphics.framework */,
+				3EE8EB12696A7140A0A859E6 /* libapp.a */,
+				E072EA60763229B34CB0F0DC /* Metal.framework */,
+				75B095ACAEB100B571ADCD7C /* MetalKit.framework */,
+				26F7574D48166001E3297071 /* QuartzCore.framework */,
+				83D675AEE4F0025AED5BE154 /* Security.framework */,
+				41E871A9CC6F701969ACF03C /* UIKit.framework */,
+				3AA2E725FCF7A643BAAC81C4 /* WebKit.framework */,
+			);
+			name = Frameworks;
+			sourceTree = "<group>";
+		};
+		75377C9A953C04B9E3800C66 /* downloaders */ = {
+			isa = PBXGroup;
+			children = (
+				3DB435A24C3B1A53D5D24238 /* mod.rs */,
+				873E2524870AB5AD79F48E34 /* dc_infinite */,
+				2E6931EBB86F63E07E6AE01D /* getcomics */,
+				360B1A24942E18007CBCF537 /* mangadex */,
+				F967C7E0A8B9A170087A34F0 /* marvel_unlimited */,
+				5102C069DCFAF9DF079B7EF9 /* viz */,
+			);
+			path = downloaders;
+			sourceTree = "<group>";
+		};
+		788D99D29BD93F06987CEB52 /* cosmiccomics */ = {
+			isa = PBXGroup;
+			children = (
+				4D6E439951D3EDCF5541BA0B /* main.mm */,
+				058A1AD01B1EBE13ED06428A /* bindings */,
+			);
+			path = cosmiccomics;
+			sourceTree = "<group>";
+		};
+		81EBFD318BD7C67E74BB9A06 = {
+			isa = PBXGroup;
+			children = (
+				82E80AF5E4F5FEC91CBC02DA /* assets */,
+				6D9DDCA54B0406143CA5FB5C /* Assets.xcassets */,
+				B72DA3AAE1DDFC5F766BB4AD /* LaunchScreen.storyboard */,
+				302D5B0FDFA87D51E595306F /* cosmiccomics_iOS */,
+				95B82EBE63D9610B2FB18710 /* Externals */,
+				A64D526DF2D54C09789B485F /* Sources */,
+				F3459D3057A01EB534A0A0F4 /* src */,
+				69D80AAFF3180A8695F3ED75 /* Frameworks */,
+				1B0B359A6C2796B3C536A81B /* Products */,
+			);
+			sourceTree = "<group>";
+		};
+		873E2524870AB5AD79F48E34 /* dc_infinite */ = {
+			isa = PBXGroup;
+			children = (
+				B00E6D740CE290E0CE40BE6C /* auth.rs */,
+				A9D7F3E6873E1992348F5942 /* db.rs */,
+				13A4A2D8537D13833C5DE01D /* download.rs */,
+				2F8912086E1CB1D831073048 /* latest.rs */,
+				22D98285D5A3E23B97D3A81D /* mod.rs */,
+				9500C8AA149A2B78E95026EE /* models.rs */,
+				1616DEC2896360052B7DB0FC /* search.rs */,
+			);
+			path = dc_infinite;
+			sourceTree = "<group>";
+		};
+		95B82EBE63D9610B2FB18710 /* Externals */ = {
+			isa = PBXGroup;
+			children = (
+			);
+			path = Externals;
+			sourceTree = "<group>";
+		};
+		A64D526DF2D54C09789B485F /* Sources */ = {
+			isa = PBXGroup;
+			children = (
+				788D99D29BD93F06987CEB52 /* cosmiccomics */,
+			);
+			path = Sources;
+			sourceTree = "<group>";
+		};
+		C41C6927359FBC1CFFC0ECA3 /* commands */ = {
+			isa = PBXGroup;
+			children = (
+				1D0DE794581F27A85AF80372 /* ai_model.rs */,
+				AD6BD4DC08491E352FF2B0C6 /* api.rs */,
+				08454331C4AB7E0D4715A42E /* collectionner.rs */,
+				A2CE19A36C03F5817547AB0A /* common.rs */,
+				B211646434DBC50569C2F499 /* database.rs */,
+				FC324CF78A6C5FE03306A4AC /* jellyfin.rs */,
+				61516DE50CD5C2F8B5F6918D /* mod.rs */,
+				6E3EA76A79DD370CF9F6EB5E /* pdfium.rs */,
+				79971E6C0908EA70E9F57B86 /* platform.rs */,
+				E217B0017C5633086B998BD6 /* profile.rs */,
+				4433F42AE47FA1465509AEED /* settings.rs */,
+				A598532EF294CB4F0A75E964 /* state.rs */,
+				6AAAA0545AF386F157E557EE /* stats.rs */,
+				B19700AD90EAC087C5D54B0A /* updater.rs */,
+				29A11F44F87EF24481A59683 /* viewer.rs */,
+			);
+			path = commands;
+			sourceTree = "<group>";
+		};
+		CB459A0AA8041064FD9742FA /* models */ = {
+			isa = PBXGroup;
+			children = (
+				522AB29750913C04ACAF2DCA /* book.rs */,
+				C47F034071E4D6041D28199B /* common.rs */,
+				F062843EA69BC93CE5DB0D1A /* field_schema.rs */,
+				EA5D4E6E208D9BBC100AB9C2 /* mod.rs */,
+				2DCB09358ED41596FF85A6F5 /* series.rs */,
+				26920E2D1DBC3EF1C63A2130 /* stats.rs */,
+			);
+			path = models;
+			sourceTree = "<group>";
+		};
+		D09A9AFDE35B4C595DD20045 /* repositories */ = {
+			isa = PBXGroup;
+			children = (
+				7D147BAB844E50ABA67D493C /* surreal_repo.rs */,
+			);
+			path = repositories;
+			sourceTree = "<group>";
+		};
+		F3459D3057A01EB534A0A0F4 /* src */ = {
+			isa = PBXGroup;
+			children = (
+				B39185E1925F8D9070323891 /* lib.rs */,
+				4E9E9FEFCD7B8C3DCF0E0782 /* main.rs */,
+				7B171EEE68067284A73FE370 /* repositories.rs */,
+				D595A6B17AF4738647329F6B /* services.rs */,
+				1BCC6FEADDEC323C12C8F036 /* utils.rs */,
+				C41C6927359FBC1CFFC0ECA3 /* commands */,
+				75377C9A953C04B9E3800C66 /* downloaders */,
+				CB459A0AA8041064FD9742FA /* models */,
+				14B47953A1F4DBB98443291A /* providers */,
+				D09A9AFDE35B4C595DD20045 /* repositories */,
+				04AC3272B861369B90B332CC /* services */,
+			);
+			name = src;
+			path = ../../src;
+			sourceTree = "<group>";
+		};
+		F967C7E0A8B9A170087A34F0 /* marvel_unlimited */ = {
+			isa = PBXGroup;
+			children = (
+				64DE58299F1DB4FE9429A915 /* auth.rs */,
+				80D7BA345F7CFEF9B6C0DCDF /* db.rs */,
+				DB66D5291125C8FC4CEF48FB /* download.rs */,
+				5D9752C58A35812DCA02FD7F /* latest.rs */,
+				93E80858F363BF0C9432EDAC /* mod.rs */,
+				02BF5A3005A9F1BF1D4039D2 /* models.rs */,
+				70E173F984FE213FE421C841 /* search.rs */,
+			);
+			path = marvel_unlimited;
+			sourceTree = "<group>";
+		};
+/* End PBXGroup section */
+
+/* Begin PBXNativeTarget section */
+		A5F3C0F888429CC88D283EEC /* cosmiccomics_iOS */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = F4F62A615042365AA435A768 /* Build configuration list for PBXNativeTarget "cosmiccomics_iOS" */;
+			buildPhases = (
+				E4F248F2306E3ADBFBB56ADA /* Build Rust Code */,
+				A4FACB5A690F951796974148 /* Sources */,
+				D151BFEEA9F127BFE29880EB /* Resources */,
+				6A648863F6FB10181E7C2515 /* Frameworks */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+			);
+			name = cosmiccomics_iOS;
+			packageProductDependencies = (
+			);
+			productName = cosmiccomics_iOS;
+			productReference = F4F54C33101384716C2B8971 /* Cosmic Comics.app */;
+			productType = "com.apple.product-type.application";
+		};
+/* End PBXNativeTarget section */
+
+/* Begin PBXProject section */
+		F296BBB0049F2055312DAA72 /* Project object */ = {
+			isa = PBXProject;
+			attributes = {
+				BuildIndependentTargetsInParallel = YES;
+				LastUpgradeCheck = 1430;
+			};
+			buildConfigurationList = 958B50898C5781FCB09AC7FB /* Build configuration list for PBXProject "cosmiccomics" */;
+			developmentRegion = en;
+			hasScannedForEncodings = 0;
+			knownRegions = (
+				Base,
+				en,
+			);
+			mainGroup = 81EBFD318BD7C67E74BB9A06;
+			minimizedProjectReferenceProxies = 1;
+			preferredProjectObjectVersion = 77;
+			productRefGroup = 1B0B359A6C2796B3C536A81B /* Products */;
+			projectDirPath = "";
+			projectRoot = "";
+			targets = (
+				A5F3C0F888429CC88D283EEC /* cosmiccomics_iOS */,
+			);
+		};
+/* End PBXProject section */
+
+/* Begin PBXResourcesBuildPhase section */
+		D151BFEEA9F127BFE29880EB /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				7DDC953179F06CF9564B0211 /* Assets.xcassets in Resources */,
+				5C8AB0680B708F0C76A309AF /* LaunchScreen.storyboard in Resources */,
+				F9AA791C4A3831625E241548 /* assets in Resources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXResourcesBuildPhase section */
+
+/* Begin PBXShellScriptBuildPhase section */
+		E4F248F2306E3ADBFBB56ADA /* Build Rust Code */ = {
+			isa = PBXShellScriptBuildPhase;
+			alwaysOutOfDate = 1;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			inputFileListPaths = (
+			);
+			inputPaths = (
+			);
+			name = "Build Rust Code";
+			outputFileListPaths = (
+			);
+			outputPaths = (
+				"$(SRCROOT)/Externals/x86_64/${CONFIGURATION}/libapp.a",
+				"$(SRCROOT)/Externals/arm64/${CONFIGURATION}/libapp.a",
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+			shellPath = /bin/sh;
+			shellScript = "npm run -- tauri ios xcode-script -v --platform ${PLATFORM_DISPLAY_NAME:?} --sdk-root ${SDKROOT:?} --framework-search-paths \"${FRAMEWORK_SEARCH_PATHS:?}\" --header-search-paths \"${HEADER_SEARCH_PATHS:?}\" --gcc-preprocessor-definitions \"${GCC_PREPROCESSOR_DEFINITIONS:-}\" --configuration ${CONFIGURATION:?} ${FORCE_COLOR} ${ARCHS:?}";
+		};
+/* End PBXShellScriptBuildPhase section */
+
+/* Begin PBXSourcesBuildPhase section */
+		A4FACB5A690F951796974148 /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				6CCC65439E54BBF94BCFE433 /* main.mm in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXSourcesBuildPhase section */
+
+/* Begin XCBuildConfiguration section */
+		7C25CDA32BE8B86358E2E84A /* release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_EMBED_SWIFT_STANDARD_LIBRARIES = YES;
+				ARCHS = arm64;
+				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				CODE_SIGN_ENTITLEMENTS = cosmiccomics_iOS/cosmiccomics_iOS.entitlements;
+				CODE_SIGN_IDENTITY = "iPhone Developer";
+				DEVELOPMENT_TEAM = U5WGLFU24B;
+				ENABLE_BITCODE = NO;
+				"EXCLUDED_ARCHS[sdk=iphoneos*]" = x86_64;
+				FRAMEWORK_SEARCH_PATHS = (
+					"$(inherited)",
+					"\".\"",
+				);
+				INFOPLIST_FILE = cosmiccomics_iOS/Info.plist;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+				);
+				"LIBRARY_SEARCH_PATHS[arch=arm64]" = (
+					"$(inherited)",
+					"$(PROJECT_DIR)/Externals/arm64/$(CONFIGURATION)",
+					"$(SDKROOT)/usr/lib/swift",
+					"$(DEVELOPER_DIR)/Toolchains/XcodeDefault.xctoolchain/usr/lib/swift/$(PLATFORM_NAME)",
+					"$(DEVELOPER_DIR)/Toolchains/XcodeDefault.xctoolchain/usr/lib/swift-5.0/$(PLATFORM_NAME)",
+				);
+				"LIBRARY_SEARCH_PATHS[arch=x86_64]" = (
+					"$(inherited)",
+					"$(PROJECT_DIR)/Externals/x86_64/$(CONFIGURATION)",
+					"$(SDKROOT)/usr/lib/swift",
+					"$(DEVELOPER_DIR)/Toolchains/XcodeDefault.xctoolchain/usr/lib/swift/$(PLATFORM_NAME)",
+					"$(DEVELOPER_DIR)/Toolchains/XcodeDefault.xctoolchain/usr/lib/swift-5.0/$(PLATFORM_NAME)",
+				);
+				PRODUCT_BUNDLE_IDENTIFIER = fr.nytuo.cosmiccomics;
+				PRODUCT_NAME = "Cosmic Comics";
+				SDKROOT = iphoneos;
+				TARGETED_DEVICE_FAMILY = "1,2";
+				VALID_ARCHS = arm64;
+			};
+			name = release;
+		};
+		C37832156440D4F66C17C106 /* debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				CLANG_ANALYZER_NONNULL = YES;
+				CLANG_ANALYZER_NUMBER_OBJECT_CONVERSION = YES_AGGRESSIVE;
+				CLANG_CXX_LANGUAGE_STANDARD = "gnu++14";
+				CLANG_CXX_LIBRARY = "libc++";
+				CLANG_ENABLE_MODULES = YES;
+				CLANG_ENABLE_OBJC_ARC = YES;
+				CLANG_ENABLE_OBJC_WEAK = YES;
+				CLANG_WARN_BLOCK_CAPTURE_AUTORELEASING = YES;
+				CLANG_WARN_BOOL_CONVERSION = YES;
+				CLANG_WARN_COMMA = YES;
+				CLANG_WARN_CONSTANT_CONVERSION = YES;
+				CLANG_WARN_DEPRECATED_OBJC_IMPLEMENTATIONS = YES;
+				CLANG_WARN_DIRECT_OBJC_ISA_USAGE = YES_ERROR;
+				CLANG_WARN_DOCUMENTATION_COMMENTS = YES;
+				CLANG_WARN_EMPTY_BODY = YES;
+				CLANG_WARN_ENUM_CONVERSION = YES;
+				CLANG_WARN_INFINITE_RECURSION = YES;
+				CLANG_WARN_INT_CONVERSION = YES;
+				CLANG_WARN_NON_LITERAL_NULL_CONVERSION = YES;
+				CLANG_WARN_OBJC_IMPLICIT_RETAIN_SELF = YES;
+				CLANG_WARN_OBJC_LITERAL_CONVERSION = YES;
+				CLANG_WARN_OBJC_ROOT_CLASS = YES_ERROR;
+				CLANG_WARN_QUOTED_INCLUDE_IN_FRAMEWORK_HEADER = YES;
+				CLANG_WARN_RANGE_LOOP_ANALYSIS = YES;
+				CLANG_WARN_STRICT_PROTOTYPES = YES;
+				CLANG_WARN_SUSPICIOUS_MOVE = YES;
+				CLANG_WARN_UNGUARDED_AVAILABILITY = YES_AGGRESSIVE;
+				CLANG_WARN_UNREACHABLE_CODE = YES;
+				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
+				COPY_PHASE_STRIP = NO;
+				DEBUG_INFORMATION_FORMAT = dwarf;
+				ENABLE_STRICT_OBJC_MSGSEND = YES;
+				ENABLE_TESTABILITY = YES;
+				GCC_C_LANGUAGE_STANDARD = gnu11;
+				GCC_DYNAMIC_NO_PIC = NO;
+				GCC_NO_COMMON_BLOCKS = YES;
+				GCC_OPTIMIZATION_LEVEL = 0;
+				GCC_PREPROCESSOR_DEFINITIONS = (
+					"$(inherited)",
+					"DEBUG=1",
+				);
+				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
+				GCC_WARN_ABOUT_RETURN_TYPE = YES_ERROR;
+				GCC_WARN_UNDECLARED_SELECTOR = YES;
+				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
+				GCC_WARN_UNUSED_FUNCTION = YES;
+				GCC_WARN_UNUSED_VARIABLE = YES;
+				IPHONEOS_DEPLOYMENT_TARGET = 14.0;
+				MTL_ENABLE_DEBUG_INFO = INCLUDE_SOURCE;
+				MTL_FAST_MATH = YES;
+				ONLY_ACTIVE_ARCH = YES;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SDKROOT = iphoneos;
+				SWIFT_ACTIVE_COMPILATION_CONDITIONS = DEBUG;
+				SWIFT_OPTIMIZATION_LEVEL = "-Onone";
+				SWIFT_VERSION = 5.0;
+			};
+			name = debug;
+		};
+		E59AFDEE29452CEAB1EC6DC4 /* debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_EMBED_SWIFT_STANDARD_LIBRARIES = YES;
+				ARCHS = arm64;
+				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				CODE_SIGN_ENTITLEMENTS = cosmiccomics_iOS/cosmiccomics_iOS.entitlements;
+				CODE_SIGN_IDENTITY = "iPhone Developer";
+				DEVELOPMENT_TEAM = U5WGLFU24B;
+				ENABLE_BITCODE = NO;
+				"EXCLUDED_ARCHS[sdk=iphoneos*]" = x86_64;
+				FRAMEWORK_SEARCH_PATHS = (
+					"$(inherited)",
+					"\".\"",
+				);
+				INFOPLIST_FILE = cosmiccomics_iOS/Info.plist;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+				);
+				"LIBRARY_SEARCH_PATHS[arch=arm64]" = (
+					"$(inherited)",
+					"$(PROJECT_DIR)/Externals/arm64/$(CONFIGURATION)",
+					"$(SDKROOT)/usr/lib/swift",
+					"$(DEVELOPER_DIR)/Toolchains/XcodeDefault.xctoolchain/usr/lib/swift/$(PLATFORM_NAME)",
+					"$(DEVELOPER_DIR)/Toolchains/XcodeDefault.xctoolchain/usr/lib/swift-5.0/$(PLATFORM_NAME)",
+				);
+				"LIBRARY_SEARCH_PATHS[arch=x86_64]" = (
+					"$(inherited)",
+					"$(PROJECT_DIR)/Externals/x86_64/$(CONFIGURATION)",
+					"$(SDKROOT)/usr/lib/swift",
+					"$(DEVELOPER_DIR)/Toolchains/XcodeDefault.xctoolchain/usr/lib/swift/$(PLATFORM_NAME)",
+					"$(DEVELOPER_DIR)/Toolchains/XcodeDefault.xctoolchain/usr/lib/swift-5.0/$(PLATFORM_NAME)",
+				);
+				PRODUCT_BUNDLE_IDENTIFIER = fr.nytuo.cosmiccomics;
+				PRODUCT_NAME = "Cosmic Comics";
+				SDKROOT = iphoneos;
+				TARGETED_DEVICE_FAMILY = "1,2";
+				VALID_ARCHS = arm64;
+			};
+			name = debug;
+		};
+		F68DFACDC59DB6A07DE255B9 /* release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				CLANG_ANALYZER_NONNULL = YES;
+				CLANG_ANALYZER_NUMBER_OBJECT_CONVERSION = YES_AGGRESSIVE;
+				CLANG_CXX_LANGUAGE_STANDARD = "gnu++14";
+				CLANG_CXX_LIBRARY = "libc++";
+				CLANG_ENABLE_MODULES = YES;
+				CLANG_ENABLE_OBJC_ARC = YES;
+				CLANG_ENABLE_OBJC_WEAK = YES;
+				CLANG_WARN_BLOCK_CAPTURE_AUTORELEASING = YES;
+				CLANG_WARN_BOOL_CONVERSION = YES;
+				CLANG_WARN_COMMA = YES;
+				CLANG_WARN_CONSTANT_CONVERSION = YES;
+				CLANG_WARN_DEPRECATED_OBJC_IMPLEMENTATIONS = YES;
+				CLANG_WARN_DIRECT_OBJC_ISA_USAGE = YES_ERROR;
+				CLANG_WARN_DOCUMENTATION_COMMENTS = YES;
+				CLANG_WARN_EMPTY_BODY = YES;
+				CLANG_WARN_ENUM_CONVERSION = YES;
+				CLANG_WARN_INFINITE_RECURSION = YES;
+				CLANG_WARN_INT_CONVERSION = YES;
+				CLANG_WARN_NON_LITERAL_NULL_CONVERSION = YES;
+				CLANG_WARN_OBJC_IMPLICIT_RETAIN_SELF = YES;
+				CLANG_WARN_OBJC_LITERAL_CONVERSION = YES;
+				CLANG_WARN_OBJC_ROOT_CLASS = YES_ERROR;
+				CLANG_WARN_QUOTED_INCLUDE_IN_FRAMEWORK_HEADER = YES;
+				CLANG_WARN_RANGE_LOOP_ANALYSIS = YES;
+				CLANG_WARN_STRICT_PROTOTYPES = YES;
+				CLANG_WARN_SUSPICIOUS_MOVE = YES;
+				CLANG_WARN_UNGUARDED_AVAILABILITY = YES_AGGRESSIVE;
+				CLANG_WARN_UNREACHABLE_CODE = YES;
+				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
+				COPY_PHASE_STRIP = NO;
+				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
+				ENABLE_NS_ASSERTIONS = NO;
+				ENABLE_STRICT_OBJC_MSGSEND = YES;
+				GCC_C_LANGUAGE_STANDARD = gnu11;
+				GCC_NO_COMMON_BLOCKS = YES;
+				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
+				GCC_WARN_ABOUT_RETURN_TYPE = YES_ERROR;
+				GCC_WARN_UNDECLARED_SELECTOR = YES;
+				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
+				GCC_WARN_UNUSED_FUNCTION = YES;
+				GCC_WARN_UNUSED_VARIABLE = YES;
+				IPHONEOS_DEPLOYMENT_TARGET = 14.0;
+				MTL_ENABLE_DEBUG_INFO = NO;
+				MTL_FAST_MATH = YES;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SDKROOT = iphoneos;
+				SWIFT_COMPILATION_MODE = wholemodule;
+				SWIFT_OPTIMIZATION_LEVEL = "-O";
+				SWIFT_VERSION = 5.0;
+			};
+			name = release;
+		};
+/* End XCBuildConfiguration section */
+
+/* Begin XCConfigurationList section */
+		958B50898C5781FCB09AC7FB /* Build configuration list for PBXProject "cosmiccomics" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				C37832156440D4F66C17C106 /* debug */,
+				F68DFACDC59DB6A07DE255B9 /* release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = debug;
+		};
+		F4F62A615042365AA435A768 /* Build configuration list for PBXNativeTarget "cosmiccomics_iOS" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				E59AFDEE29452CEAB1EC6DC4 /* debug */,
+				7C25CDA32BE8B86358E2E84A /* release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = debug;
+		};
+/* End XCConfigurationList section */
+	};
+	rootObject = F296BBB0049F2055312DAA72 /* Project object */;
+}

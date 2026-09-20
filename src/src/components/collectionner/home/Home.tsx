@@ -169,15 +169,20 @@ function Home({
   return (
     <div id="home">
       <Tabs value={activeTab} onValueChange={setActiveTab}>
-        <div className="flex items-center justify-between mb-4">
+        <div className="flex flex-wrap items-center justify-between gap-2 mb-4">
           <TabsList>
             <TabsTrigger value="reading">{t('continue_reading')}</TabsTrigger>
             <TabsTrigger value="all">{t('ALL')}</TabsTrigger>
             <TabsTrigger value="downloads">{t('download')}</TabsTrigger>
           </TabsList>
           <Button size="sm" variant="outline" onClick={onOpenAPISelector}>
-            <Plus className="h-4 w-4 mr-1" />
-            {t('add_a_new_manual_book')}
+            <Plus className="h-4 w-4 sm:mr-1" />
+            <span className="hidden sm:inline">
+              {t('add_a_new_manual_book')}
+            </span>
+            <span className="sr-only sm:hidden">
+              {t('add_a_new_manual_book')}
+            </span>
           </Button>
         </div>
 

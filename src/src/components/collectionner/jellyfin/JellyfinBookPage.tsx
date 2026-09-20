@@ -9,8 +9,9 @@ import {
   CardHeader,
   CardTitle,
 } from '@/components/ui/card.tsx';
-import { Progress } from '@/components/ui/progress.tsx';
-import { Spinner } from '@/components/ui/spinner.tsx';
+import JellyfinDownloadDialog, {
+  type DownloadState,
+} from './JellyfinDownloadDialog.tsx';
 import { HeroCard } from '@/components/collectionner/details/contentviewer/HeroCard.tsx';
 import { DetailsCard } from '@/components/collectionner/details/contentviewer/DetailsCard.tsx';
 import { ToasterHandler } from '@/components/common/ToasterHandler.tsx';
@@ -37,7 +38,10 @@ export default function JellyfinBookPage({
   const { t } = useTranslation();
   const [book, setBook] = React.useState(item);
   const [opening, setOpening] = React.useState(false);
-  const [progress, setProgress] = React.useState(0);
+  const [download, setDownload] = React.useState<DownloadState>({
+    written: 0,
+    total: null,
+  });
 
   React.useEffect(() => {
     setBook(item);
@@ -65,10 +69,10 @@ export default function JellyfinBookPage({
       return;
     }
     setOpening(true);
-    setProgress(0);
+    setDownload({ written: 0, total: null });
     const stop = await JellyfinAPI.onDownloadProgress((p) => {
-      if (p.item_id === book.id && p.total) {
-        setProgress((p.written * 100) / p.total);
+      if (p.item_id === book.id) {
+        setDownload({ written: p.written, total: p.total });
       }
     });
     try {
@@ -193,19 +197,11 @@ export default function JellyfinBookPage({
         }
       />
 
-      {opening && (
-        <Card>
-          <CardContent className="space-y-2 p-4">
-            <Progress value={progress} />
-            <p className="flex items-center gap-2 text-sm text-muted-foreground">
-              <Spinner />
-              {progress > 0 && progress < 100
-                ? t('jellyfin_downloading', { title: book.name })
-                : t('jellyfin_preparing')}
-            </p>
-          </CardContent>
-        </Card>
-      )}
+      <JellyfinDownloadDialog
+        open={opening}
+        title={book.name}
+        state={download}
+      />
       {unsupported && (
         <p className="text-sm text-destructive">
           {t('jellyfin_unsupported_format', { format: book.format })}

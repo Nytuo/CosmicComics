@@ -44,7 +44,7 @@ export default function AboutDialog({
         if (!isOpen) onClose();
       }}
     >
-      <DialogContent className="w-150">
+      <DialogContent className="sm:w-150">
         <DialogHeader>
           <DialogTitle>{t('about')}</DialogTitle>
         </DialogHeader>

@@ -1182,6 +1182,7 @@ export default function PersistentDrawerLeft() {
           preloadedImages={preloadedImages}
           currentPage={currentPage}
           onPageClick={(i) => {
+            if (window.innerWidth < 768) handleDrawerClose();
             setCurrentPage(i);
             if (!VIV_On) {
               Reader(listofImg, i);
@@ -1193,7 +1194,7 @@ export default function PersistentDrawerLeft() {
           }}
         />
         <main
-          className={`flex-1 transition-all duration-200 p-0 ${open ? 'ml-60' : 'ml-0'}`}
+          className={`flex-1 transition-all duration-200 p-0 ${open ? 'md:ml-60' : 'ml-0'}`}
         >
           <ViewerLoadingOverlay unzipStatus={unzipStatus} />
 
