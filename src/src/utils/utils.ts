@@ -8,7 +8,7 @@ import { IProviderEnum } from '@/interfaces/IProviderEnum.ts';
 const tryToParse = (str: string) => {
   try {
     return JSON.parse(str);
-  } catch (e) {
+  } catch {
     return str;
   }
 };

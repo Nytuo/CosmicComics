@@ -434,7 +434,6 @@ export function useContentViewer({
   ]);
 
   useLayoutEffect(() => {
-    // eslint-disable-next-line react-hooks/set-state-in-effect
     setFavorite(TheBook.favorite);
     setRating(TheBook.note);
 
