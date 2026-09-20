@@ -9,7 +9,7 @@ import { ToasterHandler } from '../../../common/ToasterHandler.tsx';
 import type { IMarvelUnlimitedDownloadProgress } from '@/interfaces/IMarvelUnlimited';
 import type { IDCInfiniteDownloadProgress } from '@/interfaces/IDCInfinite';
 import type { IVizDownloadProgress } from '@/interfaces/IViz';
-import ColorThief from 'colorthief/dist/color-thief.mjs';
+import { getColorSync } from 'colorthief';
 
 export type BookOrSeries = DisplayBook | DisplaySeries;
 
@@ -407,9 +407,8 @@ export function useContentViewer({
       img.crossOrigin = 'anonymous';
       img.src = imgUrl;
       img.onload = () => {
-        const colorThief = new ColorThief();
         try {
-          const color = colorThief.getColor(img);
+          const color = getColorSync(img, { colorSpace: 'rgb' })?.array();
           if (!color) return;
           const [r, g, b] = color;
           const darker = `rgb(${Math.floor(r * 0.6)}, ${Math.floor(g * 0.6)}, ${Math.floor(b * 0.6)})`;

@@ -9,10 +9,12 @@ export function useReadingSession(
 ) {
   const tracker = React.useRef<ReadingSessionTracker | null>(null);
   const latest = React.useRef({ page: 0, count: 0 });
-  latest.current = {
-    page: Math.min(lastIndex, currentPage + (secondPageShown ? 1 : 0)),
-    count: lastIndex + 1,
-  };
+  React.useLayoutEffect(() => {
+    latest.current = {
+      page: Math.min(lastIndex, currentPage + (secondPageShown ? 1 : 0)),
+      count: lastIndex + 1,
+    };
+  });
 
   React.useEffect(() => {
     const path = localStorage.getItem('currentBook');

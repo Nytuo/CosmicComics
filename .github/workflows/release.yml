@@ -35,6 +35,9 @@ on:
         default: all
         options:
           - all
+          - mobile
+          - android
+          - ios
           - macos-aarch64
           - macos-x86_64
           - ubuntu
@@ -46,6 +49,19 @@ on:
         description: 'Mark the release as a prerelease'
         type: boolean
         default: false
+      publish_stores:
+        description: 'Also upload to Google Play and App Store Connect (mobile builds only)'
+        type: boolean
+        default: false
+      play_track:
+        description: 'Google Play track used when publishing'
+        type: choice
+        default: internal
+        options:
+          - internal
+          - alpha
+          - beta
+          - production
 
 jobs:
   version:
@@ -57,6 +73,7 @@ jobs:
       previous_tag: ${{ steps.semver.outputs.previous_tag }}
       changelog: ${{ steps.semver.outputs.changelog }}
       matrix: ${{ steps.matrix.outputs.matrix }}
+      has_desktop: ${{ steps.matrix.outputs.has_desktop }}
     steps:
       - uses: actions/checkout@v4
         with:
@@ -222,18 +239,129 @@ jobs:
           if [ -z "$PLATFORM" ] || [ "$PLATFORM" = "all" ]; then
             INCLUDE="$ALL"
           else
+            # mobile / android / ios match no desktop entry, which yields an
+            # empty matrix: the build job is skipped through has_desktop.
             INCLUDE=$(echo "$ALL" | jq "[.[] | select(.id == \"$PLATFORM\")]")
           fi
           echo "matrix=$(echo "$INCLUDE" | jq -c '{include: .}')" >> "$GITHUB_OUTPUT"
+          echo "has_desktop=$(echo "$INCLUDE" | jq 'length > 0')" >> "$GITHUB_OUTPUT"
+
+  # Kept apart from "version" on purpose. A job's outputs are dropped when they
+  # contain the value of a secret, and GitHub masks a multi-line secret line by
+  # line: a pretty-printed service account JSON has lines that are just "{" and
+  # "}", which made the JSON `matrix` output of "version" vanish. This job holds
+  # the secrets, and only publishes true/false.
+  mobile-plan:
+    name: Plan mobile builds
+    runs-on: ubuntu-latest
+    outputs:
+      android: ${{ steps.mobile.outputs.android }}
+      ios: ${{ steps.mobile.outputs.ios }}
+      publish_android: ${{ steps.mobile.outputs.publish_android }}
+      publish_ios: ${{ steps.mobile.outputs.publish_ios }}
+    steps:
+      - name: Plan mobile builds
+        id: mobile
+        shell: bash
+        env:
+          PLATFORM: ${{ inputs.platform }}
+          PUBLISH: ${{ inputs.publish_stores }}
+          ANDROID_KEYSTORE_BASE64: ${{ secrets.ANDROID_KEYSTORE_BASE64 }}
+          ANDROID_KEYSTORE_PASSWORD: ${{ secrets.ANDROID_KEYSTORE_PASSWORD }}
+          ANDROID_KEY_ALIAS: ${{ secrets.ANDROID_KEY_ALIAS }}
+          PLAY_SERVICE_ACCOUNT_JSON: ${{ secrets.PLAY_SERVICE_ACCOUNT_JSON }}
+          APPLE_API_ISSUER: ${{ secrets.APPLE_API_ISSUER }}
+          APPLE_API_KEY: ${{ secrets.APPLE_API_KEY }}
+          APPLE_API_KEY_P8: ${{ secrets.APPLE_API_KEY_P8 }}
+        run: |
+          set -euo pipefail
+
+          PLATFORM="${PLATFORM:-all}"
+          case "$PLATFORM" in
+            all)     WANT_ANDROID=1; WANT_IOS=1; EXPLICIT=0 ;;
+            mobile)  WANT_ANDROID=1; WANT_IOS=1; EXPLICIT=1 ;;
+            android) WANT_ANDROID=1; WANT_IOS=0; EXPLICIT=1 ;;
+            ios)     WANT_ANDROID=0; WANT_IOS=1; EXPLICIT=1 ;;
+            *)       WANT_ANDROID=0; WANT_IOS=0; EXPLICIT=1 ;;
+          esac
+
+          # Names of the listed secrets that are empty.
+          missing() {
+            local out=() name
+            for name in "$@"; do
+              [ -n "${!name:-}" ] || out+=("$name")
+            done
+            echo "${out[*]:-}"
+          }
+
+          # $1 = label, $2 = 0|1 wanted, then the required secret names.
+          # Prints 1 when the platform is enabled, 0 when skipped.
+          plan() {
+            local label="$1" want="$2" gone
+            shift 2
+            if [ "$want" != 1 ]; then echo 0; return; fi
+            gone=$(missing "$@")
+            if [ -z "$gone" ]; then echo 1; return; fi
+            if [ "$EXPLICIT" = 1 ]; then
+              echo "::error::${label} build needs these repository secrets: ${gone}" >&2
+              exit 1
+            fi
+            echo "::warning::${label} skipped, missing secrets: ${gone}" >&2
+            echo 0
+          }
+
+          # Android needs no secret for a GitHub-release APK, only the Play
+          # upload does (see the publish block below).
+          ANDROID=$(plan "Android" "$WANT_ANDROID")
+          IOS=$(plan "iOS" "$WANT_IOS" APPLE_API_ISSUER APPLE_API_KEY APPLE_API_KEY_P8)
+
+          PUBLISH_ANDROID=false
+          PUBLISH_IOS=false
+          if [ "$PUBLISH" = "true" ]; then
+            if [ "$ANDROID" = 0 ] && [ "$IOS" = 0 ]; then
+              echo "::error::publish_stores is ticked but no mobile build is enabled for platform '${PLATFORM}'."
+              exit 1
+            fi
+            if [ "$ANDROID" = 1 ]; then
+              # Play remembers the key of the first upload, so it has to be a
+              # stable one, not the throwaway key used for GitHub-only builds.
+              GONE=$(missing ANDROID_KEYSTORE_BASE64 ANDROID_KEYSTORE_PASSWORD ANDROID_KEY_ALIAS PLAY_SERVICE_ACCOUNT_JSON)
+              if [ -n "$GONE" ]; then
+                echo "::error::Google Play upload needs these repository secrets: ${GONE}"
+                exit 1
+              fi
+              PUBLISH_ANDROID=true
+            fi
+            [ "$IOS" = 1 ] && PUBLISH_IOS=true
+          fi
+
+          {
+            echo "android=$([ "$ANDROID" = 1 ] && echo true || echo false)"
+            echo "ios=$([ "$IOS" = 1 ] && echo true || echo false)"
+            echo "publish_android=${PUBLISH_ANDROID}"
+            echo "publish_ios=${PUBLISH_IOS}"
+          } >> "$GITHUB_OUTPUT"
+
+          {
+            echo
+            echo "### Mobile"
+            echo
+            echo "- Android APK/AAB: $([ "$ANDROID" = 1 ] && echo yes || echo no) · Google Play upload: ${PUBLISH_ANDROID}"
+            echo "- iOS IPA: $([ "$IOS" = 1 ] && echo yes || echo no) · App Store Connect upload: ${PUBLISH_IOS}"
+          } >> "$GITHUB_STEP_SUMMARY"
 
   build:
     name: Build ${{ matrix.id }}
-    needs: version
+    needs: [version, mobile-plan]
+    if: ${{ needs.version.result == 'success' && needs.version.outputs.has_desktop == 'true' }}
     permissions:
       contents: write
     strategy:
       fail-fast: false
-      matrix: ${{ fromJSON(needs.version.outputs.matrix) }}
+      # GitHub evaluates this even for a skipped job. When "Resolve version"
+      # fails its outputs are empty and fromJSON('') raises a second, confusing
+      # error, so fall back to a placeholder entry (the job is skipped anyway).
+      matrix: ${{ fromJSON(needs.version.outputs.matrix || '{"include":[{"id":"skipped","runs_on":"ubuntu-latest"}]}') }}
     runs-on: ${{ matrix.runs_on }}
     steps:
       - uses: actions/checkout@v4
@@ -260,7 +388,7 @@ jobs:
           choco install cuda --version=12.9.1.576 -y
           echo "C:\Program Files\NVIDIA GPU Computing Toolkit\CUDA\v12.9\bin" | Out-File -FilePath $env:GITHUB_PATH -Encoding utf8 -Append
           echo "CUDA_PATH=C:\Program Files\NVIDIA GPU Computing Toolkit\CUDA\v12.9" | Out-File -FilePath $env:GITHUB_ENV -Encoding utf8 -Append
-      
+
       - name: install protoc (macOS)
         if: matrix.runs_on == 'macos-latest'
         run: brew install protobuf
@@ -296,23 +424,15 @@ jobs:
       # sync with package.json. The edits live only in the runner workspace —
       # they are never committed back to the repo.
       - name: Apply release version
-        shell: bash
-        env:
-          VERSION: ${{ needs.version.outputs.version }}
-        run: |
-          set -euo pipefail
-          jq --arg v "$VERSION" '.version = $v' src/src-tauri/tauri.conf.json > conf.tmp
-          mv conf.tmp src/src-tauri/tauri.conf.json
-          jq --arg v "$VERSION" '.version = $v' src/package.json > pkg.tmp
-          mv pkg.tmp src/package.json
-          perl -0pi -e 's/^(\[package\](?:[^\[]*?)\nversion\s*=\s*")[^"]*(")/${1}'"$VERSION"'${2}/ms' src/src-tauri/Cargo.toml
-          echo "Building version $VERSION"
+        uses: ./.github/actions/apply-version
+        with:
+          version: ${{ needs.version.outputs.version }}
 
       - uses: tauri-apps/tauri-action@v0
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           TAURI_SIGNING_PRIVATE_KEY: ${{ secrets.TAURI_SIGNING_PRIVATE_KEY }}
-          TAURI_SIGNING_PRIVATE_KEY_PASSWORD: ${{ secrets.TAURI_SIGNING_PRIVATE_KEY_PASSWORD }}      
+          TAURI_SIGNING_PRIVATE_KEY_PASSWORD: ${{ secrets.TAURI_SIGNING_PRIVATE_KEY_PASSWORD }}
         with:
           tagName: ${{ needs.version.outputs.tag }}
           releaseName: 'CosmicComics ${{ needs.version.outputs.tag }}'
@@ -320,3 +440,399 @@ jobs:
           releaseDraft: true
           prerelease: ${{ inputs.prerelease }}
           args: ${{ matrix.args }}
+
+  # ---------------------------------------------------------------------------
+  # Mobile. Build jobs only produce artifacts; attaching to the release and
+  # talking to the stores happen in their own jobs below.
+  # ---------------------------------------------------------------------------
+
+  android:
+    name: Build Android (APK + AAB)
+    needs: [version, mobile-plan]
+    if: ${{ needs.mobile-plan.outputs.android == 'true' }}
+    runs-on: ubuntu-latest
+    timeout-minutes: 90
+    permissions:
+      contents: read
+    env:
+      # Builds the Rust library. NDK r28+ produces 16 KB page-aligned .so files,
+      # which Google Play requires; r27 does not (Tauri does not add the flags).
+      NDK_VERSION: 28.2.13676358
+      # Default NDK of the Android Gradle plugin, installed so it never has to
+      # download anything mid-build.
+      GRADLE_NDK_VERSION: 27.0.12077973
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: 17
+
+      - uses: android-actions/setup-android@v4
+
+      - name: Android SDK and NDK
+        run: |
+          sdkmanager "ndk;${NDK_VERSION}" "ndk;${GRADLE_NDK_VERSION}" "platforms;android-36" "build-tools;36.0.0"
+          echo "NDK_HOME=$ANDROID_HOME/ndk/${NDK_VERSION}" >> "$GITHUB_ENV"
+
+      - uses: dtolnay/rust-toolchain@stable
+        with:
+          targets: aarch64-linux-android
+
+      - uses: swatinem/rust-cache@v2
+        with:
+          workspaces: './src/src-tauri -> target'
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: lts/*
+          cache: npm
+          cache-dependency-path: ./src/package-lock.json
+
+      - name: Install JS dependencies
+        run: npm ci --prefix src
+
+      - name: Apply release version
+        uses: ./.github/actions/apply-version
+        with:
+          version: ${{ needs.version.outputs.version }}
+
+      - name: Generate the Android project
+        run: npx tauri android init --ci
+        working-directory: src
+
+      # `tauri android init` writes the default Tauri icons. `tauri icon` copies
+      # ours into an existing project, but this one is generated from scratch
+      # on every run, so the icons are applied here.
+      - name: Apply the app icons
+        run: cp -R src/src-tauri/icons/android/. src/src-tauri/gen/android/app/src/main/res/
+
+      # Android refuses to install an APK that has no signature at all, so even
+      # a GitHub-only build is signed. With the keystore secrets it uses your
+      # stable key (users can update in place). Without them it uses a key made
+      # on the spot: the APK installs, but every release has a different
+      # signature, so Android makes users uninstall before updating.
+      - name: Configure release signing
+        id: signing
+        shell: bash
+        env:
+          ANDROID_KEYSTORE_BASE64: ${{ secrets.ANDROID_KEYSTORE_BASE64 }}
+          ANDROID_KEYSTORE_PASSWORD: ${{ secrets.ANDROID_KEYSTORE_PASSWORD }}
+          ANDROID_KEY_ALIAS: ${{ secrets.ANDROID_KEY_ALIAS }}
+          ANDROID_KEY_PASSWORD: ${{ secrets.ANDROID_KEY_PASSWORD }}
+        run: |
+          set -euo pipefail
+          umask 077
+          KEYSTORE="$RUNNER_TEMP/upload-keystore.jks"
+
+          if [ -n "$ANDROID_KEYSTORE_BASE64" ]; then
+            if [ -z "$ANDROID_KEYSTORE_PASSWORD" ] || [ -z "$ANDROID_KEY_ALIAS" ]; then
+              echo "::error::ANDROID_KEYSTORE_BASE64 is set, ANDROID_KEYSTORE_PASSWORD and ANDROID_KEY_ALIAS must be too."
+              exit 1
+            fi
+            printf '%s' "$ANDROID_KEYSTORE_BASE64" | base64 -d > "$KEYSTORE"
+            echo "real_key=true" >> "$GITHUB_OUTPUT"
+          else
+            echo "::warning::No ANDROID_KEYSTORE_BASE64 secret: signing with a throwaway key. The APK installs, but cannot update a build from another release."
+            ANDROID_KEYSTORE_PASSWORD=$(openssl rand -hex 16)
+            echo "::add-mask::$ANDROID_KEYSTORE_PASSWORD"
+            ANDROID_KEY_ALIAS=throwaway
+            ANDROID_KEY_PASSWORD=""
+            keytool -genkeypair -keystore "$KEYSTORE" -storetype PKCS12 \
+              -storepass "$ANDROID_KEYSTORE_PASSWORD" -keypass "$ANDROID_KEYSTORE_PASSWORD" \
+              -alias "$ANDROID_KEY_ALIAS" -keyalg RSA -keysize 2048 -validity 10000 \
+              -dname "CN=Cosmic Comics"
+            echo "real_key=false" >> "$GITHUB_OUTPUT"
+          fi
+
+          # .properties treats backslashes as escapes.
+          esc() { printf '%s' "${1//\\/\\\\}"; }
+          {
+            echo "storeFile=$(esc "$KEYSTORE")"
+            echo "password=$(esc "$ANDROID_KEYSTORE_PASSWORD")"
+            echo "keyAlias=$(esc "$ANDROID_KEY_ALIAS")"
+            echo "keyPassword=$(esc "${ANDROID_KEY_PASSWORD:-$ANDROID_KEYSTORE_PASSWORD}")"
+          } > src/src-tauri/gen/android/keystore.properties
+
+          node src/scripts/android-signing.cjs
+
+      # The version code must strictly increase on Google Play, and the run
+      # number does. Set the ANDROID_VERSION_CODE_OFFSET repository variable if
+      # a higher code was already uploaded by hand.
+      - name: Build signed APK and AAB
+        working-directory: src
+        env:
+          RUN_NUMBER: ${{ github.run_number }}
+          VERSION_CODE_OFFSET: ${{ vars.ANDROID_VERSION_CODE_OFFSET }}
+          # Same define as src/.cargo/config.toml (see the comment there), set
+          # here as well because this is the step that failed without it.
+          CXXFLAGS_aarch64_linux_android: -D_POSIX_C_SOURCE=200809L
+        run: |
+          set -euo pipefail
+          VERSION_CODE=$((RUN_NUMBER + ${VERSION_CODE_OFFSET:-0}))
+          echo "versionCode=${VERSION_CODE}"
+          npx tauri android build --apk --aab --target aarch64 \
+            --config "{\"bundle\":{\"android\":{\"versionCode\":${VERSION_CODE}}}}"
+
+      - name: Collect and verify outputs
+        shell: bash
+        env:
+          VERSION: ${{ needs.version.outputs.version }}
+          REAL_KEY: ${{ steps.signing.outputs.real_key }}
+        run: |
+          set -euo pipefail
+          OUT=src/src-tauri/gen/android/app/build/outputs
+          APK=$(find "$OUT/apk" -name '*release*.apk' | head -n1)
+          [ -n "$APK" ] || { echo "::error::APK not found under $OUT"; exit 1; }
+
+          mkdir -p dist/apk dist/aab
+          cp "$APK" "dist/apk/Cosmic-Comics_${VERSION}_android-arm64.apk"
+
+          # An unsigned APK is not installable, so refuse to ship one.
+          "$ANDROID_HOME/build-tools/36.0.0/apksigner" verify --print-certs "dist/apk/Cosmic-Comics_${VERSION}_android-arm64.apk"
+
+          # Google Play rejects native libraries whose segments are not aligned
+          # to 16 KB. Fail here, with a clear message, rather than at upload.
+          READELF="$NDK_HOME/toolchains/llvm/prebuilt/linux-x86_64/bin/llvm-readelf"
+          SO_DIR="$RUNNER_TEMP/so"
+          unzip -o -q "dist/apk/Cosmic-Comics_${VERSION}_android-arm64.apk" 'lib/*.so' -d "$SO_DIR"
+          CHECKED=0
+          for SO in "$SO_DIR"/lib/*/*.so; do
+            # The C++ runtime is linked statically (see build.rs). If it is not,
+            # these symbols stay undefined and the app fails when it loads.
+            MISSING=$("$READELF" --dyn-syms -W "$SO" \
+              | awk '$7 == "UND" { print $8 }' \
+              | grep -E '^(_ZNSt6__ndk1|_ZNSt3__1|_Znwm|_Znam|_ZdlPv|_ZdaPv|__gxx_personality_v0|__cxa_(throw|begin_catch|end_catch|rethrow|allocate_exception|free_exception|guard_acquire|guard_release|pure_virtual))' \
+              | head -n5 || true)
+            if [ -n "$MISSING" ]; then
+              echo "::error::$(basename "$SO") has unresolved C++ runtime symbols, e.g. $(echo "$MISSING" | head -n1 | tr -d '\n')"
+              exit 1
+            fi
+
+            SEGMENTS=0
+            while read -r ALIGN; do
+              SEGMENTS=$((SEGMENTS + 1))
+              if [ $((ALIGN)) -lt 16384 ]; then
+                echo "::error::$(basename "$SO") has a LOAD segment aligned to $((ALIGN)) bytes, Google Play needs 16384. Is NDK_HOME an r28+ NDK?"
+                exit 1
+              fi
+            done < <("$READELF" -lW "$SO" | awk '$1 == "LOAD" { print $NF }')
+            [ "$SEGMENTS" -gt 0 ] || { echo "::error::no LOAD segments read from $SO"; exit 1; }
+            CHECKED=$((CHECKED + 1))
+          done
+          [ "$CHECKED" -gt 0 ] || { echo "::error::no native libraries found in the APK"; exit 1; }
+          echo "16 KB alignment ok for $CHECKED native libraries"
+
+          # An AAB signed with a throwaway key is useless to Google Play.
+          if [ "$REAL_KEY" = "true" ]; then
+            AAB=$(find "$OUT/bundle" -name '*.aab' | head -n1)
+            [ -n "$AAB" ] || { echo "::error::AAB not found under $OUT"; exit 1; }
+            cp "$AAB" "dist/aab/Cosmic-Comics_${VERSION}_android.aab"
+          fi
+
+      - uses: actions/upload-artifact@v4
+        with:
+          name: mobile-android-apk
+          path: dist/apk/*.apk
+          if-no-files-found: error
+
+      - uses: actions/upload-artifact@v4
+        if: ${{ steps.signing.outputs.real_key == 'true' }}
+        with:
+          name: store-android-aab
+          path: dist/aab/*.aab
+          retention-days: 14
+          if-no-files-found: error
+
+  ios:
+    name: Build iOS (IPA)
+    needs: [version, mobile-plan]
+    if: ${{ needs.mobile-plan.outputs.ios == 'true' }}
+    runs-on: macos-latest
+    timeout-minutes: 90
+    permissions:
+      contents: read
+    steps:
+      - uses: actions/checkout@v4
+
+      # App Store Connect only accepts builds made with a recent Xcode/SDK.
+      - uses: maxim-lobanov/setup-xcode@v1
+        with:
+          xcode-version: latest-stable
+
+      - uses: dtolnay/rust-toolchain@stable
+        with:
+          targets: aarch64-apple-ios
+
+      - uses: swatinem/rust-cache@v2
+        with:
+          workspaces: './src/src-tauri -> target'
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: lts/*
+          cache: npm
+          cache-dependency-path: ./src/package-lock.json
+
+      - name: Install JS dependencies
+        run: npm ci --prefix src
+
+      - name: Apply release version
+        uses: ./.github/actions/apply-version
+        with:
+          version: ${{ needs.version.outputs.version }}
+
+      # App Store Connect rejects the upload, after the whole build, if the
+      # large icon has an alpha channel (`tauri icon` produces one).
+      - name: Check the app icons have no alpha channel
+        run: |
+          set -euo pipefail
+          for ICON in src/src-tauri/icons/ios/*.png; do
+            if sips -g hasAlpha "$ICON" | grep -q 'hasAlpha: yes'; then
+              echo "::error file=$ICON::has an alpha channel, App Store Connect rejects it. Flatten it onto an opaque background."
+              exit 1
+            fi
+          done
+
+      # CFBundleShortVersionString only accepts N.N.N, so a prerelease suffix
+      # such as 1.4.0-rc.1 is dropped. The build number must increase for every
+      # upload of the same version, the run number does.
+      - name: Set bundle version
+        env:
+          VERSION: ${{ needs.version.outputs.version }}
+          BUILD_NUMBER: ${{ github.run_number }}
+        run: |
+          set -euo pipefail
+          PLIST=src/src-tauri/gen/apple/cosmiccomics_iOS/Info.plist
+          /usr/libexec/PlistBuddy -c "Set :CFBundleShortVersionString ${VERSION%%[-+]*}" "$PLIST"
+          /usr/libexec/PlistBuddy -c "Set :CFBundleVersion ${BUILD_NUMBER}" "$PLIST"
+
+      # Signing is automatic: Xcode signs with cloud-managed certificates and
+      # profiles through the App Store Connect API key.
+      - name: Build signed IPA
+        working-directory: src
+        env:
+          APPLE_API_ISSUER: ${{ secrets.APPLE_API_ISSUER }}
+          APPLE_API_KEY: ${{ secrets.APPLE_API_KEY }}
+          APPLE_API_KEY_P8: ${{ secrets.APPLE_API_KEY_P8 }}
+          BUILD_NUMBER: ${{ github.run_number }}
+        run: |
+          set -euo pipefail
+          KEY_DIR="$HOME/.appstoreconnect/private_keys"
+          mkdir -p "$KEY_DIR"
+          printf '%s\n' "$APPLE_API_KEY_P8" > "$KEY_DIR/AuthKey_${APPLE_API_KEY}.p8"
+          export APPLE_API_KEY_PATH="$KEY_DIR/AuthKey_${APPLE_API_KEY}.p8"
+
+          npx tauri ios build --export-method app-store-connect \
+            --config "{\"bundle\":{\"iOS\":{\"bundleVersion\":\"${BUILD_NUMBER}\"}}}"
+
+      - name: Collect outputs
+        env:
+          VERSION: ${{ needs.version.outputs.version }}
+        run: |
+          set -euo pipefail
+          IPA=$(find src/src-tauri/gen/apple/build -maxdepth 3 -name '*.ipa' | head -n1)
+          [ -n "$IPA" ] || { echo "::error::IPA not found"; exit 1; }
+          mkdir -p dist/signed dist/unsigned
+          cp "$IPA" "dist/signed/Cosmic-Comics_${VERSION}_ios.ipa"
+
+          # Same build, repackaged for sideloading tools that sign it again.
+          ARCHIVE=$(find src/src-tauri/gen/apple/build -maxdepth 1 -name '*.xcarchive' | head -n1)
+          [ -n "$ARCHIVE" ] || { echo "::error::xcarchive not found"; exit 1; }
+          src/scripts/unsigned-ipa.sh "$ARCHIVE" "dist/unsigned/Cosmic-Comics_${VERSION}_ios-unsigned.ipa"
+
+      # Kept apart so the App Store upload only ever sees the signed IPA.
+      - uses: actions/upload-artifact@v4
+        with:
+          name: mobile-ios-ipa
+          path: dist/signed/*.ipa
+          if-no-files-found: error
+
+      - uses: actions/upload-artifact@v4
+        with:
+          name: mobile-ios-unsigned-ipa
+          path: dist/unsigned/*.ipa
+          if-no-files-found: error
+
+  # One job owns the release so the desktop, Android and iOS jobs can never
+  # race to create it. It finds the draft that tauri-action made, or makes one.
+  mobile-release:
+    name: Attach mobile builds to the release
+    needs: [version, build, android, ios]
+    if: >-
+      ${{ !cancelled() && needs.version.result == 'success'
+      && (needs.android.result == 'success' || needs.ios.result == 'success') }}
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    steps:
+      - uses: actions/download-artifact@v4
+        with:
+          pattern: mobile-*
+          merge-multiple: true
+          path: mobile
+
+      - uses: softprops/action-gh-release@v2
+        with:
+          tag_name: ${{ needs.version.outputs.tag }}
+          name: 'CosmicComics ${{ needs.version.outputs.tag }}'
+          body: ${{ needs.version.outputs.changelog }}
+          draft: true
+          prerelease: ${{ inputs.prerelease }}
+          target_commitish: ${{ github.sha }}
+          files: mobile/*
+          fail_on_unmatched_files: true
+
+  google-play:
+    name: Upload to Google Play
+    needs: [version, mobile-plan, android]
+    if: ${{ !cancelled() && needs.mobile-plan.outputs.publish_android == 'true' && needs.android.result == 'success' }}
+    runs-on: ubuntu-latest
+    environment: app-stores
+    permissions:
+      contents: read
+    steps:
+      - uses: actions/download-artifact@v4
+        with:
+          name: store-android-aab
+          path: aab
+
+      # The Play Console rejects "completed" releases on an app that never had
+      # one, and a production release should not go out unattended: production
+      # is therefore left as a draft to send for review from the Play Console.
+      - uses: r0adkll/upload-google-play@v1
+        with:
+          serviceAccountJsonPlainText: ${{ secrets.PLAY_SERVICE_ACCOUNT_JSON }}
+          packageName: fr.nytuo.cosmiccomics
+          releaseFiles: aab/*.aab
+          releaseName: ${{ needs.version.outputs.tag }}
+          track: ${{ inputs.play_track }}
+          status: ${{ inputs.play_track == 'production' && 'draft' || 'completed' }}
+
+  app-store:
+    name: Upload to App Store Connect
+    needs: [mobile-plan, ios]
+    if: ${{ !cancelled() && needs.mobile-plan.outputs.publish_ios == 'true' && needs.ios.result == 'success' }}
+    runs-on: macos-latest
+    environment: app-stores
+    permissions:
+      contents: read
+    steps:
+      - uses: actions/download-artifact@v4
+        with:
+          name: mobile-ios-ipa
+          path: ipa
+
+      - name: Upload build
+        env:
+          APPLE_API_ISSUER: ${{ secrets.APPLE_API_ISSUER }}
+          APPLE_API_KEY: ${{ secrets.APPLE_API_KEY }}
+          APPLE_API_KEY_P8: ${{ secrets.APPLE_API_KEY_P8 }}
+        run: |
+          set -euo pipefail
+          KEY_DIR="$HOME/.appstoreconnect/private_keys"
+          mkdir -p "$KEY_DIR"
+          printf '%s\n' "$APPLE_API_KEY_P8" > "$KEY_DIR/AuthKey_${APPLE_API_KEY}.p8"
+          xcrun altool --upload-app --type ios --file ipa/*.ipa \
+            --apiKey "$APPLE_API_KEY" --apiIssuer "$APPLE_API_ISSUER"

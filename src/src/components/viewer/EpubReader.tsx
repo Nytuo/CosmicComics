@@ -80,7 +80,9 @@ export default function EpubReader({ path }: { path: string }) {
   const [ready, setReady] = React.useState(false);
   const [error, setError] = React.useState<string | null>(null);
   const settingsRef = React.useRef(settings);
-  settingsRef.current = settings;
+  React.useLayoutEffect(() => {
+    settingsRef.current = settings;
+  });
 
   const next = React.useCallback(() => rendition.current?.next(), []);
   const prev = React.useCallback(() => rendition.current?.prev(), []);

@@ -24,7 +24,9 @@ export function useTouchNavigation({
   onToggleBar,
 }: Options) {
   const handlers = React.useRef({ onNext, onPrev, onToggleBar, continuous });
-  handlers.current = { onNext, onPrev, onToggleBar, continuous };
+  React.useLayoutEffect(() => {
+    handlers.current = { onNext, onPrev, onToggleBar, continuous };
+  });
 
   React.useEffect(() => {
     if (!enabled) return;

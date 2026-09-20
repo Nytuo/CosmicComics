@@ -147,7 +147,24 @@ function Slide({
   smooth: boolean;
   onNatural: (page: number, size: Size) => void;
 }) {
+  // Where each page sits in the block: pages are laid side by side.
+  const boxes: ({ x: number; y: number; w: number; h: number } | null)[] = [];
   let cursor = 0;
+  for (let at = 0; at < srcs.length; at++) {
+    const natural = pageSizes[at];
+    if (!block || !natural) {
+      boxes.push(null);
+      continue;
+    }
+    const width = natural.w * (block.h / natural.h);
+    boxes.push({
+      x: block.x + cursor * block.s,
+      y: block.y,
+      w: width * block.s,
+      h: block.h * block.s,
+    });
+    cursor += width;
+  }
   return (
     <>
       {!block && (
@@ -155,30 +172,16 @@ function Slide({
           <Spinner className="size-6 text-white/60" />
         </div>
       )}
-      {srcs.map(({ page, src }, at) => {
-        const natural = pageSizes[at];
-        let box = null;
-        if (block && natural) {
-          const width = natural.w * (block.h / natural.h);
-          box = {
-            x: block.x + cursor * block.s,
-            y: block.y,
-            w: width * block.s,
-            h: block.h * block.s,
-          };
-          cursor += width;
-        }
-        return (
-          <PageImage
-            key={page}
-            src={src}
-            crop={crop}
-            box={box}
-            smooth={smooth}
-            onNatural={(size) => onNatural(page, size)}
-          />
-        );
-      })}
+      {srcs.map(({ page, src }, at) => (
+        <PageImage
+          key={page}
+          src={src}
+          crop={crop}
+          box={boxes[at]}
+          smooth={smooth}
+          onNatural={(size) => onNatural(page, size)}
+        />
+      ))}
     </>
   );
 }
@@ -311,7 +314,9 @@ export default function PagedStage({
     baseScale,
     sizes,
   });
-  latest.current = { index, total, container, current, baseScale, sizes };
+  React.useLayoutEffect(() => {
+    latest.current = { index, total, container, current, baseScale, sizes };
+  });
 
   const commitView = React.useCallback((box: Box, animate = false) => {
     const { index: at, container: c, sizes: all } = latest.current;
@@ -413,7 +418,9 @@ export default function PagedStage({
   );
   const chromeTimer = React.useRef<number | undefined>(undefined);
   const settings = React.useRef({ tapZones, rtl });
-  settings.current = { tapZones, rtl };
+  React.useLayoutEffect(() => {
+    settings.current = { tapZones, rtl };
+  });
 
   const localPoint = (event: { clientX: number; clientY: number }) => {
     const rect = host.current!.getBoundingClientRect();

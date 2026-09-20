@@ -122,3 +122,5 @@ src/src-tauri/resources/model.onnx
 # Flatpak build output
 build-dir/
 .flatpak-builder/
+
+*.jks

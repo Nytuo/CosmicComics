@@ -25,7 +25,13 @@
     "tauri": "tauri",
     "format": "prettier . --write",
     "format:check": "prettier . --check",
-    "lint": "eslint src"
+    "lint": "eslint src",
+    "typecheck": "tsc --noEmit",
+    "deps:audit": "npm audit",
+    "deps:audit:rust": "cd src-tauri && cargo audit",
+    "deps:fix": "npm audit fix",
+    "deps:outdated": "npm outdated",
+    "deps:update": "npx --yes npm-check-updates --interactive --format group"
   },
   "dependencies": {
     "@base-ui/react": "^1.2.0",
@@ -55,7 +61,7 @@
     "class-variance-authority": "^0.7.1",
     "clsx": "^2.1.1",
     "cmdk": "^1.1.1",
-    "colorthief": "^2.6.0",
+    "colorthief": "^3.5.0",
     "date-fns": "^4.1.0",
     "embla-carousel-react": "^8.6.0",
     "epubjs": "^0.3.93",

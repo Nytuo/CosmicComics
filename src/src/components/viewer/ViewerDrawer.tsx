@@ -4,7 +4,7 @@ import { useEffect } from 'react';
 import { convertFileSrc } from '@tauri-apps/api/core';
 import { listen } from '@tauri-apps/api/event';
 import { Window } from '@tauri-apps/api/window';
-import ColorThief from 'colorthief/dist/color-thief.mjs';
+import { getColorSync } from 'colorthief';
 
 import * as TauriAPI from '@/API/TauriAPI';
 import { PanelRect } from '@/API/TauriAPI';
@@ -541,25 +541,30 @@ export default function PersistentDrawerLeft() {
     setTimeout(() => {
       if (backgroundColorAuto) {
         Logger.info('ColorThief : Enable');
-        const colorThief = new ColorThief();
-        try {
-          const dummyImgElement = document.createElement('img');
-          dummyImgElement.src = images[0];
-          const color = colorThief.getColor(dummyImgElement);
-          if (!color) return;
-          const [r, g, b] = color;
-          const darker = `rgb(${Math.floor(r * 0.6)}, ${Math.floor(
-            g * 0.6
-          )}, ${Math.floor(b * 0.6)})`;
+        if (!images[0]) return;
+        const dummyImgElement = document.createElement('img');
+        dummyImgElement.crossOrigin = 'anonymous';
+        dummyImgElement.onload = () => {
+          try {
+            const color = getColorSync(dummyImgElement, {
+              colorSpace: 'rgb',
+            })?.array();
+            if (!color) return;
+            const [r, g, b] = color;
+            const darker = `rgb(${Math.floor(r * 0.6)}, ${Math.floor(
+              g * 0.6
+            )}, ${Math.floor(b * 0.6)})`;
 
-          setTimeout(() => {
-            const body = document.getElementsByTagName('body')[0];
-            body.style.transition = 'background 0.5s ease-in-out 0.5s';
-            body.style.background = `linear-gradient(to left top, rgb(${r}, ${g}, ${b}), ${darker}) no-repeat fixed`;
-          }, 500);
-        } catch (e) {
-          console.error('ColorThief error:', e);
-        }
+            setTimeout(() => {
+              const body = document.getElementsByTagName('body')[0];
+              body.style.transition = 'background 0.5s ease-in-out 0.5s';
+              body.style.background = `linear-gradient(to left top, rgb(${r}, ${g}, ${b}), ${darker}) no-repeat fixed`;
+            }, 500);
+          } catch (e) {
+            console.error('ColorThief error:', e);
+          }
+        };
+        dummyImgElement.src = images[0];
       }
     }, 50);
 

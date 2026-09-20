@@ -27,7 +27,9 @@ const Magnifier: React.FC<MagnifierProps> = ({ zoomFactor, children }) => {
   };
 
   const transformValue = isMagnified
-    ? `scale(${zoomFactor}) translate(-${position.x}px, -${position.y}px)`
+    ? `translate(${-position.x * (zoomFactor - 1)}px, ${
+        -position.y * (zoomFactor - 1)
+      }px) scale(${zoomFactor})`
     : 'scale(1)';
 
   return (

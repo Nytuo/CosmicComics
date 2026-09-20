@@ -90,13 +90,15 @@ export default function DatabaseEditorSkeleton({
   }, []);
 
   const formValuesRef = useRef(formValues);
-  formValuesRef.current = formValues;
   const trackedModeRef = useRef(trackedMode);
-  trackedModeRef.current = trackedMode;
   const TheBookRef = useRef(TheBook);
-  TheBookRef.current = TheBook;
   const typeRef = useRef(type);
-  typeRef.current = type;
+  useLayoutEffect(() => {
+    formValuesRef.current = formValues;
+    trackedModeRef.current = trackedMode;
+    TheBookRef.current = TheBook;
+    typeRef.current = type;
+  });
 
   useEffect(() => {
     if (!triggerSend) return;
