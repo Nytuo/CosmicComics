@@ -25,7 +25,13 @@
     "tauri": "tauri",
     "format": "prettier . --write",
     "format:check": "prettier . --check",
-    "lint": "eslint src"
+    "lint": "eslint src",
+    "typecheck": "tsc --noEmit",
+    "deps:audit": "npm audit",
+    "deps:audit:rust": "cd src-tauri && cargo audit",
+    "deps:fix": "npm audit fix",
+    "deps:outdated": "npm outdated",
+    "deps:update": "npx --yes npm-check-updates --interactive --format group"
   },
   "dependencies": {
     "@base-ui/react": "^1.2.0",

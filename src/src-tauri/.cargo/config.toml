@@ -1,0 +1,10 @@
+# unrar_sys (the vendored C++ unrar) picks how it sets file times from
+# _POSIX_C_SOURCE. Android's libc never defines it, so unrar falls back to
+# lutimes(), which Android only declares from API 26 while the app supports
+# API 24: "use of undeclared identifier 'lutimes'". Defining it for the Android
+# targets makes unrar use utimensat(), available since API 12.
+[env]
+CXXFLAGS_aarch64_linux_android = "-D_POSIX_C_SOURCE=200809L"
+CXXFLAGS_armv7_linux_androideabi = "-D_POSIX_C_SOURCE=200809L"
+CXXFLAGS_i686_linux_android = "-D_POSIX_C_SOURCE=200809L"
+CXXFLAGS_x86_64_linux_android = "-D_POSIX_C_SOURCE=200809L"

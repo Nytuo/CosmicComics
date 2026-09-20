@@ -122,7 +122,6 @@ Notes:
 - `CBR` uses the bundled `unrar` library and `CB7` a pure-Rust 7z decoder; archives are recognised by content, so a `.cbr` that is really a ZIP still opens.
 - Not available on mobile: the Marvel/MangaDex/DC/Viz/GetComics downloaders (need a desktop browser), the Smart Panel AI and the auto-updater.
 - Jellyfin book formats: CBZ, CBR, CB7, CBT, ZIP, RAR, 7z, TAR, PDF and EPUB. Others (MOBI, AZW3, ...) are reported as unsupported.
-- See `.github/workflows/mobile.yml` for the CI build steps.
 
 ### Working on the UI without a device
 

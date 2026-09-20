@@ -1,0 +1,25 @@
+name: Apply release version
+description: >
+  Patches the release version into tauri.conf.json, package.json and Cargo.toml.
+  The edits live only in the runner workspace, they are never committed back.
+  Run it after `npm ci` so the lockfile is never left out of sync with package.json.
+
+inputs:
+  version:
+    description: Semver version without the leading v, e.g. 1.4.0
+    required: true
+
+runs:
+  using: composite
+  steps:
+    - shell: bash
+      env:
+        VERSION: ${{ inputs.version }}
+      run: |
+        set -euo pipefail
+        jq --arg v "$VERSION" '.version = $v' src/src-tauri/tauri.conf.json > conf.tmp
+        mv conf.tmp src/src-tauri/tauri.conf.json
+        jq --arg v "$VERSION" '.version = $v' src/package.json > pkg.tmp
+        mv pkg.tmp src/package.json
+        perl -0pi -e 's/^(\[package\](?:[^\[]*?)\nversion\s*=\s*")[^"]*(")/${1}'"$VERSION"'${2}/ms' src/src-tauri/Cargo.toml
+        echo "Building version $VERSION"
