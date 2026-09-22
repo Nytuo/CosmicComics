@@ -40,7 +40,7 @@ import MobileCard from './MobileCard.tsx';
 import ContinueReadingRail from './ContinueReadingRail.tsx';
 
 type BookOrSeries = DisplayBook | DisplaySeries;
-type Shelf = 'series' | 'books' | 'downloads';
+type Shelf = 'series' | 'books';
 
 const SORTS: { field: SortField; label: string }[] = [
   { field: 'name', label: 'sortByName' },
@@ -78,10 +78,13 @@ export default function MobileHome({
     books,
     series,
     reading,
-    downloads,
     jellyfin,
     isLoading,
     expiredServers,
+    bookTotal,
+    hasMoreBooks,
+    loadingMore,
+    loadMore,
   } = useLibraryData(CosmicComicsTemp, refreshKey);
   const [filter, setFilter] =
     React.useState<SearchFilterState>(defaultFilterState);
@@ -100,32 +103,19 @@ export default function MobileHome({
     () => applySearchFilterSort(books, filter),
     [books, filter]
   );
-  const shownDownloads = React.useMemo(
-    () => applySearchFilterSort(downloads, filter),
-    [downloads, filter]
-  );
 
   const filtering = filter.query !== '' || activeFilterCount(filter) > 0;
   const shelves: { id: Shelf; label: string; count: number }[] = [
     { id: 'series', label: t('series'), count: shownSeries.length },
-    { id: 'books', label: t('books'), count: shownBooks.length },
-    ...(downloads.length > 0
-      ? [
-          {
-            id: 'downloads' as Shelf,
-            label: t('download'),
-            count: shownDownloads.length,
-          },
-        ]
-      : []),
+    {
+      id: 'books',
+      label: t('books'),
+      count: filtering ? shownBooks.length : bookTotal,
+    },
   ];
-  const activeShelf = shelves.some((s) => s.id === shelf) ? shelf : 'series';
+  const activeShelf = shelf;
   const items: BookOrSeries[] =
-    activeShelf === 'series'
-      ? shownSeries
-      : activeShelf === 'books'
-        ? shownBooks
-        : shownDownloads;
+    activeShelf === 'series' ? shownSeries : shownBooks;
 
   const openBook = (item: BookOrSeries) => {
     const ref = jellyfinRef(item);
@@ -257,7 +247,9 @@ export default function MobileHome({
                 )}
               >
                 {label}
-                <span className="ml-1.5 text-xs opacity-60">{count}</span>
+                <span className="ml-1.5 text-xs opacity-60">
+                  {count.toLocaleString()}
+                </span>
               </button>
             ))}
           </div>
@@ -280,6 +272,25 @@ export default function MobileHome({
                 />
               )}
             />
+          )}
+          {activeShelf === 'books' && hasMoreBooks && (
+            <div className="flex flex-col items-center gap-2 py-2 text-center text-sm text-muted-foreground">
+              <span>
+                {t('jellyfin_books_shown', {
+                  shown: books.length.toLocaleString(),
+                  total: bookTotal.toLocaleString(),
+                })}
+              </span>
+              <Button
+                variant="outline"
+                className="rounded-full"
+                onClick={loadMore}
+                disabled={loadingMore}
+              >
+                {loadingMore && <Spinner />}
+                {t('jellyfin_load_more')}
+              </Button>
+            </div>
           )}
         </>
       )}

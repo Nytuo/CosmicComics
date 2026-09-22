@@ -10,6 +10,7 @@ import {
   Home,
   LibraryBig,
   BarChart3,
+  RefreshCcw,
 } from 'lucide-react';
 import {
   Sidebar,
@@ -43,6 +44,7 @@ export function AppSidebar({
   onOpenHome,
   onOpenLibraries,
   onOpenStats,
+  onOpenSync,
   onExtractMissingImages,
   ...props
 }: React.ComponentProps<typeof Sidebar> & {
@@ -58,6 +60,7 @@ export function AppSidebar({
   onOpenHome: () => void;
   onOpenLibraries: () => void;
   onOpenStats: () => void;
+  onOpenSync: () => void;
   onExtractMissingImages: () => void;
 }) {
   const { t } = useTranslation();
@@ -131,6 +134,15 @@ export function AppSidebar({
                 >
                   <BarChart3 />
                   <span>{t('stats_title')}</span>
+                </SidebarMenuButton>
+              </SidebarMenuItem>
+              <SidebarMenuItem>
+                <SidebarMenuButton
+                  onClick={closing(onOpenSync)}
+                  tooltip={t('sync_title')}
+                >
+                  <RefreshCcw />
+                  <span>{t('sync_title')}</span>
                 </SidebarMenuButton>
               </SidebarMenuItem>
               {platform.downloaders && (

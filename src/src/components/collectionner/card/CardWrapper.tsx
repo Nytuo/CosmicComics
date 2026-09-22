@@ -63,6 +63,7 @@ const CardWrapper: React.FC<BookCardProps> = ({
       onClick={handleClick}
       apiName={getApiName(provider)}
       favorite={book.favorite}
+      offline={!!jellyfinRef(book)?.offline}
       className={className}
     />
   );

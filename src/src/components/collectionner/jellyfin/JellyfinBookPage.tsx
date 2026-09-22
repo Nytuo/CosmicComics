@@ -9,6 +9,7 @@ import {
   CardHeader,
   CardTitle,
 } from '@/components/ui/card.tsx';
+import JellyfinOfflineButton from './JellyfinOfflineButton.tsx';
 import JellyfinDownloadDialog, {
   type DownloadState,
 } from './JellyfinDownloadDialog.tsx';
@@ -23,6 +24,8 @@ import { providerEnum } from '@/utils/utils.ts';
 interface Props {
   serverId: string;
   item: JellyfinAPI.JellyfinItem;
+  /** Library and series the book was opened from. */
+  context: JellyfinAPI.OfflineContext;
   onBack: () => void;
   onChanged: () => void;
   onUnauthorized: () => void;
@@ -31,6 +34,7 @@ interface Props {
 export default function JellyfinBookPage({
   serverId,
   item,
+  context,
   onBack,
   onChanged,
   onUnauthorized,
@@ -163,18 +167,32 @@ export default function JellyfinBookPage({
             : undefined
         }
         extraActions={
-          canResume ? (
-            <Button
-              variant="outline"
-              size="sm"
-              className="gap-1.5"
-              onClick={() => read(true)}
-              disabled={opening}
-            >
-              <RotateCcw className="h-4 w-4" />
-              {t('jellyfin_start_over')}
-            </Button>
-          ) : undefined
+          <>
+            {canResume && (
+              <Button
+                variant="outline"
+                size="sm"
+                className="gap-1.5"
+                onClick={() => read(true)}
+                disabled={opening}
+              >
+                <RotateCcw className="h-4 w-4" />
+                {t('jellyfin_start_over')}
+              </Button>
+            )}
+            {!unsupported && (
+              <JellyfinOfflineButton
+                serverId={serverId}
+                item={book}
+                context={{
+                  ...context,
+                  series_id: context.series_id ?? book.parent_id,
+                  series_name: context.series_name ?? book.series_name,
+                }}
+                onChanged={onChanged}
+              />
+            )}
+          </>
         }
         onFavoriteToggle={() =>
           update(() =>

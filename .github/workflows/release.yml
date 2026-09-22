@@ -389,6 +389,21 @@ jobs:
           echo "C:\Program Files\NVIDIA GPU Computing Toolkit\CUDA\v12.9\bin" | Out-File -FilePath $env:GITHUB_PATH -Encoding utf8 -Append
           echo "CUDA_PATH=C:\Program Files\NVIDIA GPU Computing Toolkit\CUDA\v12.9" | Out-File -FilePath $env:GITHUB_ENV -Encoding utf8 -Append
 
+      # candle's CUDA kernels are compiled for the one GPU architecture in
+      # CUDA_COMPUTE_CAP. Unset, the build asks `nvidia-smi`, and a CI runner has
+      # no GPU, so it panics. The kernels are built as PTX, which the driver
+      # recompiles for newer GPUs but not for older ones: 75 (Turing, RTX 20xx /
+      # GTX 16xx) and newer. The app only uses F32 and I64 tensors, so it does
+      # not need the Ampere-only kernels. Set the CUDA_COMPUTE_CAP repository
+      # variable to target something else (it must be a code `nvcc --list-gpu-code`
+      # knows, e.g. 61 for Pascal, 80 for Ampere).
+      - name: select the GPU architecture (cuda)
+        if: matrix.cuda == true
+        shell: bash
+        env:
+          CUDA_CAP: ${{ vars.CUDA_COMPUTE_CAP || '75' }}
+        run: echo "CUDA_COMPUTE_CAP=${CUDA_CAP}" >> "$GITHUB_ENV"
+
       - name: install protoc (macOS)
         if: matrix.runs_on == 'macos-latest'
         run: brew install protobuf
@@ -507,6 +522,11 @@ jobs:
       # on every run, so the icons are applied here.
       - name: Apply the app icons
         run: cp -R src/src-tauri/icons/android/. src/src-tauri/gen/android/app/src/main/res/
+
+      # Device sync finds other devices with mDNS, which Android only delivers
+      # to apps holding a Wi-Fi multicast lock.
+      - name: Allow local network discovery
+        run: node src/scripts/android-multicast.cjs
 
       # Android refuses to install an APK that has no signature at all, so even
       # a GitHub-only build is signed. With the keystore secrets it uses your

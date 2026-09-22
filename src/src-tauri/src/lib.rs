@@ -30,7 +30,24 @@ pub fn run() {
         .with_thread_names(false)
         .init();
 
-    let builder = tauri::Builder::default()
+    let builder = tauri::Builder::default();
+
+    // Must come first: a second launch (double click on a book while the app
+    // is open) hands its arguments to this instance and quits.
+    #[cfg(desktop)]
+    let builder = builder.plugin(tauri_plugin_single_instance::init(|app, args, cwd| {
+        match commands::open_file::from_args(&args, std::path::Path::new(&cwd)) {
+            Some(path) => commands::open_file::open(app, &path),
+            None => {
+                if let Some(window) = app.get_webview_window("main") {
+                    let _ = window.unminimize();
+                    let _ = window.set_focus();
+                }
+            }
+        }
+    }));
+
+    let builder = builder
         .plugin(tauri_plugin_opener::init())
         .plugin(tauri_plugin_dialog::init())
         .plugin(tauri_plugin_fs::init());
@@ -113,27 +130,11 @@ pub fn run() {
             });
 
             #[cfg(desktop)]
-            let file_extensions = ["cbz", "cbr", "cb7", "cbt", "rar", "zip", "7z", "epub", "pdf"];
-            #[cfg(desktop)]
-            let args: Vec<String> = env::args().collect();
-            #[cfg(desktop)]
-            for arg in args.iter().skip(1) {
-                let path = std::path::Path::new(arg);
-                if let Some(ext) = path.extension() {
-                    let ext_lower = ext.to_string_lossy().to_lowercase();
-                    if file_extensions.contains(&ext_lower.as_str()) && path.exists() {
-                        let file_path = path.to_string_lossy().to_string();
-                        tracing::info!("Opening file from CLI args: {}", file_path);
-                        let handle = app.handle().clone();
-                        tauri::async_runtime::spawn(async move {
-                            tokio::time::sleep(std::time::Duration::from_millis(1500)).await;
-                            handle.emit("open-file", file_path).unwrap_or_else(|e| {
-                                tracing::error!("Failed to emit open-file event: {}", e);
-                            });
-                        });
-                        break;
-                    }
-                }
+            if let Some(path) = commands::open_file::from_args(
+                &env::args().collect::<Vec<_>>(),
+                &env::current_dir().unwrap_or_default(),
+            ) {
+                commands::open_file::open(app.handle(), &path);
             }
 
             let model_path = PathBuf::from(&base_path).join("model.onnx");
@@ -209,6 +210,22 @@ pub fn run() {
             commands::jellyfin::jellyfin_report_fraction,
             commands::jellyfin::jellyfin_prepare_book,
             commands::jellyfin::jellyfin_clear_cache,
+            commands::jellyfin::jellyfin_refresh_server,
+            commands::open_file::take_pending_open_file,
+            commands::jellyfin::jellyfin_offline_download,
+            commands::jellyfin::jellyfin_offline_list,
+            commands::jellyfin::jellyfin_offline_remove,
+            commands::jellyfin::jellyfin_offline_flush,
+            commands::sync::sync_start,
+            commands::sync::sync_stop,
+            commands::sync::sync_status,
+            commands::sync::sync_set_device_name,
+            commands::sync::sync_peers,
+            commands::sync::sync_probe,
+            commands::sync::sync_pair,
+            commands::sync::sync_forget,
+            commands::sync::sync_run,
+            commands::sync::sync_transfer,
             commands::profile::download_database,
             commands::profile::refresh_metadata_by_provider,
             commands::collectionner::fill_blank_images,
@@ -440,20 +457,12 @@ pub fn run() {
         .run(|app, event| {
             #[cfg(any(target_os = "macos", target_os = "ios"))]
             if let tauri::RunEvent::Opened { urls } = event {
-                let file_extensions = ["cbz", "cbr", "cb7", "cbt", "rar", "zip", "7z", "epub", "pdf"];
-                for url in urls {
-                    if let Ok(path) = url.to_file_path() {
-                        if let Some(ext) = path.extension() {
-                            let ext_lower = ext.to_string_lossy().to_lowercase();
-                            if file_extensions.contains(&ext_lower.as_str()) {
-                                let file_path = path.to_string_lossy().to_string();
-                                tracing::info!("Opening file from OS event: {}", file_path);
-                                app.emit("open-file", file_path).unwrap_or_else(|e| {
-                                    tracing::error!("Failed to emit open-file event: {}", e);
-                                });
-                            }
-                        }
-                    }
+                if let Some(path) = urls
+                    .iter()
+                    .filter_map(|url| url.to_file_path().ok())
+                    .find(|p| commands::open_file::openable(p))
+                {
+                    commands::open_file::open(app, &path);
                 }
             }
             #[cfg(not(any(target_os = "macos", target_os = "ios")))]

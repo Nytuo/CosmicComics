@@ -6,7 +6,9 @@ import {
   FileUp,
   ImageIcon,
   Info,
+  LibraryBig,
   Lightbulb,
+  RefreshCcw,
   Settings,
 } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
@@ -29,6 +31,8 @@ interface MobileShellProps {
   onOpenSettings: () => void;
   onOpenDownloaders: () => void;
   onOpenAbout: () => void;
+  onOpenSync: () => void;
+  onOpenLibraries: () => void;
   onExtractMissingImages: () => void;
   children: React.ReactNode;
 }
@@ -49,6 +53,8 @@ export default function MobileShell({
   onOpenSettings,
   onOpenDownloaders,
   onOpenAbout,
+  onOpenSync,
+  onOpenLibraries,
   onExtractMissingImages,
   children,
 }: MobileShellProps) {
@@ -75,6 +81,21 @@ export default function MobileShell({
   ];
 
   const moreActions: SheetAction[] = [
+    {
+      id: 'sync',
+      label: t('sync_title'),
+      description: t('sync_hint'),
+      icon: RefreshCcw,
+      tone: 'accent',
+      onSelect: onOpenSync,
+    },
+    {
+      id: 'libraries',
+      label: t('libraries'),
+      description: t('nav_libraries_hint'),
+      icon: LibraryBig,
+      onSelect: onOpenLibraries,
+    },
     {
       id: 'bookmarks',
       label: t('Bookmark'),

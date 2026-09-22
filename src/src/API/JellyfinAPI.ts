@@ -9,6 +9,8 @@ export interface JellyfinServerInfo {
   user_name: string;
   version: string;
   allow_insecure: boolean;
+  /** Device the sign-in was copied from by device sync, until refreshed. */
+  borrowed_from?: string | null;
 }
 
 export interface JellyfinPublicInfo {
@@ -210,6 +212,19 @@ export const prepareBook = (
 export const clearCache = (serverId?: string): Promise<void> =>
   invoke('jellyfin_clear_cache', { serverId });
 
+export interface RefreshResult {
+  rebound: boolean;
+  rebind_error: string | null;
+  session_ok: boolean;
+}
+
+/**
+ * Drops the server's cached covers and books, and gets this device its own
+ * session through Quick Connect.
+ */
+export const refreshServer = (serverId: string): Promise<RefreshResult> =>
+  invoke('jellyfin_refresh_server', { serverId });
+
 export interface DownloadProgress {
   item_id: string;
   written: number;
@@ -223,14 +238,78 @@ export const onDownloadProgress = (
     handler(event.payload)
   );
 
+export interface OfflineContext {
+  library_id: string;
+  library_name: string;
+  series_id?: string | null;
+  series_name?: string | null;
+}
+
+export interface OfflineBook {
+  server_id: string;
+  item: JellyfinItem;
+  context: OfflineContext;
+  path: string;
+  format: string;
+  size: number;
+  downloaded_at: number;
+  has_cover: boolean;
+  pending: number;
+}
+
+export interface OfflineProgress {
+  root_id: string;
+  item_id: string;
+  title: string;
+  index: number;
+  count: number;
+  written: number;
+  total: number | null;
+}
+
+export const downloadOffline = (
+  serverId: string,
+  itemId: string,
+  context: OfflineContext
+): Promise<OfflineBook[]> =>
+  invoke('jellyfin_offline_download', { serverId, itemId, context });
+
+export const listOffline = (): Promise<OfflineBook[]> =>
+  invoke('jellyfin_offline_list', {});
+
+export const removeOffline = (
+  serverId: string,
+  itemIds?: string[]
+): Promise<void> => invoke('jellyfin_offline_remove', { serverId, itemIds });
+
+export const flushOffline = (serverId: string): Promise<number> =>
+  invoke('jellyfin_offline_flush', { serverId });
+
+export const onOfflineProgress = (
+  handler: (progress: OfflineProgress) => void
+): Promise<() => void> =>
+  listen<OfflineProgress>('jellyfin-offline-progress', (event) =>
+    handler(event.payload)
+  );
+
+/** Network failures, as opposed to a rejected session or a missing item. */
+export const isOfflineError = (error: unknown): boolean =>
+  String(error).startsWith('Could not reach the Jellyfin server');
+
+/**
+ * `childFallback` asks for the cover of the first book below a folder when
+ * the folder has no image of its own.
+ */
 export function coverUrl(
   serverId: string,
   itemId: string,
   tag: string | null | undefined,
-  width = 400
+  width = 400,
+  childFallback = false
 ): string {
   const params = new URLSearchParams({ w: String(width) });
   if (tag) params.set('tag', tag);
+  if (childFallback) params.set('child', '1');
   const origin = convertFileSrc('_', 'jfimg').slice(0, -1);
   return `${origin}${encodeURIComponent(serverId)}/${encodeURIComponent(itemId)}?${params}`;
 }

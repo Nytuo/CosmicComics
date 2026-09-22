@@ -17,6 +17,7 @@ import APISelectorDialog from './dialogs/APISelectorDialog.tsx';
 
 import DownloadersWrapperPage from './downloaders/DownloadersWrapperPage.tsx';
 import AboutDialog from './dialogs/AboutDialog.tsx';
+import SyncDialog from './dialogs/SyncDialog.tsx';
 import BookmarksDialog from './dialogs/BookmarksDialog.tsx';
 import SettingsDialog from './dialogs/SettingsDialog.tsx';
 import { AppSidebar } from './app-sidebar.tsx';
@@ -24,6 +25,7 @@ import MobileShell, {
   type MobileSection,
 } from '@/components/mobile/MobileShell.tsx';
 import MobileHome from '@/components/mobile/MobileHome.tsx';
+import MobileOffline from '@/components/mobile/MobileOffline.tsx';
 import { useMobileLayout } from '@/hooks/use-mobile-layout.ts';
 import LibrariesPage from './LibrariesPage.tsx';
 import JellyfinBrowser, { NAV_KEY } from './jellyfin/JellyfinBrowser.tsx';
@@ -53,6 +55,7 @@ export default function MiniDrawer({
   const [openBookmarks, setOpenBookmarks] = React.useState(false);
   const [openSettings, setOpenSettings] = React.useState(false);
   const [openAbout, setOpenAbout] = React.useState(false);
+  const [openSync, setOpenSync] = React.useState(false);
   const [showLibraries, setShowLibraries] = React.useState(false);
   const [downloadersOpen, setDownloadersOpen] = React.useState(false);
   const [jellyfinNav, setJellyfinNav] = React.useState<JellyfinNav | null>(
@@ -66,6 +69,7 @@ export default function MiniDrawer({
     }
   );
   const [showStats, setShowStats] = React.useState(false);
+  const [showOffline, setShowOffline] = React.useState(false);
   const [refreshKey, setRefreshKey] = React.useState(0);
   const [openDetails, setOpenDetails] = React.useState<{
     open: boolean;
@@ -236,6 +240,7 @@ export default function MiniDrawer({
     setShowLibraries(false);
     setJellyfinNav(null);
     setShowStats(false);
+    setShowOffline(false);
     setDownloadersOpen(false);
     setIsLoading(false);
     handleRemoveBreadcrumbsTo(1);
@@ -247,6 +252,7 @@ export default function MiniDrawer({
     setShowLibraries(true);
     setJellyfinNav(null);
     setShowStats(false);
+    setShowOffline(false);
     setDownloadersOpen(false);
     setIsLoading(false);
   }
@@ -258,7 +264,19 @@ export default function MiniDrawer({
     setJellyfinNav(null);
     setDownloadersOpen(false);
     setIsLoading(false);
+    setShowOffline(false);
     setShowStats(true);
+  }
+
+  function setOpenOffline() {
+    setOpenDetails(null);
+    setOpenSeries(null);
+    setShowLibraries(false);
+    setJellyfinNav(null);
+    setShowStats(false);
+    setDownloadersOpen(false);
+    setIsLoading(false);
+    setShowOffline(true);
   }
 
   function setOpenJellyfin(nav: JellyfinNav) {
@@ -267,6 +285,7 @@ export default function MiniDrawer({
     setShowLibraries(false);
     setJellyfinNav(nav);
     setShowStats(false);
+    setShowOffline(false);
     setDownloadersOpen(false);
     setIsLoading(false);
   }
@@ -353,6 +372,13 @@ export default function MiniDrawer({
       <LibrariesPage />
     ) : downloadersOpen ? (
       <DownloadersWrapperPage CosmicComicsTemp={CosmicComicsTemp} />
+    ) : mobile && showOffline ? (
+      <MobileOffline
+        handleOpenDetails={handleOpenDetails}
+        onOpenJellyfin={setOpenJellyfin}
+        CosmicComicsTemp={CosmicComicsTemp}
+        refreshKey={refreshKey}
+      />
     ) : mobile ? (
       <MobileHome
         handleOpenDetails={handleOpenDetails}
@@ -375,11 +401,11 @@ export default function MiniDrawer({
       />
     );
 
-  const mobileSection: MobileSection = showLibraries
-    ? 'libraries'
-    : showStats
-      ? 'stats'
-      : downloadersOpen
+  const mobileSection: MobileSection = showStats
+    ? 'stats'
+    : showOffline
+      ? 'offline'
+      : showLibraries || downloadersOpen
         ? 'more'
         : 'home';
   const detailsOpen = !!(openSeries?.open || openDetails?.open);
@@ -391,11 +417,13 @@ export default function MiniDrawer({
         ? t('nav_library')
         : showStats
           ? t('stats_title')
-          : downloadersOpen
-            ? t('downloaders')
-            : jellyfinNav
-              ? 'Jellyfin'
-              : t('HOME');
+          : showOffline
+            ? t('nav_offline')
+            : downloadersOpen
+              ? t('downloaders')
+              : jellyfinNav
+                ? 'Jellyfin'
+                : t('HOME');
 
   return (
     <>
@@ -408,6 +436,11 @@ export default function MiniDrawer({
         }}
       />
       <AboutDialog openModal={openAbout} onClose={() => setOpenAbout(false)} />
+      <SyncDialog
+        open={openSync}
+        onClose={() => setOpenSync(false)}
+        onLibraryChanged={() => setRefreshKey((k) => k + 1)}
+      />
       <BookmarksDialog
         openModal={openBookmarks}
         onClose={() => setOpenBookmarks(false)}
@@ -430,7 +463,7 @@ export default function MiniDrawer({
           onBack={detailsOpen ? goBack : undefined}
           onNavigate={(next) => {
             if (next === 'home') setOpenHome();
-            else if (next === 'libraries') setOpenLibraries();
+            else if (next === 'offline') setOpenOffline();
             else setOpenStats();
           }}
           onImport={handleOpenUpload}
@@ -439,6 +472,8 @@ export default function MiniDrawer({
           onOpenSettings={() => setOpenSettings(true)}
           onOpenDownloaders={handleOpenDownloaders}
           onOpenAbout={() => setOpenAbout(true)}
+          onOpenSync={() => setOpenSync(true)}
+          onOpenLibraries={() => setOpenLibraries()}
           onExtractMissingImages={extractMissingImages}
         >
           {loadingOverlay}
@@ -456,6 +491,7 @@ export default function MiniDrawer({
             onOpenHome={() => setOpenHome()}
             onOpenLibraries={() => setOpenLibraries()}
             onOpenStats={() => setOpenStats()}
+            onOpenSync={() => setOpenSync(true)}
             onExtractMissingImages={extractMissingImages}
           />
 

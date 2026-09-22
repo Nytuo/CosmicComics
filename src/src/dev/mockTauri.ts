@@ -309,6 +309,8 @@ export function installTauriMock() {
         case 'get_all_scan_paths':
         case 'jellyfin_list_servers':
         case 'jellyfin_get_resume':
+        case 'jellyfin_offline_list':
+        case 'sync_peers':
           return [];
         case 'get_api_credentials':
           return {};

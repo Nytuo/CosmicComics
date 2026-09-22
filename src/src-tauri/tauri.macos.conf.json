@@ -1,0 +1,13 @@
+{
+  "build": {
+    "beforeBundleCommand": "bash src-tauri/quicklook/build.sh"
+  },
+  "bundle": {
+    "macOS": {
+      "files": {
+        "PlugIns/CosmicComicsThumbnail.appex": "quicklook/build/CosmicComicsThumbnail.appex",
+        "PlugIns/CosmicComicsPreview.appex": "quicklook/build/CosmicComicsPreview.appex"
+      }
+    }
+  }
+}

@@ -23,6 +23,7 @@ import {
 } from '@/API/jellyfinLibrary.ts';
 import JellyfinServerDialog from './JellyfinServerDialog.tsx';
 import JellyfinBookPage from './JellyfinBookPage.tsx';
+import JellyfinOfflineButton from './JellyfinOfflineButton.tsx';
 
 export const NAV_KEY = 'jellyfin.nav';
 const PAGE_SIZE = 60;
@@ -200,6 +201,14 @@ export default function JellyfinBrowser({
     setReloadKey((k) => k + 1);
   }, []);
 
+  const library = trail[0];
+  const offlineContext: JellyfinAPI.OfflineContext = {
+    library_id: library?.id ?? '',
+    library_name: library?.name ?? '',
+    series_id: trail.length >= 2 ? parent.id : null,
+    series_name: trail.length >= 2 ? parent.name : null,
+  };
+
   const reloginDialog = (
     <JellyfinServerDialog
       open={relogin}
@@ -215,6 +224,7 @@ export default function JellyfinBrowser({
         <JellyfinBookPage
           serverId={serverId}
           item={selected}
+          context={offlineContext}
           onBack={() =>
             selected.id === entryBook.current ? onExit() : setSelected(null)
           }
@@ -320,6 +330,15 @@ export default function JellyfinBrowser({
                 <SelectItem value="read">{t('jellyfin_sort_read')}</SelectItem>
               </SelectContent>
             </Select>
+            {trail.length >= 2 && !searching && (
+              <JellyfinOfflineButton
+                key={parent.id}
+                serverId={serverId}
+                item={{ id: parent.id, name: parent.name, is_book: false }}
+                context={offlineContext}
+                onChanged={changed}
+              />
+            )}
           </>
         )}
       </div>

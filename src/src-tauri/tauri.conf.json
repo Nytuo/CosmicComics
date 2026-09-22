@@ -57,7 +57,11 @@
         ],
         "name": "Comic Book Archive (ZIP)",
         "mimeType": "application/vnd.comicbook+zip",
-        "role": "Viewer"
+        "role": "Viewer",
+        "exportedType": {
+          "identifier": "fr.nytuo.cosmiccomics.cbz",
+          "conformsTo": ["public.data", "public.archive"]
+        }
       },
       {
         "ext": [
@@ -65,7 +69,11 @@
         ],
         "name": "Comic Book Archive (RAR)",
         "mimeType": "application/vnd.comicbook-rar",
-        "role": "Viewer"
+        "role": "Viewer",
+        "exportedType": {
+          "identifier": "fr.nytuo.cosmiccomics.cbr",
+          "conformsTo": ["public.data", "public.archive"]
+        }
       },
       {
         "ext": [
@@ -73,7 +81,23 @@
         ],
         "name": "Comic Book Archive (TAR)",
         "mimeType": "application/vnd.comicbook+tar",
-        "role": "Viewer"
+        "role": "Viewer",
+        "exportedType": {
+          "identifier": "fr.nytuo.cosmiccomics.cbt",
+          "conformsTo": ["public.data", "public.archive"]
+        }
+      },
+      {
+        "ext": [
+          "cb7"
+        ],
+        "name": "Comic Book Archive (7z)",
+        "mimeType": "application/x-cb7",
+        "role": "Viewer",
+        "exportedType": {
+          "identifier": "fr.nytuo.cosmiccomics.cb7",
+          "conformsTo": ["public.data", "public.archive"]
+        }
       },
       {
         "ext": [

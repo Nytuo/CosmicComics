@@ -1,4 +1,7 @@
 use crate::commands::state::AppState;
+use crate::services::jellyfin_offline::{
+    self as offline, OfflineBook, OfflineContext, PendingChange,
+};
 use crate::services::jellyfin_service::{
     self as jf, ItemsQuery, JellyfinClient, JellyfinError, JellyfinItem, JellyfinItemsPage,
     JellyfinPublicInfo, JellyfinServer, JellyfinServerInfo, JellyfinStore, PreparedBook,
@@ -155,6 +158,7 @@ pub async fn jellyfin_remove_server(
     let base = base_path(&state).await;
     JellyfinStore::new(&base).remove(&server_id).map_err(err)?;
     let _ = std::fs::remove_dir_all(cache_root(&base).join("books").join(&server_id));
+    let _ = offline::remove(&base, &server_id, None);
     Ok(())
 }
 
@@ -187,7 +191,51 @@ pub async fn jellyfin_get_item(
 ) -> Result<JellyfinItem, String> {
     let base = base_path(&state).await;
     let (_, client) = session(&base, &server_id)?;
-    client.item(&item_id).await.map_err(err)
+    match client.item(&item_id).await {
+        Ok(item) => {
+            offline::refresh(&base, &server_id, &item);
+            Ok(item)
+        }
+        Err(JellyfinError::Network(e)) => offline::get(&base, &server_id, &item_id)
+            .map(|kept| kept.item)
+            .ok_or_else(|| err(JellyfinError::Network(e))),
+        Err(e) => Err(err(e)),
+    }
+}
+
+/// Runs a reading change against the server and mirrors it on the offline
+/// copy. When the server cannot be reached, an offline book keeps the change
+/// to send it later instead of failing.
+async fn user_change(
+    state: &State<'_, AppState>,
+    server_id: &str,
+    item_id: &str,
+    change: PendingChange,
+) -> Result<(), String> {
+    let base = base_path(state).await;
+    let (_, client) = session(&base, server_id)?;
+    let result = match change {
+        PendingChange::Page { page, page_count } => {
+            client.report_progress(item_id, page, page_count).await
+        }
+        PendingChange::Fraction { fraction } => client.report_fraction(item_id, fraction).await,
+        PendingChange::Played { played } => client.set_played(item_id, played).await,
+        PendingChange::Favorite { favorite } => client.set_favorite(item_id, favorite).await,
+    };
+    match result {
+        Ok(()) => {
+            offline::record(&base, server_id, item_id, change, false);
+            Ok(())
+        }
+        Err(JellyfinError::Network(e)) => {
+            if offline::record(&base, server_id, item_id, change, true) {
+                Ok(())
+            } else {
+                Err(err(JellyfinError::Network(e)))
+            }
+        }
+        Err(e) => Err(err(e)),
+    }
 }
 
 #[tauri::command]
@@ -208,9 +256,13 @@ pub async fn jellyfin_set_played(
     item_id: String,
     played: bool,
 ) -> Result<(), String> {
-    let base = base_path(&state).await;
-    let (_, client) = session(&base, &server_id)?;
-    client.set_played(&item_id, played).await.map_err(err)
+    user_change(
+        &state,
+        &server_id,
+        &item_id,
+        PendingChange::Played { played },
+    )
+    .await
 }
 
 #[tauri::command]
@@ -220,9 +272,13 @@ pub async fn jellyfin_set_favorite(
     item_id: String,
     favorite: bool,
 ) -> Result<(), String> {
-    let base = base_path(&state).await;
-    let (_, client) = session(&base, &server_id)?;
-    client.set_favorite(&item_id, favorite).await.map_err(err)
+    user_change(
+        &state,
+        &server_id,
+        &item_id,
+        PendingChange::Favorite { favorite },
+    )
+    .await
 }
 
 #[tauri::command]
@@ -233,12 +289,13 @@ pub async fn jellyfin_report_progress(
     page: i64,
     page_count: i64,
 ) -> Result<(), String> {
-    let base = base_path(&state).await;
-    let (_, client) = session(&base, &server_id)?;
-    client
-        .report_progress(&item_id, page, page_count)
-        .await
-        .map_err(err)
+    user_change(
+        &state,
+        &server_id,
+        &item_id,
+        PendingChange::Page { page, page_count },
+    )
+    .await
 }
 
 #[tauri::command]
@@ -248,12 +305,13 @@ pub async fn jellyfin_report_fraction(
     item_id: String,
     fraction: f64,
 ) -> Result<(), String> {
-    let base = base_path(&state).await;
-    let (_, client) = session(&base, &server_id)?;
-    client
-        .report_fraction(&item_id, fraction)
-        .await
-        .map_err(err)
+    user_change(
+        &state,
+        &server_id,
+        &item_id,
+        PendingChange::Fraction { fraction },
+    )
+    .await
 }
 
 #[derive(Serialize, Clone)]
@@ -272,6 +330,27 @@ pub async fn jellyfin_prepare_book(
 ) -> Result<PreparedBook, String> {
     let base = base_path(&state).await;
     let (_, client) = session(&base, &server_id)?;
+    if let Some(kept) = offline::get(&base, &server_id, &item_id) {
+        let item = match client.item(&item_id).await {
+            Ok(fresh) => {
+                offline::refresh(&base, &server_id, &fresh);
+                offline::get(&base, &server_id, &item_id)
+                    .map(|k| k.item)
+                    .unwrap_or(fresh)
+            }
+            Err(JellyfinError::Network(_)) => kept.item.clone(),
+            Err(e) => return Err(err(e)),
+        };
+        info!("[jellyfin] opening offline copy of {}", item_id);
+        return Ok(PreparedBook {
+            path: kept.path,
+            format: kept.format,
+            resume_page: item.resume_page,
+            resume_fraction: item.resume_fraction,
+            title: item.name,
+            from_cache: true,
+        });
+    }
     let emit_id = item_id.clone();
     let progress: jf::ProgressFn = Arc::new(move |written, total| {
         let _ = app.emit(
@@ -306,6 +385,152 @@ pub async fn jellyfin_clear_cache(
     Ok(())
 }
 
+#[derive(Serialize, Clone)]
+struct OfflineDownloadEvent {
+    root_id: String,
+    item_id: String,
+    title: String,
+    index: usize,
+    count: usize,
+    written: u64,
+    total: Option<u64>,
+}
+
+#[tauri::command]
+pub async fn jellyfin_offline_download(
+    state: State<'_, AppState>,
+    app: AppHandle,
+    server_id: String,
+    item_id: String,
+    context: Option<OfflineContext>,
+) -> Result<Vec<OfflineBook>, String> {
+    let base = base_path(&state).await;
+    let (_, client) = session(&base, &server_id)?;
+    let root_id = item_id.clone();
+    let progress: offline::OfflineProgressFn = Arc::new(move |p| {
+        let _ = app.emit(
+            "jellyfin-offline-progress",
+            OfflineDownloadEvent {
+                root_id: root_id.clone(),
+                item_id: p.item_id,
+                title: p.title,
+                index: p.index,
+                count: p.count,
+                written: p.written,
+                total: p.total,
+            },
+        );
+    });
+    offline::download(
+        &client,
+        &base,
+        &server_id,
+        &item_id,
+        context.unwrap_or_default(),
+        progress,
+    )
+    .await
+    .map_err(err)
+}
+
+#[tauri::command]
+pub async fn jellyfin_offline_list(state: State<'_, AppState>) -> Result<Vec<OfflineBook>, String> {
+    Ok(offline::list(&base_path(&state).await))
+}
+
+#[tauri::command]
+pub async fn jellyfin_offline_remove(
+    state: State<'_, AppState>,
+    server_id: String,
+    item_ids: Option<Vec<String>>,
+) -> Result<(), String> {
+    let base = base_path(&state).await;
+    match item_ids {
+        Some(ids) => {
+            for id in ids {
+                offline::remove(&base, &server_id, Some(&id)).map_err(err)?;
+            }
+            Ok(())
+        }
+        None => offline::remove(&base, &server_id, None).map_err(err),
+    }
+}
+
+#[tauri::command]
+pub async fn jellyfin_offline_flush(
+    state: State<'_, AppState>,
+    server_id: String,
+) -> Result<usize, String> {
+    let base = base_path(&state).await;
+    let (_, client) = session(&base, &server_id)?;
+    offline::flush(&client, &base, &server_id)
+        .await
+        .map_err(err)
+}
+
+#[derive(Serialize)]
+pub struct RefreshResult {
+    /// The sign-in was replaced by a session of this device.
+    rebound: bool,
+    /// Why it could not be (Quick Connect off, refused…).
+    rebind_error: Option<String>,
+    /// The session works after the refresh.
+    session_ok: bool,
+}
+
+/// Forgets what was cached for a server (covers, books opened for reading),
+/// gets this device its own session through Quick Connect and checks it.
+#[tauri::command]
+pub async fn jellyfin_refresh_server(
+    state: State<'_, AppState>,
+    server_id: String,
+) -> Result<RefreshResult, String> {
+    if !is_safe_id(&server_id) {
+        return Err("Invalid server id".into());
+    }
+    let base = base_path(&state).await;
+    let cache = cache_root(&base);
+    let _ = std::fs::remove_dir_all(cache.join("books").join(&server_id));
+    let prefix: String = server_id
+        .chars()
+        .filter(|c| c.is_ascii_alphanumeric() || *c == '-')
+        .collect::<String>()
+        + "_";
+    if let Ok(images) = std::fs::read_dir(cache.join("images")) {
+        for image in images.flatten() {
+            if image.file_name().to_string_lossy().starts_with(&prefix) {
+                let _ = std::fs::remove_file(image.path());
+            }
+        }
+    }
+
+    let store = JellyfinStore::new(&base);
+    let server = store.get(&server_id).ok_or("unauthorized")?;
+    let device_id = store.device_id().map_err(err)?;
+    let (rebound, rebind_error) = match jf::rebind(&server, &device_id).await {
+        Ok(fresh) => {
+            if fresh.id != server.id {
+                let _ = store.remove(&server.id);
+            }
+            store.upsert(fresh).map_err(err)?;
+            (true, None)
+        }
+        Err(e) => (false, Some(e.to_string())),
+    };
+    let session_ok = match store.get(&server_id) {
+        Some(current) => JellyfinClient::for_server(&current, &device_id)
+            .views()
+            .await
+            .is_ok(),
+        None => false,
+    };
+    Ok(RefreshResult {
+        rebound,
+        rebind_error,
+        session_ok,
+    })
+}
+
 fn plain(status: StatusCode, message: &str) -> Response<Cow<'static, [u8]>> {
     Response::builder()
         .status(status)
@@ -338,16 +563,39 @@ pub async fn serve_cover(app: &AppHandle, uri: &Uri) -> Response<Cow<'static, [u
         .unwrap_or(400)
         .clamp(50, 1600);
     let tag = query_value(uri, "tag");
-    match jf::cached_image(
-        &client,
-        server_id,
-        item_id,
-        tag.as_deref(),
-        width,
-        &cache_root(&base),
-    )
-    .await
-    {
+    let child_fallback = query_value(uri, "child").as_deref() == Some("1");
+    let cache = cache_root(&base);
+    let mut result = if tag.is_none() && child_fallback {
+        Err(JellyfinError::NotFound)
+    } else {
+        jf::cached_image(&client, server_id, item_id, tag.as_deref(), width, &cache).await
+    };
+    if child_fallback && matches!(result, Err(JellyfinError::NotFound)) {
+        result = match client.first_book(item_id).await {
+            Ok(Some(book)) if book.image_tag.is_some() => {
+                jf::cached_image(
+                    &client,
+                    server_id,
+                    &book.id,
+                    book.image_tag.as_deref(),
+                    width,
+                    &cache,
+                )
+                .await
+            }
+            Ok(_) => Err(JellyfinError::NotFound),
+            Err(e) => Err(e),
+        };
+    }
+    if matches!(
+        result,
+        Err(JellyfinError::Network(_)) | Err(JellyfinError::NotFound)
+    ) {
+        if let Some(kept) = offline::cover(&base, server_id, item_id) {
+            result = Ok(kept);
+        }
+    }
+    match result {
         Ok((bytes, content_type)) => Response::builder()
             .status(StatusCode::OK)
             .header(header::CONTENT_TYPE, content_type)

@@ -1,4 +1,4 @@
-import { CheckCircle2, Heart } from 'lucide-react';
+import { CheckCircle2, Download, Heart } from 'lucide-react';
 import { resolveImageUrl } from '@/utils/imageUrl.ts';
 import { jellyfinRef } from '@/API/jellyfinLibrary.ts';
 import type { DisplayBook, DisplaySeries } from '@/interfaces/IDisplayBook.ts';
@@ -31,6 +31,7 @@ export default function MobileCard({
       : item.format?.toUpperCase()
     : `${item.read_count}/${item.book_count}`;
   const remote = !!jellyfinRef(item);
+  const offline = !!jellyfinRef(item)?.offline;
   const done = isBook(item) ? item.read : progress >= 100;
 
   return (
@@ -52,8 +53,9 @@ export default function MobileCard({
         />
         <div className="absolute inset-x-0 top-0 flex items-start justify-between p-1.5">
           {remote ? (
-            <span className="rounded-full bg-black/60 px-2 py-0.5 text-[10px] font-semibold text-white backdrop-blur">
+            <span className="flex items-center gap-1 rounded-full bg-black/60 px-2 py-0.5 text-[10px] font-semibold text-white backdrop-blur">
               Jellyfin
+              {offline && <Download className="size-3" />}
             </span>
           ) : (
             <span />

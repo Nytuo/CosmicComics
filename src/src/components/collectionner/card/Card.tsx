@@ -3,7 +3,7 @@ import { useTranslation } from 'react-i18next';
 import { resolveImageUrl } from '@/utils/imageUrl.ts';
 import styles from './card.module.css';
 import { Badge } from '../../ui/badge.tsx';
-import { CheckCircle2, Heart } from 'lucide-react';
+import { CheckCircle2, Download, Heart } from 'lucide-react';
 
 interface CardProps {
   title: string;
@@ -13,6 +13,8 @@ interface CardProps {
   apiName?: string;
   favorite?: boolean;
   read?: boolean;
+  /** Kept on this device for offline reading. */
+  offline?: boolean;
   className?: string;
 }
 
@@ -27,6 +29,7 @@ export const Card: React.FC<CardProps> = ({
   apiName,
   favorite,
   read,
+  offline,
   className,
 }) => {
   const { t } = useTranslation();
@@ -109,6 +112,11 @@ export const Card: React.FC<CardProps> = ({
                 {t('favorite')}
               </Badge>
             )}
+            {offline && (
+              <Badge variant="secondary" title={t('jellyfin_offline_badge')}>
+                <Download className="h-3 w-3" />
+              </Badge>
+            )}
           </div>
           {read && (
             <CheckCircle2 className="absolute bottom-2 right-2 z-20 h-5 w-5 text-green-500 drop-shadow" />
@@ -126,6 +134,11 @@ export const Card: React.FC<CardProps> = ({
               <Badge variant="destructive">
                 <Heart className="h-3 w-3 mr-1 fill-current" />
                 {t('favorite')}
+              </Badge>
+            )}
+            {offline && (
+              <Badge variant="secondary" title={t('jellyfin_offline_badge')}>
+                <Download className="h-3 w-3" />
               </Badge>
             )}
           </div>

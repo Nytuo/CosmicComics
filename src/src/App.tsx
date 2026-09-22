@@ -13,6 +13,7 @@ import { Toaster } from 'sonner';
 import { TooltipProvider } from './components/ui/tooltip.tsx';
 import { useEffect } from 'react';
 import { listen } from '@tauri-apps/api/event';
+import { invoke } from '@tauri-apps/api/core';
 import ModelDownloadModal from './components/common/ModelDownloadModal.tsx';
 import PdfiumDownloadModal from './components/common/PdfiumDownloadModal.tsx';
 import UpdaterModal from './components/common/UpdaterModal.tsx';
@@ -48,12 +49,20 @@ function ZoomGuard() {
 function App() {
   const platform = usePlatform();
   useEffect(() => {
-    const unlisten = listen<string>('open-file', (event) => {
-      const filePath = event.payload;
-      console.log('Opening file from OS:', filePath);
+    // A book opened from the system waits in the backend until taken, so one
+    // opened while the app was starting is picked up here on the first render.
+    const openPending = async () => {
+      const filePath = await invoke<string | null>(
+        'take_pending_open_file'
+      ).catch(() => null);
+      if (!filePath) return;
       localStorage.setItem('currentBook', filePath);
+      localStorage.removeItem('currentPage');
+      localStorage.removeItem('currentFraction');
       window.location.href = '/viewer';
-    });
+    };
+    openPending();
+    const unlisten = listen<string>('open-file', openPending);
 
     return () => {
       unlisten.then((fn) => fn());

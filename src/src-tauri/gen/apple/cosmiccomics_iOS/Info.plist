@@ -43,7 +43,11 @@
 	<key>LSSupportsOpeningDocumentsInPlace</key>
 	<false/>
 	<key>NSLocalNetworkUsageDescription</key>
-	<string>Cosmic Comics connects to your Jellyfin server on your local network to browse and download your books.</string>
+	<string>Cosmic Comics connects to your Jellyfin server and to your other devices running Cosmic Comics on your local network to browse, download and sync your books.</string>
+	<key>NSBonjourServices</key>
+	<array>
+		<string>_cosmiccomics._tcp</string>
+	</array>
 	<key>CFBundleDocumentTypes</key>
 	<array>
 		<dict>

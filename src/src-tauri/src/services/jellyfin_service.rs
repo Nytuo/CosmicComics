@@ -78,6 +78,10 @@ pub struct JellyfinServer {
     pub version: String,
     #[serde(default)]
     pub allow_insecure: bool,
+    /// Name of the device this sign-in was copied from by device sync. Its
+    /// token belongs to that device until [`rebind`] gets one for this one.
+    #[serde(default)]
+    pub borrowed_from: Option<String>,
 }
 
 #[derive(Debug, Clone, Serialize, PartialEq)]
@@ -89,6 +93,7 @@ pub struct JellyfinServerInfo {
     pub user_name: String,
     pub version: String,
     pub allow_insecure: bool,
+    pub borrowed_from: Option<String>,
 }
 
 impl From<&JellyfinServer> for JellyfinServerInfo {
@@ -101,6 +106,7 @@ impl From<&JellyfinServer> for JellyfinServerInfo {
             user_name: s.user_name.clone(),
             version: s.version.clone(),
             allow_insecure: s.allow_insecure,
+            borrowed_from: s.borrowed_from.clone(),
         }
     }
 }
@@ -317,13 +323,14 @@ struct RawItemsPage {
     total_record_count: i64,
 }
 
-#[derive(Debug, Clone, Default, Serialize, PartialEq)]
+#[derive(Debug, Clone, Default, Serialize, Deserialize, PartialEq)]
 pub struct JellyfinPerson {
     pub name: String,
     pub role: String,
 }
 
-#[derive(Debug, Clone, Default, Serialize, PartialEq)]
+#[derive(Debug, Clone, Default, Serialize, Deserialize, PartialEq)]
+#[serde(default)]
 pub struct JellyfinItem {
     pub id: String,
     pub name: String,
@@ -370,7 +377,7 @@ pub struct JellyfinItemsPage {
     pub start_index: u32,
 }
 
-const KNOWN_BOOK_EXTENSIONS: &[&str] = &[
+pub(crate) const KNOWN_BOOK_EXTENSIONS: &[&str] = &[
     "cbz", "cbr", "cb7", "cbt", "zip", "rar", "7z", "tar", "pdf", "epub",
 ];
 
@@ -657,6 +664,7 @@ impl JellyfinClient {
             access_token: auth.access_token,
             version: info.version.clone(),
             allow_insecure,
+            borrowed_from: None,
         })
     }
 
@@ -691,6 +699,17 @@ impl JellyfinClient {
             secret: raw.secret,
             code: raw.code,
         })
+    }
+
+    /// Approves a Quick Connect code with this (signed-in) session.
+    pub async fn quick_connect_authorize(&self, code: &str) -> Result<()> {
+        let user_id = self.user_id()?;
+        self.send(
+            self.request(Method::POST, "/QuickConnect/Authorize")
+                .query(&[("code", code), ("userId", user_id)]),
+        )
+        .await
+        .map(|_| ())
     }
 
     pub async fn quick_connect_poll(
@@ -880,6 +899,48 @@ impl JellyfinClient {
         Ok(out)
     }
 
+    /// First book (by sort name) anywhere below a folder, used as the cover
+    /// of folders that have no image of their own.
+    pub async fn first_book(&self, parent_id: &str) -> Result<Option<JellyfinItem>> {
+        let page = self
+            .items(&ItemsQuery {
+                parent_id: Some(parent_id.to_string()),
+                recursive: true,
+                include_types: vec!["Book".into()],
+                limit: Some(1),
+                ..Default::default()
+            })
+            .await?;
+        Ok(page.items.into_iter().next())
+    }
+
+    /// Every book below a folder (or the book itself), in sort-name order.
+    pub async fn books_under(&self, item: &JellyfinItem) -> Result<Vec<JellyfinItem>> {
+        if item.is_book {
+            return Ok(vec![item.clone()]);
+        }
+        const PAGE: u32 = 500;
+        let mut books: Vec<JellyfinItem> = Vec::new();
+        loop {
+            let page = self
+                .items(&ItemsQuery {
+                    parent_id: Some(item.id.clone()),
+                    recursive: true,
+                    include_types: vec!["Book".into()],
+                    start_index: books.len() as u32,
+                    limit: Some(PAGE),
+                    extra_fields: Some("People,Genres".into()),
+                    ..Default::default()
+                })
+                .await?;
+            let received = page.items.len();
+            books.extend(page.items);
+            if received == 0 || books.len() as i64 >= page.total {
+                return Ok(books);
+            }
+        }
+    }
+
     pub async fn report_progress(&self, item_id: &str, page: i64, page_count: i64) -> Result<()> {
         let user_id = self.user_id()?;
         let finished = page_count > 0 && page >= page_count - 1;
@@ -991,13 +1052,25 @@ impl JellyfinClient {
         dest: &Path,
         on_progress: &ProgressFn,
     ) -> Result<u64> {
-        let response = Self::check(
-            self.request(Method::GET, &format!("/Items/{item_id}/Download"))
+        // `/Download` answers 404 on some servers (item hidden from the
+        // download view, proxies); `/File` serves the same original file.
+        let fetch = |endpoint: &str| {
+            self.http
+                .get(format!("{}/Items/{item_id}/{endpoint}", self.base))
+                .header("Authorization", self.authorization())
                 .header("Accept", "*/*")
                 .send()
-                .await?,
-        )
-        .await?;
+        };
+        let response = match Self::check(fetch("Download").await?).await {
+            Err(JellyfinError::NotFound) => {
+                warn!(
+                    "[jellyfin] /Items/{}/Download answered 404, trying /File",
+                    item_id
+                );
+                Self::check(fetch("File").await?).await?
+            }
+            other => other?,
+        };
         let total = response.content_length();
         if let Some(dir) = dest.parent() {
             tokio::fs::create_dir_all(dir).await?;
@@ -1018,6 +1091,64 @@ impl JellyfinClient {
         file.flush().await?;
         on_progress(written, total);
         Ok(written)
+    }
+}
+
+/// Replaces a server's sign-in with a session of this device, approved by the
+/// current one through Quick Connect. Jellyfin binds tokens to the device that
+/// signed in, so a token copied from another device can browse but may be
+/// refused for downloads.
+pub async fn rebind(server: &JellyfinServer, device_id: &str) -> Result<JellyfinServer> {
+    let info = discover(&server.url, device_id, server.allow_insecure).await?;
+    if !info.quick_connect {
+        return Err(JellyfinError::Invalid(
+            "Quick Connect is off on this server: sign in again instead".into(),
+        ));
+    }
+    let anonymous = JellyfinClient::anonymous(&info.url, device_id, server.allow_insecure);
+    let start = anonymous.quick_connect_start().await?;
+    JellyfinClient::for_server(server, device_id)
+        .quick_connect_authorize(&start.code)
+        .await?;
+    for _ in 0..10 {
+        if let Some(fresh) = anonymous
+            .quick_connect_poll(&info, &start.secret, server.allow_insecure)
+            .await?
+        {
+            info!("[jellyfin] '{}' now has a session of its own", fresh.name);
+            return Ok(JellyfinServer {
+                borrowed_from: None,
+                ..fresh
+            });
+        }
+        tokio::time::sleep(Duration::from_millis(300)).await;
+    }
+    Err(JellyfinError::Invalid(
+        "The server did not confirm the new session".into(),
+    ))
+}
+
+/// Gives every sign-in copied from another device a session of its own.
+/// Failures are kept for later: the copied token still works for browsing.
+pub async fn rebind_borrowed(base_path: &str) {
+    let store = JellyfinStore::new(base_path);
+    let Ok(device_id) = store.device_id() else {
+        return;
+    };
+    for server in store
+        .servers()
+        .into_iter()
+        .filter(|s| s.borrowed_from.is_some())
+    {
+        match rebind(&server, &device_id).await {
+            Ok(fresh) => {
+                if fresh.id != server.id {
+                    let _ = store.remove(&server.id);
+                }
+                let _ = store.upsert(fresh);
+            }
+            Err(e) => warn!("[jellyfin] could not rebind '{}': {}", server.name, e),
+        }
     }
 }
 
@@ -1084,7 +1215,7 @@ fn unsupported_message(item: &JellyfinItem) -> String {
     )
 }
 
-fn detect_format(file: &Path, declared: Option<&str>) -> Option<String> {
+pub(crate) fn detect_format(file: &Path, declared: Option<&str>) -> Option<String> {
     let declared = declared.map(str::to_ascii_lowercase);
     if matches!(declared.as_deref(), Some("pdf") | Some("epub")) {
         return declared;
@@ -1271,6 +1402,7 @@ mod tests {
                 access_token: "tok".into(),
                 version: "10.10.0".into(),
                 allow_insecure: false,
+                borrowed_from: None,
             },
             "device1",
         )
@@ -1423,6 +1555,70 @@ mod tests {
     }
 
     #[tokio::test]
+    async fn a_copied_sign_in_is_swapped_for_a_session_of_this_device() {
+        let server = MockServer::start().await;
+        Mock::given(method("GET"))
+            .and(path("/System/Info/Public"))
+            .respond_with(ResponseTemplate::new(200).set_body_json(json!({
+                "ServerName": "Home", "Version": "10.10.3", "Id": "srv"
+            })))
+            .mount(&server)
+            .await;
+        Mock::given(method("GET"))
+            .and(path("/QuickConnect/Enabled"))
+            .respond_with(ResponseTemplate::new(200).set_body_json(true))
+            .mount(&server)
+            .await;
+        Mock::given(method("POST"))
+            .and(path("/QuickConnect/Initiate"))
+            .respond_with(ResponseTemplate::new(200).set_body_json(json!({
+                "Secret": "sec", "Code": "654321"
+            })))
+            .mount(&server)
+            .await;
+        Mock::given(method("POST"))
+            .and(path("/QuickConnect/Authorize"))
+            .and(query_param("code", "654321"))
+            .and(query_param("userId", "usr"))
+            .and(header_exists("Authorization"))
+            .respond_with(ResponseTemplate::new(200).set_body_json(true))
+            .expect(1)
+            .mount(&server)
+            .await;
+        Mock::given(method("GET"))
+            .and(path("/QuickConnect/Connect"))
+            .respond_with(ResponseTemplate::new(200).set_body_json(json!({
+                "Secret": "sec", "Authenticated": true
+            })))
+            .mount(&server)
+            .await;
+        Mock::given(method("POST"))
+            .and(path("/Users/AuthenticateWithQuickConnect"))
+            .respond_with(ResponseTemplate::new(200).set_body_json(json!({
+                "AccessToken": "phone-token", "ServerId": "srv",
+                "User": { "Id": "usr", "Name": "me" }
+            })))
+            .mount(&server)
+            .await;
+
+        let copied = JellyfinServer {
+            id: "srv-usr".into(),
+            name: "Home".into(),
+            url: server.uri(),
+            user_id: "usr".into(),
+            user_name: "me".into(),
+            access_token: "desktop-token".into(),
+            version: "10.10.3".into(),
+            allow_insecure: false,
+            borrowed_from: Some("Desktop".into()),
+        };
+        let fresh = rebind(&copied, "phone").await.unwrap();
+        assert_eq!(fresh.access_token, "phone-token");
+        assert_eq!(fresh.id, copied.id, "the server keeps its id");
+        assert_eq!(fresh.borrowed_from, None);
+    }
+
+    #[tokio::test]
     async fn items_are_mapped_for_the_ui() {
         let server = MockServer::start().await;
         Mock::given(method("GET"))
@@ -1547,6 +1743,149 @@ mod tests {
             "Path": "/lib/issue1.cbr", "MediaSources": [{ "Size": 5, "Container": "cbr" }],
             "UserData": { "PlaybackPositionTicks": 30000 }
         })
+    }
+
+    #[tokio::test]
+    async fn a_404_on_download_falls_back_to_the_original_file() {
+        use crate::services::jellyfin_offline as offline;
+        let server = MockServer::start().await;
+        Mock::given(method("GET"))
+            .and(path("/Items/book1"))
+            .respond_with(ResponseTemplate::new(200).set_body_json(book_json("v1")))
+            .mount(&server)
+            .await;
+        Mock::given(method("GET"))
+            .and(path("/Items/book1/Download"))
+            .respond_with(ResponseTemplate::new(404))
+            .mount(&server)
+            .await;
+        Mock::given(method("GET"))
+            .and(path("/Items/book1/File"))
+            .respond_with(ResponseTemplate::new(200).set_body_bytes(b"PK\x03\x04data".to_vec()))
+            .expect(1)
+            .mount(&server)
+            .await;
+        Mock::given(method("GET"))
+            .and(path("/Items/folder1"))
+            .respond_with(ResponseTemplate::new(200).set_body_json(json!({
+                "Id": "folder1", "Name": "Saga", "Type": "Folder", "IsFolder": true
+            })))
+            .mount(&server)
+            .await;
+        let mut broken = book_json("v1");
+        broken["Id"] = json!("book2");
+        let mut other = book_json("v1");
+        other["Id"] = json!("book3");
+        Mock::given(method("GET"))
+            .and(path("/Items"))
+            .and(query_param("parentId", "folder1"))
+            .respond_with(ResponseTemplate::new(200).set_body_json(json!({
+                "Items": [broken, other], "TotalRecordCount": 2
+            })))
+            .mount(&server)
+            .await;
+        let base = tempfile::tempdir().unwrap();
+        let base = base.path().to_str().unwrap();
+        let client = signed_in(&server);
+        let noop: offline::OfflineProgressFn = Arc::new(|_| {});
+
+        let kept = offline::download(
+            &client,
+            base,
+            "srv-usr",
+            "book1",
+            Default::default(),
+            noop.clone(),
+        )
+        .await
+        .unwrap();
+        assert_eq!(std::fs::read(&kept[0].path).unwrap(), b"PK\x03\x04data");
+
+        let err = offline::download(
+            &client,
+            base,
+            "srv-usr",
+            "folder1",
+            Default::default(),
+            noop,
+        )
+        .await
+        .unwrap_err();
+        assert!(
+            err.to_string().contains("no file"),
+            "a folder where nothing downloads fails: {err}"
+        );
+    }
+
+    #[tokio::test]
+    async fn offline_download_keeps_a_book_or_every_book_of_a_folder() {
+        use crate::services::jellyfin_offline as offline;
+        let server = MockServer::start().await;
+        Mock::given(method("GET"))
+            .and(path("/Items/book1"))
+            .respond_with(ResponseTemplate::new(200).set_body_json(book_json("v1")))
+            .mount(&server)
+            .await;
+        Mock::given(method("GET"))
+            .and(path("/Items/folder1"))
+            .respond_with(ResponseTemplate::new(200).set_body_json(json!({
+                "Id": "folder1", "Name": "Saga", "Type": "Folder", "IsFolder": true
+            })))
+            .mount(&server)
+            .await;
+        Mock::given(method("GET"))
+            .and(path("/Items"))
+            .and(query_param("parentId", "folder1"))
+            .respond_with(ResponseTemplate::new(200).set_body_json(json!({
+                "Items": [book_json("v1")], "TotalRecordCount": 1
+            })))
+            .mount(&server)
+            .await;
+        Mock::given(method("GET"))
+            .and(path("/Items/book1/Download"))
+            .respond_with(ResponseTemplate::new(200).set_body_bytes(b"PK\x03\x04data".to_vec()))
+            .expect(1)
+            .mount(&server)
+            .await;
+        let base = tempfile::tempdir().unwrap();
+        let base = base.path().to_str().unwrap();
+        let client = signed_in(&server);
+        let noop: offline::OfflineProgressFn = Arc::new(|_| {});
+
+        let kept = offline::download(
+            &client,
+            base,
+            "srv-usr",
+            "book1",
+            Default::default(),
+            noop.clone(),
+        )
+        .await
+        .unwrap();
+        assert_eq!(kept.len(), 1);
+        assert_eq!(std::fs::read(&kept[0].path).unwrap(), b"PK\x03\x04data");
+
+        let kept = offline::download(
+            &client,
+            base,
+            "srv-usr",
+            "folder1",
+            Default::default(),
+            noop.clone(),
+        )
+        .await
+        .unwrap();
+        assert_eq!(
+            kept.len(),
+            1,
+            "the kept copy is reused, not downloaded again"
+        );
+        assert_eq!(kept[0].context.series_id.as_deref(), Some("folder1"));
+
+        let missing = offline::download(&client, base, "srv-usr", "gone", Default::default(), noop)
+            .await
+            .unwrap_err();
+        assert!(missing.to_string().contains("does not know"), "{missing}");
     }
 
     #[tokio::test]
@@ -1732,6 +2071,7 @@ mod tests {
             access_token: "old".into(),
             version: String::new(),
             allow_insecure: false,
+            borrowed_from: None,
         };
         store.upsert(server.clone()).unwrap();
         server.access_token = "new".into();

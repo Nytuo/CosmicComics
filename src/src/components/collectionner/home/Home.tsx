@@ -9,6 +9,7 @@ import {
 } from '@/components/ui/tabs.tsx';
 import { Button } from '@/components/ui/button.tsx';
 import { Plus } from 'lucide-react';
+import { Spinner } from '@/components/ui/spinner.tsx';
 import {
   jellyfinRef,
   navFor,
@@ -47,7 +48,12 @@ function Home({
     jellyfin,
     isLoading,
     expiredServers,
+    bookTotal,
+    hasMoreBooks,
+    loadingMore,
+    loadMore,
   } = useLibraryData(CosmicComicsTemp, refreshKey);
+  const formatCount = (n: number) => n.toLocaleString();
   const [filterState, setFilterState] =
     useState<SearchFilterState>(defaultFilterState);
   const [activeTab, setActiveTab] = useState('reading');
@@ -84,7 +90,7 @@ function Home({
       };
     }
     if (activeAllSubTab === 'books') {
-      return { total: mergedBooks.length, filtered: filteredBooks.length };
+      return { total: bookTotal, filtered: filteredBooks.length };
     }
     return { total: mergedSeries.length, filtered: filteredSeries.length };
   }, [
@@ -94,7 +100,7 @@ function Home({
     filteredReadingBooks.length,
     downloadBooks.length,
     filteredDownloadBooks.length,
-    mergedBooks.length,
+    bookTotal,
     filteredBooks.length,
     mergedSeries.length,
     filteredSeries.length,
@@ -160,12 +166,24 @@ function Home({
         <TabsContent value="all">
           <div className="p-3">
             {isLoading ? (
-              <p>{t('loading')}...</p>
+              <div className="flex justify-center py-16">
+                <Spinner className="size-8" />
+              </div>
             ) : (
               <Tabs value={activeAllSubTab} onValueChange={setActiveAllSubTab}>
                 <TabsList>
-                  <TabsTrigger value="series">{t('series')}</TabsTrigger>
-                  <TabsTrigger value="books">{t('books')}</TabsTrigger>
+                  <TabsTrigger value="series">
+                    {t('series')}
+                    <span className="ml-1.5 text-xs opacity-60">
+                      {formatCount(mergedSeries.length)}
+                    </span>
+                  </TabsTrigger>
+                  <TabsTrigger value="books">
+                    {t('books')}
+                    <span className="ml-1.5 text-xs opacity-60">
+                      {formatCount(bookTotal)}
+                    </span>
+                  </TabsTrigger>
                 </TabsList>
 
                 <TabsContent value="series">
@@ -192,6 +210,25 @@ function Home({
                       handleOpenDetails={openBook}
                     />
                   )}
+                  {hasMoreBooks && (
+                    <div className="flex flex-wrap items-center justify-center gap-3 py-4 text-sm text-muted-foreground">
+                      <span>
+                        {t('jellyfin_books_shown', {
+                          shown: formatCount(mergedBooks.length),
+                          total: formatCount(bookTotal),
+                        })}
+                      </span>
+                      <Button
+                        size="sm"
+                        variant="outline"
+                        onClick={loadMore}
+                        disabled={loadingMore}
+                      >
+                        {loadingMore && <Spinner className="mr-2" />}
+                        {t('jellyfin_load_more')}
+                      </Button>
+                    </div>
+                  )}
                 </TabsContent>
               </Tabs>
             )}
@@ -201,7 +238,9 @@ function Home({
         <TabsContent value="reading">
           <div className="p-3">
             {isLoading ? (
-              <p>{t('loading')}...</p>
+              <div className="flex justify-center py-16">
+                <Spinner className="size-8" />
+              </div>
             ) : (
               <>
                 <h2 id="continueReading" className="text-xl font-semibold mb-3">
@@ -223,7 +262,9 @@ function Home({
         <TabsContent value="downloads">
           <div className="p-3">
             {isLoading ? (
-              <p>{t('loading')}...</p>
+              <div className="flex justify-center py-16">
+                <Spinner className="size-8" />
+              </div>
             ) : filteredDownloadBooks.length === 0 ? (
               <p className="text-muted-foreground">{t('nothingHere')}</p>
             ) : (

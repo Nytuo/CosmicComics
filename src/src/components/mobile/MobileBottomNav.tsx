@@ -1,15 +1,9 @@
 import * as React from 'react';
-import {
-  BarChart3,
-  Home,
-  LibraryBig,
-  MoreHorizontal,
-  Plus,
-} from 'lucide-react';
+import { BarChart3, Download, Home, MoreHorizontal, Plus } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
 import { cn } from '@/lib/utils';
 
-export type MobileSection = 'home' | 'libraries' | 'stats' | 'more';
+export type MobileSection = 'home' | 'offline' | 'stats' | 'more';
 
 interface MobileBottomNavProps {
   section: MobileSection;
@@ -31,7 +25,7 @@ export default function MobileBottomNav({
     icon: React.ElementType;
   }[] = [
     { id: 'home', label: t('HOME'), icon: Home },
-    { id: 'libraries', label: t('nav_library'), icon: LibraryBig },
+    { id: 'offline', label: t('nav_offline'), icon: Download },
     { id: 'stats', label: t('nav_stats'), icon: BarChart3 },
     { id: 'more', label: t('nav_more'), icon: MoreHorizontal },
   ];
