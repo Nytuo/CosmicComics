@@ -11,7 +11,9 @@ use commands::state::AppState;
 #[cfg(all(feature = "ai", desktop))]
 use services::panel_detection_service;
 use std::{env, fs, path::PathBuf};
-use tauri::{Emitter, Manager};
+#[cfg(desktop)]
+use tauri::Emitter;
+use tauri::Manager;
 use tracing_subscriber::fmt::time::ChronoLocal;
 
 fn setup_directories(base_path: &str) {

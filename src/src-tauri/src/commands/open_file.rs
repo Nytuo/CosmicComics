@@ -41,6 +41,7 @@ pub fn open(app: &AppHandle, path: &Path) {
     *PENDING.lock().unwrap_or_else(|e| e.into_inner()) = Some(path.clone());
     let _ = app.emit("open-file", path);
     if let Some(window) = app.get_webview_window("main") {
+        #[cfg(desktop)]
         let _ = window.unminimize();
         let _ = window.show();
         let _ = window.set_focus();
