@@ -24,6 +24,16 @@ const LOCKED_VIEWPORT =
 const ZOOMABLE_VIEWPORT =
   'width=device-width, initial-scale=1, maximum-scale=5, viewport-fit=cover';
 
+function ScrollToTop() {
+  const { pathname } = useLocation();
+
+  useEffect(() => {
+    window.scrollTo(0, 0);
+  }, [pathname]);
+
+  return null;
+}
+
 function ZoomGuard() {
   const { pathname } = useLocation();
   const zoomable = pathname.startsWith('/viewer');
@@ -76,6 +86,7 @@ function App() {
       {platform.pdf && <PdfiumDownloadModal />}
       {platform.updater && <UpdaterModal />}
       <BrowserRouter>
+        <ScrollToTop />
         <ZoomGuard />
         <Routes>
           <Route path="/" element={<Navigate to="/collectionner" replace />} />

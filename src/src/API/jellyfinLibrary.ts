@@ -6,6 +6,7 @@ import type {
 } from '@/API/JellyfinAPI';
 import type { DisplayBook, DisplaySeries } from '@/interfaces/IDisplayBook.ts';
 import { providerEnum } from '@/utils/utils.ts';
+import { isForceOffline } from '@/API/forceOffline.ts';
 
 export interface JellyfinRef {
   serverId: string;
@@ -417,6 +418,11 @@ async function loadServer(
 ): Promise<JellyfinSource> {
   const source: JellyfinSource = { server, libraries: [], expired: false };
   const keptIds = new Set(kept.map((b) => b.item.id));
+  if (isForceOffline()) {
+    source.offline = true;
+    source.libraries = loadOffline(server, kept, out);
+    return source;
+  }
   try {
     const views = await JellyfinAPI.getViews(server.id);
     await JellyfinAPI.flushOffline(server.id).catch(() => 0);

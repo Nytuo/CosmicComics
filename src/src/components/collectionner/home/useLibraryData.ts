@@ -6,6 +6,7 @@ import {
   loadMoreJellyfinBooks,
   type JellyfinLibraryData,
 } from '@/API/jellyfinLibrary.ts';
+import { useForceOffline } from '@/API/forceOffline.ts';
 
 /**
  * Loads the local + Jellyfin library once and exposes the merged lists.
@@ -20,6 +21,7 @@ export function useLibraryData(CosmicComicsTemp: string, refreshKey?: number) {
   const [localLoading, setLocalLoading] = useState(true);
   const [jellyfinLoading, setJellyfinLoading] = useState(true);
   const [loadingMore, setLoadingMore] = useState(false);
+  const [forceOffline] = useForceOffline();
 
   useEffect(() => {
     const loadData = async () => {
@@ -57,7 +59,7 @@ export function useLibraryData(CosmicComicsTemp: string, refreshKey?: number) {
     return () => {
       alive = false;
     };
-  }, [CosmicComicsTemp, refreshKey]);
+  }, [CosmicComicsTemp, refreshKey, forceOffline]);
 
   const books = useMemo(
     () => [...allBooks, ...(jellyfin?.books ?? [])],

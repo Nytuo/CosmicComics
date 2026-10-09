@@ -6,6 +6,7 @@ import { Progress } from '@/components/ui/progress.tsx';
 import { Spinner } from '@/components/ui/spinner.tsx';
 import { ToasterHandler } from '@/components/common/ToasterHandler.tsx';
 import * as TauriAPI from '@/API/TauriAPI';
+import * as JellyfinAPI from '@/API/JellyfinAPI';
 import { useBookPages } from '../hooks/useBookPages.ts';
 import { useJellyfinProgress } from '../hooks/useJellyfinProgress.ts';
 import { useReadingSession } from '../hooks/useReadingSession.ts';
@@ -86,7 +87,12 @@ export default function MobileViewer() {
   const page = Math.min(index, lastIndex);
   const furthest = shown[shown.length - 1];
   const bookId = context.book?.id ?? null;
-  const title = context.book?.title ?? fileName(bookPath);
+  const jellyfinSession = React.useMemo(
+    () => JellyfinAPI.readJellyfinSession(),
+    []
+  );
+  const title =
+    jellyfinSession?.title ?? context.book?.title ?? fileName(bookPath);
   const bookmarks = useBookmarks(bookId);
 
   // Resume where the reader left off (a bookmark can request a specific page).
@@ -334,7 +340,7 @@ export default function MobileViewer() {
       <MobileViewerChrome
         visible={chromeVisible}
         title={title}
-        subtitle={context.seriesTitle}
+        subtitle={context.seriesTitle ?? jellyfinSession?.seriesName ?? null}
         page={page}
         lastIndex={lastIndex}
         pages={source.pages}

@@ -564,6 +564,8 @@
   "sync_copied": "{{count}} livre(s) copié(s) depuis {{name}}",
   "nav_offline": "Hors ligne",
   "nav_libraries_hint": "Dossiers, analyse et serveurs Jellyfin",
+  "force_offline_mode": "Forcer le mode hors ligne",
+  "force_offline_mode_hint": "Ignore le réseau et n'affiche que ce qui est téléchargé, même avec une connexion",
   "offline_empty": "Les livres téléchargés apparaissent ici et se lisent sans réseau : téléchargez des livres Jellyfin depuis leur page, ou utilisez les téléchargeurs.",
   "offline_count": "{{count}} livre(s) lisible(s) sans réseau",
   "jellyfin_refresh": "Actualiser",

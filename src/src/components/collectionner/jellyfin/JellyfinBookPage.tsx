@@ -20,6 +20,8 @@ import * as JellyfinAPI from '@/API/JellyfinAPI';
 import type { DisplayBook } from '@/interfaces/IDisplayBook.ts';
 import { toDisplayBook } from '@/API/jellyfinLibrary.ts';
 import { providerEnum } from '@/utils/utils.ts';
+import { useMobileLayout } from '@/hooks/use-mobile-layout.ts';
+import { cn } from '@/lib/utils.ts';
 
 interface Props {
   serverId: string;
@@ -40,6 +42,7 @@ export default function JellyfinBookPage({
   onUnauthorized,
 }: Props) {
   const { t } = useTranslation();
+  const mobile = useMobileLayout();
   const [book, setBook] = React.useState(item);
   const [opening, setOpening] = React.useState(false);
   const [download, setDownload] = React.useState<DownloadState>({
@@ -143,7 +146,13 @@ export default function JellyfinBookPage({
   const date = book.year ?? book.date_created?.slice(0, 4) ?? '';
 
   return (
-    <div className="mx-auto w-full max-w-6xl space-y-6 px-4 py-6">
+    <div
+      className={
+        mobile
+          ? 'w-full space-y-5'
+          : 'mx-auto w-full max-w-6xl space-y-6 px-4 py-6'
+      }
+    >
       <HeroCard
         remote
         TheBook={displayBook}
@@ -172,7 +181,10 @@ export default function JellyfinBookPage({
               <Button
                 variant="outline"
                 size="sm"
-                className="gap-1.5"
+                className={cn(
+                  'gap-1.5',
+                  mobile && 'h-12 shrink-0 rounded-full'
+                )}
                 onClick={() => read(true)}
                 disabled={opening}
               >
@@ -184,6 +196,7 @@ export default function JellyfinBookPage({
               <JellyfinOfflineButton
                 serverId={serverId}
                 item={book}
+                className={mobile ? 'h-12 shrink-0 rounded-full' : undefined}
                 context={{
                   ...context,
                   series_id: context.series_id ?? book.parent_id,

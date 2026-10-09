@@ -13,6 +13,8 @@ import {
   navFor,
   type JellyfinNav,
 } from '@/API/jellyfinLibrary.ts';
+import * as JellyfinAPI from '@/API/JellyfinAPI';
+import { ToasterHandler } from '@/components/common/ToasterHandler.tsx';
 import type { DisplayBook } from '@/interfaces/IDisplayBook.ts';
 import MobileCard from './MobileCard.tsx';
 
@@ -42,10 +44,31 @@ export default function MobileOffline({
     [downloads, query]
   );
 
-  const open = (book: DisplayBook) => {
+  // Every Jellyfin book shown here was kept for offline reading, so open it
+  // straight from the local cache instead of routing through the online browser
+  const open = async (book: DisplayBook) => {
     const ref = jellyfinRef(book);
-    if (ref) onOpenJellyfin(navFor(ref, book.title));
-    else handleOpenDetails(true, book, book.provider_id);
+    if (!ref) {
+      handleOpenDetails(true, book, book.provider_id);
+      return;
+    }
+    try {
+      const prepared = await JellyfinAPI.prepareBook(ref.serverId, ref.itemId);
+      JellyfinAPI.openInViewer(prepared, {
+        serverId: ref.serverId,
+        itemId: ref.itemId,
+        title: book.title,
+        seriesName: null,
+        format: prepared.format,
+      });
+    } catch (e) {
+      // The local copy may be gone fallback to the online browser instead of a dead end.
+      if (JellyfinAPI.isOfflineError(e)) {
+        ToasterHandler(`${t('jellyfin_open_failed')}: ${String(e)}`, 'error');
+      } else {
+        onOpenJellyfin(navFor(ref, book.title));
+      }
+    }
   };
 
   if (isLoading) {

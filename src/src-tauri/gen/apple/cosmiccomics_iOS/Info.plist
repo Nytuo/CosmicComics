@@ -55,6 +55,10 @@
 			<array>
 				<string>cbz</string>
 			</array>
+			<key>LSItemContentTypes</key>
+			<array>
+				<string>fr.nytuo.cosmiccomics.cbz</string>
+			</array>
 			<key>CFBundleTypeName</key>
 			<string>Comic Book Archive (ZIP)</string>
 			<key>CFBundleTypeRole</key>
@@ -66,6 +70,10 @@
 			<key>CFBundleTypeExtensions</key>
 			<array>
 				<string>cbr</string>
+			</array>
+			<key>LSItemContentTypes</key>
+			<array>
+				<string>fr.nytuo.cosmiccomics.cbr</string>
 			</array>
 			<key>CFBundleTypeName</key>
 			<string>Comic Book Archive (RAR)</string>
@@ -79,8 +87,28 @@
 			<array>
 				<string>cbt</string>
 			</array>
+			<key>LSItemContentTypes</key>
+			<array>
+				<string>fr.nytuo.cosmiccomics.cbt</string>
+			</array>
 			<key>CFBundleTypeName</key>
 			<string>Comic Book Archive (TAR)</string>
+			<key>CFBundleTypeRole</key>
+			<string>Viewer</string>
+			<key>LSHandlerRank</key>
+			<string>Default</string>
+		</dict>
+		<dict>
+			<key>CFBundleTypeExtensions</key>
+			<array>
+				<string>cb7</string>
+			</array>
+			<key>LSItemContentTypes</key>
+			<array>
+				<string>fr.nytuo.cosmiccomics.cb7</string>
+			</array>
+			<key>CFBundleTypeName</key>
+			<string>Comic Book Archive (7z)</string>
 			<key>CFBundleTypeRole</key>
 			<string>Viewer</string>
 			<key>LSHandlerRank</key>
@@ -149,6 +177,81 @@
 			<string>Viewer</string>
 			<key>LSHandlerRank</key>
 			<string>Default</string>
+		</dict>
+	</array>
+	<key>UTExportedTypeDeclarations</key>
+	<array>
+		<dict>
+			<key>UTTypeIdentifier</key>
+			<string>fr.nytuo.cosmiccomics.cbz</string>
+			<key>UTTypeConformsTo</key>
+			<array>
+				<string>public.data</string>
+				<string>public.archive</string>
+			</array>
+			<key>UTTypeTagSpecification</key>
+			<dict>
+				<key>public.filename-extension</key>
+				<array>
+					<string>cbz</string>
+				</array>
+				<key>public.mime-type</key>
+				<string>application/vnd.comicbook+zip</string>
+			</dict>
+		</dict>
+		<dict>
+			<key>UTTypeIdentifier</key>
+			<string>fr.nytuo.cosmiccomics.cbr</string>
+			<key>UTTypeConformsTo</key>
+			<array>
+				<string>public.data</string>
+				<string>public.archive</string>
+			</array>
+			<key>UTTypeTagSpecification</key>
+			<dict>
+				<key>public.filename-extension</key>
+				<array>
+					<string>cbr</string>
+				</array>
+				<key>public.mime-type</key>
+				<string>application/vnd.comicbook-rar</string>
+			</dict>
+		</dict>
+		<dict>
+			<key>UTTypeIdentifier</key>
+			<string>fr.nytuo.cosmiccomics.cbt</string>
+			<key>UTTypeConformsTo</key>
+			<array>
+				<string>public.data</string>
+				<string>public.archive</string>
+			</array>
+			<key>UTTypeTagSpecification</key>
+			<dict>
+				<key>public.filename-extension</key>
+				<array>
+					<string>cbt</string>
+				</array>
+				<key>public.mime-type</key>
+				<string>application/vnd.comicbook+tar</string>
+			</dict>
+		</dict>
+		<dict>
+			<key>UTTypeIdentifier</key>
+			<string>fr.nytuo.cosmiccomics.cb7</string>
+			<key>UTTypeConformsTo</key>
+			<array>
+				<string>public.data</string>
+				<string>public.archive</string>
+			</array>
+			<key>UTTypeTagSpecification</key>
+			<dict>
+				<key>public.filename-extension</key>
+				<array>
+					<string>cb7</string>
+				</array>
+				<key>public.mime-type</key>
+				<string>application/x-cb7</string>
+			</dict>
 		</dict>
 	</array>
 </dict>

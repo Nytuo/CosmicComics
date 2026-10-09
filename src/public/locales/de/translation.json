@@ -564,6 +564,8 @@
   "sync_copied": "{{count}} Buch/Bücher von {{name}} kopiert",
   "nav_offline": "Offline",
   "nav_libraries_hint": "Ordner, Scan und Jellyfin-Server",
+  "force_offline_mode": "Offline-Modus erzwingen",
+  "force_offline_mode_hint": "Netzwerk überspringen und nur Heruntergeladenes anzeigen, auch bei bestehender Verbindung",
   "offline_empty": "Heruntergeladene Bücher erscheinen hier und lassen sich ohne Netzwerk lesen: Lade Jellyfin-Bücher auf ihrer Seite herunter oder nutze die Downloader.",
   "offline_count": "{{count}} Buch/Bücher ohne Netzwerk lesbar",
   "jellyfin_refresh": "Aktualisieren",

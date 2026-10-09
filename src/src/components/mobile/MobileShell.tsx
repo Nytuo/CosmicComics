@@ -2,6 +2,7 @@ import * as React from 'react';
 import {
   Bookmark,
   CloudDownload,
+  CloudOff,
   FilePlus2,
   FileUp,
   ImageIcon,
@@ -14,6 +15,8 @@ import {
 import { useTranslation } from 'react-i18next';
 import { openUrl } from '@tauri-apps/plugin-opener';
 import { usePlatform } from '@/hooks/use-platform.ts';
+import { useForceOffline } from '@/API/forceOffline.ts';
+import { invalidateJellyfinCache } from '@/API/jellyfinLibrary.ts';
 import MobileBottomNav, { type MobileSection } from './MobileBottomNav.tsx';
 import MobileTopBar from './MobileTopBar.tsx';
 import ActionSheet, { type SheetAction } from './ActionSheet.tsx';
@@ -62,6 +65,7 @@ export default function MobileShell({
   const platform = usePlatform();
   const [createOpen, setCreateOpen] = React.useState(false);
   const [moreOpen, setMoreOpen] = React.useState(false);
+  const [forceOffline, setForceOffline] = useForceOffline();
 
   const createActions: SheetAction[] = [
     {
@@ -108,6 +112,19 @@ export default function MobileShell({
       icon: CloudDownload,
       hidden: !platform.downloaders,
       onSelect: onOpenDownloaders,
+    },
+    {
+      id: 'force-offline',
+      label: t('force_offline_mode'),
+      description: t('force_offline_mode_hint'),
+      icon: CloudOff,
+      toggle: {
+        checked: forceOffline,
+        onCheckedChange: (checked) => {
+          setForceOffline(checked);
+          invalidateJellyfinCache();
+        },
+      },
     },
     {
       id: 'settings',

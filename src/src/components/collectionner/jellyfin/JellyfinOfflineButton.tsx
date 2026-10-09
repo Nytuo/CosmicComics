@@ -7,13 +7,14 @@ import { ToasterHandler } from '@/components/common/ToasterHandler.tsx';
 import * as JellyfinAPI from '@/API/JellyfinAPI';
 import { invalidateJellyfinCache } from '@/API/jellyfinLibrary.ts';
 import { formatBytes } from '../stats/format.ts';
+import { cn } from '@/lib/utils.ts';
 
 interface Props {
   serverId: string;
-  /** A book, or a folder whose books are all kept. */
   item: { id: string; name: string; is_book: boolean };
   context: JellyfinAPI.OfflineContext;
   size?: 'sm' | 'default';
+  className?: string;
   onChanged?: () => void;
 }
 
@@ -23,6 +24,7 @@ export default function JellyfinOfflineButton({
   item,
   context,
   size = 'sm',
+  className,
   onChanged,
 }: Props) {
   const { t } = useTranslation();
@@ -101,7 +103,12 @@ export default function JellyfinOfflineButton({
       ? Math.round((progress.written * 100) / progress.total)
       : null;
     return (
-      <Button variant="outline" size={size} disabled className="gap-1.5">
+      <Button
+        variant="outline"
+        size={size}
+        disabled
+        className={cn('gap-1.5', className)}
+      >
         <Spinner />
         <span className="max-w-56 truncate tabular-nums">
           {progress.count > 1
@@ -120,7 +127,7 @@ export default function JellyfinOfflineButton({
         <Button
           variant="outline"
           size={size}
-          className="gap-1.5"
+          className={cn('gap-1.5', className)}
           disabled={busy}
           onClick={remove}
           title={t('jellyfin_offline_remove')}
@@ -153,7 +160,7 @@ export default function JellyfinOfflineButton({
     <Button
       variant="outline"
       size={size}
-      className="gap-1.5"
+      className={cn('gap-1.5', className)}
       disabled={busy}
       onClick={download}
     >

@@ -332,6 +332,27 @@ export default function MiniDrawer({
       </div>
     ) : null;
 
+  const pageKey =
+    openSeries && openSeries.open
+      ? `series:${openSeries.series.id}`
+      : openDetails && openDetails.open
+        ? `details:${openDetails.book.id}`
+        : showStats
+          ? 'stats'
+          : jellyfinNav
+            ? `jellyfin:${jellyfinNav.serverId}:${jellyfinNav.trail[jellyfinNav.trail.length - 1]?.id ?? ''}:${jellyfinNav.bookId ?? ''}`
+            : showLibraries
+              ? 'libraries'
+              : downloadersOpen
+                ? 'downloaders'
+                : mobile && showOffline
+                  ? 'offline'
+                  : 'home';
+
+  React.useEffect(() => {
+    window.scrollTo(0, 0);
+  }, [pageKey]);
+
   const page =
     openSeries && openSeries.open ? (
       <SeriesDetails

@@ -7,6 +7,7 @@ import {
   DrawerHeader,
   DrawerTitle,
 } from '@/components/ui/drawer';
+import { Switch } from '@/components/ui/switch.tsx';
 import { cn } from '@/lib/utils';
 
 export interface SheetAction {
@@ -14,9 +15,13 @@ export interface SheetAction {
   label: string;
   description?: string;
   icon: React.ElementType;
-  onSelect: () => void;
+  onSelect?: () => void;
   tone?: 'default' | 'accent' | 'danger';
   hidden?: boolean;
+  toggle?: {
+    checked: boolean;
+    onCheckedChange: (checked: boolean) => void;
+  };
 }
 
 interface ActionSheetProps {
@@ -57,17 +62,9 @@ export default function ActionSheet({
                 icon: Icon,
                 onSelect,
                 tone = 'default',
-              }) => (
-                <button
-                  key={id}
-                  type="button"
-                  onClick={() => {
-                    onOpenChange(false);
-                    // Let the drawer finish closing before the next surface opens.
-                    window.setTimeout(onSelect, 150);
-                  }}
-                  className="flex items-center gap-4 rounded-2xl px-3 py-3 text-left transition-colors active:bg-accent"
-                >
+                toggle,
+              }) => {
+                const iconBadge = (
                   <span
                     className={cn(
                       'flex size-11 shrink-0 items-center justify-center rounded-2xl',
@@ -79,6 +76,8 @@ export default function ActionSheet({
                   >
                     <Icon className="size-5" />
                   </span>
+                );
+                const labelBlock = (
                   <span className="min-w-0 flex-1">
                     <span className="block truncate text-[15px] font-medium">
                       {label}
@@ -89,9 +88,40 @@ export default function ActionSheet({
                       </span>
                     )}
                   </span>
-                  <ChevronRight className="size-4 shrink-0 text-muted-foreground" />
-                </button>
-              )
+                );
+
+                if (toggle) {
+                  return (
+                    <div
+                      key={id}
+                      className="flex items-center gap-4 rounded-2xl px-3 py-3"
+                    >
+                      {iconBadge}
+                      {labelBlock}
+                      <Switch
+                        checked={toggle.checked}
+                        onCheckedChange={toggle.onCheckedChange}
+                      />
+                    </div>
+                  );
+                }
+
+                return (
+                  <button
+                    key={id}
+                    type="button"
+                    onClick={() => {
+                      onOpenChange(false);
+                      if (onSelect) window.setTimeout(onSelect, 150);
+                    }}
+                    className="flex items-center gap-4 rounded-2xl px-3 py-3 text-left transition-colors active:bg-accent"
+                  >
+                    {iconBadge}
+                    {labelBlock}
+                    <ChevronRight className="size-4 shrink-0 text-muted-foreground" />
+                  </button>
+                );
+              }
             )}
         </div>
       </DrawerContent>

@@ -564,6 +564,8 @@
   "sync_copied": "{{count}} libro(s) copiado(s) desde {{name}}",
   "nav_offline": "Sin conexión",
   "nav_libraries_hint": "Carpetas, análisis y servidores Jellyfin",
+  "force_offline_mode": "Forzar modo sin conexión",
+  "force_offline_mode_hint": "Omite la red y muestra solo lo descargado, incluso con conexión",
   "offline_empty": "Los libros descargados aparecen aquí y se leen sin red: descarga libros de Jellyfin desde su página o usa los descargadores.",
   "offline_count": "{{count}} libro(s) legible(s) sin red",
   "jellyfin_refresh": "Actualizar",
