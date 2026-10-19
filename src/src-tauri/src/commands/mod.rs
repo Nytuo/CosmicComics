@@ -1,4 +1,5 @@
 pub mod ai_model;
+pub mod analytics;
 pub mod api;
 pub mod collectionner;
 pub mod common;

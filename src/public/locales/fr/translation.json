@@ -573,5 +573,15 @@
   "jellyfin_refresh_rebound": "Actualisé : cet appareil a maintenant sa propre session",
   "jellyfin_refresh_done": "Cache vidé.",
   "jellyfin_refresh_sign_in": "La session ne fonctionne plus : reconnectez-vous.",
-  "jellyfin_borrowed": "Connexion reprise de {{name}}. Actualisez pour donner à cet appareil sa propre session si la lecture ou le téléchargement échoue."
+  "jellyfin_borrowed": "Connexion reprise de {{name}}. Actualisez pour donner à cet appareil sa propre session si la lecture ou le téléchargement échoue.",
+  "analytics_title": "Aider à améliorer Cosmic Comics ?",
+  "analytics_intro": "Cosmic Comics peut envoyer des comptages d'utilisation anonymes et des rapports de bugs à un serveur Aptabase auto-hébergé (analytics.nytuo.fr), géré par le développeur. Il sert uniquement à compter les utilisateurs et à trouver les bugs.",
+  "analytics_never": "Rien n'est envoyé sauf si vous l'activez ci-dessous. Jamais envoyé : vos livres, votre bibliothèque, noms de fichiers, chemins, historique de lecture ou toute donnée personnelle. Pas de compte, pas de publicité, pas de tiers.",
+  "analytics_change_later": "Désactivé sauf si vous acceptez, et vous pouvez changer d'avis à tout moment dans les Paramètres.",
+  "analytics_decline": "Non merci",
+  "analytics_usage": "Comptage d'utilisation anonyme",
+  "analytics_usage_description": "Compte les utilisateurs et les lancements (version de l'app et système uniquement).",
+  "analytics_errors": "Rapports d'erreurs",
+  "analytics_errors_description": "Envoie les plantages et erreurs pour corriger les bugs (texte et pile d'appels, sans chemins de fichiers).",
+  "analytics_confirm": "Confirmer"
 }

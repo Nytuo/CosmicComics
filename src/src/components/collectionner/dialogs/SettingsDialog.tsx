@@ -18,6 +18,12 @@ import {
 import { Button } from '@/components/ui/button.tsx';
 import { Label } from '@/components/ui/label.tsx';
 import { Input } from '@/components/ui/input.tsx';
+import { Switch } from '@/components/ui/switch.tsx';
+import {
+  type AnalyticsConsent,
+  getAnalyticsConsent,
+  setAnalyticsConsent,
+} from '@/utils/analytics.ts';
 import { setTheme } from '@/utils/Common.ts';
 import { cn } from '@/lib/utils';
 import { Check, Eye, EyeOff, KeyRound, Loader2 } from 'lucide-react';
@@ -114,8 +120,20 @@ export default function SettingsDialog({
     'idle' | 'success' | 'error'
   >('idle');
 
+  const [analytics, setAnalytics] = React.useState<AnalyticsConsent>({
+    usage: false,
+    errors: false,
+  });
+  const changeAnalytics = (patch: Partial<AnalyticsConsent>) => {
+    const previous = analytics;
+    const next = { ...analytics, ...patch };
+    setAnalytics(next);
+    setAnalyticsConsent(next).catch(() => setAnalytics(previous));
+  };
+
   React.useEffect(() => {
     if (!openModal) return;
+    getAnalyticsConsent().then((c) => c && setAnalytics(c));
     getCredentialDefinitions().then(setCredDefs).catch(console.error);
     getApiCredentials().then(setCredValues).catch(console.error);
   }, [openModal]);
@@ -254,6 +272,26 @@ export default function SettingsDialog({
                 ))}
               </SelectContent>
             </Select>
+          </div>
+
+          <div className="space-y-4">
+            {(['usage', 'errors'] as const).map((key) => (
+              <div key={key} className="flex items-start justify-between gap-4">
+                <div className="space-y-1">
+                  <Label htmlFor={`analytics-${key}`}>
+                    {t(`analytics_${key}`)}
+                  </Label>
+                  <p className="text-xs text-muted-foreground">
+                    {t(`analytics_${key}_description`)}
+                  </p>
+                </div>
+                <Switch
+                  id={`analytics-${key}`}
+                  checked={analytics[key]}
+                  onCheckedChange={(value) => changeAnalytics({ [key]: value })}
+                />
+              </div>
+            ))}
           </div>
 
           {credDefs.length > 0 && (

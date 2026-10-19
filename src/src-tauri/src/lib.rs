@@ -85,6 +85,7 @@ pub fn run() {
             };
 
             setup_directories(&base_path);
+            commands::analytics::init(app.handle(), &base_path);
 
             let app_state = AppState::new(base_path.clone(), app.handle().clone());
             app.manage(app_state);
@@ -191,6 +192,8 @@ pub fn run() {
             Ok(())
         })
         .invoke_handler(tauri::generate_handler![
+            commands::analytics::get_analytics_consent,
+            commands::analytics::set_analytics_consent,
             commands::stats::stats_record_session,
             commands::stats::stats_get_overview,
             commands::stats::stats_clear_history,
@@ -457,6 +460,9 @@ pub fn run() {
         .build(tauri::generate_context!())
         .expect("error while building tauri application")
         .run(|app, event| {
+            if matches!(event, tauri::RunEvent::Exit) {
+                commands::analytics::on_exit(app);
+            }
             #[cfg(any(target_os = "macos", target_os = "ios"))]
             if let tauri::RunEvent::Opened { urls } = event {
                 if let Some(path) = urls

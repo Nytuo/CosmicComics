@@ -10,6 +10,8 @@
     "core:event:default",
     "opener:default",
     "dialog:default",
+    "aptabase:allow-track-event",
+    "aptabase:allow-track-error",
     "core:window:allow-set-fullscreen",
     {
       "identifier": "opener:allow-open-path",

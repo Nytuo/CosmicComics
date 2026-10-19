@@ -17,6 +17,7 @@ import { invoke } from '@tauri-apps/api/core';
 import ModelDownloadModal from './components/common/ModelDownloadModal.tsx';
 import PdfiumDownloadModal from './components/common/PdfiumDownloadModal.tsx';
 import UpdaterModal from './components/common/UpdaterModal.tsx';
+import AnalyticsConsentModal from './components/common/AnalyticsConsentModal.tsx';
 import { usePlatform } from './hooks/use-platform.ts';
 
 const LOCKED_VIEWPORT =
@@ -85,6 +86,7 @@ function App() {
       {platform.ai && <ModelDownloadModal />}
       {platform.pdf && <PdfiumDownloadModal />}
       {platform.updater && <UpdaterModal />}
+      <AnalyticsConsentModal />
       <BrowserRouter>
         <ScrollToTop />
         <ZoomGuard />

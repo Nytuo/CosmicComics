@@ -247,6 +247,20 @@ export function installTauriMock() {
     (cmd, args) => {
       const a = (args ?? {}) as Record<string, any>;
       switch (cmd) {
+        case 'get_analytics_consent': {
+          const v = sessionStorage.getItem('mockAnalytics');
+          return v === null ? null : JSON.parse(v);
+        }
+        case 'set_analytics_consent':
+          sessionStorage.setItem(
+            'mockAnalytics',
+            JSON.stringify({ usage: a.usage, errors: a.errors })
+          );
+          return null;
+        case 'plugin:aptabase|track_error':
+        case 'plugin:aptabase|track_event':
+          console.log('[mock] track_event', JSON.stringify(a));
+          return null;
         case 'get_platform_capabilities':
           return {
             platform: mobile ? 'ios' : 'macos',

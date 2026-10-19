@@ -34,6 +34,7 @@
     "deps:update": "npx --yes npm-check-updates --interactive --format group"
   },
   "dependencies": {
+    "@aptabase/tauri": "^0.7.0",
     "@base-ui/react": "^1.2.0",
     "@hookform/resolvers": "^5.2.2",
     "@radix-ui/react-avatar": "^1.1.11",
